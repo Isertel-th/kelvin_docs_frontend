@@ -82,7 +82,7 @@
             btn.disabled = true;
 
             try {
-                const res = await fetch('http://localhost:3000/api/subir', {
+                const res = await fetch('https://backend-kelvin-docus.onrender.com/api/subir', {
                     method: 'POST',
                     headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
                     body: formData

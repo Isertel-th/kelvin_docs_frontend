@@ -56,7 +56,7 @@
 
         async function cargar() {
             try {
-                const res = await fetch('http://localhost:3000/api/admin/empleados', {
+                const res = await fetch('https://backend-kelvin-docus.onrender.com/api/admin/empleados', {
                     headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
                 });
                 if(!res.ok) throw new Error();
@@ -77,7 +77,7 @@
         async function abrirC(id, nombre) {
             document.getElementById('nEmp').innerText = nombre;
             try {
-                const res = await fetch(`http://localhost:3000/api/admin/documentos/${id}`, {
+                const res = await fetch(`https://backend-kelvin-docus.onrender.com/api/admin/documentos/${id}`, {
                     headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
                 });
                 const docsSubidos = await res.json();
@@ -137,7 +137,7 @@
         
         async function borrar(did, uid, nom) {
             if(!confirm("¿Eliminar este documento del sistema?")) return;
-            await fetch(`http://localhost:3000/api/admin/documentos/${did}`, {
+            await fetch(`https://backend-kelvin-docus.onrender.com/api/admin/documentos/${did}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
             });
