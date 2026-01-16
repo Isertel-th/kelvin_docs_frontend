@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel de Administración</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-slate-100 min-h-screen p-8">
+    <div class="max-w-5xl mx-auto">
+        <header class="flex justify-between items-center mb-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-800">Panel Administrativo</h1>
+                <p class="text-slate-500">Control de cumplimiento de expedientes</p>
+            </div>
+            <button onclick="localStorage.clear(); location.href='index.html'" class="bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-600 px-4 py-2 rounded-lg font-medium transition-all">
+                Cerrar Sesión
+            </button>
+        </header>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <table class="w-full text-left">
+                <thead class="bg-slate-50 border-b border-slate-200">
+                    <tr>
+                        <th class="px-6 py-4 text-sm font-bold text-slate-600">Empleado</th>
+                        <th class="px-6 py-4 text-sm font-bold text-slate-600 text-right">Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="listaEmps" class="divide-y divide-slate-100"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="modalC" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden">
+            <div class="bg-slate-50 p-6 border-b border-slate-200 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-slate-800">📂 Expediente: <span id="nEmp" class="text-indigo-600"></span></h3>
+                <button onclick="cerrarModal()" class="text-slate-400 hover:text-slate-600 text-xl">&times;</button>
+            </div>
+            <div id="lDocs" class="p-6 max-h-[70vh] overflow-y-auto space-y-3">
+                </div>
+            <div class="p-6 bg-slate-50 border-t border-slate-200 text-right">
+                <button onclick="cerrarModal()" class="bg-indigo-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-indigo-700">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const DOCS_REQUERIDOS = [
+            "Apta médica",
+            "Capacitaciones de PRL",
+            "Certificado de competencia",
+            "Capacitación de trabajos en altura",
+            "Acta de entrega de EPP"
+        ];
+
+        async function cargar() {
+            try {
+                const res = await fetch('http://localhost:3000/api/admin/empleados', {
+                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+                });
+                if(!res.ok) throw new Error();
+                const emps = await res.json();
+                document.getElementById('listaEmps').innerHTML = emps.map(e => `
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-6 py-4 font-semibold text-slate-700">${e.nombre_completo}</td>
+                        <td class="px-6 py-4 text-right">
+                            <button onclick="abrirC(${e.id}, '${e.nombre_completo}')" class="text-indigo-600 bg-indigo-50 px-4 py-2 rounded-lg font-bold text-sm">
+                                <i class="fas fa-folder-open mr-2"></i>Revisar Documentos
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) { window.location.href = 'index.html'; }
+        }
+
+        async function abrirC(id, nombre) {
+            document.getElementById('nEmp').innerText = nombre;
+            try {
+                const res = await fetch(`http://localhost:3000/api/admin/documentos/${id}`, {
+                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+                });
+                const docsSubidos = await res.json();
+                const listaContainer = document.getElementById('lDocs');
+                
+                // Generar el checklist comparando requeridos vs subidos
+                listaContainer.innerHTML = DOCS_REQUERIDOS.map(req => {
+                    const docEncontrado = docsSubidos.find(d => d.tipo_documento.includes(req));
+                    
+                    if (docEncontrado) {
+                        // Documento ENTREGADO (Visto verde)
+                        let secureUrl = docEncontrado.url_cloudinary.replace(/^http:/, "https:");
+                        let urlDescarga = secureUrl.replace('/upload/', '/upload/fl_attachment/');
+
+                        return `
+                            <div class="flex items-center justify-between p-4 bg-emerald-50 border border-emerald-100 rounded-xl">
+                                <div class="flex items-center">
+                                    <i class="fas fa-check-circle text-emerald-500 text-xl mr-3"></i>
+                                    <div>
+                                        <p class="font-bold text-emerald-900 text-sm">${req}</p>
+                                        <p class="text-xs text-emerald-600 uppercase font-bold tracking-wider">Entregado</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-2">
+                                    <a href="${secureUrl}" target="_blank" class="p-2 text-indigo-600 hover:bg-white rounded-lg shadow-sm bg-white/50">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="${urlDescarga}" target="_blank" download class="p-2 text-emerald-600 hover:bg-white rounded-lg shadow-sm bg-white/50">
+                                        <i class="fas fa-download"></i>
+                                    </a>
+                                    <button onclick="borrar(${docEncontrado.id}, ${id}, '${nombre}')" class="p-2 text-rose-600 hover:bg-rose-50 rounded-lg">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </div>`;
+                    } else {
+                        // Documento FALTANTE (Equis roja)
+                        return `
+                            <div class="flex items-center justify-between p-4 bg-rose-50 border border-rose-100 rounded-xl">
+                                <div class="flex items-center">
+                                    <i class="fas fa-times-circle text-rose-400 text-xl mr-3"></i>
+                                    <div>
+                                        <p class="font-bold text-rose-900 text-sm">${req}</p>
+                                        <p class="text-xs text-rose-500 uppercase font-bold tracking-wider">Pendiente de subir</p>
+                                    </div>
+                                </div>
+                                <span class="text-rose-300 text-xs italic">Faltante</span>
+                            </div>`;
+                    }
+                }).join('');
+
+                document.getElementById('modalC').classList.remove('hidden');
+            } catch (error) { alert("Error al cargar expediente."); }
+        }
+
+        function cerrarModal() { document.getElementById('modalC').classList.add('hidden'); }
+        
+        async function borrar(did, uid, nom) {
+            if(!confirm("¿Eliminar este documento del sistema?")) return;
+            await fetch(`http://localhost:3000/api/admin/documentos/${did}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+            });
+            abrirC(uid, nom);
+        }
+
+        cargar();
+    </script>
+</body>
+</html>
