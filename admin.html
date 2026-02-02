@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Panel de Administración</title>
+    <title>Panel de Administración - Gestión</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -11,25 +11,75 @@
         <header class="flex justify-between items-center mb-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
             <div>
                 <h1 class="text-2xl font-bold text-slate-800">Panel Administrativo</h1>
-                <p class="text-slate-500">Control de cumplimiento de expedientes</p>
+                <p class="text-slate-500">Seleccione una categoría para gestionar</p>
             </div>
-            <button onclick="localStorage.clear(); location.href='index.html'" class="bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-600 px-4 py-2 rounded-lg font-medium transition-all">
-                Cerrar Sesión
-            </button>
+            <div class="flex gap-3">
+                <button id="btnVolver" onclick="mostrarMenuPrincipal()" class="hidden bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-2 rounded-lg font-medium transition-all flex items-center">
+                    <i class="fas fa-arrow-left mr-2"></i> Volver
+                </button>
+                <button onclick="localStorage.clear(); location.href='index.html'" class="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-lg font-medium transition-all">
+                    Cerrar Sesión
+                </button>
+            </div>
         </header>
 
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-            <table class="w-full text-left">
-                <thead class="bg-slate-50 border-b border-slate-200">
-                    <tr>
-                        <th class="px-6 py-4 text-sm font-bold text-slate-600">Empleado</th>
-                        <th class="px-6 py-4 text-sm font-bold text-slate-600 text-right">Acción</th>
-                    </tr>
-                </thead>
-                <tbody id="listaEmps" class="divide-y divide-slate-100"></tbody>
-            </table>
+        <div id="menuPrincipal" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div onclick="cargarSeccionTrabajadores()" class="bg-white p-10 rounded-3xl shadow-sm border-2 border-transparent hover:border-indigo-500 cursor-pointer transition-all duration-300 group">
+                <div class="w-20 h-20 bg-indigo-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-indigo-600 transition-colors">
+                    <i class="fas fa-users text-indigo-600 text-3xl group-hover:text-white"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-800 mb-2">Trabajadores</h2>
+                <p class="text-slate-500">Gestione los expedientes y certificados de cada empleado.</p>
+            </div>
+
+            <div onclick="cargarSeccionEmpresa()" class="bg-white p-10 rounded-3xl shadow-sm border-2 border-transparent hover:border-emerald-500 cursor-pointer transition-all duration-300 group">
+                <div class="w-20 h-20 bg-emerald-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-emerald-600 transition-colors">
+                    <i class="fas fa-building text-emerald-600 text-3xl group-hover:text-white"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-800 mb-2">Empresa</h2>
+                <p class="text-slate-500">Documentación corporativa y reglamentos generales.</p>
+            </div>
         </div>
-    </div>
+
+        <div id="seccionTrabajadores" class="hidden animate-fade-in">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <table class="w-full text-left">
+                    <thead class="bg-slate-50 border-b border-slate-200">
+                        <tr>
+                            <th class="px-6 py-4 text-sm font-bold text-slate-600">Empleado</th>
+                            <th class="px-6 py-4 text-sm font-bold text-slate-600 text-right">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listaEmps" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+        </div>
+
+<div id="seccionEmpresa" class="hidden animate-fade-in space-y-4">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center">
+                    <i class="fas fa-file-shield mr-2 text-emerald-600"></i> Documentos Institucionales
+                </h2>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                        <span class="font-medium text-slate-700">Reglamento de seguridad</span>
+                        <button onclick="prepararSubida('Reglamento de seguridad')" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center"><i class="fas fa-upload mr-2"></i> Subir PDF</button>
+                    </div>
+                    <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                        <span class="font-medium text-slate-700">Aprobación del reglamento</span>
+                        <button onclick="prepararSubida('Aprobación del reglamento')" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center"><i class="fas fa-upload mr-2"></i> Subir PDF</button>
+                    </div>
+                    <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                        <span class="font-medium text-slate-700">Matrices de riesgos</span>
+                        <button onclick="prepararSubida('Matrices de riesgos')" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center"><i class="fas fa-upload mr-2"></i> Subir PDF</button>
+                    </div>
+                    <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                        <span class="font-medium text-slate-700">Procedimiento de trabajos en altura</span>
+                        <button onclick="prepararSubida('Procedimiento de trabajos en altura')" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center"><i class="fas fa-upload mr-2"></i> Subir PDF</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     <div id="modalC" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden">
@@ -37,114 +87,105 @@
                 <h3 class="text-lg font-bold text-slate-800">📂 Expediente: <span id="nEmp" class="text-indigo-600"></span></h3>
                 <button onclick="cerrarModal()" class="text-slate-400 hover:text-slate-600 text-xl">&times;</button>
             </div>
-            <div id="lDocs" class="p-6 max-h-[70vh] overflow-y-auto space-y-3">
-                </div>
+            <div id="lDocs" class="p-6 max-h-[70vh] overflow-y-auto space-y-3"></div>
             <div class="p-6 bg-slate-50 border-t border-slate-200 text-right">
                 <button onclick="cerrarModal()" class="bg-indigo-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-indigo-700">Cerrar</button>
             </div>
         </div>
     </div>
 
-    <script>
-        const DOCS_REQUERIDOS = [
-            "Apta médica",
-            "Capacitaciones de PRL",
-            "Certificado de competencia",
-            "Capacitación de trabajos en altura",
-            "Acta de entrega de EPP"
-        ];
+    <input type="file" id="fileInput" class="hidden" accept=".pdf" onchange="ejecutarSubida(this)">
 
-        async function cargar() {
+    <script>
+        const API_BASE = "https://backend-kelvin-docus.onrender.com/api";
+        const DOCS_TRABAJADOR = ["Apta médica", "Capacitaciones de PRL", "Certificado de competencia", "Capacitación de trabajos en altura", "Acta de entrega de EPP"];
+        let subiendoTipo = ""; 
+
+        function mostrarMenuPrincipal() {
+            document.getElementById('menuPrincipal').classList.remove('hidden');
+            document.getElementById('seccionTrabajadores').classList.add('hidden');
+            document.getElementById('seccionEmpresa').classList.add('hidden');
+            document.getElementById('btnVolver').classList.add('hidden');
+        }
+        function cargarSeccionTrabajadores() {
+            document.getElementById('menuPrincipal').classList.add('hidden');
+            document.getElementById('seccionTrabajadores').classList.remove('hidden');
+            document.getElementById('btnVolver').classList.remove('hidden');
+            cargarListaEmpleados();
+        }
+        function cargarSeccionEmpresa() {
+            document.getElementById('menuPrincipal').classList.add('hidden');
+            document.getElementById('seccionEmpresa').classList.remove('hidden');
+            document.getElementById('btnVolver').classList.remove('hidden');
+        }
+
+        function prepararSubida(tipo) {
+            subiendoTipo = tipo;
+            document.getElementById('fileInput').click();
+        }
+
+        async function ejecutarSubida(input) {
+            const archivo = input.files[0];
+            if (!archivo) return;
+
+            // VALIDACIÓN FRONTEND: Solo PDF
+            if (archivo.type !== "application/pdf") {
+                alert("❌ Error: Solo se permiten archivos en formato PDF.");
+                input.value = "";
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('archivo', archivo);
+            formData.append('tipo_documento', subiendoTipo);
+
             try {
-                const res = await fetch('https://backend-kelvin-docus.onrender.com/api/admin/empleados', {
-                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+                const res = await fetch(`${API_BASE}/subir-empresa`, {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+                    body: formData
                 });
-                if(!res.ok) throw new Error();
-                const emps = await res.json();
-                document.getElementById('listaEmps').innerHTML = emps.map(e => `
-                    <tr class="hover:bg-slate-50">
-                        <td class="px-6 py-4 font-semibold text-slate-700">${e.nombre_completo}</td>
-                        <td class="px-6 py-4 text-right">
-                            <button onclick="abrirC(${e.id}, '${e.nombre_completo}')" class="text-indigo-600 bg-indigo-50 px-4 py-2 rounded-lg font-bold text-sm">
-                                <i class="fas fa-folder-open mr-2"></i>Revisar Documentos
-                            </button>
-                        </td>
-                    </tr>
-                `).join('');
-            } catch (e) { window.location.href = 'index.html'; }
+                if (res.ok) alert("✅ Documento de empresa subido con éxito");
+                else {
+                    const errorData = await res.json();
+                    alert("❌ Error: " + (errorData.error || "No se pudo subir"));
+                }
+            } catch (e) { alert("Error de conexión con el servidor"); }
+            input.value = "";
+        }
+
+        async function cargarListaEmpleados() {
+            const res = await fetch(`${API_BASE}/admin/empleados`, {
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+            });
+            const emps = await res.json();
+            document.getElementById('listaEmps').innerHTML = emps.map(e => `
+                <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4 font-semibold text-slate-700">${e.nombre_completo}</td>
+                    <td class="px-6 py-4 text-right">
+                        <button onclick="abrirC(${e.id}, '${e.nombre_completo}')" class="text-indigo-600 bg-indigo-50 px-4 py-2 rounded-lg font-bold text-sm">
+                            <i class="fas fa-folder-open mr-2"></i>Revisar
+                        </button>
+                    </td>
+                </tr>`).join('');
         }
 
         async function abrirC(id, nombre) {
             document.getElementById('nEmp').innerText = nombre;
-            try {
-                const res = await fetch(`https://backend-kelvin-docus.onrender.com/api/admin/documentos/${id}`, {
-                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-                });
-                const docsSubidos = await res.json();
-                const listaContainer = document.getElementById('lDocs');
-                
-                // Generar el checklist comparando requeridos vs subidos
-                listaContainer.innerHTML = DOCS_REQUERIDOS.map(req => {
-                    const docEncontrado = docsSubidos.find(d => d.tipo_documento.includes(req));
-                    
-                    if (docEncontrado) {
-                        // Documento ENTREGADO (Visto verde)
-                        let secureUrl = docEncontrado.url_cloudinary.replace(/^http:/, "https:");
-                        let urlDescarga = secureUrl.replace('/upload/', '/upload/fl_attachment/');
-
-                        return `
-                            <div class="flex items-center justify-between p-4 bg-emerald-50 border border-emerald-100 rounded-xl">
-                                <div class="flex items-center">
-                                    <i class="fas fa-check-circle text-emerald-500 text-xl mr-3"></i>
-                                    <div>
-                                        <p class="font-bold text-emerald-900 text-sm">${req}</p>
-                                        <p class="text-xs text-emerald-600 uppercase font-bold tracking-wider">Entregado</p>
-                                    </div>
-                                </div>
-                                <div class="flex gap-2">
-                                    <a href="${secureUrl}" target="_blank" class="p-2 text-indigo-600 hover:bg-white rounded-lg shadow-sm bg-white/50">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    <a href="${urlDescarga}" target="_blank" download class="p-2 text-emerald-600 hover:bg-white rounded-lg shadow-sm bg-white/50">
-                                        <i class="fas fa-download"></i>
-                                    </a>
-                                    <button onclick="borrar(${docEncontrado.id}, ${id}, '${nombre}')" class="p-2 text-rose-600 hover:bg-rose-50 rounded-lg">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </div>
-                            </div>`;
-                    } else {
-                        // Documento FALTANTE (Equis roja)
-                        return `
-                            <div class="flex items-center justify-between p-4 bg-rose-50 border border-rose-100 rounded-xl">
-                                <div class="flex items-center">
-                                    <i class="fas fa-times-circle text-rose-400 text-xl mr-3"></i>
-                                    <div>
-                                        <p class="font-bold text-rose-900 text-sm">${req}</p>
-                                        <p class="text-xs text-rose-500 uppercase font-bold tracking-wider">Pendiente de subir</p>
-                                    </div>
-                                </div>
-                                <span class="text-rose-300 text-xs italic">Faltante</span>
-                            </div>`;
-                    }
-                }).join('');
-
-                document.getElementById('modalC').classList.remove('hidden');
-            } catch (error) { alert("Error al cargar expediente."); }
-        }
-
-        function cerrarModal() { document.getElementById('modalC').classList.add('hidden'); }
-        
-        async function borrar(did, uid, nom) {
-            if(!confirm("¿Eliminar este documento del sistema?")) return;
-            await fetch(`https://backend-kelvin-docus.onrender.com/api/admin/documentos/${did}`, {
-                method: 'DELETE',
+            const res = await fetch(`${API_BASE}/admin/documentos/${id}`, {
                 headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
             });
-            abrirC(uid, nom);
+            const subidos = await res.json();
+            document.getElementById('lDocs').innerHTML = DOCS_TRABAJADOR.map(req => {
+                const doc = subidos.find(d => d.tipo_documento.includes(req));
+                return doc ? `<div class="flex items-center justify-between p-4 bg-emerald-50 border border-emerald-100 rounded-xl">
+                    <div class="flex items-center"><i class="fas fa-check-circle text-emerald-500 mr-3"></i><p class="font-bold text-sm">${req}</p></div>
+                    <a href="${doc.url_cloudinary}" target="_blank" class="p-2 text-indigo-600"><i class="fas fa-eye"></i></a>
+                </div>` : `<div class="p-4 bg-rose-50 border border-rose-100 rounded-xl text-rose-900 font-bold text-sm">${req} (Pendiente)</div>`;
+            }).join('');
+            document.getElementById('modalC').classList.remove('hidden');
         }
-
-        cargar();
+        function cerrarModal() { document.getElementById('modalC').classList.add('hidden'); }
     </script>
 </body>
 </html>
