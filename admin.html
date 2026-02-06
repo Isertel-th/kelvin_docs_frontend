@@ -80,19 +80,7 @@
                         <span class="font-medium text-slate-700">Reglamento de seguridad</span>
                         <button onclick="prepararSubidaEmpresa('Reglamento de seguridad')" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center"><i class="fas fa-upload mr-2"></i> Subir PDF</button>
                     </div>
-                    <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                        <span class="font-medium text-slate-700">Aprobación del reglamento</span>
-                        <button onclick="prepararSubidaEmpresa('Aprobación del reglamento')" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center"><i class="fas fa-upload mr-2"></i> Subir PDF</button>
                     </div>
-                    <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                        <span class="font-medium text-slate-700">Matrices de riesgos</span>
-                        <button onclick="prepararSubidaEmpresa('Matrices de riesgos')" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center"><i class="fas fa-upload mr-2"></i> Subir PDF</button>
-                    </div>
-                    <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                        <span class="font-medium text-slate-700">Procedimiento de trabajos en altura</span>
-                        <button onclick="prepararSubidaEmpresa('Procedimiento de trabajos en altura')" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center"><i class="fas fa-upload mr-2"></i> Subir PDF</button>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -112,15 +100,18 @@
                     <button onclick="cerrarModal()" class="text-2xl text-slate-400">&times;</button>
                 </div>
                 <div id="lDocs" class="p-6 space-y-3 max-h-80 overflow-y-auto bg-white"></div>
-                <div class="p-6 bg-indigo-50 border-t flex gap-2">
-                    <select id="tipoDocAdmin" class="flex-1 p-2 border rounded-lg text-sm">
-                        <option>Apta médica</option>
-                        <option>Capacitaciones de PRL</option>
-                        <option>Certificado de competencia</option>
-                        <option>Capacitación de trabajos en altura</option>
-                        <option>Acta de entrega de EPP</option>
-                    </select>
-                    <button onclick="prepararSubidaTrabajador()" class="bg-indigo-600 text-white px-4 rounded-lg font-bold text-sm">Subir PDF</button>
+                <div class="p-6 bg-indigo-50 border-t grid grid-cols-1 gap-2">
+                    <div class="flex gap-2">
+                        <select id="tipoDocAdmin" class="flex-1 p-2 border rounded-lg text-sm">
+                            <option>Apta médica</option>
+                            <option>Capacitaciones de PRL</option>
+                            <option>Certificado de competencia</option>
+                            <option>Capacitación de trabajos en altura</option>
+                            <option>Acta de entrega de EPP</option>
+                        </select>
+                        <input type="date" id="fechaCaducidad" class="p-2 border rounded-lg text-sm" title="Fecha de caducidad">
+                    </div>
+                    <button onclick="prepararSubidaTrabajador()" class="w-full bg-indigo-600 text-white py-2 rounded-lg font-bold text-sm">SUBIR DOCUMENTO</button>
                 </div>
             </div>
         </div>
@@ -198,32 +189,63 @@
             const docs = await res.json();
             document.getElementById('lDocs').innerHTML = docs.map(d => `
                 <div class="flex items-center justify-between p-3 bg-slate-50 border rounded-xl">
-                    <span class="text-xs font-bold text-slate-700 uppercase">${d.tipo_documento}</span>
+                    <div>
+                        <span class="text-xs font-bold text-slate-700 uppercase">${d.tipo_documento}</span>
+                        ${d.fecha_caducidad ? `<p class="text-[10px] text-red-500 font-bold uppercase">Caduca: ${new Date(d.fecha_caducidad).toLocaleDateString()}</p>` : ''}
+                    </div>
                     <div class="flex gap-1">
                         <a href="${d.url_cloudinary}" target="_blank" class="p-2 text-blue-600 bg-white rounded-lg border shadow-sm"><i class="fas fa-eye"></i></a>
-                        <a href="${d.url_cloudinary}" download class="p-2 text-emerald-600 bg-white rounded-lg border shadow-sm"><i class="fas fa-download"></i></a>
                         <button onclick="eliminarDoc(${d.id})" class="p-2 text-red-600 bg-white rounded-lg border shadow-sm"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>`).join('') || '<p class="text-center text-slate-400 py-4 italic text-sm">Sin documentos</p>';
             document.getElementById('modalC').classList.remove('hidden');
         }
 
-        function prepararSubidaEmpresa(tipo) { modoEmpresa = true; subiendoTipo = tipo; document.getElementById('fileInput').click(); }
-        function prepararSubidaTrabajador() { modoEmpresa = false; subiendoTipo = document.getElementById('tipoDocAdmin').value; document.getElementById('fileInput').click(); }
+        function prepararSubidaEmpresa(tipo) { 
+            modoEmpresa = true; 
+            subiendoTipo = tipo; 
+            document.getElementById('fileInput').click(); 
+        }
+
+        function prepararSubidaTrabajador() { 
+            modoEmpresa = false; 
+            subiendoTipo = document.getElementById('tipoDocAdmin').value; 
+            document.getElementById('fileInput').click(); 
+        }
 
         document.getElementById('fileInput').onchange = async function() {
             const file = this.files[0]; if(!file) return;
+            
+            let fecha = "";
+            if(modoEmpresa) {
+                fecha = prompt("Fecha de caducidad (AAAA-MM-DD) - Opcional:");
+            } else {
+                fecha = document.getElementById('fechaCaducidad').value;
+            }
+
             const formData = new FormData();
             formData.append('archivo', file);
             formData.append('tipo_documento', subiendoTipo);
-            if(!modoEmpresa) { formData.append('usuario_id', idActual); formData.append('nombre_user', nombreActual); }
+            formData.append('fecha_caducidad', fecha);
+
+            if(!modoEmpresa) { 
+                formData.append('usuario_id', idActual); 
+                formData.append('nombre_user', nombreActual); 
+            }
 
             const res = await fetch(modoEmpresa ? `${API_BASE}/subir-empresa` : `${API_BASE}/admin/subir-a-usuario`, {
                 method: 'POST',
                 headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
                 body: formData
             });
-            if(res.ok) { alert("Carga exitosa"); if(modoEmpresa) cargarListaEmpresa(); else abrirExpediente(idActual, nombreActual); }
+            
+            if(res.ok) { 
+                alert("Carga exitosa"); 
+                if(modoEmpresa) cargarListaEmpresa(); else {
+                    abrirExpediente(idActual, nombreActual);
+                    document.getElementById('fechaCaducidad').value = "";
+                }
+            }
             this.value = "";
         };
 
@@ -234,11 +256,13 @@
             const docs = await res.json();
             document.getElementById('listaDocsEmpresa').innerHTML = docs.map(d => `
                 <tr class="hover:bg-slate-50">
-                    <td class="px-6 py-4 text-xs font-bold text-slate-700 uppercase">${d.tipo_documento}</td>
+                    <td class="px-6 py-4">
+                        <div class="text-xs font-bold text-slate-700 uppercase">${d.tipo_documento}</div>
+                        ${d.fecha_caducidad ? `<div class="text-[10px] text-red-500 font-bold uppercase">Expira: ${new Date(d.fecha_caducidad).toLocaleDateString()}</div>` : ''}
+                    </td>
                     <td class="px-6 py-4 text-right">
                         <div class="flex justify-end gap-2">
                             <a href="${d.url_cloudinary}" target="_blank" class="p-2 text-blue-600 bg-white border rounded-lg"><i class="fas fa-eye"></i></a>
-                            <a href="${d.url_cloudinary}" download class="p-2 text-emerald-600 bg-white border rounded-lg"><i class="fas fa-download"></i></a>
                             <button onclick="eliminarDocEmpresa(${d.id})" class="p-2 text-red-600 bg-white border rounded-lg"><i class="fas fa-trash"></i></button>
                         </div>
                     </td>
