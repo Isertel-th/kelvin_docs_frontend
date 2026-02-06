@@ -62,8 +62,8 @@
         <div id="seccionIndicadores" class="hidden animate-fade-in space-y-6">
             <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
                 <div class="flex items-center justify-between mb-8">
-                    <h2 class="text-2xl font-bold text-slate-800">Estadísticas de Cumplimiento</h2>
-                    <div class="bg-red-600 text-white px-6 py-2 rounded-xl">
+                    <h2 class="text-2xl font-bold text-slate-800 italic uppercase">Estadísticas de Cumplimiento</h2>
+                    <div class="bg-red-600 text-white px-6 py-2 rounded-xl shadow-lg">
                         <span class="text-sm opacity-80 uppercase font-bold">Personal Total:</span>
                         <span id="statTotalTrabajadores" class="text-xl font-black ml-2">0</span>
                     </div>
@@ -75,13 +75,14 @@
 
         <div id="seccionTrabajadores" class="hidden animate-fade-in space-y-6">
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                <h3 class="font-bold text-slate-800 mb-4 uppercase text-xs tracking-wider">Nuevo Trabajador</h3>
+                <h3 class="font-bold text-slate-800 mb-4 uppercase text-xs tracking-wider italic">Nuevo Trabajador</h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <input type="text" id="nombre_completo" placeholder="Nombre Completo del Trabajador" class="md:col-span-2 p-2 border rounded-lg text-sm bg-slate-50">
+                    <input type="text" id="nombre_completo" placeholder="Nombre Completo del Trabajador" class="md:col-span-2 p-2 border rounded-lg text-sm bg-slate-50 uppercase font-bold">
                     <input type="text" id="cedula" placeholder="Cédula / ID" class="p-2 border rounded-lg text-sm font-bold bg-indigo-50">
-                    <button onclick="crearTrabajador()" class="md:col-span-3 bg-indigo-600 text-white font-bold py-2 rounded-lg hover:bg-indigo-700 transition-all">Registrar Trabajador</button>
+                    <button onclick="crearTrabajador()" class="md:col-span-3 bg-indigo-600 text-white font-bold py-2 rounded-lg hover:bg-indigo-700 transition-all uppercase text-sm">Registrar Trabajador en Base de Datos</button>
                 </div>
             </div>
+
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap gap-4 items-center">
                 <div class="flex-1 min-w-[200px] relative">
                     <i class="fas fa-search absolute left-3 top-3 text-slate-400"></i>
@@ -92,6 +93,7 @@
                     <input type="text" id="filtroCedula" onkeyup="filtrarTrabajadores()" placeholder="Filtrar por cédula..." class="w-full pl-10 p-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                 </div>
             </div>
+
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                 <table class="w-full text-left">
                     <thead class="bg-slate-50 border-b">
@@ -112,20 +114,24 @@
                 </h2>
                 <div class="space-y-4">
                     <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                        <span class="font-medium text-slate-700">Reglamento de seguridad</span>
-                        <button onclick="prepararSubidaEmpresa('Reglamento de seguridad')" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center"><i class="fas fa-upload mr-2"></i> Subir PDF</button>
+                        <span class="font-medium text-slate-700 uppercase text-xs font-bold italic">Reglamento de seguridad</span>
+                        <button onclick="prepararSubidaEmpresa('Reglamento de seguridad')" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center hover:bg-indigo-700"><i class="fas fa-upload mr-2"></i> Subir PDF</button>
                     </div>
                     <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                        <span class="font-medium text-slate-700">Aprobación del reglamento</span>
-                        <button onclick="prepararSubidaEmpresa('Aprobación del reglamento')" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center"><i class="fas fa-upload mr-2"></i> Subir PDF</button>
+                        <span class="font-medium text-slate-700 uppercase text-xs font-bold italic">Aprobación del reglamento</span>
+                        <button onclick="prepararSubidaEmpresa('Aprobación del reglamento')" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center hover:bg-indigo-700"><i class="fas fa-upload mr-2"></i> Subir PDF</button>
                     </div>
                     <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                        <span class="font-medium text-slate-700">Matrices de riesgos</span>
-                        <button onclick="prepararSubidaEmpresa('Matrices de riesgos')" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center"><i class="fas fa-upload mr-2"></i> Subir PDF</button>
+                        <span class="font-medium text-slate-700 uppercase text-xs font-bold italic">Matrices de riesgos</span>
+                        <button onclick="prepararSubidaEmpresa('Matrices de riesgos')" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center hover:bg-indigo-700"><i class="fas fa-upload mr-2"></i> Subir PDF</button>
                     </div>
                     <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                        <span class="font-medium text-slate-700">Procedimiento de trabajos en altura</span>
-                        <button onclick="prepararSubidaEmpresa('Procedimiento de trabajos en altura')" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center"><i class="fas fa-upload mr-2"></i> Subir PDF</button>
+                        <span class="font-medium text-slate-700 uppercase text-xs font-bold italic">Procedimiento de trabajos en altura</span>
+                        <button onclick="prepararSubidaEmpresa('Procedimiento de trabajos en altura')" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center hover:bg-indigo-700"><i class="fas fa-upload mr-2"></i> Subir PDF</button>
+                    </div>
+                    <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                        <span class="font-medium text-slate-700 uppercase text-xs font-bold italic">Plan de emergencia</span>
+                        <button onclick="prepararSubidaEmpresa('Plan de emergencia')" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center hover:bg-indigo-700"><i class="fas fa-upload mr-2"></i> Subir PDF</button>
                     </div>
                 </div>
             </div>
@@ -133,8 +139,14 @@
 
         <div id="seccionGestionEmpresarial" class="hidden animate-fade-in space-y-4">
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="p-6 bg-purple-600 text-white font-bold italic">Monitor de Archivos Corporativos</div>
+                <div class="p-6 bg-purple-600 text-white font-bold italic uppercase text-sm tracking-widest">Monitor de Archivos Corporativos</div>
                 <table class="w-full text-left">
+                    <thead class="bg-slate-50 border-b">
+                        <tr class="text-[10px] uppercase font-bold text-slate-400">
+                            <th class="px-6 py-3">Tipo de Documento / Vencimiento</th>
+                            <th class="px-6 py-3 text-right">Acciones</th>
+                        </tr>
+                    </thead>
                     <tbody id="listaDocsEmpresa" class="divide-y divide-slate-100"></tbody>
                 </table>
             </div>
@@ -144,19 +156,19 @@
             <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden animate-fade-in">
                 <div class="p-6 bg-slate-50 border-b flex justify-between items-center">
                     <h3 class="font-bold text-slate-800 italic uppercase text-sm">📂 Expediente: <span id="nEmp" class="text-indigo-600"></span></h3>
-                    <button onclick="cerrarModal()" class="text-2xl text-slate-400">&times;</button>
+                    <button onclick="cerrarModal()" class="text-2xl text-slate-400 hover:text-red-500 transition-colors">&times;</button>
                 </div>
                 <div id="lDocs" class="p-6 space-y-3 max-h-80 overflow-y-auto bg-white"></div>
                 <div class="p-6 bg-indigo-50 border-t flex flex-wrap gap-2">
-                    <select id="tipoDocAdmin" class="flex-1 p-2 border rounded-lg text-sm">
+                    <select id="tipoDocAdmin" class="flex-1 p-2 border rounded-lg text-sm font-bold">
                         <option>Apta médica</option>
                         <option>Capacitaciones de PRL</option>
                         <option>Certificado de competencia</option>
                         <option>Capacitación de trabajos en altura</option>
                         <option>Acta de entrega de EPP</option>
                     </select>
-                    <input type="date" id="fechaCaducidad" class="p-2 border rounded-lg text-sm" title="Fecha de caducidad">
-                    <button onclick="prepararSubidaTrabajador()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-indigo-700 transition-all">Subir PDF</button>
+                    <input type="date" id="fechaCaducidad" class="p-2 border rounded-lg text-sm font-bold" title="Fecha de caducidad">
+                    <button onclick="prepararSubidaTrabajador()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-indigo-700 transition-all uppercase">Subir PDF</button>
                 </div>
             </div>
         </div>
@@ -171,9 +183,12 @@
 
         function mostrarMenuPrincipal() {
             document.getElementById('menuPrincipal').classList.remove('hidden');
-            ['seccionTrabajadores', 'seccionEmpresa', 'seccionGestionEmpresarial', 'seccionIndicadores', 'btnVolver'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            ['seccionTrabajadores', 'seccionEmpresa', 'seccionGestionEmpresarial', 'seccionIndicadores', 'btnVolver'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
         }
 
+        // --- NUEVA LÓGICA DE INDICADORES ---
         async function cargarSeccionIndicadores() {
             document.getElementById('menuPrincipal').classList.add('hidden');
             document.getElementById('seccionIndicadores').classList.remove('hidden');
@@ -184,29 +199,42 @@
                     headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
                 });
                 const data = await res.json();
-                document.getElementById('statTotalTrabajadores').innerText = data.totalTrabajadores;
+                
+                const total = data.totalTrabajadores || 0;
+                document.getElementById('statTotalTrabajadores').innerText = total;
 
-                const tiposOficiales = [
-                    "Apta médica", "Capacitaciones de PRL", "Certificado de competencia", 
-                    "Capacitación de trabajos en altura", "Acta de entrega de EPP"
-                ];
+                const tiposOficiales = ["Apta médica", "Capacitaciones de PRL", "Certificado de competencia", "Capacitación de trabajos en altura", "Acta de entrega de EPP"];
 
                 const html = tiposOficiales.map(tipo => {
                     const found = data.detalles.find(d => d.tipo_documento === tipo);
-                    const cant = found ? found.cantidad : 0;
+                    const cant = found ? parseInt(found.cantidad) : 0;
+                    const porcentaje = total > 0 ? ((cant / total) * 100).toFixed(1) : 0;
+
                     return `
-                        <div class="p-6 bg-slate-50 rounded-2xl border-l-8 border-red-500 shadow-sm">
-                            <h4 class="text-xs font-black text-slate-400 uppercase mb-2">${tipo}</h4>
-                            <div class="flex items-baseline gap-2">
-                                <span class="text-4xl font-black text-slate-800">${cant}</span>
-                                <span class="text-slate-400 font-bold text-sm">Archivos</span>
+                        <div class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-wider">${tipo}</h4>
+                                    <div class="flex items-baseline gap-2">
+                                        <span class="text-3xl font-black text-slate-800">${cant}</span>
+                                        <span class="text-slate-400 text-xs font-bold">de ${total}</span>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-lg font-black text-red-600">${porcentaje}%</span>
+                                </div>
                             </div>
+                            <div class="w-full bg-slate-100 rounded-full h-2">
+                                <div class="bg-red-600 h-2 rounded-full transition-all duration-1000" style="width: ${porcentaje}%"></div>
+                            </div>
+                            <p class="text-[9px] text-slate-400 mt-2 font-medium uppercase text-center italic">Nivel de cumplimiento</p>
                         </div>`;
                 }).join('');
                 document.getElementById('contenedorEstadisticas').innerHTML = html;
             } catch(e) { console.error(e); }
         }
 
+        // --- TRABAJADORES ---
         function cargarSeccionTrabajadores() {
             document.getElementById('menuPrincipal').classList.add('hidden');
             document.getElementById('seccionTrabajadores').classList.remove('hidden');
@@ -214,6 +242,51 @@
             cargarListaEmpleados();
         }
 
+        async function cargarListaEmpleados() {
+            const res = await fetch(`${API_BASE}/admin/empleados`, {
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+            });
+            todosLosEmpleados = await res.json();
+            renderizarTablaEmpleados(todosLosEmpleados);
+        }
+
+        function renderizarTablaEmpleados(lista) {
+            document.getElementById('listaEmps').innerHTML = lista.map(e => `
+                <tr class="hover:bg-slate-50 animate-fade-in">
+                    <td class="px-6 py-4">
+                        <div class="font-bold text-slate-800 uppercase text-xs">${e.nombre_completo}</div>
+                        <div class="text-indigo-600 font-bold text-xs italic">ID / CÉDULA: ${e.cedula}</div>
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <button onclick="abrirExpediente(${e.id}, '${e.nombre_completo}')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold uppercase hover:bg-indigo-700 transition-all shadow-sm">Ver Carpeta</button>
+                    </td>
+                </tr>`).join('');
+        }
+
+        function filtrarTrabajadores() {
+            const bn = document.getElementById('filtroNombre').value.toLowerCase();
+            const bc = document.getElementById('filtroCedula').value.toLowerCase();
+            const filtrados = todosLosEmpleados.filter(e => e.nombre_completo.toLowerCase().includes(bn) && e.cedula.toLowerCase().includes(bc));
+            renderizarTablaEmpleados(filtrados);
+        }
+
+        async function crearTrabajador() {
+            const nombre = document.getElementById('nombre_completo').value;
+            const dni = document.getElementById('cedula').value;
+            if(!nombre || !dni) return alert("Error: Debe completar Nombre y Cédula");
+            const res = await fetch(`${API_BASE}/admin/crear-usuario`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+                body: JSON.stringify({ nombre_completo: nombre, cedula: dni })
+            });
+            if(res.ok) { 
+                alert("Trabajador registrado con éxito");
+                document.getElementById('nombre_completo').value = ""; document.getElementById('cedula').value = "";
+                cargarListaEmpleados(); 
+            }
+        }
+
+        // --- EMPRESA Y GESTIÓN ---
         function cargarSeccionEmpresa() {
             document.getElementById('menuPrincipal').classList.add('hidden');
             document.getElementById('seccionEmpresa').classList.remove('hidden');
@@ -227,51 +300,27 @@
             cargarListaEmpresa();
         }
 
-        async function crearTrabajador() {
-            const nombre = document.getElementById('nombre_completo').value;
-            const dni = document.getElementById('cedula').value;
-            if(!nombre || !dni) return alert("Nombre y Cédula requeridos");
-            const res = await fetch(`${API_BASE}/admin/crear-usuario`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
-                body: JSON.stringify({ nombre_completo: nombre, cedula: dni })
-            });
-            if(res.ok) { 
-                alert("Registrado"); 
-                document.getElementById('nombre_completo').value = "";
-                document.getElementById('cedula').value = "";
-                cargarListaEmpleados(); 
-            }
-        }
-
-        async function cargarListaEmpleados() {
-            const res = await fetch(`${API_BASE}/admin/empleados`, {
+        async function cargarListaEmpresa() {
+            const res = await fetch(`${API_BASE}/admin/documentos-empresa`, {
                 headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
             });
-            todosLosEmpleados = await res.json();
-            renderizarTablaEmpleados(todosLosEmpleados);
-        }
-
-        function filtrarTrabajadores() {
-            const busquedaNombre = document.getElementById('filtroNombre').value.toLowerCase();
-            const busquedaCedula = document.getElementById('filtroCedula').value.toLowerCase();
-            const filtrados = todosLosEmpleados.filter(e => e.nombre_completo.toLowerCase().includes(busquedaNombre) && e.cedula.toLowerCase().includes(busquedaCedula));
-            renderizarTablaEmpleados(filtrados);
-        }
-
-        function renderizarTablaEmpleados(lista) {
-            document.getElementById('listaEmps').innerHTML = lista.map(e => `
-                <tr class="hover:bg-slate-50 animate-fade-in">
+            const docs = await res.json();
+            document.getElementById('listaDocsEmpresa').innerHTML = docs.map(d => `
+                <tr class="hover:bg-slate-50">
                     <td class="px-6 py-4">
-                        <div class="font-bold text-slate-800 uppercase text-xs">${e.nombre_completo}</div>
-                        <div class="text-indigo-600 font-bold text-xs">ID: ${e.cedula}</div>
+                        <div class="text-xs font-bold text-slate-700 uppercase italic">${d.tipo_documento}</div>
+                        ${d.fecha_caducidad ? `<div class="text-[10px] text-red-500 font-bold italic">CADUCIDAD: ${new Date(d.fecha_caducidad).toLocaleDateString()}</div>` : ''}
                     </td>
                     <td class="px-6 py-4 text-right">
-                        <button onclick="abrirExpediente(${e.id}, '${e.nombre_completo}')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold uppercase hover:bg-indigo-700 transition-all">Ver Carpeta</button>
+                        <div class="flex justify-end gap-2">
+                            <a href="${d.url_cloudinary}" target="_blank" class="p-2 text-blue-600 bg-white border rounded-lg hover:bg-blue-50"><i class="fas fa-eye"></i></a>
+                            <button onclick="eliminarDocEmpresa(${d.id})" class="p-2 text-red-600 bg-white border rounded-lg hover:bg-red-50"><i class="fas fa-trash"></i></button>
+                        </div>
                     </td>
-                </tr>`).join('') || '<tr><td colspan="2" class="p-6 text-center text-slate-400 italic">No se encontraron trabajadores</td></tr>';
+                </tr>`).join('');
         }
 
+        // --- EXPEDIENTES Y SUBIDA ---
         async function abrirExpediente(id, nombre) {
             idActual = id; nombreActual = nombre;
             document.getElementById('nEmp').innerText = nombre;
@@ -282,23 +331,25 @@
             document.getElementById('lDocs').innerHTML = docs.map(d => `
                 <div class="flex items-center justify-between p-3 bg-slate-50 border rounded-xl">
                     <div>
-                        <span class="text-xs font-bold text-slate-700 uppercase">${d.tipo_documento}</span>
+                        <span class="text-xs font-bold text-slate-700 uppercase italic">${d.tipo_documento}</span>
                         ${d.fecha_caducidad ? `<p class="text-[10px] text-red-500 font-bold">VENCE: ${new Date(d.fecha_caducidad).toLocaleDateString()}</p>` : ''}
                     </div>
                     <div class="flex gap-1">
                         <a href="${d.url_cloudinary}" target="_blank" class="p-2 text-blue-600 bg-white rounded-lg border shadow-sm"><i class="fas fa-eye"></i></a>
                         <button onclick="eliminarDoc(${d.id})" class="p-2 text-red-600 bg-white rounded-lg border shadow-sm"><i class="fas fa-trash"></i></button>
                     </div>
-                </div>`).join('') || '<p class="text-center text-slate-400 py-4 italic text-sm">No hay documentos cargados</p>';
+                </div>`).join('') || '<p class="text-center text-slate-400 py-4 italic text-sm font-bold uppercase">No hay documentos registrados</p>';
             document.getElementById('modalC').classList.remove('hidden');
         }
 
+        function cerrarModal() { document.getElementById('modalC').classList.add('hidden'); }
         function prepararSubidaEmpresa(tipo) { modoEmpresa = true; subiendoTipo = tipo; document.getElementById('fileInput').click(); }
         function prepararSubidaTrabajador() { modoEmpresa = false; subiendoTipo = document.getElementById('tipoDocAdmin').value; document.getElementById('fileInput').click(); }
 
         document.getElementById('fileInput').onchange = async function() {
             const file = this.files[0]; if(!file) return;
-            let fecha = modoEmpresa ? prompt("Ingrese la fecha de caducidad (AAAA-MM-DD):") : document.getElementById('fechaCaducidad').value;
+            let fecha = modoEmpresa ? prompt("Ingrese fecha de caducidad (AAAA-MM-DD):") : document.getElementById('fechaCaducidad').value;
+            
             const formData = new FormData();
             formData.append('archivo', file);
             formData.append('tipo_documento', subiendoTipo);
@@ -311,33 +362,14 @@
                 body: formData
             });
             if(res.ok) { 
-                alert("Carga exitosa"); 
+                alert("Documento subido con éxito"); 
                 if(modoEmpresa) cargarListaEmpresa(); else abrirExpediente(idActual, nombreActual);
             }
             this.value = "";
         };
 
-        async function cargarListaEmpresa() {
-            const res = await fetch(`${API_BASE}/admin/documentos-empresa`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
-            const docs = await res.json();
-            document.getElementById('listaDocsEmpresa').innerHTML = docs.map(d => `
-                <tr class="hover:bg-slate-50">
-                    <td class="px-6 py-4">
-                        <div class="text-xs font-bold text-slate-700 uppercase">${d.tipo_documento}</div>
-                        ${d.fecha_caducidad ? `<div class="text-[10px] text-red-500 font-bold italic text-right">CADUCIDAD: ${new Date(d.fecha_caducidad).toLocaleDateString()}</div>` : ''}
-                    </td>
-                    <td class="px-6 py-4 text-right">
-                        <div class="flex justify-end gap-2">
-                            <a href="${d.url_cloudinary}" target="_blank" class="p-2 text-blue-600 bg-white border rounded-lg"><i class="fas fa-eye"></i></a>
-                            <button onclick="eliminarDocEmpresa(${d.id})" class="p-2 text-red-600 bg-white border rounded-lg"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </td>
-                </tr>`).join('');
-        }
-
-        async function eliminarDoc(id) { if(confirm("¿Eliminar?")) { await fetch(`${API_BASE}/admin/documentos/${id}`, { method: 'DELETE', headers: {'Authorization': 'Bearer '+localStorage.getItem('token')} }); abrirExpediente(idActual, nombreActual); } }
-        async function eliminarDocEmpresa(id) { if(confirm("¿Eliminar?")) { await fetch(`${API_BASE}/admin/documentos-empresa/${id}`, { method: 'DELETE', headers: {'Authorization': 'Bearer '+localStorage.getItem('token')} }); cargarListaEmpresa(); } }
-        function cerrarModal() { document.getElementById('modalC').classList.add('hidden'); }
+        async function eliminarDoc(id) { if(confirm("¿Seguro que desea eliminar?")) { await fetch(`${API_BASE}/admin/documentos/${id}`, { method: 'DELETE', headers: {'Authorization': 'Bearer '+localStorage.getItem('token')} }); abrirExpediente(idActual, nombreActual); } }
+        async function eliminarDocEmpresa(id) { if(confirm("¿Seguro que desea eliminar?")) { await fetch(`${API_BASE}/admin/documentos-empresa/${id}`, { method: 'DELETE', headers: {'Authorization': 'Bearer '+localStorage.getItem('token')} }); cargarListaEmpresa(); } }
     </script>
 </body>
 </html>
