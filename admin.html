@@ -29,7 +29,7 @@
                     <i class="fas fa-users text-indigo-600 text-3xl group-hover:text-white"></i>
                 </div>
                 <h2 class="text-2xl font-bold text-slate-800 mb-2">Trabajadores</h2>
-                <p class="text-slate-500">Gestione los expedientes de cada empleado.</p>
+                <p class="text-slate-500">Crear empleados y gestionar sus expedientes.</p>
             </div>
 
             <div onclick="cargarSeccionEmpresa()" class="bg-white p-10 rounded-3xl shadow-sm border-2 border-transparent hover:border-emerald-500 cursor-pointer transition-all duration-300 group">
@@ -49,7 +49,17 @@
             </div>
         </div>
 
-        <div id="seccionTrabajadores" class="hidden">
+        <div id="seccionTrabajadores" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <h3 class="font-bold text-slate-800 mb-4">Registrar Nuevo Empleado</h3>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                    <input type="text" id="addNombre" placeholder="Nombre Completo" class="p-2 border rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="text" id="addUser" placeholder="Usuario (DNI)" class="p-2 border rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="password" id="addPass" placeholder="Contraseña" class="p-2 border rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                    <button onclick="crearTrabajador()" class="bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700">Crear</button>
+                </div>
+            </div>
+
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                 <table class="w-full text-left">
                     <thead class="bg-slate-50 border-b border-slate-200">
@@ -71,45 +81,25 @@
                 <div class="space-y-4">
                     <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl">
                         <span class="font-medium text-slate-700">Reglamento de seguridad</span>
-                        <button onclick="prepararSubida('Reglamento de seguridad')" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center"><i class="fas fa-upload mr-2"></i> Subir PDF</button>
-                    </div>
-                    <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                        <span class="font-medium text-slate-700">Aprobación del reglamento</span>
-                        <button onclick="prepararSubida('Aprobación del reglamento')" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center"><i class="fas fa-upload mr-2"></i> Subir PDF</button>
+                        <button onclick="prepararSubida('Reglamento de seguridad', true)" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center"><i class="fas fa-upload mr-2"></i> Subir PDF</button>
                     </div>
                     <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl">
                         <span class="font-medium text-slate-700">Matrices de riesgos</span>
-                        <button onclick="prepararSubida('Matrices de riesgos')" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center"><i class="fas fa-upload mr-2"></i> Subir PDF</button>
-                    </div>
-                    <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                        <span class="font-medium text-slate-700">Procedimiento de trabajos en altura</span>
-                        <button onclick="prepararSubida('Procedimiento de trabajos en altura')" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center"><i class="fas fa-upload mr-2"></i> Subir PDF</button>
+                        <button onclick="prepararSubida('Matrices de riesgos', true)" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center"><i class="fas fa-upload mr-2"></i> Subir PDF</button>
                     </div>
                 </div>
             </div>
         </div>
+
         <div id="seccionGestionEmpresarial" class="hidden space-y-4">
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                 <div class="p-6 bg-purple-600 text-white flex justify-between items-center">
-                    <h2 class="text-lg font-bold flex items-center">
-                        <i class="fas fa-folder-tree mr-2"></i> Monitor de Archivos Corporativos
-                    </h2>
-                    <button onclick="cargarListaEmpresa()" class="text-xs bg-purple-500 hover:bg-purple-400 px-3 py-1 rounded-lg transition-colors">
-                        <i class="fas fa-sync-alt"></i> Actualizar
-                    </button>
+                    <h2 class="text-lg font-bold flex items-center"><i class="fas fa-folder-tree mr-2"></i> Monitor Archivos Corporativos</h2>
+                    <button onclick="cargarListaEmpresa()" class="text-xs bg-purple-500 px-3 py-1 rounded-lg"><i class="fas fa-sync-alt"></i></button>
                 </div>
                 <table class="w-full text-left">
-                    <thead class="bg-slate-50 border-b border-slate-200">
-                        <tr>
-                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Documento</th>
-                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase text-right">Gestión</th>
-                        </tr>
-                    </thead>
                     <tbody id="listaDocsEmpresa" class="divide-y divide-slate-100"></tbody>
                 </table>
-                <div id="vacioEmpresa" class="hidden p-10 text-center text-slate-400">
-                    <i class="fas fa-inbox text-4xl mb-3 block"></i> No hay archivos corporativos subidos aún.
-                </div>
             </div>
         </div>
 
@@ -117,90 +107,64 @@
             <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden">
                 <div class="bg-slate-50 p-6 border-b border-slate-200 flex justify-between items-center">
                     <h3 class="text-lg font-bold text-slate-800">📂 Expediente: <span id="nEmp" class="text-indigo-600"></span></h3>
-                    <button onclick="cerrarModal()" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
+                    <button onclick="cerrarModal()" class="text-slate-400 text-2xl">&times;</button>
                 </div>
-                <div id="lDocs" class="p-6 max-h-[70vh] overflow-y-auto space-y-3"></div>
-                <div class="p-4 bg-slate-50 border-t border-slate-200 text-right">
-                    <button onclick="cerrarModal()" class="bg-slate-800 text-white px-6 py-2 rounded-lg font-bold hover:bg-slate-900">Cerrar</button>
+                <div id="lDocs" class="p-6 max-h-[50vh] overflow-y-auto space-y-3"></div>
+                
+                <div class="p-6 bg-indigo-50 border-t border-slate-100">
+                    <p class="text-xs font-bold text-indigo-700 uppercase mb-3">Cargar nuevo documento al empleado</p>
+                    <div class="flex gap-2">
+                        <select id="tipoDocAdmin" class="flex-1 p-2 border rounded-lg text-sm">
+                            <option value="Apta médica">Apta médica</option>
+                            <option value="Capacitaciones de PRL">Capacitaciones de PRL</option>
+                            <option value="Certificado de competencia">Certificado de competencia</option>
+                            <option value="Capacitación de trabajos en altura">Capacitación de trabajos en altura</option>
+                            <option value="Acta de entrega de EPP">Acta de entrega de EPP</option>
+                        </select>
+                        <button onclick="prepararSubidaAdmin()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold">Subir PDF</button>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 text-right">
+                    <button onclick="cerrarModal()" class="bg-slate-800 text-white px-6 py-2 rounded-lg font-bold">Cerrar</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <input type="file" id="fileInput" class="hidden" accept=".pdf" onchange="ejecutarSubida(this)">
+    <input type="file" id="fileInput" class="hidden" accept=".pdf">
 
     <script>
         const API_BASE = "https://backend-kelvin-docus.onrender.com/api";
-        const DOCS_TRABAJADOR = ["Apta médica", "Capacitaciones de PRL", "Certificado de competencia", "Capacitación de trabajos en altura", "Acta de entrega de EPP"];
-        let subiendoTipo = "";
-        let idUsuarioActual = null;
+        const DOCS_REQUERIDOS = ["Apta médica", "Capacitaciones de PRL", "Certificado de competencia", "Capacitación de trabajos en altura", "Acta de entrega de EPP"];
+        let idUsuarioSeleccionado = null;
+        let esSubidaEmpresa = false;
+        let tipoActual = "";
 
         function mostrarMenuPrincipal() {
-            document.getElementById('menuPrincipal').classList.remove('hidden');
-            document.getElementById('seccionTrabajadores').classList.add('hidden');
-            document.getElementById('seccionEmpresa').classList.add('hidden');
-            document.getElementById('seccionGestionEmpresarial').classList.add('hidden');
-            document.getElementById('btnVolver').classList.add('hidden');
+            ['menuPrincipal'].forEach(id => document.getElementById(id).classList.remove('hidden'));
+            ['seccionTrabajadores', 'seccionEmpresa', 'seccionGestionEmpresarial', 'btnVolver'].forEach(id => document.getElementById(id).classList.add('hidden'));
         }
 
-        // --- FUNCIONES GESTIÓN EMPRESARIAL ---
-        function cargarSeccionGestionEmpresarial() {
-            document.getElementById('menuPrincipal').classList.add('hidden');
-            document.getElementById('seccionGestionEmpresarial').classList.remove('hidden');
-            document.getElementById('btnVolver').classList.remove('hidden');
-            cargarListaEmpresa();
-        }
-
-        async function cargarListaEmpresa() {
-            const container = document.getElementById('listaDocsEmpresa');
-            const vacio = document.getElementById('vacioEmpresa');
-            try {
-                const res = await fetch(`${API_BASE}/admin/documentos-empresa`, {
-                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-                });
-                const docs = await res.json();
-                if (docs.length === 0) {
-                    vacio.classList.remove('hidden');
-                    container.innerHTML = '';
-                    return;
-                }
-                vacio.classList.add('hidden');
-                container.innerHTML = docs.map(doc => {
-                    const downloadUrl = doc.url_cloudinary.replace('/upload/', '/upload/fl_attachment/');
-                    return `
-                    <tr class="hover:bg-purple-50 transition-colors">
-                        <td class="px-6 py-4">
-                            <span class="font-semibold text-slate-700 block text-sm">${doc.tipo_documento}</span>
-                        </td>
-                        <td class="px-6 py-4 text-right">
-                            <div class="flex justify-end gap-2">
-                                <a href="${doc.url_cloudinary}" target="_blank" class="w-9 h-9 flex items-center justify-center bg-white text-indigo-600 rounded-lg shadow-sm border border-slate-200 hover:bg-indigo-50"><i class="fas fa-eye text-xs"></i></a>
-                                <a href="${downloadUrl}" download class="w-9 h-9 flex items-center justify-center bg-white text-emerald-600 rounded-lg shadow-sm border border-slate-200 hover:bg-emerald-50"><i class="fas fa-download text-xs"></i></a>
-                                <button onclick="eliminarDocEmpresa(${doc.id})" class="w-9 h-9 flex items-center justify-center bg-white text-rose-600 rounded-lg shadow-sm border border-slate-200 hover:bg-rose-50"><i class="fas fa-trash-alt text-xs"></i></button>
-                            </div>
-                        </td>
-                    </tr>`;
-                }).join('');
-            } catch (e) { console.error(e); }
-        }
-
-        async function eliminarDocEmpresa(id) {
-            if (!confirm("¿Deseas eliminar este registro empresarial?")) return;
-            try {
-                const res = await fetch(`${API_BASE}/admin/documentos-empresa/${id}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-                });
-                if (res.ok) { alert("Eliminado correctamente"); cargarListaEmpresa(); }
-            } catch (e) { alert("Error de conexión"); }
-        }
-
-        // --- FUNCIONES TRABAJADORES ---
         function cargarSeccionTrabajadores() {
             document.getElementById('menuPrincipal').classList.add('hidden');
             document.getElementById('seccionTrabajadores').classList.remove('hidden');
             document.getElementById('btnVolver').classList.remove('hidden');
             cargarListaEmpleados();
+        }
+
+        async function crearTrabajador() {
+            const nombre = document.getElementById('addNombre').value;
+            const user = document.getElementById('addUser').value;
+            const pass = document.getElementById('addPass').value;
+            if(!nombre || !user || !pass) return alert("Faltan datos");
+
+            const res = await fetch(`${API_BASE}/admin/crear-usuario`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+                body: JSON.stringify({ nombre_completo: nombre, username: user, password_hash: pass })
+            });
+            if(res.ok) { alert("Creado"); cargarListaEmpleados(); }
         }
 
         async function cargarListaEmpleados() {
@@ -212,70 +176,121 @@
                 <tr class="hover:bg-slate-50">
                     <td class="px-6 py-4 font-semibold text-slate-700">${e.nombre_completo}</td>
                     <td class="px-6 py-4 text-right">
-                        <button onclick="abrirC(${e.id}, '${e.nombre_completo}')" class="text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-lg font-bold text-sm">Ver Expediente</button>
+                        <button onclick="abrirExpediente(${e.id}, '${e.nombre_completo}')" class="text-indigo-600 bg-indigo-50 px-4 py-2 rounded-lg font-bold text-sm">Ver Expediente</button>
                     </td>
                 </tr>`).join('');
         }
 
-        async function abrirC(id, nombre) {
-            idUsuarioActual = id;
+        async function abrirExpediente(id, nombre) {
+            idUsuarioSeleccionado = id;
             document.getElementById('nEmp').innerText = nombre;
             const res = await fetch(`${API_BASE}/admin/documentos/${id}`, {
                 headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
             });
-            const subidos = await res.json();
-            document.getElementById('lDocs').innerHTML = DOCS_TRABAJADOR.map(req => {
-                const doc = subidos.find(d => d.tipo_documento.includes(req));
-                if (doc) {
-                    const dl = doc.url_cloudinary.replace('/upload/', '/upload/fl_attachment/');
-                    return `
-                        <div class="flex items-center justify-between p-4 bg-emerald-50 border border-emerald-100 rounded-xl">
-                            <p class="font-bold text-sm text-emerald-900">${req}</p>
-                            <div class="flex gap-2">
-                                <a href="${doc.url_cloudinary}" target="_blank" class="w-9 h-9 flex items-center justify-center bg-white text-indigo-600 rounded-lg border border-slate-200"><i class="fas fa-eye"></i></a>
-                                <a href="${dl}" download class="w-9 h-9 flex items-center justify-center bg-white text-emerald-600 rounded-lg border border-slate-200"><i class="fas fa-download"></i></a>
-                                <button onclick="eliminarDoc(${doc.id}, '${nombre}')" class="w-9 h-9 flex items-center justify-center bg-white text-rose-600 rounded-lg border border-slate-200"><i class="fas fa-trash-alt"></i></button>
-                            </div>
-                        </div>`;
-                }
-                return `<div class="p-4 bg-rose-50 border border-rose-100 rounded-xl text-rose-800 font-bold text-sm italic">${req} (Pendiente)</div>`;
+            const docs = await res.json();
+            
+            document.getElementById('lDocs').innerHTML = DOCS_REQUERIDOS.map(req => {
+                const doc = docs.find(d => d.tipo_documento === req);
+                return doc ? `
+                    <div class="flex items-center justify-between p-3 bg-emerald-50 border border-emerald-100 rounded-xl">
+                        <span class="text-sm font-bold text-emerald-800">${req}</span>
+                        <div class="flex gap-2">
+                            <a href="${doc.url_cloudinary}" target="_blank" class="p-2 bg-white text-indigo-600 rounded-lg"><i class="fas fa-eye"></i></a>
+                            <button onclick="eliminarDoc(${doc.id}, '${nombre}')" class="p-2 bg-white text-rose-600 rounded-lg"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>` : 
+                    `<div class="p-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-800 text-xs italic font-bold">${req} (Faltante)</div>`;
             }).join('');
             document.getElementById('modalC').classList.remove('hidden');
         }
 
-        async function eliminarDoc(docId, nombreEmpleado) {
-            if (!confirm(`¿Eliminar permanentemente?`)) return;
-            try {
-                const res = await fetch(`${API_BASE}/admin/documentos/${docId}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-                });
-                if (res.ok) { alert("Eliminado"); abrirC(idUsuarioActual, nombreEmpleado); }
-            } catch (e) { alert("Error"); }
+        // --- SISTEMA DE SUBIDA UNIFICADO ---
+        function prepararSubidaAdmin() {
+            tipoActual = document.getElementById('tipoDocAdmin').value;
+            esSubidaEmpresa = false;
+            document.getElementById('fileInput').click();
+        }
+
+        function prepararSubida(tipo, empresa = false) {
+            tipoActual = tipo;
+            esSubidaEmpresa = empresa;
+            document.getElementById('fileInput').click();
+        }
+
+        document.getElementById('fileInput').onchange = async function() {
+            const file = this.files[0];
+            if(!file || file.type !== "application/pdf") return alert("Solo PDF");
+
+            const formData = new FormData();
+            formData.append('archivo', file);
+            formData.append('tipo_documento', tipoActual);
+            
+            let url = esSubidaEmpresa ? `${API_BASE}/subir-empresa` : `${API_BASE}/admin/subir-a-usuario`;
+            if(!esSubidaEmpresa) {
+                formData.append('usuario_id', idUsuarioSeleccionado);
+                formData.append('nombre_user', document.getElementById('nEmp').innerText);
+            }
+
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+                body: formData
+            });
+
+            if(res.ok) {
+                alert("Subida exitosa");
+                if(!esSubidaEmpresa) abrirExpediente(idUsuarioSeleccionado, document.getElementById('nEmp').innerText);
+            }
+            this.value = "";
+        };
+
+        async function eliminarDoc(id, nombre) {
+            if(!confirm("¿Eliminar?")) return;
+            await fetch(`${API_BASE}/admin/documentos/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+            });
+            abrirExpediente(idUsuarioSeleccionado, nombre);
         }
 
         function cerrarModal() { document.getElementById('modalC').classList.add('hidden'); }
+        
+        // Carga de secciones restantes (Empresa y Monitor)
         function cargarSeccionEmpresa() {
             document.getElementById('menuPrincipal').classList.add('hidden');
             document.getElementById('seccionEmpresa').classList.remove('hidden');
             document.getElementById('btnVolver').classList.remove('hidden');
         }
-        function prepararSubida(tipo) { subiendoTipo = tipo; document.getElementById('fileInput').click(); }
-        async function ejecutarSubida(input) {
-            const archivo = input.files[0];
-            if (!archivo || archivo.type !== "application/pdf") return alert("Solo PDFs");
-            const formData = new FormData();
-            formData.append('archivo', archivo);
-            formData.append('tipo_documento', subiendoTipo);
-            try {
-                const res = await fetch(`${API_BASE}/subir-empresa`, {
-                    method: 'POST',
-                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
-                    body: formData
-                });
-                if (res.ok) alert("✅ Éxito al subir");
-            } catch (e) { alert("Error al subir"); }
-            input.value = "";
+
+        function cargarSeccionGestionEmpresarial() {
+            document.getElementById('menuPrincipal').classList.add('hidden');
+            document.getElementById('seccionGestionEmpresarial').classList.remove('hidden');
+            document.getElementById('btnVolver').classList.remove('hidden');
+            cargarListaEmpresa();
+        }
+
+        async function cargarListaEmpresa() {
+            const res = await fetch(`${API_BASE}/admin/documentos-empresa`, {
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+            });
+            const docs = await res.json();
+            document.getElementById('listaDocsEmpresa').innerHTML = docs.map(d => `
+                <tr>
+                    <td class="px-6 py-4 text-sm font-bold text-slate-700">${d.tipo_documento}</td>
+                    <td class="px-6 py-4 text-right">
+                        <a href="${d.url_cloudinary}" target="_blank" class="text-indigo-600 mr-4"><i class="fas fa-eye"></i></a>
+                        <button onclick="eliminarDocEmpresa(${d.id})" class="text-rose-600"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>`).join('');
+        }
+
+        async function eliminarDocEmpresa(id) {
+            if(!confirm("¿Eliminar?")) return;
+            await fetch(`${API_BASE}/admin/documentos-empresa/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+            });
+            cargarListaEmpresa();
         }
     </script>
 </body>
