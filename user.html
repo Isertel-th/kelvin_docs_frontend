@@ -39,7 +39,7 @@
                     <i class="fas fa-search text-2xl"></i>
                 </div>
                 <h2 class="text-xl font-bold">Gestión</h2>
-                <p class="text-slate-500 text-sm italic">Monitor de archivos subidos</p>
+                <p class="text-slate-500 text-sm italic">Monitor de archivos</p>
             </div>
 
             <div onclick="cargarSeccionIndicadores()" class="bg-white p-10 rounded-3xl shadow-sm border-2 border-transparent hover:border-red-500 cursor-pointer transition-all group text-center">
@@ -56,7 +56,7 @@
                 <div class="flex items-center justify-between mb-8">
                     <h2 class="text-2xl font-bold text-slate-800 uppercase italic">Cumplimiento Global</h2>
                     <div class="bg-red-600 text-white px-6 py-2 rounded-xl">
-                        <span class="text-sm font-bold uppercase">Personal Registrado: </span>
+                        <span class="text-sm font-bold uppercase">Personal Total: </span>
                         <span id="statTotalTrabajadores" class="text-xl font-black ml-1">0</span>
                     </div>
                 </div>
@@ -90,7 +90,7 @@
 
         <div id="seccionGestionEmpresarial" class="hidden animate-fade-in">
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="p-6 bg-slate-800 text-white font-bold text-sm uppercase italic">Monitor de Archivos Corporativos</div>
+                <div class="p-6 bg-slate-800 text-white font-bold text-sm uppercase italic">Consulta de Archivos</div>
                 <table class="w-full text-left">
                     <tbody id="listaDocsEmpresa" class="divide-y divide-slate-100"></tbody>
                 </table>
@@ -100,10 +100,10 @@
         <div id="modalC" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden">
                 <div class="p-6 bg-slate-50 border-b flex justify-between items-center">
-                    <h3 class="font-bold text-slate-800 uppercase text-sm italic">📂 Carpeta de: <span id="nEmp" class="text-indigo-600"></span></h3>
-                    <button onclick="cerrarModal()" class="text-2xl text-slate-400 hover:text-red-500 transition-colors">&times;</button>
+                    <h3 class="font-bold text-slate-800 uppercase text-sm italic">📂 Carpeta: <span id="nEmp" class="text-indigo-600"></span></h3>
+                    <button onclick="cerrarModal()" class="text-2xl text-slate-400 hover:text-red-500">&times;</button>
                 </div>
-                <div id="lDocs" class="p-6 space-y-3 max-h-[70vh] overflow-y-auto bg-white"></div>
+                <div id="lDocs" class="p-6 space-y-3 max-h-96 overflow-y-auto bg-white"></div>
             </div>
         </div>
     </div>
@@ -119,12 +119,75 @@
             });
         }
 
-        // --- LÓGICA DE INDICADORES ---
+        // --- TRABAJADORES Y FILTROS CORREGIDOS ---
+        function cargarSeccionTrabajadores() {
+            document.getElementById('menuPrincipal').classList.add('hidden');
+            document.getElementById('seccionTrabajadores').classList.remove('hidden');
+            document.getElementById('btnVolver').classList.remove('hidden');
+            cargarListaEmpleados();
+        }
+
+        async function cargarListaEmpleados() {
+            const res = await fetch(`${API_BASE}/admin/empleados`, {
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+            });
+            todosLosEmpleados = await res.json();
+            renderizarTablaEmpleados(todosLosEmpleados);
+        }
+
+        function filtrarTrabajadores() {
+            const nom = document.getElementById('filtroNombre').value.toLowerCase();
+            const ced = document.getElementById('filtroCedula').value.toLowerCase();
+            
+            const filtrados = todosLosEmpleados.filter(e => {
+                return e.nombre_completo.toLowerCase().includes(nom) && 
+                       e.cedula.toLowerCase().includes(ced);
+            });
+            renderizarTablaEmpleados(filtrados);
+        }
+
+        function renderizarTablaEmpleados(lista) {
+            const tabla = document.getElementById('listaEmps');
+            if (lista.length === 0) {
+                tabla.innerHTML = '<tr><td colspan="2" class="p-6 text-center text-slate-400 italic font-bold">Sin resultados</td></tr>';
+                return;
+            }
+            tabla.innerHTML = lista.map(e => `
+                <tr class="hover:bg-slate-50 animate-fade-in">
+                    <td class="px-6 py-4">
+                        <div class="font-bold text-slate-800 uppercase text-xs">${e.nombre_completo}</div>
+                        <div class="text-indigo-600 font-bold text-[10px] italic">ID: ${e.cedula}</div>
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <button onclick="abrirExpediente(${e.id}, '${e.nombre_completo}')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold uppercase hover:bg-indigo-700 transition-all">Ver Archivos</button>
+                    </td>
+                </tr>`).join('');
+        }
+
+        async function abrirExpediente(id, nombre) {
+            document.getElementById('nEmp').innerText = nombre;
+            const res = await fetch(`${API_BASE}/admin/documentos/${id}`, {
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+            });
+            const docs = await res.json();
+            document.getElementById('lDocs').innerHTML = docs.map(d => `
+                <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-xl">
+                    <div>
+                        <span class="text-xs font-bold uppercase text-slate-700 italic">${d.tipo_documento}</span>
+                        ${d.fecha_caducidad ? `<p class="text-[10px] text-red-500 font-bold italic">Vence: ${new Date(d.fecha_caducidad).toLocaleDateString()}</p>` : ''}
+                    </div>
+                    <a href="${d.url_cloudinary}" target="_blank" class="bg-white p-2 border rounded-lg text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm font-bold text-xs">
+                        <i class="fas fa-eye mr-1"></i> VER PDF
+                    </a>
+                </div>`).join('') || '<p class="text-center text-slate-400 italic font-bold py-10 uppercase text-xs">Expediente vacío</p>';
+            document.getElementById('modalC').classList.remove('hidden');
+        }
+
+        // --- INDICADORES ---
         async function cargarSeccionIndicadores() {
             document.getElementById('menuPrincipal').classList.add('hidden');
             document.getElementById('seccionIndicadores').classList.remove('hidden');
             document.getElementById('btnVolver').classList.remove('hidden');
-            
             try {
                 const res = await fetch(`${API_BASE}/admin/estadisticas`, {
                     headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
@@ -143,7 +206,7 @@
                         <div class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm transition-all hover:shadow-md">
                             <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">${tipo}</h4>
                             <div class="flex justify-between items-baseline mb-3">
-                                <span class="text-3xl font-black text-slate-800">${cant} <small class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">/ ${total}</small></span>
+                                <span class="text-3xl font-black text-slate-800">${cant} <small class="text-[10px] text-slate-400 font-bold">/ ${total}</small></span>
                                 <span class="text-xl font-black text-red-600">${porcentaje}%</span>
                             </div>
                             <div class="w-full bg-slate-100 rounded-full h-2">
@@ -151,67 +214,10 @@
                             </div>
                         </div>`;
                 }).join('');
-            } catch(e) { console.error("Error cargando estadísticas:", e); }
+            } catch(e) { console.error(e); }
         }
 
-        // --- LÓGICA DE TRABAJADORES ---
-        function cargarSeccionTrabajadores() {
-            document.getElementById('menuPrincipal').classList.add('hidden');
-            document.getElementById('seccionTrabajadores').classList.remove('hidden');
-            document.getElementById('btnVolver').classList.remove('hidden');
-            cargarListaEmpleados();
-        }
-
-        async function cargarListaEmpleados() {
-            const res = await fetch(`${API_BASE}/admin/empleados`, {
-                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-            });
-            todosLosEmpleados = await res.json();
-            renderizarTabla(todosLosEmpleados);
-        }
-
-        function renderizarTabla(lista) {
-            document.getElementById('listaEmps').innerHTML = lista.map(e => `
-                <tr class="hover:bg-slate-50 animate-fade-in">
-                    <td class="px-6 py-4">
-                        <div class="font-bold text-slate-800 uppercase text-xs">${e.nombre_completo}</div>
-                        <div class="text-indigo-600 font-bold text-[10px] italic">ID: ${e.cedula}</div>
-                    </td>
-                    <td class="px-6 py-4 text-right">
-                        <button onclick="abrirExpediente(${e.id}, '${e.nombre_completo}')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold uppercase hover:bg-indigo-700 transition-all shadow-sm">Ver Archivos</button>
-                    </td>
-                </tr>`).join('') || '<tr><td colspan="2" class="p-6 text-center text-slate-400 italic">No se encontraron resultados</td></tr>';
-        }
-
-        function filtrarTrabajadores() {
-            const n = document.getElementById('filtroNombre').value.toLowerCase();
-            const c = document.getElementById('filtroCedula').value.toLowerCase();
-            const filtrados = todosLosEmpleados.filter(e => 
-                e.nombre_completo.toLowerCase().includes(n) && e.cedula.toLowerCase().includes(c)
-            );
-            renderizarTabla(filtrados);
-        }
-
-        async function abrirExpediente(id, nombre) {
-            document.getElementById('nEmp').innerText = nombre;
-            const res = await fetch(`${API_BASE}/admin/documentos/${id}`, {
-                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-            });
-            const docs = await res.json();
-            document.getElementById('lDocs').innerHTML = docs.map(d => `
-                <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-xl">
-                    <div>
-                        <span class="text-xs font-bold uppercase text-slate-700 italic">${d.tipo_documento}</span>
-                        ${d.fecha_caducidad ? `<p class="text-[10px] text-red-500 font-bold italic uppercase">Vence: ${new Date(d.fecha_caducidad).toLocaleDateString()}</p>` : ''}
-                    </div>
-                    <a href="${d.url_cloudinary}" target="_blank" class="bg-white p-2 border rounded-lg text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm">
-                        <i class="fas fa-eye mr-1"></i> VER PDF
-                    </a>
-                </div>`).join('') || '<p class="text-center text-slate-400 italic font-bold uppercase text-xs py-10">Este expediente se encuentra vacío</p>';
-            document.getElementById('modalC').classList.remove('hidden');
-        }
-
-        // --- LÓGICA DE GESTIÓN (DOCS EMPRESA) ---
+        // --- GESTIÓN (DOCS EMPRESA) ---
         function cargarSeccionGestionEmpresarial() {
             document.getElementById('menuPrincipal').classList.add('hidden');
             document.getElementById('seccionGestionEmpresarial').classList.remove('hidden');
@@ -226,14 +232,11 @@
             const docs = await res.json();
             document.getElementById('listaDocsEmpresa').innerHTML = docs.map(d => `
                 <tr class="hover:bg-slate-50">
-                    <td class="px-6 py-4">
-                        <div class="text-xs font-bold uppercase text-slate-600 italic">${d.tipo_documento}</div>
-                        ${d.fecha_caducidad ? `<div class="text-[9px] text-red-500 font-bold italic">VENCIMIENTO: ${new Date(d.fecha_caducidad).toLocaleDateString()}</div>` : ''}
-                    </td>
+                    <td class="px-6 py-4 text-xs font-bold uppercase text-slate-600 italic">${d.tipo_documento}</td>
                     <td class="px-6 py-4 text-right">
-                        <a href="${d.url_cloudinary}" target="_blank" class="text-blue-600 font-bold text-[10px] uppercase hover:underline"><i class="fas fa-external-link-alt mr-1"></i> Abrir Documento</a>
+                        <a href="${d.url_cloudinary}" target="_blank" class="text-blue-600 font-bold text-[10px] uppercase hover:underline"><i class="fas fa-eye mr-1"></i> Abrir</a>
                     </td>
-                </tr>`).join('') || '<tr><td colspan="2" class="p-6 text-center text-slate-400 italic">No hay archivos corporativos disponibles</td></tr>';
+                </tr>`).join('');
         }
 
         function cerrarModal() { document.getElementById('modalC').classList.add('hidden'); }
