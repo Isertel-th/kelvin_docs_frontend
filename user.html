@@ -2,100 +2,225 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Carpeta - Gestión de Documentos</title>
+    <title>Panel de Consulta - Visualización</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .animate-fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
 </head>
-<body class="bg-slate-50 min-h-screen flex items-center justify-center p-4">
-    <div class="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100">
-        <div class="bg-indigo-600 p-6 text-white text-center">
-            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                <i class="fas fa-cloud-upload-alt text-2xl"></i>
-            </div>
-            <h2 class="text-xl font-bold">Hola, <span id="uName">Empleado</span></h2>
-            <p class="text-indigo-100 text-sm">Gestiona tus documentos obligatorios (PDF)</p>
-        </div>
-        
-        <div class="p-8 space-y-5">
+<body class="bg-slate-100 min-h-screen p-8">
+    <div class="max-w-6xl mx-auto">
+        <header class="flex justify-between items-center mb-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
             <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-2">Tipo de Documento</label>
-                <select id="tDoc" class="w-full border border-slate-200 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
-                    <option value="Apta médica">📋 Apta médica</option>
-                    <option value="Capacitaciones de PRL">📚 Capacitaciones de PRL</option>
-                    <option value="Certificado de competencia">⚡ Certificado de competencia</option>
-                    <option value="Capacitación de trabajos en altura">🏗️ Capacitación de trabajos en altura</option>
-                    <option value="Acta de entrega de EPP">🛡️ Acta de entrega de EPP</option>
-                </select>
+                <h1 class="text-2xl font-bold text-slate-800">Panel de Consulta</h1>
+                <p class="text-slate-500 text-sm">Solo lectura y visualización de indicadores</p>
+            </div>
+            <div class="flex gap-3">
+                <button id="btnVolver" onclick="mostrarMenuPrincipal()" class="hidden bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-2 rounded-lg font-bold transition-all flex items-center">
+                    <i class="fas fa-arrow-left mr-2"></i> Volver
+                </button>
+                <button onclick="localStorage.clear(); location.href='index.html'" class="bg-red-50 text-red-600 px-4 py-2 rounded-lg font-bold hover:bg-red-100">Cerrar Sesión</button>
+            </div>
+        </header>
+
+        <div id="menuPrincipal" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div onclick="cargarSeccionTrabajadores()" class="bg-white p-10 rounded-3xl shadow-sm border-2 border-transparent hover:border-indigo-500 cursor-pointer transition-all group text-center">
+                <div class="w-16 h-16 bg-indigo-50 rounded-xl flex items-center justify-center mb-4 mx-auto group-hover:bg-indigo-600 group-hover:text-white transition-all text-indigo-600">
+                    <i class="fas fa-user-friends text-2xl"></i>
+                </div>
+                <h2 class="text-xl font-bold">Trabajadores</h2>
+                <p class="text-slate-500 text-sm italic">Ver expedientes de personal</p>
             </div>
 
-            <div class="relative group">
-                <label class="block text-sm font-semibold text-slate-700 mb-2">Seleccionar Archivo (Solo PDF)</label>
-                <input type="file" id="fInput" class="hidden" accept=".pdf" onchange="actualizarNombreArchivo()">
-                <label for="fInput" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-slate-300 rounded-xl cursor-pointer bg-slate-50 hover:bg-indigo-50 hover:border-indigo-300 transition-all text-center px-4">
-                    <i id="fileIcon" class="fas fa-file-pdf text-slate-400 text-2xl mb-2"></i>
-                    <span id="fileNameDisplay" class="text-sm text-slate-500 font-medium break-all">Click para buscar PDF</span>
-                </label>
+            <div onclick="cargarSeccionGestionEmpresarial()" class="bg-white p-10 rounded-3xl shadow-sm border-2 border-transparent hover:border-purple-500 cursor-pointer transition-all group text-center">
+                <div class="w-16 h-16 bg-purple-50 rounded-xl flex items-center justify-center mb-4 mx-auto group-hover:bg-purple-600 group-hover:text-white transition-all text-purple-600">
+                    <i class="fas fa-search text-2xl"></i>
+                </div>
+                <h2 class="text-xl font-bold">Gestión</h2>
+                <p class="text-slate-500 text-sm italic">Ver archivos subidos</p>
             </div>
 
-            <button onclick="subir()" id="btnSubir" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-lg transition-all transform active:scale-95">
-                Enviar a mi Carpeta
-            </button>
+            <div onclick="cargarSeccionIndicadores()" class="bg-white p-10 rounded-3xl shadow-sm border-2 border-transparent hover:border-red-500 cursor-pointer transition-all group text-center">
+                <div class="w-16 h-16 bg-red-50 rounded-xl flex items-center justify-center mb-4 mx-auto group-hover:bg-red-600 group-hover:text-white transition-all text-red-600">
+                    <i class="fas fa-chart-line text-2xl"></i>
+                </div>
+                <h2 class="text-xl font-bold text-red-600">Indicadores</h2>
+                <p class="text-slate-500 text-sm italic">Estadísticas de cumplimiento</p>
+            </div>
+        </div>
 
-            <div id="status" class="text-center text-sm font-medium hidden"></div>
+        <div id="seccionIndicadores" class="hidden animate-fade-in space-y-6">
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-2xl font-bold text-slate-800 uppercase italic">Cumplimiento Global</h2>
+                    <div class="bg-red-600 text-white px-6 py-2 rounded-xl">
+                        <span class="text-sm font-bold">Total Trabajadores: </span>
+                        <span id="statTotalTrabajadores" class="text-xl font-black ml-1">0</span>
+                    </div>
+                </div>
+                <div id="contenedorEstadisticas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </div>
+        </div>
 
-            <button onclick="logout()" class="w-full text-slate-400 text-sm font-medium hover:text-red-500 transition-colors pt-4 border-t border-slate-100">
-                <i class="fas fa-sign-out-alt mr-2"></i>Cerrar Sesión Segura
-            </button>
+        <div id="seccionTrabajadores" class="hidden animate-fade-in space-y-6">
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap gap-4 items-center">
+                <div class="flex-1 relative">
+                    <i class="fas fa-search absolute left-3 top-3 text-slate-400"></i>
+                    <input type="text" id="filtroNombre" onkeyup="filtrarTrabajadores()" placeholder="Buscar por nombre..." class="w-full pl-10 p-2 border rounded-lg text-sm outline-none">
+                </div>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <table class="w-full text-left">
+                    <thead class="bg-slate-50 border-b">
+                        <tr>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Trabajador</th>
+                            <th class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listaEmps" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="seccionGestionEmpresarial" class="hidden animate-fade-in">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-6 bg-slate-800 text-white font-bold text-sm uppercase">Consulta de Archivos</div>
+                <table class="w-full text-left">
+                    <tbody id="listaDocsEmpresa" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="modalC" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden">
+                <div class="p-6 bg-slate-50 border-b flex justify-between items-center">
+                    <h3 class="font-bold text-slate-800 uppercase text-sm">📂 Carpeta: <span id="nEmp" class="text-indigo-600"></span></h3>
+                    <button onclick="cerrarModal()" class="text-2xl text-slate-400 hover:text-red-500">&times;</button>
+                </div>
+                <div id="lDocs" class="p-6 space-y-3 max-h-96 overflow-y-auto bg-white">
+                    </div>
+            </div>
         </div>
     </div>
 
     <script>
-        document.getElementById('uName').innerText = localStorage.getItem('nombre');
+        const API_BASE = "https://backend-kelvin-docus.onrender.com/api";
+        let todosLosEmpleados = [];
 
-        function actualizarNombreArchivo() {
-            const input = document.getElementById('fInput');
-            const display = document.getElementById('fileNameDisplay');
-            if (input.files.length > 0) {
-                display.innerText = input.files[0].name;
-                display.classList.replace('text-slate-500', 'text-indigo-600');
-            }
+        function mostrarMenuPrincipal() {
+            document.getElementById('menuPrincipal').classList.remove('hidden');
+            ['seccionTrabajadores', 'seccionGestionEmpresarial', 'seccionIndicadores', 'btnVolver'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
         }
 
-        async function subir() {
-            const file = document.getElementById('fInput').files[0];
-            const status = document.getElementById('status');
-            const btn = document.getElementById('btnSubir');
+        async function cargarSeccionIndicadores() {
+            document.getElementById('menuPrincipal').classList.add('hidden');
+            document.getElementById('seccionIndicadores').classList.remove('hidden');
+            document.getElementById('btnVolver').classList.remove('hidden');
             
-            if (!file) return alert("Selecciona un archivo.");
-            if (file.type !== "application/pdf") return alert("Solo se aceptan PDFs.");
-
-            status.className = "text-center text-sm font-medium text-indigo-600 block";
-            status.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Subiendo...';
-            btn.disabled = true;
-
-            const formData = new FormData();
-            formData.append('archivo', file);
-            formData.append('tipo_documento', document.getElementById('tDoc').value);
-            formData.append('nombre_user', localStorage.getItem('nombre'));
-
             try {
-                const res = await fetch('https://backend-kelvin-docus.onrender.com/api/subir', {
-                    method: 'POST',
-                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
-                    body: formData
+                const res = await fetch(`${API_BASE}/admin/estadisticas`, {
+                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
                 });
-                if (res.ok) {
-                    status.innerHTML = "✅ ¡Documento guardado con éxito!";
-                    document.getElementById('fInput').value = "";
-                } else {
-                    status.innerHTML = "❌ Error en el servidor";
-                }
-            } catch (e) { status.innerHTML = "❌ Error de conexión"; }
-            finally { btn.disabled = false; }
+                const data = await res.json();
+                const total = data.totalTrabajadores || 0;
+                document.getElementById('statTotalTrabajadores').innerText = total;
+
+                const tiposOficiales = ["Apta médica", "Capacitaciones de PRL", "Certificado de competencia", "Capacitación de trabajos en altura", "Acta de entrega de EPP"];
+
+                document.getElementById('contenedorEstadisticas').innerHTML = tiposOficiales.map(tipo => {
+                    const found = data.detalles.find(d => d.tipo_documento === tipo);
+                    const cant = found ? parseInt(found.cantidad) : 0;
+                    const porcentaje = total > 0 ? ((cant / total) * 100).toFixed(1) : 0;
+                    return `
+                        <div class="p-6 bg-white rounded-2xl border border-slate-100 shadow-sm">
+                            <h4 class="text-[10px] font-black text-slate-400 uppercase mb-2">${tipo}</h4>
+                            <div class="flex justify-between items-baseline mb-2">
+                                <span class="text-2xl font-black text-slate-800">${cant} <small class="text-xs text-slate-400 font-bold">/ ${total}</small></span>
+                                <span class="text-red-600 font-black">${porcentaje}%</span>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-1.5">
+                                <div class="bg-red-500 h-1.5 rounded-full" style="width: ${porcentaje}%"></div>
+                            </div>
+                        </div>`;
+                }).join('');
+            } catch(e) { console.error(e); }
         }
 
-        function logout() { localStorage.clear(); window.location.href='index.html'; }
+        function cargarSeccionTrabajadores() {
+            document.getElementById('menuPrincipal').classList.add('hidden');
+            document.getElementById('seccionTrabajadores').classList.remove('hidden');
+            document.getElementById('btnVolver').classList.remove('hidden');
+            cargarListaEmpleados();
+        }
+
+        async function cargarListaEmpleados() {
+            const res = await fetch(`${API_BASE}/admin/empleados`, {
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+            });
+            todosLosEmpleados = await res.json();
+            renderizarTabla(todosLosEmpleados);
+        }
+
+        function renderizarTabla(lista) {
+            document.getElementById('listaEmps').innerHTML = lista.map(e => `
+                <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4">
+                        <div class="font-bold text-slate-800 uppercase text-xs">${e.nombre_completo}</div>
+                        <div class="text-slate-400 text-[10px]">ID: ${e.cedula}</div>
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <button onclick="abrirExpediente(${e.id}, '${e.nombre_completo}')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold uppercase">Ver Archivos</button>
+                    </td>
+                </tr>`).join('');
+        }
+
+        function filtrarTrabajadores() {
+            const txt = document.getElementById('filtroNombre').value.toLowerCase();
+            renderizarTabla(todosLosEmpleados.filter(e => e.nombre_completo.toLowerCase().includes(txt)));
+        }
+
+        async function abrirExpediente(id, nombre) {
+            document.getElementById('nEmp').innerText = nombre;
+            const res = await fetch(`${API_BASE}/admin/documentos/${id}`, {
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+            });
+            const docs = await res.json();
+            document.getElementById('lDocs').innerHTML = docs.map(d => `
+                <div class="flex items-center justify-between p-4 bg-slate-50 border rounded-xl">
+                    <span class="text-xs font-bold uppercase text-slate-700">${d.tipo_documento}</span>
+                    <a href="${d.url_cloudinary}" target="_blank" class="bg-white p-2 border rounded-lg text-blue-600 hover:bg-blue-600 hover:text-white transition-all">
+                        <i class="fas fa-eye mr-1"></i> Abrir PDF
+                    </a>
+                </div>`).join('') || '<p class="text-center text-slate-400 italic">No hay documentos en este expediente.</p>';
+            document.getElementById('modalC').classList.remove('hidden');
+        }
+
+        function cargarSeccionGestionEmpresarial() {
+            document.getElementById('menuPrincipal').classList.add('hidden');
+            document.getElementById('seccionGestionEmpresarial').classList.remove('hidden');
+            document.getElementById('btnVolver').classList.remove('hidden');
+            cargarListaEmpresa();
+        }
+
+        async function cargarListaEmpresa() {
+            const res = await fetch(`${API_BASE}/admin/documentos-empresa`, {
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+            });
+            const docs = await res.json();
+            document.getElementById('listaDocsEmpresa').innerHTML = docs.map(d => `
+                <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4 text-xs font-bold uppercase text-slate-600">${d.tipo_documento}</td>
+                    <td class="px-6 py-4 text-right">
+                        <a href="${d.url_cloudinary}" target="_blank" class="text-blue-600 font-bold text-xs"><i class="fas fa-eye mr-1"></i> VER</a>
+                    </td>
+                </tr>`).join('');
+        }
+
+        function cerrarModal() { document.getElementById('modalC').classList.add('hidden'); }
     </script>
 </body>
 </html>
