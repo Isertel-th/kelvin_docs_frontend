@@ -59,6 +59,53 @@
             </div>
         </div>
 
+        <div id="seccionTrabajadores" class="hidden animate-fade-in space-y-6">
+            <div id="selectorEstado" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div onclick="setModoLista('activos')" class="bg-white p-8 rounded-2xl shadow-sm border-2 border-transparent hover:border-indigo-500 cursor-pointer transition-all flex items-center gap-4">
+                    <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center"><i class="fas fa-user-check"></i></div>
+                    <div><h3 class="font-bold uppercase text-sm">Personal Activo</h3><p class="text-xs text-slate-500">Gestión de trabajadores vigentes</p></div>
+                </div>
+                <div onclick="setModoLista('pasivos')" class="bg-white p-8 rounded-2xl shadow-sm border-2 border-transparent hover:border-slate-500 cursor-pointer transition-all flex items-center gap-4">
+                    <div class="w-12 h-12 bg-slate-100 text-slate-600 rounded-full flex items-center justify-center"><i class="fas fa-user-slash"></i></div>
+                    <div><h3 class="font-bold uppercase text-sm">Archivo Pasivo</h3><p class="text-xs text-slate-500">Histórico de personal dado de baja</p></div>
+                </div>
+            </div>
+
+            <div id="contenidoLista" class="hidden space-y-6">
+                <div id="formNuevo" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h3 class="font-bold text-slate-800 mb-4 uppercase text-xs tracking-wider italic">Nuevo Trabajador</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <input type="text" id="nombre_completo" placeholder="Nombre Completo del Trabajador" class="md:col-span-2 p-2 border rounded-lg text-sm bg-slate-50 uppercase font-bold">
+                        <input type="text" id="cedula" placeholder="Cédula / ID" class="p-2 border rounded-lg text-sm font-bold bg-indigo-50">
+                        <button onclick="crearTrabajador()" class="md:col-span-3 bg-indigo-600 text-white font-bold py-2 rounded-lg hover:bg-indigo-700 transition-all uppercase text-sm">Registrar Trabajador en Base de Datos</button>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap gap-4 items-center">
+                    <div class="flex-1 min-w-[200px] relative">
+                        <i class="fas fa-search absolute left-3 top-3 text-slate-400"></i>
+                        <input type="text" id="filtroNombre" onkeyup="filtrarTrabajadores()" placeholder="Filtrar por nombre..." class="w-full pl-10 p-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div class="flex-1 min-w-[200px] relative">
+                        <i class="fas fa-id-card absolute left-3 top-3 text-slate-400"></i>
+                        <input type="text" id="filtroCedula" onkeyup="filtrarTrabajadores()" placeholder="Filtrar por cédula..." class="w-full pl-10 p-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50 border-b">
+                            <tr>
+                                <th class="px-6 py-4 text-sm font-bold text-slate-600">Nombre / Identificación</th>
+                                <th class="px-6 py-4 text-sm font-bold text-slate-600 text-right">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="listaEmps" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <div id="seccionIndicadores" class="hidden animate-fade-in space-y-6">
             <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
                 <div class="flex items-center justify-between mb-8">
@@ -68,42 +115,7 @@
                         <span id="statTotalTrabajadores" class="text-xl font-black ml-2">0</span>
                     </div>
                 </div>
-                <div id="contenedorEstadisticas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    </div>
-            </div>
-        </div>
-
-        <div id="seccionTrabajadores" class="hidden animate-fade-in space-y-6">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                <h3 class="font-bold text-slate-800 mb-4 uppercase text-xs tracking-wider italic">Nuevo Trabajador</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <input type="text" id="nombre_completo" placeholder="Nombre Completo del Trabajador" class="md:col-span-2 p-2 border rounded-lg text-sm bg-slate-50 uppercase font-bold">
-                    <input type="text" id="cedula" placeholder="Cédula / ID" class="p-2 border rounded-lg text-sm font-bold bg-indigo-50">
-                    <button onclick="crearTrabajador()" class="md:col-span-3 bg-indigo-600 text-white font-bold py-2 rounded-lg hover:bg-indigo-700 transition-all uppercase text-sm">Registrar Trabajador en Base de Datos</button>
-                </div>
-            </div>
-
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap gap-4 items-center">
-                <div class="flex-1 min-w-[200px] relative">
-                    <i class="fas fa-search absolute left-3 top-3 text-slate-400"></i>
-                    <input type="text" id="filtroNombre" onkeyup="filtrarTrabajadores()" placeholder="Filtrar por nombre..." class="w-full pl-10 p-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                </div>
-                <div class="flex-1 min-w-[200px] relative">
-                    <i class="fas fa-id-card absolute left-3 top-3 text-slate-400"></i>
-                    <input type="text" id="filtroCedula" onkeyup="filtrarTrabajadores()" placeholder="Filtrar por cédula..." class="w-full pl-10 p-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                </div>
-            </div>
-
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <table class="w-full text-left">
-                    <thead class="bg-slate-50 border-b">
-                        <tr>
-                            <th class="px-6 py-4 text-sm font-bold text-slate-600">Nombre / Identificación</th>
-                            <th class="px-6 py-4 text-sm font-bold text-slate-600 text-right">Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody id="listaEmps" class="divide-y divide-slate-100"></tbody>
-                </table>
+                <div id="contenedorEstadisticas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
             </div>
         </div>
 
@@ -180,70 +192,36 @@
         const API_BASE = "https://backend-kelvin-docus.onrender.com/api";
         let idActual = null; let nombreActual = ""; let modoEmpresa = false; let subiendoTipo = "";
         let todosLosEmpleados = [];
+        let modoLista = 'activos'; // 'activos' o 'pasivos'
 
         function mostrarMenuPrincipal() {
             document.getElementById('menuPrincipal').classList.remove('hidden');
-            ['seccionTrabajadores', 'seccionEmpresa', 'seccionGestionEmpresarial', 'seccionIndicadores', 'btnVolver'].forEach(id => {
+            ['seccionTrabajadores', 'seccionEmpresa', 'seccionGestionEmpresarial', 'seccionIndicadores', 'btnVolver', 'contenidoLista'].forEach(id => {
                 document.getElementById(id).classList.add('hidden');
             });
+            document.getElementById('selectorEstado').classList.add('hidden');
         }
 
-        // --- NUEVA LÓGICA DE INDICADORES ---
-        async function cargarSeccionIndicadores() {
-            document.getElementById('menuPrincipal').classList.add('hidden');
-            document.getElementById('seccionIndicadores').classList.remove('hidden');
-            document.getElementById('btnVolver').classList.remove('hidden');
-            
-            try {
-                const res = await fetch(`${API_BASE}/admin/estadisticas`, {
-                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-                });
-                const data = await res.json();
-                
-                const total = data.totalTrabajadores || 0;
-                document.getElementById('statTotalTrabajadores').innerText = total;
-
-                const tiposOficiales = ["Apta médica", "Capacitaciones de PRL", "Certificado de competencia", "Capacitación de trabajos en altura", "Acta de entrega de EPP"];
-
-                const html = tiposOficiales.map(tipo => {
-                    const found = data.detalles.find(d => d.tipo_documento === tipo);
-                    const cant = found ? parseInt(found.cantidad) : 0;
-                    const porcentaje = total > 0 ? ((cant / total) * 100).toFixed(1) : 0;
-
-                    return `
-                        <div class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-                            <div class="flex justify-between items-start mb-4">
-                                <div>
-                                    <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-wider">${tipo}</h4>
-                                    <div class="flex items-baseline gap-2">
-                                        <span class="text-3xl font-black text-slate-800">${cant}</span>
-                                        <span class="text-slate-400 text-xs font-bold">de ${total}</span>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <span class="text-lg font-black text-red-600">${porcentaje}%</span>
-                                </div>
-                            </div>
-                            <div class="w-full bg-slate-100 rounded-full h-2">
-                                <div class="bg-red-600 h-2 rounded-full transition-all duration-1000" style="width: ${porcentaje}%"></div>
-                            </div>
-                            <p class="text-[9px] text-slate-400 mt-2 font-medium uppercase text-center italic">Nivel de cumplimiento</p>
-                        </div>`;
-                }).join('');
-                document.getElementById('contenedorEstadisticas').innerHTML = html;
-            } catch(e) { console.error(e); }
-        }
-
-        // --- TRABAJADORES ---
+        // --- GESTIÓN DE VISTA TRABAJADORES ---
         function cargarSeccionTrabajadores() {
             document.getElementById('menuPrincipal').classList.add('hidden');
             document.getElementById('seccionTrabajadores').classList.remove('hidden');
+            document.getElementById('selectorEstado').classList.remove('hidden');
+            document.getElementById('contenidoLista').classList.add('hidden');
             document.getElementById('btnVolver').classList.remove('hidden');
+        }
+
+        function setModoLista(modo) {
+            modoLista = modo;
+            document.getElementById('selectorEstado').classList.add('hidden');
+            document.getElementById('contenidoLista').classList.remove('hidden');
+            document.getElementById('formNuevo').style.display = (modo === 'activos') ? 'block' : 'none';
             cargarListaEmpleados();
         }
 
         async function cargarListaEmpleados() {
-            const res = await fetch(`${API_BASE}/admin/empleados`, {
+            const endpoint = modoLista === 'activos' ? '/admin/empleados' : '/admin/pasivos';
+            const res = await fetch(`${API_BASE}${endpoint}`, {
                 headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
             });
             todosLosEmpleados = await res.json();
@@ -257,10 +235,63 @@
                         <div class="font-bold text-slate-800 uppercase text-xs">${e.nombre_completo}</div>
                         <div class="text-indigo-600 font-bold text-xs italic">ID / CÉDULA: ${e.cedula}</div>
                     </td>
-                    <td class="px-6 py-4 text-right">
+                    <td class="px-6 py-4 text-right flex justify-end gap-2">
+                        ${modoLista === 'activos' ? `
+                        <button onclick="transformarPasivo(${e.id})" class="bg-amber-50 text-amber-600 px-3 py-2 rounded-lg text-[10px] font-bold uppercase hover:bg-amber-100 border border-amber-200">
+                            Transformar a pasivo
+                        </button>` : ''}
                         <button onclick="abrirExpediente(${e.id}, '${e.nombre_completo}')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold uppercase hover:bg-indigo-700 transition-all shadow-sm">Ver Carpeta</button>
                     </td>
                 </tr>`).join('');
+        }
+
+        async function transformarPasivo(id) {
+            if(confirm("¿Seguro que desea mover este trabajador a PASIVOS? Se moverán también todos sus documentos.")){
+                const res = await fetch(`${API_BASE}/admin/mover-a-pasivo/${id}`, {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+                });
+                if(res.ok) { alert("Usuario transformado con éxito"); cargarListaEmpleados(); }
+            }
+        }
+
+        // --- INDICADORES ---
+        async function cargarSeccionIndicadores() {
+            document.getElementById('menuPrincipal').classList.add('hidden');
+            document.getElementById('seccionIndicadores').classList.remove('hidden');
+            document.getElementById('btnVolver').classList.remove('hidden');
+            try {
+                const res = await fetch(`${API_BASE}/admin/estadisticas`, {
+                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+                });
+                const data = await res.json();
+                const total = data.totalTrabajadores || 0;
+                document.getElementById('statTotalTrabajadores').innerText = total;
+                const tiposOficiales = ["Apta médica", "Capacitaciones de PRL", "Certificado de competencia", "Capacitación de trabajos en altura", "Acta de entrega de EPP"];
+                const html = tiposOficiales.map(tipo => {
+                    const found = data.detalles.find(d => d.tipo_documento === tipo);
+                    const cant = found ? parseInt(found.cantidad) : 0;
+                    const porcentaje = total > 0 ? ((cant / total) * 100).toFixed(1) : 0;
+                    return `
+                        <div class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-wider">${tipo}</h4>
+                                    <div class="flex items-baseline gap-2">
+                                        <span class="text-3xl font-black text-slate-800">${cant}</span>
+                                        <span class="text-slate-400 text-xs font-bold">de ${total}</span>
+                                    </div>
+                                </div>
+                                <div class="text-right"><span class="text-lg font-black text-red-600">${porcentaje}%</span></div>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-2">
+                                <div class="bg-red-600 h-2 rounded-full transition-all duration-1000" style="width: ${porcentaje}%"></div>
+                            </div>
+                            <p class="text-[9px] text-slate-400 mt-2 font-medium uppercase text-center italic">Nivel de cumplimiento</p>
+                        </div>`;
+                }).join('');
+                document.getElementById('contenedorEstadisticas').innerHTML = html;
+            } catch(e) { console.error(e); }
         }
 
         function filtrarTrabajadores() {
@@ -286,7 +317,7 @@
             }
         }
 
-        // --- EMPRESA Y GESTIÓN ---
+        // --- EMPRESA ---
         function cargarSeccionEmpresa() {
             document.getElementById('menuPrincipal').classList.add('hidden');
             document.getElementById('seccionEmpresa').classList.remove('hidden');
@@ -320,11 +351,11 @@
                 </tr>`).join('');
         }
 
-        // --- EXPEDIENTES Y SUBIDA ---
+        // --- EXPEDIENTES ---
         async function abrirExpediente(id, nombre) {
             idActual = id; nombreActual = nombre;
             document.getElementById('nEmp').innerText = nombre;
-            const res = await fetch(`${API_BASE}/admin/documentos/${id}`, {
+            const res = await fetch(`${API_BASE}/admin/documentos/${id}?pasivo=${modoLista==='pasivos'}`, {
                 headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
             });
             const docs = await res.json();
@@ -354,7 +385,11 @@
             formData.append('archivo', file);
             formData.append('tipo_documento', subiendoTipo);
             formData.append('fecha_caducidad', fecha);
-            if(!modoEmpresa) { formData.append('usuario_id', idActual); formData.append('nombre_user', nombreActual); }
+            if(!modoEmpresa) { 
+                formData.append('usuario_id', idActual); 
+                formData.append('nombre_user', nombreActual); 
+                formData.append('es_pasivo', modoLista === 'pasivos');
+            }
 
             const res = await fetch(modoEmpresa ? `${API_BASE}/subir-empresa` : `${API_BASE}/admin/subir-a-usuario`, {
                 method: 'POST',
@@ -368,7 +403,15 @@
             this.value = "";
         };
 
-        async function eliminarDoc(id) { if(confirm("¿Seguro que desea eliminar?")) { await fetch(`${API_BASE}/admin/documentos/${id}`, { method: 'DELETE', headers: {'Authorization': 'Bearer '+localStorage.getItem('token')} }); abrirExpediente(idActual, nombreActual); } }
+        async function eliminarDoc(id) { 
+            if(confirm("¿Seguro que desea eliminar?")) { 
+                await fetch(`${API_BASE}/admin/documentos/${id}?pasivo=${modoLista==='pasivos'}`, { 
+                    method: 'DELETE', 
+                    headers: {'Authorization': 'Bearer '+localStorage.getItem('token')} 
+                }); 
+                abrirExpediente(idActual, nombreActual); 
+            } 
+        }
         async function eliminarDocEmpresa(id) { if(confirm("¿Seguro que desea eliminar?")) { await fetch(`${API_BASE}/admin/documentos-empresa/${id}`, { method: 'DELETE', headers: {'Authorization': 'Bearer '+localStorage.getItem('token')} }); cargarListaEmpresa(); } }
     </script>
 </body>
