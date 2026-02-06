@@ -2,22 +2,26 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Panel Administrativo - Sistema Gestión</title>
+    <title>Panel Administrativo - Gestión Documental</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .animate-fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
 </head>
 <body class="bg-slate-100 min-h-screen p-8">
     <div class="max-w-6xl mx-auto">
         <header class="flex justify-between items-center mb-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
             <div>
                 <h1 class="text-2xl font-bold text-slate-800">Panel Administrativo</h1>
-                <p class="text-slate-500 text-sm">Gestión centralizada de expedientes</p>
+                <p class="text-slate-500 text-sm">Gestión de trabajadores y documentos empresa</p>
             </div>
             <div class="flex gap-3">
                 <button id="btnVolver" onclick="mostrarMenuPrincipal()" class="hidden bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-2 rounded-lg font-bold transition-all flex items-center">
                     <i class="fas fa-arrow-left mr-2"></i> Volver
                 </button>
-                <button onclick="localStorage.clear(); location.href='index.html'" class="bg-red-50 text-red-600 px-4 py-2 rounded-lg font-bold hover:bg-red-100">Salir</button>
+                <button onclick="localStorage.clear(); location.href='index.html'" class="bg-red-50 text-red-600 px-4 py-2 rounded-lg font-bold hover:bg-red-100">Cerrar Sesión</button>
             </div>
         </header>
 
@@ -34,7 +38,7 @@
                     <i class="fas fa-building text-2xl"></i>
                 </div>
                 <h2 class="text-xl font-bold">Empresa</h2>
-                <p class="text-slate-500 text-sm italic">Subida de documentos institucionales</p>
+                <p class="text-slate-500 text-sm italic">Documentos Institucionales</p>
             </div>
             <div onclick="cargarSeccionGestionEmpresarial()" class="bg-white p-10 rounded-3xl shadow-sm border-2 border-transparent hover:border-purple-500 cursor-pointer transition-all group">
                 <div class="w-16 h-16 bg-purple-50 rounded-xl flex items-center justify-center mb-4 group-hover:bg-purple-600 group-hover:text-white transition-all text-purple-600">
@@ -45,16 +49,13 @@
             </div>
         </div>
 
-        <div id="seccionTrabajadores" class="hidden space-y-6">
+        <div id="seccionTrabajadores" class="hidden animate-fade-in space-y-6">
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                 <h3 class="font-bold text-slate-800 mb-4 uppercase text-xs tracking-wider">Nuevo Trabajador</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
-                    <input type="text" id="p_nom" placeholder="Primer Nombre" class="p-2 border rounded-lg text-sm bg-slate-50">
-                    <input type="text" id="s_nom" placeholder="Segundo Nombre" class="p-2 border rounded-lg text-sm bg-slate-50">
-                    <input type="text" id="p_ape" placeholder="Primer Apellido" class="p-2 border rounded-lg text-sm bg-slate-50">
-                    <input type="text" id="s_ape" placeholder="Segundo Apellido" class="p-2 border rounded-lg text-sm bg-slate-50">
-                    <input type="text" id="cedula" placeholder="Cédula" class="p-2 border rounded-lg text-sm font-bold bg-indigo-50">
-                    <button onclick="crearTrabajador()" class="lg:col-span-5 bg-indigo-600 text-white font-bold py-2 rounded-lg hover:bg-indigo-700 transition-all">Registrar</button>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <input type="text" id="nombre_completo" placeholder="Nombre Completo del Trabajador" class="md:col-span-2 p-2 border rounded-lg text-sm bg-slate-50">
+                    <input type="text" id="cedula" placeholder="Cédula / ID" class="p-2 border rounded-lg text-sm font-bold bg-indigo-50">
+                    <button onclick="crearTrabajador()" class="md:col-span-3 bg-indigo-600 text-white font-bold py-2 rounded-lg hover:bg-indigo-700 transition-all">Registrar Trabajador</button>
                 </div>
             </div>
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
@@ -70,7 +71,7 @@
             </div>
         </div>
 
-        <div id="seccionEmpresa" class="hidden space-y-4">
+        <div id="seccionEmpresa" class="hidden animate-fade-in space-y-4">
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                 <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center">
                     <i class="fas fa-file-shield mr-2 text-emerald-600"></i> Documentos Institucionales
@@ -96,7 +97,7 @@
             </div>
         </div>
 
-        <div id="seccionGestionEmpresarial" class="hidden space-y-4">
+        <div id="seccionGestionEmpresarial" class="hidden animate-fade-in space-y-4">
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                 <div class="p-6 bg-purple-600 text-white font-bold italic">Monitor de Archivos Corporativos</div>
                 <table class="w-full text-left">
@@ -106,9 +107,9 @@
         </div>
 
         <div id="modalC" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden">
+            <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden animate-fade-in">
                 <div class="p-6 bg-slate-50 border-b flex justify-between items-center">
-                    <h3 class="font-bold text-slate-800 italic uppercase text-sm">📂 Carpeta: <span id="nEmp" class="text-indigo-600"></span></h3>
+                    <h3 class="font-bold text-slate-800 italic uppercase text-sm">📂 Expediente: <span id="nEmp" class="text-indigo-600"></span></h3>
                     <button onclick="cerrarModal()" class="text-2xl text-slate-400">&times;</button>
                 </div>
                 <div id="lDocs" class="p-6 space-y-3 max-h-80 overflow-y-auto bg-white"></div>
@@ -121,7 +122,7 @@
                         <option>Acta de entrega de EPP</option>
                     </select>
                     <input type="date" id="fechaCaducidad" class="p-2 border rounded-lg text-sm" title="Fecha de caducidad">
-                    <button onclick="prepararSubidaTrabajador()" class="bg-indigo-600 text-white px-4 rounded-lg font-bold text-sm">Subir PDF</button>
+                    <button onclick="prepararSubidaTrabajador()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-indigo-700 transition-all">Subir PDF</button>
                 </div>
             </div>
         </div>
@@ -159,18 +160,21 @@
         }
 
         async function crearTrabajador() {
-            const data = {
-                p_nom: document.getElementById('p_nom').value, s_nom: document.getElementById('s_nom').value,
-                p_ape: document.getElementById('p_ape').value, s_ape: document.getElementById('s_ape').value,
-                cedula: document.getElementById('cedula').value
-            };
-            if(!data.p_nom || !data.p_ape || !data.cedula) return alert("Cédula y Nombres obligatorios");
+            const nombre = document.getElementById('nombre_completo').value;
+            const dni = document.getElementById('cedula').value;
+            if(!nombre || !dni) return alert("Nombre y Cédula requeridos");
+            
             const res = await fetch(`${API_BASE}/admin/crear-usuario`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
-                body: JSON.stringify(data)
+                body: JSON.stringify({ nombre_completo: nombre, cedula: dni })
             });
-            if(res.ok) { alert("Usuario Registrado"); cargarListaEmpleados(); }
+            if(res.ok) { 
+                alert("Registrado"); 
+                document.getElementById('nombre_completo').value = "";
+                document.getElementById('cedula').value = "";
+                cargarListaEmpleados(); 
+            }
         }
 
         async function cargarListaEmpleados() {
@@ -181,11 +185,11 @@
             document.getElementById('listaEmps').innerHTML = emps.map(e => `
                 <tr class="hover:bg-slate-50">
                     <td class="px-6 py-4">
-                        <div class="font-bold text-slate-800 uppercase text-xs">${e.primer_apellido} ${e.segundo_apellido} ${e.primer_nombre}</div>
-                        <div class="text-indigo-600 font-bold text-xs">C.I: ${e.cedula}</div>
+                        <div class="font-bold text-slate-800 uppercase text-xs">${e.nombre_completo}</div>
+                        <div class="text-indigo-600 font-bold text-xs">ID: ${e.cedula}</div>
                     </td>
                     <td class="px-6 py-4 text-right">
-                        <button onclick="abrirExpediente(${e.id}, '${e.primer_nombre} ${e.primer_apellido}')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold uppercase">Expediente</button>
+                        <button onclick="abrirExpediente(${e.id}, '${e.nombre_completo}')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold uppercase hover:bg-indigo-700 transition-all">Ver Carpeta</button>
                     </td>
                 </tr>`).join('');
         }
@@ -207,7 +211,7 @@
                         <a href="${d.url_cloudinary}" target="_blank" class="p-2 text-blue-600 bg-white rounded-lg border shadow-sm"><i class="fas fa-eye"></i></a>
                         <button onclick="eliminarDoc(${d.id})" class="p-2 text-red-600 bg-white rounded-lg border shadow-sm"><i class="fas fa-trash"></i></button>
                     </div>
-                </div>`).join('') || '<p class="text-center text-slate-400 py-4 italic text-sm">Sin documentos</p>';
+                </div>`).join('') || '<p class="text-center text-slate-400 py-4 italic text-sm">No hay documentos cargados</p>';
             document.getElementById('modalC').classList.remove('hidden');
         }
 
@@ -216,7 +220,7 @@
             subiendoTipo = tipo; 
             document.getElementById('fileInput').click(); 
         }
-        
+
         function prepararSubidaTrabajador() { 
             modoEmpresa = false; 
             subiendoTipo = document.getElementById('tipoDocAdmin').value; 
@@ -228,7 +232,7 @@
             
             let fecha = "";
             if(modoEmpresa) {
-                fecha = prompt("Ingrese la fecha de caducidad (AAAA-MM-DD) o deje vacío:");
+                fecha = prompt("Ingrese la fecha de caducidad para este documento (AAAA-MM-DD):");
             } else {
                 fecha = document.getElementById('fechaCaducidad').value;
             }
@@ -237,7 +241,7 @@
             formData.append('archivo', file);
             formData.append('tipo_documento', subiendoTipo);
             formData.append('fecha_caducidad', fecha);
-            
+
             if(!modoEmpresa) { 
                 formData.append('usuario_id', idActual); 
                 formData.append('nombre_user', nombreActual); 
@@ -269,7 +273,7 @@
                 <tr class="hover:bg-slate-50">
                     <td class="px-6 py-4">
                         <div class="text-xs font-bold text-slate-700 uppercase">${d.tipo_documento}</div>
-                        ${d.fecha_caducidad ? `<div class="text-[10px] text-red-500 font-bold">EXPIRA: ${new Date(d.fecha_caducidad).toLocaleDateString()}</div>` : ''}
+                        ${d.fecha_caducidad ? `<div class="text-[10px] text-red-500 font-bold italic text-right">CADUCIDAD: ${new Date(d.fecha_caducidad).toLocaleDateString()}</div>` : ''}
                     </td>
                     <td class="px-6 py-4 text-right">
                         <div class="flex justify-end gap-2">
@@ -280,8 +284,8 @@
                 </tr>`).join('');
         }
 
-        async function eliminarDoc(id) { if(confirm("¿Borrar?")) { await fetch(`${API_BASE}/admin/documentos/${id}`, { method: 'DELETE', headers: {'Authorization': 'Bearer '+localStorage.getItem('token')} }); abrirExpediente(idActual, nombreActual); } }
-        async function eliminarDocEmpresa(id) { if(confirm("¿Borrar?")) { await fetch(`${API_BASE}/admin/documentos-empresa/${id}`, { method: 'DELETE', headers: {'Authorization': 'Bearer '+localStorage.getItem('token')} }); cargarListaEmpresa(); } }
+        async function eliminarDoc(id) { if(confirm("¿Seguro que desea eliminar?")) { await fetch(`${API_BASE}/admin/documentos/${id}`, { method: 'DELETE', headers: {'Authorization': 'Bearer '+localStorage.getItem('token')} }); abrirExpediente(idActual, nombreActual); } }
+        async function eliminarDocEmpresa(id) { if(confirm("¿Seguro que desea eliminar?")) { await fetch(`${API_BASE}/admin/documentos-empresa/${id}`, { method: 'DELETE', headers: {'Authorization': 'Bearer '+localStorage.getItem('token')} }); cargarListaEmpresa(); } }
         function cerrarModal() { document.getElementById('modalC').classList.add('hidden'); }
     </script>
 </body>
