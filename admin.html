@@ -58,6 +58,18 @@
                     <button onclick="crearTrabajador()" class="md:col-span-3 bg-indigo-600 text-white font-bold py-2 rounded-lg hover:bg-indigo-700 transition-all">Registrar Trabajador</button>
                 </div>
             </div>
+
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap gap-4 items-center">
+                <div class="flex-1 min-w-[200px] relative">
+                    <i class="fas fa-search absolute left-3 top-3 text-slate-400"></i>
+                    <input type="text" id="filtroNombre" onkeyup="filtrarTrabajadores()" placeholder="Filtrar por nombre..." class="w-full pl-10 p-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <div class="flex-1 min-w-[200px] relative">
+                    <i class="fas fa-id-card absolute left-3 top-3 text-slate-400"></i>
+                    <input type="text" id="filtroCedula" onkeyup="filtrarTrabajadores()" placeholder="Filtrar por cédula..." class="w-full pl-10 p-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+            </div>
+
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                 <table class="w-full text-left">
                     <thead class="bg-slate-50 border-b">
@@ -133,6 +145,7 @@
     <script>
         const API_BASE = "https://backend-kelvin-docus.onrender.com/api";
         let idActual = null; let nombreActual = ""; let modoEmpresa = false; let subiendoTipo = "";
+        let todosLosEmpleados = []; // Variable para almacenar la lista original de empleados
 
         function mostrarMenuPrincipal() {
             document.getElementById('menuPrincipal').classList.remove('hidden');
@@ -181,9 +194,28 @@
             const res = await fetch(`${API_BASE}/admin/empleados`, {
                 headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
             });
-            const emps = await res.json();
-            document.getElementById('listaEmps').innerHTML = emps.map(e => `
-                <tr class="hover:bg-slate-50">
+            todosLosEmpleados = await res.json();
+            renderizarTablaEmpleados(todosLosEmpleados);
+        }
+
+        // Función para filtrar y mostrar resultados en tiempo real
+        function filtrarTrabajadores() {
+            const busquedaNombre = document.getElementById('filtroNombre').value.toLowerCase();
+            const busquedaCedula = document.getElementById('filtroCedula').value.toLowerCase();
+
+            const filtrados = todosLosEmpleados.filter(e => {
+                const coincideNombre = e.nombre_completo.toLowerCase().includes(busquedaNombre);
+                const coincideCedula = e.cedula.toLowerCase().includes(busquedaCedula);
+                return coincideNombre && coincideCedula;
+            });
+
+            renderizarTablaEmpleados(filtrados);
+        }
+
+        // Función auxiliar para pintar la tabla de empleados
+        function renderizarTablaEmpleados(lista) {
+            document.getElementById('listaEmps').innerHTML = lista.map(e => `
+                <tr class="hover:bg-slate-50 animate-fade-in">
                     <td class="px-6 py-4">
                         <div class="font-bold text-slate-800 uppercase text-xs">${e.nombre_completo}</div>
                         <div class="text-indigo-600 font-bold text-xs">ID: ${e.cedula}</div>
@@ -191,7 +223,7 @@
                     <td class="px-6 py-4 text-right">
                         <button onclick="abrirExpediente(${e.id}, '${e.nombre_completo}')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold uppercase hover:bg-indigo-700 transition-all">Ver Carpeta</button>
                     </td>
-                </tr>`).join('');
+                </tr>`).join('') || '<tr><td colspan="2" class="p-6 text-center text-slate-400 italic">No se encontraron trabajadores</td></tr>';
         }
 
         async function abrirExpediente(id, nombre) {
