@@ -119,29 +119,40 @@
             });
         }
 
-        // --- TRABAJADORES Y FILTROS CORREGIDOS ---
+        // --- LÓGICA DE TRABAJADORES CORREGIDA ---
         function cargarSeccionTrabajadores() {
             document.getElementById('menuPrincipal').classList.add('hidden');
             document.getElementById('seccionTrabajadores').classList.remove('hidden');
             document.getElementById('btnVolver').classList.remove('hidden');
+            
+            // Reiniciar filtros al entrar para mostrar lista completa
+            document.getElementById('filtroNombre').value = "";
+            document.getElementById('filtroCedula').value = "";
+            
             cargarListaEmpleados();
         }
 
         async function cargarListaEmpleados() {
-            const res = await fetch(`${API_BASE}/admin/empleados`, {
-                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-            });
-            todosLosEmpleados = await res.json();
-            renderizarTablaEmpleados(todosLosEmpleados);
+            try {
+                const res = await fetch(`${API_BASE}/admin/empleados`, {
+                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+                });
+                todosLosEmpleados = await res.json();
+                renderizarTablaEmpleados(todosLosEmpleados);
+            } catch (e) {
+                console.error("Error al cargar empleados", e);
+            }
         }
 
         function filtrarTrabajadores() {
-            const nom = document.getElementById('filtroNombre').value.toLowerCase();
-            const ced = document.getElementById('filtroCedula').value.toLowerCase();
+            const nom = document.getElementById('filtroNombre').value.toLowerCase().trim();
+            const ced = document.getElementById('filtroCedula').value.toLowerCase().trim();
             
+            // Filtro dinámico igual al de admin.html
             const filtrados = todosLosEmpleados.filter(e => {
-                return e.nombre_completo.toLowerCase().includes(nom) && 
-                       e.cedula.toLowerCase().includes(ced);
+                const coincideNombre = e.nombre_completo.toLowerCase().includes(nom);
+                const coincideCedula = e.cedula.toLowerCase().includes(ced);
+                return coincideNombre && coincideCedula;
             });
             renderizarTablaEmpleados(filtrados);
         }
@@ -149,7 +160,7 @@
         function renderizarTablaEmpleados(lista) {
             const tabla = document.getElementById('listaEmps');
             if (lista.length === 0) {
-                tabla.innerHTML = '<tr><td colspan="2" class="p-6 text-center text-slate-400 italic font-bold">Sin resultados</td></tr>';
+                tabla.innerHTML = '<tr><td colspan="2" class="p-10 text-center text-slate-400 italic font-bold uppercase text-[10px]">No se encontraron resultados</td></tr>';
                 return;
             }
             tabla.innerHTML = lista.map(e => `
