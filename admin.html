@@ -2,171 +2,287 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Panel Admin - Debug Mode</title>
+    <title>Panel de Administración - Gestión</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="bg-slate-100 p-4 md:p-8">
+<body class="bg-slate-100 min-h-screen p-8">
     <div class="max-w-5xl mx-auto">
-        <header class="flex justify-between items-center bg-white p-6 rounded-xl shadow-sm mb-6">
-            <h1 class="text-xl font-bold">Gestión Centralizada</h1>
-            <button onclick="localStorage.clear(); location.href='index.html'" class="text-red-500 font-bold">Salir</button>
+        <header class="flex justify-between items-center mb-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-800">Panel Administrativo</h1>
+                <p class="text-slate-500">Gestión de expedientes y empresa</p>
+            </div>
+            <div class="flex gap-3">
+                <button id="btnVolver" onclick="mostrarMenuPrincipal()" class="hidden bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-2 rounded-lg font-medium transition-all flex items-center">
+                    <i class="fas fa-arrow-left mr-2"></i> Volver
+                </button>
+                <button onclick="localStorage.clear(); location.href='index.html'" class="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-lg font-medium transition-all">
+                    Cerrar Sesión
+                </button>
+            </div>
         </header>
 
-        <div class="bg-white p-6 rounded-xl shadow-sm mb-8 border-l-4 border-indigo-500">
-            <h2 class="font-bold mb-4 italic text-slate-600 underline">PASO 1: Crear nuevo trabajador</h2>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <input type="text" id="addNombre" placeholder="Nombre Completo" class="p-2 border rounded">
-                <input type="text" id="addUser" placeholder="Usuario (Cédula/DNI)" class="p-2 border rounded">
-                <input type="password" id="addPass" placeholder="Contraseña" class="p-2 border rounded">
-                <button onclick="crearTrabajador()" class="bg-indigo-600 text-white font-bold rounded py-2 hover:bg-indigo-700">
-                    <i class="fas fa-plus mr-2"></i>Crear Trabajador
-                </button>
+        <div id="menuPrincipal" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div onclick="cargarSeccionTrabajadores()" class="bg-white p-10 rounded-3xl shadow-sm border-2 border-transparent hover:border-indigo-500 cursor-pointer transition-all duration-300 group">
+                <div class="w-20 h-20 bg-indigo-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-indigo-600 transition-colors">
+                    <i class="fas fa-users text-indigo-600 text-3xl group-hover:text-white"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-800 mb-2">Trabajadores</h2>
+                <p class="text-slate-500">Gestión de expedientes de empleados.</p>
+            </div>
+
+            <div onclick="cargarSeccionEmpresa()" class="bg-white p-10 rounded-3xl shadow-sm border-2 border-transparent hover:border-emerald-500 cursor-pointer transition-all duration-300 group">
+                <div class="w-20 h-20 bg-emerald-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-emerald-600 transition-colors">
+                    <i class="fas fa-building text-emerald-600 text-3xl group-hover:text-white"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-800 mb-2">Empresa</h2>
+                <p class="text-slate-500">Subir nueva documentación corporativa.</p>
+            </div>
+
+            <div onclick="cargarSeccionGestionEmpresarial()" class="bg-white p-10 rounded-3xl shadow-sm border-2 border-transparent hover:border-purple-500 cursor-pointer transition-all duration-300 group">
+                <div class="w-20 h-20 bg-purple-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-purple-600 transition-colors">
+                    <i class="fas fa-briefcase text-purple-600 text-3xl group-hover:text-white"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-800 mb-2">Gestión Empresarial</h2>
+                <p class="text-slate-500">Monitor de archivos institucionales.</p>
             </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-            <table class="w-full text-left">
-                <thead class="bg-slate-50 border-b">
-                    <tr>
-                        <th class="p-4 font-bold">Nombre del Trabajador</th>
-                        <th class="p-4 text-right">Acción</th>
-                    </tr>
-                </thead>
-                <tbody id="listaEmps"></tbody>
-            </table>
+        <div id="seccionTrabajadores" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <h3 class="font-bold text-slate-800 mb-4"><i class="fas fa-user-plus mr-2 text-indigo-600"></i>Registrar Nuevo Trabajador</h3>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                    <input type="text" id="addNombre" placeholder="Nombre Completo" class="p-2 border rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="text" id="addUser" placeholder="Usuario (DNI)" class="p-2 border rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="password" id="addPass" placeholder="Contraseña" class="p-2 border rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+                    <button onclick="crearTrabajador()" class="bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition-all">Crear</button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <table class="w-full text-left">
+                    <thead class="bg-slate-50 border-b border-slate-200">
+                        <tr>
+                            <th class="px-6 py-4 text-sm font-bold text-slate-600">Empleado</th>
+                            <th class="px-6 py-4 text-sm font-bold text-slate-600 text-right">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listaEmps" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
         </div>
 
-        <div id="modalC" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-            <div class="bg-white w-full max-w-lg rounded-xl overflow-hidden shadow-2xl">
-                <div class="p-4 bg-indigo-600 text-white flex justify-between">
-                    <h3 id="nEmp" class="font-bold">Expediente</h3>
-                    <button onclick="cerrarModal()">✕</button>
-                </div>
-                <div id="lDocs" class="p-6 space-y-2 max-h-60 overflow-y-auto"></div>
-                
-                <div class="p-6 bg-slate-50 border-t">
-                    <p class="text-xs font-bold mb-2">PASO 2: Subir PDF a este usuario</p>
-                    <div class="flex gap-2">
-                        <select id="tipoDocAdmin" class="flex-1 p-2 border rounded text-sm">
-                            <option>Apta médica</option>
-                            <option>Capacitaciones de PRL</option>
-                            <option>Certificado de competencia</option>
-                            <option>Capacitación de trabajos en altura</option>
-                            <option>Acta de entrega de EPP</option>
-                        </select>
-                        <button onclick="document.getElementById('fileInput').click()" class="bg-emerald-600 text-white px-4 py-2 rounded text-sm font-bold">Subir</button>
+        <div id="seccionEmpresa" class="hidden space-y-4">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center">
+                    <i class="fas fa-file-shield mr-2 text-emerald-600"></i> Documentos Institucionales
+                </h2>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                        <span class="font-medium text-slate-700">Reglamento de seguridad</span>
+                        <button onclick="prepararSubidaEmpresa('Reglamento de seguridad')" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold">Subir PDF</button>
                     </div>
+                    <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                        <span class="font-medium text-slate-700">Matrices de riesgos</span>
+                        <button onclick="prepararSubidaEmpresa('Matrices de riesgos')" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold">Subir PDF</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="seccionGestionEmpresarial" class="hidden space-y-4">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-6 bg-purple-600 text-white flex justify-between items-center">
+                    <h2 class="text-lg font-bold flex items-center"><i class="fas fa-folder-tree mr-2"></i> Monitor Archivos Corporativos</h2>
+                </div>
+                <table class="w-full text-left">
+                    <tbody id="listaDocsEmpresa" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="modalC" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden">
+                <div class="bg-slate-50 p-6 border-b border-slate-200 flex justify-between items-center">
+                    <h3 class="text-lg font-bold text-slate-800 italic">📂 Expediente: <span id="nEmp" class="text-indigo-600 not-italic"></span></h3>
+                    <button onclick="cerrarModal()" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
+                </div>
+                <div id="lDocs" class="p-6 max-h-[50vh] overflow-y-auto space-y-3"></div>
+                
+                <div class="p-6 bg-indigo-50 border-t border-slate-100">
+                    <p class="text-xs font-bold text-indigo-700 uppercase mb-3">Subir documento a este empleado:</p>
+                    <div class="flex gap-2">
+                        <select id="tipoDocAdmin" class="flex-1 p-2 border rounded-lg text-sm">
+                            <option value="Apta médica">Apta médica</option>
+                            <option value="Capacitaciones de PRL">Capacitaciones de PRL</option>
+                            <option value="Certificado de competencia">Certificado de competencia</option>
+                            <option value="Capacitación de trabajos en altura">Capacitación de trabajos en altura</option>
+                            <option value="Acta de entrega de EPP">Acta de entrega de EPP</option>
+                        </select>
+                        <button onclick="prepararSubidaAdmin()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold">Subir PDF</button>
+                    </div>
+                </div>
+                <div class="p-4 bg-slate-50 text-right">
+                    <button onclick="cerrarModal()" class="bg-slate-800 text-white px-6 py-2 rounded-lg font-bold">Cerrar</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <input type="file" id="fileInput" class="hidden" accept=".pdf" onchange="ejecutarSubidaAdmin(this)">
+    <input type="file" id="fileInput" class="hidden" accept=".pdf">
 
     <script>
         const API_BASE = "https://backend-kelvin-docus.onrender.com/api";
-        let idUsuarioSeleccionado = null;
+        let idUsuarioActual = null;
+        let nombreEmpleadoActual = "";
+        let subiendoTipo = "";
+        let modoEmpresa = false;
 
-        async function cargarListaEmpleados() {
-            try {
-                const res = await fetch(`${API_BASE}/admin/empleados`, {
-                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-                });
-                const emps = await res.json();
-                document.getElementById('listaEmps').innerHTML = emps.map(e => `
-                    <tr class="border-b hover:bg-slate-50">
-                        <td class="p-4 font-medium">${e.nombre_completo}</td>
-                        <td class="p-4 text-right">
-                            <button onclick="abrirExpediente(${e.id}, '${e.nombre_completo}')" class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded font-bold">Ver / Subir</button>
-                        </td>
-                    </tr>`).join('');
-            } catch (e) { console.error("Error cargando lista", e); }
+        function mostrarMenuPrincipal() {
+            document.getElementById('menuPrincipal').classList.remove('hidden');
+            ['seccionTrabajadores', 'seccionEmpresa', 'seccionGestionEmpresarial', 'btnVolver'].forEach(id => document.getElementById(id).classList.add('hidden'));
+        }
+
+        function cargarSeccionTrabajadores() {
+            document.getElementById('menuPrincipal').classList.add('hidden');
+            document.getElementById('seccionTrabajadores').classList.remove('hidden');
+            document.getElementById('btnVolver').classList.remove('hidden');
+            cargarListaEmpleados();
         }
 
         async function crearTrabajador() {
             const nombre = document.getElementById('addNombre').value;
             const user = document.getElementById('addUser').value;
             const pass = document.getElementById('addPass').value;
+            if(!nombre || !user || !pass) return alert("Completa los datos");
 
-            console.log("Intentando enviar datos al servidor...");
+            const res = await fetch(`${API_BASE}/admin/crear-usuario`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+                body: JSON.stringify({ nombre_completo: nombre, username: user, password_hash: pass })
+            });
+            if(res.ok) { 
+                alert("Trabajador creado"); 
+                document.getElementById('addNombre').value = "";
+                document.getElementById('addUser').value = "";
+                document.getElementById('addPass').value = "";
+                cargarListaEmpleados(); 
+            } else { alert("Error al crear"); }
+        }
 
-            if(!nombre || !user || !pass) return alert("Faltan datos");
-
-            try {
-                const res = await fetch(`${API_BASE}/admin/crear-usuario`, {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + localStorage.getItem('token') 
-                    },
-                    body: JSON.stringify({ nombre_completo: nombre, username: user, password_hash: pass })
-                });
-
-                const data = await res.json();
-                console.log("Respuesta del servidor:", data);
-
-                if(res.ok) {
-                    alert("✅ Éxito: Usuario creado");
-                    document.getElementById('addNombre').value = "";
-                    document.getElementById('addUser').value = "";
-                    document.getElementById('addPass').value = "";
-                    cargarListaEmpleados();
-                } else {
-                    alert(`❌ Error del Servidor: ${data.detalle || data.error}`);
-                }
-            } catch (e) {
-                console.error("Error de conexión:", e);
-                alert("❌ Error de conexión al servidor");
-            }
+        async function cargarListaEmpleados() {
+            const res = await fetch(`${API_BASE}/admin/empleados`, {
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+            });
+            const emps = await res.json();
+            document.getElementById('listaEmps').innerHTML = emps.map(e => `
+                <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4 font-semibold text-slate-700">${e.nombre_completo}</td>
+                    <td class="px-6 py-4 text-right">
+                        <button onclick="abrirExpediente(${e.id}, '${e.nombre_completo}')" class="text-indigo-600 bg-indigo-50 px-4 py-2 rounded-lg font-bold text-sm">Ver Expediente</button>
+                    </td>
+                </tr>`).join('');
         }
 
         async function abrirExpediente(id, nombre) {
-            idUsuarioSeleccionado = id;
+            idUsuarioActual = id;
+            nombreEmpleadoActual = nombre;
             document.getElementById('nEmp').innerText = nombre;
-            document.getElementById('modalC').classList.remove('hidden');
             const res = await fetch(`${API_BASE}/admin/documentos/${id}`, {
                 headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
             });
             const docs = await res.json();
-            document.getElementById('lDocs').innerHTML = docs.length ? docs.map(d => `
-                <div class="flex justify-between bg-white p-2 border rounded">
-                    <span class="text-sm font-bold">${d.tipo_documento}</span>
-                    <a href="${d.url_cloudinary}" target="_blank" class="text-indigo-600"><i class="fas fa-eye"></i></a>
-                </div>`).join('') : '<p class="text-center text-slate-400">Sin documentos</p>';
+            document.getElementById('lDocs').innerHTML = docs.map(d => `
+                <div class="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-xl">
+                    <span class="text-sm font-bold text-slate-700">${d.tipo_documento}</span>
+                    <div class="flex gap-2">
+                        <a href="${d.url_cloudinary}" target="_blank" class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg"><i class="fas fa-eye"></i></a>
+                        <button onclick="eliminarDoc(${d.id})" class="p-2 text-rose-600 hover:bg-rose-50 rounded-lg"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>`).join('') || '<p class="text-center text-slate-400">No hay documentos cargados</p>';
+            document.getElementById('modalC').classList.remove('hidden');
         }
 
-        async function ejecutarSubidaAdmin(input) {
-            const file = input.files[0];
-            const tipo = document.getElementById('tipoDocAdmin').value;
-            if(!file) return;
+        // --- SISTEMA DE SUBIDA ---
+        function prepararSubidaAdmin() {
+            modoEmpresa = false;
+            subiendoTipo = document.getElementById('tipoDocAdmin').value;
+            document.getElementById('fileInput').click();
+        }
+
+        function prepararSubidaEmpresa(tipo) {
+            modoEmpresa = true;
+            subiendoTipo = tipo;
+            document.getElementById('fileInput').click();
+        }
+
+        document.getElementById('fileInput').onchange = async function() {
+            const file = this.files[0];
+            if(!file || file.type !== "application/pdf") return alert("Solo PDF");
 
             const formData = new FormData();
             formData.append('archivo', file);
-            formData.append('tipo_documento', tipo);
-            formData.append('usuario_id', idUsuarioSeleccionado);
-            formData.append('nombre_user', document.getElementById('nEmp').innerText);
+            formData.append('tipo_documento', subiendoTipo);
+            
+            let url = modoEmpresa ? `${API_BASE}/subir-empresa` : `${API_BASE}/admin/subir-a-usuario`;
+            if(!modoEmpresa) {
+                formData.append('usuario_id', idUsuarioActual);
+                formData.append('nombre_user', nombreEmpleadoActual);
+            }
 
             try {
-                const res = await fetch(`${API_BASE}/admin/subir-a-usuario`, {
+                const res = await fetch(url, {
                     method: 'POST',
                     headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
                     body: formData
                 });
                 if(res.ok) {
-                    alert("✅ PDF cargado al expediente");
-                    abrirExpediente(idUsuarioSeleccionado, document.getElementById('nEmp').innerText);
-                } else {
-                    alert("Error al subir");
+                    alert("Carga exitosa");
+                    if(!modoEmpresa) abrirExpediente(idUsuarioActual, nombreEmpleadoActual);
                 }
-            } catch (e) { alert("Error de red"); }
-            input.value = "";
+            } catch (e) { alert("Error de carga"); }
+            this.value = "";
+        };
+
+        async function eliminarDoc(id) {
+            if(!confirm("¿Eliminar?")) return;
+            await fetch(`${API_BASE}/admin/documentos/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+            });
+            abrirExpediente(idUsuarioActual, nombreEmpleadoActual);
         }
 
         function cerrarModal() { document.getElementById('modalC').classList.add('hidden'); }
 
-        // Carga inicial
-        window.onload = cargarListaEmpleados;
+        // GESTIÓN EMPRESA (TUS ORIGINALES)
+        function cargarSeccionEmpresa() {
+            document.getElementById('menuPrincipal').classList.add('hidden');
+            document.getElementById('seccionEmpresa').classList.remove('hidden');
+            document.getElementById('btnVolver').classList.remove('hidden');
+        }
+
+        function cargarSeccionGestionEmpresarial() {
+            document.getElementById('menuPrincipal').classList.add('hidden');
+            document.getElementById('seccionGestionEmpresarial').classList.remove('hidden');
+            document.getElementById('btnVolver').classList.remove('hidden');
+            cargarListaEmpresa();
+        }
+
+        async function cargarListaEmpresa() {
+            const res = await fetch(`${API_BASE}/admin/documentos-empresa`, {
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+            });
+            const docs = await res.json();
+            document.getElementById('listaDocsEmpresa').innerHTML = docs.map(d => `
+                <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4 text-sm font-bold text-slate-700">${d.tipo_documento}</td>
+                    <td class="px-6 py-4 text-right">
+                        <a href="${d.url_cloudinary}" target="_blank" class="text-indigo-600 mr-4"><i class="fas fa-eye"></i></a>
+                    </td>
+                </tr>`).join('');
+        }
     </script>
 </body>
 </html>
