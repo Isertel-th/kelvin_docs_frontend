@@ -25,27 +25,51 @@
             </div>
         </header>
 
-        <div id="menuPrincipal" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div onclick="cargarSeccionTrabajadores()" class="bg-white p-10 rounded-3xl shadow-sm border-2 border-transparent hover:border-indigo-500 cursor-pointer transition-all group">
-                <div class="w-16 h-16 bg-indigo-50 rounded-xl flex items-center justify-center mb-4 group-hover:bg-indigo-600 group-hover:text-white transition-all text-indigo-600">
+        <div id="menuPrincipal" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div onclick="cargarSeccionTrabajadores()" class="bg-white p-10 rounded-3xl shadow-sm border-2 border-transparent hover:border-indigo-500 cursor-pointer transition-all group text-center">
+                <div class="w-16 h-16 bg-indigo-50 rounded-xl flex items-center justify-center mb-4 mx-auto group-hover:bg-indigo-600 group-hover:text-white transition-all text-indigo-600">
                     <i class="fas fa-user-friends text-2xl"></i>
                 </div>
                 <h2 class="text-xl font-bold">Trabajadores</h2>
                 <p class="text-slate-500 text-sm italic">Expedientes de personal</p>
             </div>
-            <div onclick="cargarSeccionEmpresa()" class="bg-white p-10 rounded-3xl shadow-sm border-2 border-transparent hover:border-emerald-500 cursor-pointer transition-all group">
-                <div class="w-16 h-16 bg-emerald-50 rounded-xl flex items-center justify-center mb-4 group-hover:bg-emerald-600 group-hover:text-white transition-all text-emerald-600">
+            
+            <div onclick="cargarSeccionEmpresa()" class="bg-white p-10 rounded-3xl shadow-sm border-2 border-transparent hover:border-emerald-500 cursor-pointer transition-all group text-center">
+                <div class="w-16 h-16 bg-emerald-50 rounded-xl flex items-center justify-center mb-4 mx-auto group-hover:bg-emerald-600 group-hover:text-white transition-all text-emerald-600">
                     <i class="fas fa-building text-2xl"></i>
                 </div>
                 <h2 class="text-xl font-bold">Empresa</h2>
                 <p class="text-slate-500 text-sm italic">Documentos Institucionales</p>
             </div>
-            <div onclick="cargarSeccionGestionEmpresarial()" class="bg-white p-10 rounded-3xl shadow-sm border-2 border-transparent hover:border-purple-500 cursor-pointer transition-all group">
-                <div class="w-16 h-16 bg-purple-50 rounded-xl flex items-center justify-center mb-4 group-hover:bg-purple-600 group-hover:text-white transition-all text-purple-600">
+
+            <div onclick="cargarSeccionGestionEmpresarial()" class="bg-white p-10 rounded-3xl shadow-sm border-2 border-transparent hover:border-purple-500 cursor-pointer transition-all group text-center">
+                <div class="w-16 h-16 bg-purple-50 rounded-xl flex items-center justify-center mb-4 mx-auto group-hover:bg-purple-600 group-hover:text-white transition-all text-purple-600">
                     <i class="fas fa-folder-open text-2xl"></i>
                 </div>
                 <h2 class="text-xl font-bold">Gestión</h2>
                 <p class="text-slate-500 text-sm italic">Monitor de archivos</p>
+            </div>
+
+            <div onclick="cargarSeccionIndicadores()" class="bg-white p-10 rounded-3xl shadow-sm border-2 border-transparent hover:border-red-500 cursor-pointer transition-all group text-center">
+                <div class="w-16 h-16 bg-red-50 rounded-xl flex items-center justify-center mb-4 mx-auto group-hover:bg-red-600 group-hover:text-white transition-all text-red-600">
+                    <i class="fas fa-chart-line text-2xl"></i>
+                </div>
+                <h2 class="text-xl font-bold text-red-600">Indicadores</h2>
+                <p class="text-slate-500 text-sm italic">Estadísticas totales</p>
+            </div>
+        </div>
+
+        <div id="seccionIndicadores" class="hidden animate-fade-in space-y-6">
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-2xl font-bold text-slate-800">Estadísticas de Cumplimiento</h2>
+                    <div class="bg-red-600 text-white px-6 py-2 rounded-xl">
+                        <span class="text-sm opacity-80 uppercase font-bold">Personal Total:</span>
+                        <span id="statTotalTrabajadores" class="text-xl font-black ml-2">0</span>
+                    </div>
+                </div>
+                <div id="contenedorEstadisticas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    </div>
             </div>
         </div>
 
@@ -58,7 +82,6 @@
                     <button onclick="crearTrabajador()" class="md:col-span-3 bg-indigo-600 text-white font-bold py-2 rounded-lg hover:bg-indigo-700 transition-all">Registrar Trabajador</button>
                 </div>
             </div>
-
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap gap-4 items-center">
                 <div class="flex-1 min-w-[200px] relative">
                     <i class="fas fa-search absolute left-3 top-3 text-slate-400"></i>
@@ -69,7 +92,6 @@
                     <input type="text" id="filtroCedula" onkeyup="filtrarTrabajadores()" placeholder="Filtrar por cédula..." class="w-full pl-10 p-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                 </div>
             </div>
-
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                 <table class="w-full text-left">
                     <thead class="bg-slate-50 border-b">
@@ -145,11 +167,44 @@
     <script>
         const API_BASE = "https://backend-kelvin-docus.onrender.com/api";
         let idActual = null; let nombreActual = ""; let modoEmpresa = false; let subiendoTipo = "";
-        let todosLosEmpleados = []; // Variable para almacenar la lista original de empleados
+        let todosLosEmpleados = [];
 
         function mostrarMenuPrincipal() {
             document.getElementById('menuPrincipal').classList.remove('hidden');
-            ['seccionTrabajadores', 'seccionEmpresa', 'seccionGestionEmpresarial', 'btnVolver'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            ['seccionTrabajadores', 'seccionEmpresa', 'seccionGestionEmpresarial', 'seccionIndicadores', 'btnVolver'].forEach(id => document.getElementById(id).classList.add('hidden'));
+        }
+
+        async function cargarSeccionIndicadores() {
+            document.getElementById('menuPrincipal').classList.add('hidden');
+            document.getElementById('seccionIndicadores').classList.remove('hidden');
+            document.getElementById('btnVolver').classList.remove('hidden');
+            
+            try {
+                const res = await fetch(`${API_BASE}/admin/estadisticas`, {
+                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+                });
+                const data = await res.json();
+                document.getElementById('statTotalTrabajadores').innerText = data.totalTrabajadores;
+
+                const tiposOficiales = [
+                    "Apta médica", "Capacitaciones de PRL", "Certificado de competencia", 
+                    "Capacitación de trabajos en altura", "Acta de entrega de EPP"
+                ];
+
+                const html = tiposOficiales.map(tipo => {
+                    const found = data.detalles.find(d => d.tipo_documento === tipo);
+                    const cant = found ? found.cantidad : 0;
+                    return `
+                        <div class="p-6 bg-slate-50 rounded-2xl border-l-8 border-red-500 shadow-sm">
+                            <h4 class="text-xs font-black text-slate-400 uppercase mb-2">${tipo}</h4>
+                            <div class="flex items-baseline gap-2">
+                                <span class="text-4xl font-black text-slate-800">${cant}</span>
+                                <span class="text-slate-400 font-bold text-sm">Archivos</span>
+                            </div>
+                        </div>`;
+                }).join('');
+                document.getElementById('contenedorEstadisticas').innerHTML = html;
+            } catch(e) { console.error(e); }
         }
 
         function cargarSeccionTrabajadores() {
@@ -176,7 +231,6 @@
             const nombre = document.getElementById('nombre_completo').value;
             const dni = document.getElementById('cedula').value;
             if(!nombre || !dni) return alert("Nombre y Cédula requeridos");
-            
             const res = await fetch(`${API_BASE}/admin/crear-usuario`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
@@ -198,21 +252,13 @@
             renderizarTablaEmpleados(todosLosEmpleados);
         }
 
-        // Función para filtrar y mostrar resultados en tiempo real
         function filtrarTrabajadores() {
             const busquedaNombre = document.getElementById('filtroNombre').value.toLowerCase();
             const busquedaCedula = document.getElementById('filtroCedula').value.toLowerCase();
-
-            const filtrados = todosLosEmpleados.filter(e => {
-                const coincideNombre = e.nombre_completo.toLowerCase().includes(busquedaNombre);
-                const coincideCedula = e.cedula.toLowerCase().includes(busquedaCedula);
-                return coincideNombre && coincideCedula;
-            });
-
+            const filtrados = todosLosEmpleados.filter(e => e.nombre_completo.toLowerCase().includes(busquedaNombre) && e.cedula.toLowerCase().includes(busquedaCedula));
             renderizarTablaEmpleados(filtrados);
         }
 
-        // Función auxiliar para pintar la tabla de empleados
         function renderizarTablaEmpleados(lista) {
             document.getElementById('listaEmps').innerHTML = lista.map(e => `
                 <tr class="hover:bg-slate-50 animate-fade-in">
@@ -247,59 +293,32 @@
             document.getElementById('modalC').classList.remove('hidden');
         }
 
-        function prepararSubidaEmpresa(tipo) { 
-            modoEmpresa = true; 
-            subiendoTipo = tipo; 
-            document.getElementById('fileInput').click(); 
-        }
-
-        function prepararSubidaTrabajador() { 
-            modoEmpresa = false; 
-            subiendoTipo = document.getElementById('tipoDocAdmin').value; 
-            document.getElementById('fileInput').click(); 
-        }
+        function prepararSubidaEmpresa(tipo) { modoEmpresa = true; subiendoTipo = tipo; document.getElementById('fileInput').click(); }
+        function prepararSubidaTrabajador() { modoEmpresa = false; subiendoTipo = document.getElementById('tipoDocAdmin').value; document.getElementById('fileInput').click(); }
 
         document.getElementById('fileInput').onchange = async function() {
             const file = this.files[0]; if(!file) return;
-            
-            let fecha = "";
-            if(modoEmpresa) {
-                fecha = prompt("Ingrese la fecha de caducidad para este documento (AAAA-MM-DD):");
-            } else {
-                fecha = document.getElementById('fechaCaducidad').value;
-            }
-
+            let fecha = modoEmpresa ? prompt("Ingrese la fecha de caducidad (AAAA-MM-DD):") : document.getElementById('fechaCaducidad').value;
             const formData = new FormData();
             formData.append('archivo', file);
             formData.append('tipo_documento', subiendoTipo);
             formData.append('fecha_caducidad', fecha);
-
-            if(!modoEmpresa) { 
-                formData.append('usuario_id', idActual); 
-                formData.append('nombre_user', nombreActual); 
-            }
+            if(!modoEmpresa) { formData.append('usuario_id', idActual); formData.append('nombre_user', nombreActual); }
 
             const res = await fetch(modoEmpresa ? `${API_BASE}/subir-empresa` : `${API_BASE}/admin/subir-a-usuario`, {
                 method: 'POST',
                 headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
                 body: formData
             });
-            
             if(res.ok) { 
                 alert("Carga exitosa"); 
-                if(modoEmpresa) cargarListaEmpresa(); 
-                else {
-                    abrirExpediente(idActual, nombreActual);
-                    document.getElementById('fechaCaducidad').value = "";
-                }
+                if(modoEmpresa) cargarListaEmpresa(); else abrirExpediente(idActual, nombreActual);
             }
             this.value = "";
         };
 
         async function cargarListaEmpresa() {
-            const res = await fetch(`${API_BASE}/admin/documentos-empresa`, {
-                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-            });
+            const res = await fetch(`${API_BASE}/admin/documentos-empresa`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
             const docs = await res.json();
             document.getElementById('listaDocsEmpresa').innerHTML = docs.map(d => `
                 <tr class="hover:bg-slate-50">
@@ -316,8 +335,8 @@
                 </tr>`).join('');
         }
 
-        async function eliminarDoc(id) { if(confirm("¿Seguro que desea eliminar?")) { await fetch(`${API_BASE}/admin/documentos/${id}`, { method: 'DELETE', headers: {'Authorization': 'Bearer '+localStorage.getItem('token')} }); abrirExpediente(idActual, nombreActual); } }
-        async function eliminarDocEmpresa(id) { if(confirm("¿Seguro que desea eliminar?")) { await fetch(`${API_BASE}/admin/documentos-empresa/${id}`, { method: 'DELETE', headers: {'Authorization': 'Bearer '+localStorage.getItem('token')} }); cargarListaEmpresa(); } }
+        async function eliminarDoc(id) { if(confirm("¿Eliminar?")) { await fetch(`${API_BASE}/admin/documentos/${id}`, { method: 'DELETE', headers: {'Authorization': 'Bearer '+localStorage.getItem('token')} }); abrirExpediente(idActual, nombreActual); } }
+        async function eliminarDocEmpresa(id) { if(confirm("¿Eliminar?")) { await fetch(`${API_BASE}/admin/documentos-empresa/${id}`, { method: 'DELETE', headers: {'Authorization': 'Bearer '+localStorage.getItem('token')} }); cargarListaEmpresa(); } }
         function cerrarModal() { document.getElementById('modalC').classList.add('hidden'); }
     </script>
 </body>
