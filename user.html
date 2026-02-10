@@ -3,6 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>Panel de Consulta - Visualización</title>
+    <script>
+        (function() {
+            const token = localStorage.getItem('token');
+            const rol = localStorage.getItem('rol');
+            if (!token || (rol !== 'user' && rol !== 'admin')) {
+                window.location.href = 'index.html';
+            }
+        })();
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -108,7 +117,7 @@
 
     <script>
         const API_BASE = "https://kelvin-th-docs-backend.onrender.com/api";
-        let todosLosEmpleados = []; // Variable global crítica
+        let todosLosEmpleados = []; 
 
         function mostrarMenuPrincipal() {
             document.getElementById('menuPrincipal').classList.remove('hidden');
@@ -117,49 +126,35 @@
             });
         }
 
-        // --- LÓGICA DE FILTRADO CORREGIDA ---
-
         async function cargarListaEmpleados() {
             try {
                 const res = await fetch(`${API_BASE}/admin/empleados`, {
                     headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
                 });
+                if (res.status === 401 || res.status === 400) { location.href = 'index.html'; return; }
                 const data = await res.json();
-                
-                // Aseguramos que sea un array
                 todosLosEmpleados = Array.isArray(data) ? data : [];
-                console.log("Empleados cargados:", todosLosEmpleados); // Debug
-                
                 renderizarTablaEmpleados(todosLosEmpleados);
-            } catch (e) {
-                console.error("Error cargando empleados:", e);
-            }
+            } catch (e) { console.error("Error:", e); }
         }
 
         function cargarSeccionTrabajadores() {
             document.getElementById('menuPrincipal').classList.add('hidden');
             document.getElementById('seccionTrabajadores').classList.remove('hidden');
             document.getElementById('btnVolver').classList.remove('hidden');
-            
-            // Reset de inputs
             document.getElementById('filtroNombre').value = "";
             document.getElementById('filtroCedula').value = "";
-            
             cargarListaEmpleados();
         }
 
         function filtrarTrabajadores() {
             const valNombre = document.getElementById('filtroNombre').value.toLowerCase().trim();
             const valCedula = document.getElementById('filtroCedula').value.toLowerCase().trim();
-
-            console.log("Filtrando por:", { nombre: valNombre, cedula: valCedula });
-
             const filtrados = todosLosEmpleados.filter(emp => {
                 const n = (emp.nombre_completo || "").toLowerCase();
                 const c = (emp.cedula || "").toLowerCase();
                 return n.includes(valNombre) && c.includes(valCedula);
             });
-
             renderizarTablaEmpleados(filtrados);
         }
 
@@ -169,7 +164,6 @@
                 tbody.innerHTML = '<tr><td colspan="2" class="p-8 text-center text-slate-400 italic font-bold uppercase text-xs">No se encontraron resultados</td></tr>';
                 return;
             }
-
             tbody.innerHTML = lista.map(e => `
                 <tr class="hover:bg-slate-50 animate-fade-in">
                     <td class="px-6 py-4">
@@ -181,8 +175,6 @@
                     </td>
                 </tr>`).join('');
         }
-
-        // --- RESTO DE FUNCIONES (INDICADORES, DOCUMENTOS, MODAL) ---
 
         async function abrirExpediente(id, nombre) {
             document.getElementById('nEmp').innerText = nombre;
@@ -216,9 +208,7 @@
                 const data = await res.json();
                 const total = data.totalTrabajadores || 0;
                 document.getElementById('statTotalTrabajadores').innerText = total;
-
                 const tiposOficiales = ["Apta médica", "Capacitaciones de PRL", "Certificado de competencia", "Capacitación de trabajos en altura", "Acta de entrega de EPP"];
-
                 document.getElementById('contenedorEstadisticas').innerHTML = tiposOficiales.map(tipo => {
                     const found = data.detalles.find(d => d.tipo_documento === tipo);
                     const cant = found ? parseInt(found.cantidad) : 0;
