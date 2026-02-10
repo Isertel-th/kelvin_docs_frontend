@@ -78,7 +78,7 @@
                         <input type="text" id="nombre_completo" placeholder="Nombre Completo" class="p-2 border rounded-lg text-sm bg-slate-50 uppercase font-bold">
                         <input type="text" id="cedula" placeholder="Cédula / ID" class="p-2 border rounded-lg text-sm font-bold bg-indigo-50">
                         <input type="date" id="fecha_ingreso" title="Fecha de Ingreso" class="p-2 border rounded-lg text-sm font-bold bg-white">
-                        <button onclick="crearTrabajador()" class="bg-indigo-600 text-white font-bold py-2 rounded-lg hover:bg-indigo-700 transition-all uppercase text-sm">Registrar</button>
+                        <button type="button" onclick="crearTrabajador()" class="bg-indigo-600 text-white font-bold py-2 rounded-lg hover:bg-indigo-700 transition-all uppercase text-sm">Registrar</button>
                     </div>
                 </div>
 
@@ -224,7 +224,6 @@
             renderizarTablaEmpleados(todosLosEmpleados);
         }
 
-        // --- ACTUALIZADO PARA MOSTRAR FECHA DE INGRESO ---
         function renderizarTablaEmpleados(lista) {
             document.getElementById('listaEmps').innerHTML = lista.map(e => `
                 <tr class="hover:bg-slate-50 animate-fade-in">
@@ -245,23 +244,37 @@
                 </tr>`).join('');
         }
 
-        // --- ACTUALIZADO PARA ENVIAR FECHA_INGRESO ---
         async function crearTrabajador() {
             const nombre = document.getElementById('nombre_completo').value;
             const dni = document.getElementById('cedula').value;
             const fecha = document.getElementById('fecha_ingreso').value;
+
             if(!nombre || !dni) return alert("Error: Debe completar Nombre y Cédula");
-            const res = await fetch(`${API_BASE}/admin/crear-usuario`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
-                body: JSON.stringify({ nombre_completo: nombre, cedula: dni, fecha_ingreso: fecha })
-            });
-            if(res.ok) { 
-                alert("Trabajador registrado con éxito");
-                document.getElementById('nombre_completo').value = ""; 
-                document.getElementById('cedula').value = "";
-                document.getElementById('fecha_ingreso').value = "";
-                cargarListaEmpleados(); 
+
+            try {
+                const res = await fetch(`${API_BASE}/admin/crear-usuario`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json', 
+                        'Authorization': 'Bearer ' + localStorage.getItem('token') 
+                    },
+                    body: JSON.stringify({ nombre_completo: nombre, cedula: dni, fecha_ingreso: fecha })
+                });
+
+                const data = await res.json();
+
+                if(res.ok) { 
+                    alert("Trabajador registrado con éxito");
+                    document.getElementById('nombre_completo').value = ""; 
+                    document.getElementById('cedula').value = "";
+                    document.getElementById('fecha_ingreso').value = "";
+                    cargarListaEmpleados(); 
+                } else {
+                    alert("Error: " + (data.error || "No se pudo registrar al trabajador"));
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Error de conexión con el servidor");
             }
         }
 
