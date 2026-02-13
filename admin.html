@@ -230,6 +230,17 @@
         let todosLosEmpleados = []; // Aquí guardaremos la lista completa para filtrar localmente
         let modoLista = 'activos'; 
 
+        // NUEVA FUNCIÓN PARA CORREGIR EL ERROR DE FECHA
+        function formatearFechaUTC(fechaString) {
+            if (!fechaString) return "No registrada";
+            const fecha = new Date(fechaString);
+            // Usamos UTC para obtener el día exacto de la base de datos sin restar horas
+            const dia = fecha.getUTCDate();
+            const mes = fecha.getUTCMonth() + 1; // +1 porque los meses van de 0-11
+            const anio = fecha.getUTCFullYear();
+            return `${dia}/${mes}/${anio}`;
+        }
+
         function mostrarMenuPrincipal() {
             document.getElementById('menuPrincipal').classList.remove('hidden');
             ['seccionTrabajadores', 'seccionEmpresa', 'seccionGestionEmpresarial', 'seccionIndicadores', 'btnVolver', 'contenidoLista'].forEach(id => {
@@ -267,13 +278,14 @@
         }
 
         function renderizarTablaEmpleados(lista) {
+            // Se aplicó la función formatearFechaUTC en la visualización
             document.getElementById('listaEmps').innerHTML = lista.map(e => `
                 <tr class="hover:bg-slate-50 animate-fade-in">
                     <td class="px-6 py-4">
                         <div class="font-bold text-slate-800 uppercase text-xs">${e.nombre_completo}</div>
                         <div class="text-indigo-600 font-bold text-[10px] italic">CÉDULA: ${e.cedula}</div>
                         <div class="text-slate-500 font-medium text-[10px] mt-1">
-                            <i class="fas fa-calendar-alt mr-1"></i> INGRESO: ${e.fecha_ingreso ? new Date(e.fecha_ingreso).toLocaleDateString('es-ES') : 'No registrada'}
+                            <i class="fas fa-calendar-alt mr-1"></i> INGRESO: ${formatearFechaUTC(e.fecha_ingreso)}
                         </div>
                     </td>
                     <td class="px-6 py-4 text-right flex justify-end gap-2">
@@ -286,7 +298,7 @@
                 </tr>`).join('');
         }
 
-        // NUEVA FUNCIÓN DE FILTRADO GRANULAR (AÑO / MES)
+        // FUNCIÓN DE FILTRADO (Adaptada a UTC para consistencia)
         function ejecutarFiltros() {
             const busqueda = document.getElementById('filtroNombre').value.toLowerCase();
             const mesFiltro = document.getElementById('filtroMes').value; // "" o 0-11
@@ -301,8 +313,9 @@
                 let coincideFecha = true;
                 if (e.fecha_ingreso) {
                     const fechaObj = new Date(e.fecha_ingreso);
-                    const mesEmp = fechaObj.getMonth(); // 0 a 11
-                    const anioEmp = fechaObj.getFullYear();
+                    // IMPORTANTE: Usamos getUTC... para filtrar por lo que se ve en pantalla
+                    const mesEmp = fechaObj.getUTCMonth(); // 0 a 11
+                    const anioEmp = fechaObj.getUTCFullYear();
 
                     const coincideMes = mesFiltro === "" || mesEmp == mesFiltro;
                     const coincideAnio = anioFiltro === "" || anioEmp == anioFiltro;
@@ -366,7 +379,6 @@
                 });
                 const data = await res.json();
                 const total = data.totalTrabajadores || 0;
-                document.getElementById('statTotalTrabajadores').innerText = total;
                 const tiposOficiales = ["Apta médica", "Capacitaciones de PRL", "Certificado de competencia", "Capacitación de trabajos en altura", "Acta de entrega de EPP"];
                 const html = tiposOficiales.map(tipo => {
                     const found = data.detalles.find(d => d.tipo_documento === tipo);
