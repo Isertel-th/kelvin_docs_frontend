@@ -94,7 +94,14 @@
                 <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap gap-4 items-center">
                     <div class="flex-1 min-w-[200px] relative">
                         <i class="fas fa-search absolute left-3 top-3 text-slate-400"></i>
-                        <input type="text" id="filtroNombre" onkeyup="filtrarTrabajadores()" placeholder="Filtrar por nombre..." class="w-full pl-10 p-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <input type="text" id="filtroNombre" onkeyup="ejecutarFiltros()" placeholder="Buscar por nombre o cédula..." class="w-full pl-10 p-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase italic">Filtrar por Ingreso:</label>
+                        <input type="date" id="filtroFecha" onchange="ejecutarFiltros()" class="p-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-slate-600 font-bold">
+                        <button onclick="limpiarFiltros()" class="text-slate-400 hover:text-red-500 p-2 transition-colors" title="Limpiar Filtros">
+                            <i class="fas fa-times-circle"></i>
+                        </button>
                     </div>
                 </div>
 
@@ -335,11 +342,39 @@
             } catch(e) { console.error(e); }
         }
 
-        function filtrarTrabajadores() {
-            const bn = document.getElementById('filtroNombre').value.toLowerCase();
-            const filtrados = todosLosEmpleados.filter(e => e.nombre_completo.toLowerCase().includes(bn) || e.cedula.toLowerCase().includes(bn));
+        // --- NUEVA LÓGICA DE FILTRADO COMBINADO ---
+        function ejecutarFiltros() {
+            const busqueda = document.getElementById('filtroNombre').value.toLowerCase();
+            const fechaFiltro = document.getElementById('filtroFecha').value; // Formato YYYY-MM-DD
+
+            const filtrados = todosLosEmpleados.filter(e => {
+                // Filtro por nombre o cédula
+                const coincideTexto = e.nombre_completo.toLowerCase().includes(busqueda) || 
+                                     e.cedula.toLowerCase().includes(busqueda);
+                
+                // Filtro por fecha (compara solo la parte YYYY-MM-DD)
+                let coincideFecha = true;
+                if (fechaFiltro) {
+                    if (!e.fecha_ingreso) {
+                        coincideFecha = false;
+                    } else {
+                        const fechaEmp = e.fecha_ingreso.split('T')[0];
+                        coincideFecha = (fechaEmp === fechaFiltro);
+                    }
+                }
+
+                return coincideTexto && coincideFecha;
+            });
+
             renderizarTablaEmpleados(filtrados);
         }
+
+        function limpiarFiltros() {
+            document.getElementById('filtroNombre').value = "";
+            document.getElementById('filtroFecha').value = "";
+            renderizarTablaEmpleados(todosLosEmpleados);
+        }
+        // ------------------------------------------
 
         function cargarSeccionEmpresa() {
             document.getElementById('menuPrincipal').classList.add('hidden');
