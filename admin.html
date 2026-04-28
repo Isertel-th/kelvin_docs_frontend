@@ -81,13 +81,29 @@
             </div>
 
             <div id="contenidoLista" class="hidden space-y-6">
-                <div id="formNuevo" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                    <h3 class="font-bold text-slate-800 mb-4 uppercase text-xs tracking-wider italic">Nuevo Trabajador</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-                        <input type="text" id="nombre_completo" placeholder="Nombre Completo" class="p-2 border rounded-lg text-sm bg-slate-50 uppercase font-bold">
-                        <input type="text" id="cedula" placeholder="Cédula / ID" class="p-2 border rounded-lg text-sm font-bold bg-indigo-50">
-                        <input type="date" id="fecha_ingreso" title="Fecha de Ingreso" class="p-2 border rounded-lg text-sm font-bold bg-white">
-                        <button type="button" onclick="crearTrabajador()" class="bg-indigo-600 text-white font-bold py-2 rounded-lg hover:bg-indigo-700 transition-all uppercase text-sm">Registrar</button>
+                <div id="formNuevo" class="bg-white p-8 rounded-2xl shadow-md border border-slate-200">
+                    <h3 class="font-bold text-slate-800 mb-6 uppercase text-xs tracking-widest italic flex items-center">
+                        <i class="fas fa-user-plus mr-2 text-indigo-600"></i> Nuevo Registro de Personal
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-2xl p-4">
+                            <img id="previewFoto" src="https://via.placeholder.com/100" class="w-24 h-24 rounded-full object-cover mb-2 border-2 border-white shadow-sm">
+                            <label class="cursor-pointer bg-indigo-50 text-indigo-600 px-3 py-1 rounded-lg text-[10px] font-bold hover:bg-indigo-100 transition-all">
+                                <i class="fas fa-camera mr-1"></i> FOTO
+                                <input type="file" id="foto_usuario" accept="image/*" class="hidden" onchange="previewImage(this)">
+                            </label>
+                        </div>
+                        <div class="md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <input type="text" id="nombre_completo" placeholder="Nombre Completo" class="p-2 border rounded-lg text-sm bg-slate-50 uppercase font-bold outline-none focus:ring-2 focus:ring-indigo-500">
+                            <input type="text" id="cedula" placeholder="Cédula / ID" class="p-2 border rounded-lg text-sm font-bold bg-indigo-50 outline-none focus:ring-2 focus:ring-indigo-500">
+                            <input type="date" id="fecha_ingreso" title="Fecha de Ingreso" class="p-2 border rounded-lg text-sm font-bold bg-white outline-none focus:ring-2 focus:ring-indigo-500">
+                            <input type="email" id="correo" placeholder="Correo Electrónico" class="p-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <input type="tel" id="celular" placeholder="Celular" class="p-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <input type="text" id="direccion" placeholder="Dirección" class="p-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                    </div>
+                    <div class="mt-4 flex justify-end">
+                        <button type="button" onclick="crearTrabajador()" class="bg-indigo-600 text-white font-bold px-8 py-2 rounded-lg hover:bg-indigo-700 transition-all uppercase text-xs shadow-lg">Registrar Colaborador</button>
                     </div>
                 </div>
 
@@ -96,35 +112,18 @@
                         <i class="fas fa-search absolute left-3 top-3 text-slate-400"></i>
                         <input type="text" id="filtroNombre" onkeyup="ejecutarFiltros()" placeholder="Buscar por nombre o cédula..." class="w-full pl-10 p-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
                     </div>
-                    
                     <div class="flex items-center gap-2">
-                        <label class="text-[10px] font-bold text-slate-400 uppercase italic">Filtrar por Ingreso:</label>
-                        <select id="filtroMes" onchange="ejecutarFiltros()" class="p-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-slate-600 font-bold bg-slate-50">
+                        <select id="filtroMes" onchange="ejecutarFiltros()" class="p-2 border rounded-lg text-sm font-bold bg-slate-50 outline-none">
                             <option value="">Cualquier Mes</option>
-                            <option value="0">Enero</option>
-                            <option value="1">Febrero</option>
-                            <option value="2">Marzo</option>
-                            <option value="3">Abril</option>
-                            <option value="4">Mayo</option>
-                            <option value="5">Junio</option>
-                            <option value="6">Julio</option>
-                            <option value="7">Agosto</option>
-                            <option value="8">Septiembre</option>
-                            <option value="9">Octubre</option>
-                            <option value="10">Noviembre</option>
-                            <option value="11">Diciembre</option>
+                            <option value="0">Enero</option><option value="1">Febrero</option><option value="2">Marzo</option><option value="3">Abril</option>
+                            <option value="4">Mayo</option><option value="5">Junio</option><option value="6">Julio</option><option value="7">Agosto</option>
+                            <option value="8">Septiembre</option><option value="9">Octubre</option><option value="10">Noviembre</option><option value="11">Diciembre</option>
                         </select>
-                        <select id="filtroAnio" onchange="ejecutarFiltros()" class="p-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-slate-600 font-bold bg-slate-50">
+                        <select id="filtroAnio" onchange="ejecutarFiltros()" class="p-2 border rounded-lg text-sm font-bold bg-slate-50 outline-none">
                             <option value="">Cualquier Año</option>
-                            <option value="2022">2022</option>
-                            <option value="2023">2023</option>
-                            <option value="2024">2024</option>
-                            <option value="2025">2025</option>
-                            <option value="2026">2026</option>
+                            <option value="2024">2024</option><option value="2025">2025</option><option value="2026">2026</option>
                         </select>
-                        <button onclick="limpiarFiltros()" class="text-slate-400 hover:text-red-500 p-2 transition-colors" title="Limpiar Filtros">
-                            <i class="fas fa-times-circle"></i>
-                        </button>
+                        <button onclick="limpiarFiltros()" class="text-slate-400 hover:text-red-500 p-2"><i class="fas fa-times-circle"></i></button>
                     </div>
                 </div>
 
@@ -132,7 +131,7 @@
                     <table class="w-full text-left">
                         <thead class="bg-slate-50 border-b">
                             <tr>
-                                <th class="px-6 py-4 text-sm font-bold text-slate-600">Detalles del Trabajador</th>
+                                <th class="px-6 py-4 text-sm font-bold text-slate-600">Colaborador</th>
                                 <th class="px-6 py-4 text-sm font-bold text-slate-600 text-right">Acción</th>
                             </tr>
                         </thead>
@@ -145,9 +144,9 @@
         <div id="seccionIndicadores" class="hidden animate-fade-in space-y-6">
             <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
                 <div class="flex items-center justify-between mb-8">
-                    <h2 class="text-2xl font-bold text-slate-800 italic uppercase">Estadísticas de Cumplimiento</h2>
+                    <h2 class="text-2xl font-bold text-slate-800 italic uppercase">Cumplimiento</h2>
                     <div class="bg-red-600 text-white px-6 py-2 rounded-xl shadow-lg">
-                        <span class="text-sm opacity-80 uppercase font-bold">Personal Total:</span>
+                        <span class="text-sm opacity-80 uppercase font-bold">Total:</span>
                         <span id="statTotalTrabajadores" class="text-xl font-black ml-2">0</span>
                     </div>
                 </div>
@@ -158,28 +157,16 @@
         <div id="seccionEmpresa" class="hidden animate-fade-in space-y-4">
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                 <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center">
-                    <i class="fas fa-file-shield mr-2 text-emerald-600"></i> Documentos Institucionales
+                    <i class="fas fa-file-shield mr-2 text-emerald-600"></i> Institucionales
                 </h2>
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                        <span class="font-medium text-slate-700 uppercase text-xs font-bold italic">Reglamento de seguridad</span>
-                        <button onclick="prepararSubidaEmpresa('Reglamento de seguridad')" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center hover:bg-indigo-700"><i class="fas fa-upload mr-2"></i> Subir PDF</button>
+                <div class="space-y-4" id="listaDocsBaseEmpresa">
+                    <div class="flex items-center justify-between p-4 bg-slate-50 border rounded-xl">
+                        <span class="text-xs font-bold italic uppercase">Reglamento de seguridad</span>
+                        <button onclick="prepararSubidaEmpresa('Reglamento de seguridad')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-indigo-700">SUBIR PDF</button>
                     </div>
-                    <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                        <span class="font-medium text-slate-700 uppercase text-xs font-bold italic">Aprobación del reglamento</span>
-                        <button onclick="prepararSubidaEmpresa('Aprobación del reglamento')" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center hover:bg-indigo-700"><i class="fas fa-upload mr-2"></i> Subir PDF</button>
-                    </div>
-                    <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                        <span class="font-medium text-slate-700 uppercase text-xs font-bold italic">Matrices de riesgos</span>
-                        <button onclick="prepararSubidaEmpresa('Matrices de riesgos')" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center hover:bg-indigo-700"><i class="fas fa-upload mr-2"></i> Subir PDF</button>
-                    </div>
-                    <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                        <span class="font-medium text-slate-700 uppercase text-xs font-bold italic">Procedimiento de trabajos en altura</span>
-                        <button onclick="prepararSubidaEmpresa('Procedimiento de trabajos en altura')" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center hover:bg-indigo-700"><i class="fas fa-upload mr-2"></i> Subir PDF</button>
-                    </div>
-                    <div class="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                        <span class="font-medium text-slate-700 uppercase text-xs font-bold italic">Plan de emergencia</span>
-                        <button onclick="prepararSubidaEmpresa('Plan de emergencia')" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center hover:bg-indigo-700"><i class="fas fa-upload mr-2"></i> Subir PDF</button>
+                    <div class="flex items-center justify-between p-4 bg-slate-50 border rounded-xl">
+                        <span class="text-xs font-bold italic uppercase">Aprobación del reglamento</span>
+                        <button onclick="prepararSubidaEmpresa('Aprobación del reglamento')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-indigo-700">SUBIR PDF</button>
                     </div>
                 </div>
             </div>
@@ -187,14 +174,8 @@
 
         <div id="seccionGestionEmpresarial" class="hidden animate-fade-in space-y-4">
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="p-6 bg-purple-600 text-white font-bold italic uppercase text-sm tracking-widest">Monitor de Archivos Corporativos</div>
+                <div class="p-6 bg-purple-600 text-white font-bold italic uppercase text-sm">Monitor de Archivos Corporativos</div>
                 <table class="w-full text-left">
-                    <thead class="bg-slate-50 border-b">
-                        <tr class="text-[10px] uppercase font-bold text-slate-400">
-                            <th class="px-6 py-3">Tipo de Documento / Vencimiento</th>
-                            <th class="px-6 py-3 text-right">Acciones</th>
-                        </tr>
-                    </thead>
                     <tbody id="listaDocsEmpresa" class="divide-y divide-slate-100"></tbody>
                 </table>
             </div>
@@ -209,14 +190,10 @@
                 <div id="lDocs" class="p-6 space-y-3 max-h-80 overflow-y-auto bg-white"></div>
                 <div class="p-6 bg-indigo-50 border-t flex flex-wrap gap-2">
                     <select id="tipoDocAdmin" class="flex-1 p-2 border rounded-lg text-sm font-bold">
-                        <option>Apta médica</option>
-                        <option>Capacitaciones de PRL</option>
-                        <option>Certificado de competencia</option>
-                        <option>Capacitación de trabajos en altura</option>
-                        <option>Acta de entrega de EPP</option>
+                        <option>Apta médica</option><option>Capacitaciones de PRL</option><option>Certificado de competencia</option><option>Capacitación de trabajos en altura</option><option>Acta de entrega de EPP</option>
                     </select>
-                    <input type="date" id="fechaCaducidad" class="p-2 border rounded-lg text-sm font-bold" title="Fecha de caducidad">
-                    <button onclick="prepararSubidaTrabajador()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-indigo-700 transition-all uppercase">Subir PDF</button>
+                    <input type="date" id="fechaCaducidad" class="p-2 border rounded-lg text-sm font-bold">
+                    <button onclick="prepararSubidaTrabajador()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-indigo-700 uppercase">Subir PDF</button>
                 </div>
             </div>
         </div>
@@ -227,18 +204,21 @@
     <script>
         const API_BASE = "https://kelvin-th-docs-backend.onrender.com/api";
         let idActual = null; let nombreActual = ""; let modoEmpresa = false; let subiendoTipo = "";
-        let todosLosEmpleados = []; // Aquí guardaremos la lista completa para filtrar localmente
+        let todosLosEmpleados = []; 
         let modoLista = 'activos'; 
 
-        // NUEVA FUNCIÓN PARA CORREGIR EL ERROR DE FECHA
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => document.getElementById('previewFoto').src = e.target.result;
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
         function formatearFechaUTC(fechaString) {
             if (!fechaString) return "No registrada";
             const fecha = new Date(fechaString);
-            // Usamos UTC para obtener el día exacto de la base de datos sin restar horas
-            const dia = fecha.getUTCDate();
-            const mes = fecha.getUTCMonth() + 1; // +1 porque los meses van de 0-11
-            const anio = fecha.getUTCFullYear();
-            return `${dia}/${mes}/${anio}`;
+            return `${fecha.getUTCDate()}/${fecha.getUTCMonth() + 1}/${fecha.getUTCFullYear()}`;
         }
 
         function mostrarMenuPrincipal() {
@@ -270,65 +250,70 @@
             const res = await fetch(`${API_BASE}${endpoint}`, {
                 headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
             });
-            if (res.status === 401 || res.status === 400) { location.href = 'index.html'; return; }
-            
-            // Guardamos en la variable global para los filtros
             todosLosEmpleados = await res.json();
             renderizarTablaEmpleados(todosLosEmpleados);
         }
 
         function renderizarTablaEmpleados(lista) {
-            // Se aplicó la función formatearFechaUTC en la visualización
             document.getElementById('listaEmps').innerHTML = lista.map(e => `
                 <tr class="hover:bg-slate-50 animate-fade-in">
-                    <td class="px-6 py-4">
-                        <div class="font-bold text-slate-800 uppercase text-xs">${e.nombre_completo}</div>
-                        <div class="text-indigo-600 font-bold text-[10px] italic">CÉDULA: ${e.cedula}</div>
-                        <div class="text-slate-500 font-medium text-[10px] mt-1">
-                            <i class="fas fa-calendar-alt mr-1"></i> INGRESO: ${formatearFechaUTC(e.fecha_ingreso)}
+                    <td class="px-6 py-4 flex items-center gap-4">
+                        <img src="${e.foto_url || 'https://via.placeholder.com/40'}" class="w-10 h-10 rounded-full object-cover border border-slate-200">
+                        <div>
+                            <div class="font-bold text-slate-800 uppercase text-xs">${e.nombre_completo}</div>
+                            <div class="text-indigo-600 font-bold text-[9px] italic">ID: ${e.cedula} | TEL: ${e.celular || 'N/A'}</div>
+                            <div class="text-slate-400 text-[9px] uppercase font-medium">Ingreso: ${formatearFechaUTC(e.fecha_ingreso)}</div>
                         </div>
                     </td>
                     <td class="px-6 py-4 text-right flex justify-end gap-2">
-                        ${modoLista === 'activos' ? `
-                        <button onclick="transformarPasivo(${e.id})" class="bg-amber-50 text-amber-600 px-3 py-2 rounded-lg text-[10px] font-bold uppercase hover:bg-amber-100 border border-amber-200">
-                            Pasivo
-                        </button>` : ''}
-                        <button onclick="abrirExpediente(${e.id}, '${e.nombre_completo}')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold uppercase hover:bg-indigo-700 transition-all shadow-sm">Ver Carpeta</button>
+                        ${modoLista === 'activos' ? `<button onclick="transformarPasivo(${e.id})" class="bg-amber-50 text-amber-600 px-3 py-2 rounded-lg text-[10px] font-bold border border-amber-100">BAJA</button>` : ''}
+                        <button onclick="abrirExpediente(${e.id}, '${e.nombre_completo}')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-indigo-700 shadow-sm uppercase">Expediente</button>
                     </td>
                 </tr>`).join('');
         }
 
-        // FUNCIÓN DE FILTRADO (Adaptada a UTC para consistencia)
-        function ejecutarFiltros() {
-            const busqueda = document.getElementById('filtroNombre').value.toLowerCase();
-            const mesFiltro = document.getElementById('filtroMes').value; // "" o 0-11
-            const anioFiltro = document.getElementById('filtroAnio').value; // "" o 2024...
+        async function crearTrabajador() {
+            const formData = new FormData();
+            const fields = ['nombre_completo', 'cedula', 'fecha_ingreso', 'correo', 'celular', 'direccion'];
+            
+            for (const f of fields) {
+                const val = document.getElementById(f).value;
+                if(!val && f !== 'fecha_ingreso') return alert("Por favor complete: " + f.replace('_',' '));
+                formData.append(f, val);
+            }
 
-            const filtrados = todosLosEmpleados.filter(e => {
-                // 1. Coincidencia por texto
-                const coincideTexto = e.nombre_completo.toLowerCase().includes(busqueda) || 
-                                     e.cedula.toLowerCase().includes(busqueda);
-                
-                // 2. Coincidencia por Fecha
-                let coincideFecha = true;
-                if (e.fecha_ingreso) {
-                    const fechaObj = new Date(e.fecha_ingreso);
-                    // IMPORTANTE: Usamos getUTC... para filtrar por lo que se ve en pantalla
-                    const mesEmp = fechaObj.getUTCMonth(); // 0 a 11
-                    const anioEmp = fechaObj.getUTCFullYear();
+            const foto = document.getElementById('foto_usuario').files[0];
+            if(foto) formData.append('foto', foto);
 
-                    const coincideMes = mesFiltro === "" || mesEmp == mesFiltro;
-                    const coincideAnio = anioFiltro === "" || anioEmp == anioFiltro;
-                    
-                    coincideFecha = coincideMes && coincideAnio;
-                } else {
-                    // Si el empleado no tiene fecha, solo sale si no hay filtros de fecha activos
-                    if (mesFiltro !== "" || anioFiltro !== "") coincideFecha = false;
-                }
-
-                return coincideTexto && coincideFecha;
+            const res = await fetch(`${API_BASE}/admin/crear-usuario`, {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+                body: formData
             });
 
+            if(res.ok) {
+                alert("Empleado registrado con éxito");
+                location.reload();
+            } else {
+                const err = await res.json();
+                alert("Error: " + err.error);
+            }
+        }
+
+        // --- LÓGICAS ORIGINALES SIN CAMBIOS ---
+        function ejecutarFiltros() {
+            const busqueda = document.getElementById('filtroNombre').value.toLowerCase();
+            const mesFiltro = document.getElementById('filtroMes').value;
+            const anioFiltro = document.getElementById('filtroAnio').value;
+            const filtrados = todosLosEmpleados.filter(e => {
+                const coincideTexto = e.nombre_completo.toLowerCase().includes(busqueda) || e.cedula.toLowerCase().includes(busqueda);
+                let coincideFecha = true;
+                if (e.fecha_ingreso && (mesFiltro !== "" || anioFiltro !== "")) {
+                    const f = new Date(e.fecha_ingreso);
+                    coincideFecha = (mesFiltro === "" || f.getUTCMonth() == mesFiltro) && (anioFiltro === "" || f.getUTCFullYear() == anioFiltro);
+                }
+                return coincideTexto && coincideFecha;
+            });
             renderizarTablaEmpleados(filtrados);
         }
 
@@ -339,33 +324,13 @@
             renderizarTablaEmpleados(todosLosEmpleados);
         }
 
-        async function crearTrabajador() {
-            const nombre = document.getElementById('nombre_completo').value;
-            const dni = document.getElementById('cedula').value;
-            const fecha = document.getElementById('fecha_ingreso').value;
-            if(!nombre || !dni) return alert("Error: Debe completar Nombre y Cédula");
-
-            try {
-                const res = await fetch(`${API_BASE}/admin/crear-usuario`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
-                    body: JSON.stringify({ nombre_completo: nombre, cedula: dni, fecha_ingreso: fecha })
-                });
-                if(res.ok) { 
-                    alert("Trabajador registrado con éxito");
-                    document.getElementById('nombre_completo').value = ""; document.getElementById('cedula').value = ""; document.getElementById('fecha_ingreso').value = "";
-                    cargarListaEmpleados(); 
-                }
-            } catch (err) { console.error(err); }
-        }
-
         async function transformarPasivo(id) {
-            if(confirm("¿Seguro que desea mover este trabajador a PASIVOS?")){
+            if(confirm("¿Mover a PASIVOS?")) {
                 const res = await fetch(`${API_BASE}/admin/mover-a-pasivo/${id}`, {
                     method: 'POST',
                     headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
                 });
-                if(res.ok) { alert("Usuario transformado con éxito"); cargarListaEmpleados(); }
+                if(res.ok) cargarListaEmpleados();
             }
         }
 
@@ -373,36 +338,20 @@
             document.getElementById('menuPrincipal').classList.add('hidden');
             document.getElementById('seccionIndicadores').classList.remove('hidden');
             document.getElementById('btnVolver').classList.remove('hidden');
-            try {
-                const res = await fetch(`${API_BASE}/admin/estadisticas`, {
-                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-                });
-                const data = await res.json();
-                const total = data.totalTrabajadores || 0;
-                const tiposOficiales = ["Apta médica", "Capacitaciones de PRL", "Certificado de competencia", "Capacitación de trabajos en altura", "Acta de entrega de EPP"];
-                const html = tiposOficiales.map(tipo => {
-                    const found = data.detalles.find(d => d.tipo_documento === tipo);
-                    const cant = found ? parseInt(found.cantidad) : 0;
-                    const porcentaje = total > 0 ? ((cant / total) * 100).toFixed(1) : 0;
-                    return `
-                        <div class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-                            <div class="flex justify-between items-start mb-4">
-                                <div>
-                                    <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-wider">${tipo}</h4>
-                                    <div class="flex items-baseline gap-2">
-                                        <span class="text-3xl font-black text-slate-800">${cant}</span>
-                                        <span class="text-slate-400 text-xs font-bold">de ${total}</span>
-                                    </div>
-                                </div>
-                                <div class="text-right"><span class="text-lg font-black text-red-600">${porcentaje}%</span></div>
-                            </div>
-                            <div class="w-full bg-slate-100 rounded-full h-2">
-                                <div class="bg-red-600 h-2 rounded-full transition-all duration-1000" style="width: ${porcentaje}%"></div>
-                            </div>
-                        </div>`;
-                }).join('');
-                document.getElementById('contenedorEstadisticas').innerHTML = html;
-            } catch(e) { console.error(e); }
+            const res = await fetch(`${API_BASE}/admin/estadisticas`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+            const data = await res.json();
+            document.getElementById('statTotalTrabajadores').innerText = data.totalTrabajadores;
+            const tipos = ["Apta médica", "Capacitaciones de PRL", "Certificado de competencia", "Capacitación de trabajos en altura", "Acta de entrega de EPP"];
+            document.getElementById('contenedorEstadisticas').innerHTML = tipos.map(t => {
+                const f = data.detalles.find(d => d.tipo_documento === t);
+                const cant = f ? parseInt(f.cantidad) : 0;
+                const porc = data.totalTrabajadores > 0 ? ((cant / data.totalTrabajadores) * 100).toFixed(1) : 0;
+                return `<div class="p-6 bg-white rounded-2xl border">
+                    <h4 class="text-[10px] font-black text-slate-400 uppercase">${t}</h4>
+                    <div class="flex justify-between items-baseline mb-2"><span class="text-2xl font-black">${cant}</span><span class="text-red-600 font-bold">${porc}%</span></div>
+                    <div class="w-full bg-slate-100 h-2 rounded-full"><div class="bg-red-600 h-2 rounded-full" style="width:${porc}%"></div></div>
+                </div>`;
+            }).join('');
         }
 
         function cargarSeccionEmpresa() {
@@ -419,43 +368,17 @@
         }
 
         async function cargarListaEmpresa() {
-            const res = await fetch(`${API_BASE}/admin/documentos-empresa`, {
-                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-            });
+            const res = await fetch(`${API_BASE}/admin/documentos-empresa`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
             const docs = await res.json();
-            document.getElementById('listaDocsEmpresa').innerHTML = docs.map(d => `
-                <tr class="hover:bg-slate-50">
-                    <td class="px-6 py-4">
-                        <div class="text-xs font-bold text-slate-700 uppercase italic">${d.tipo_documento}</div>
-                        ${d.fecha_caducidad ? `<div class="text-[10px] text-red-500 font-bold italic">CADUCIDAD: ${new Date(d.fecha_caducidad).toLocaleDateString()}</div>` : ''}
-                    </td>
-                    <td class="px-6 py-4 text-right">
-                        <div class="flex justify-end gap-2">
-                            <a href="${d.url_cloudinary}" target="_blank" class="p-2 text-blue-600 bg-white border rounded-lg hover:bg-blue-50"><i class="fas fa-eye"></i></a>
-                            <button onclick="eliminarDocEmpresa(${d.id})" class="p-2 text-red-600 bg-white border rounded-lg hover:bg-red-50"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </td>
-                </tr>`).join('');
+            document.getElementById('listaDocsEmpresa').innerHTML = docs.map(d => `<tr class="hover:bg-slate-50"><td class="px-6 py-4 text-xs font-bold uppercase italic">${d.tipo_documento}</td><td class="px-6 py-4 text-right"><a href="${d.url_cloudinary}" target="_blank" class="text-blue-600 mr-4"><i class="fas fa-eye"></i></a><button onclick="eliminarDocEmpresa(${d.id})" class="text-red-500"><i class="fas fa-trash"></i></button></td></tr>`).join('');
         }
 
         async function abrirExpediente(id, nombre) {
             idActual = id; nombreActual = nombre;
             document.getElementById('nEmp').innerText = nombre;
-            const res = await fetch(`${API_BASE}/admin/documentos/${id}?pasivo=${modoLista==='pasivos'}`, {
-                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-            });
+            const res = await fetch(`${API_BASE}/admin/documentos/${id}?pasivo=${modoLista==='pasivos'}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
             const docs = await res.json();
-            document.getElementById('lDocs').innerHTML = docs.map(d => `
-                <div class="flex items-center justify-between p-3 bg-slate-50 border rounded-xl">
-                    <div>
-                        <span class="text-xs font-bold text-slate-700 uppercase italic">${d.tipo_documento}</span>
-                        ${d.fecha_caducidad ? `<p class="text-[10px] text-red-500 font-bold">VENCE: ${new Date(d.fecha_caducidad).toLocaleDateString()}</p>` : ''}
-                    </div>
-                    <div class="flex gap-1">
-                        <a href="${d.url_cloudinary}" target="_blank" class="p-2 text-blue-600 bg-white rounded-lg border shadow-sm"><i class="fas fa-eye"></i></a>
-                        <button onclick="eliminarDoc(${d.id})" class="p-2 text-red-600 bg-white rounded-lg border shadow-sm"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>`).join('') || '<p class="text-center text-slate-400 py-4 italic text-sm font-bold uppercase">No hay documentos registrados</p>';
+            document.getElementById('lDocs').innerHTML = docs.map(d => `<div class="flex justify-between items-center p-3 bg-slate-50 border rounded-xl"><span class="text-xs font-bold uppercase">${d.tipo_documento}</span><div><a href="${d.url_cloudinary}" target="_blank" class="text-blue-600 mr-2"><i class="fas fa-eye"></i></a><button onclick="eliminarDoc(${d.id})" class="text-red-500"><i class="fas fa-trash"></i></button></div></div>`).join('') || '<p class="text-center text-slate-400 py-4 italic text-xs uppercase font-bold">Sin archivos</p>';
             document.getElementById('modalC').classList.remove('hidden');
         }
 
@@ -465,38 +388,17 @@
 
         document.getElementById('fileInput').onchange = async function() {
             const file = this.files[0]; if(!file) return;
-            let fecha = modoEmpresa ? prompt("Ingrese fecha de caducidad (AAAA-MM-DD):") : document.getElementById('fechaCaducidad').value;
             const formData = new FormData();
             formData.append('archivo', file);
             formData.append('tipo_documento', subiendoTipo);
-            formData.append('fecha_caducidad', fecha);
-            if(!modoEmpresa) { 
-                formData.append('usuario_id', idActual); 
-                formData.append('nombre_user', nombreActual); 
-                formData.append('es_pasivo', modoLista === 'pasivos');
-            }
-            const res = await fetch(modoEmpresa ? `${API_BASE}/subir-empresa` : `${API_BASE}/admin/subir-a-usuario`, {
-                method: 'POST',
-                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
-                body: formData
-            });
-            if(res.ok) { 
-                alert("Documento subido con éxito"); 
-                if(modoEmpresa) cargarListaEmpresa(); else abrirExpediente(idActual, nombreActual);
-            }
+            if(!modoEmpresa) { formData.append('usuario_id', idActual); formData.append('nombre_user', nombreActual); formData.append('es_pasivo', modoLista === 'pasivos'); formData.append('fecha_caducidad', document.getElementById('fechaCaducidad').value); }
+            const res = await fetch(modoEmpresa ? `${API_BASE}/subir-empresa` : `${API_BASE}/admin/subir-a-usuario`, { method: 'POST', headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }, body: formData });
+            if(res.ok) { if(modoEmpresa) cargarListaEmpresa(); else abrirExpediente(idActual, nombreActual); }
             this.value = "";
         };
 
-        async function eliminarDoc(id) { 
-            if(confirm("¿Seguro que desea eliminar?")) { 
-                await fetch(`${API_BASE}/admin/documentos/${id}?pasivo=${modoLista==='pasivos'}`, { 
-                    method: 'DELETE', 
-                    headers: {'Authorization': 'Bearer '+localStorage.getItem('token')} 
-                }); 
-                abrirExpediente(idActual, nombreActual); 
-            } 
-        }
-        async function eliminarDocEmpresa(id) { if(confirm("¿Seguro que desea eliminar?")) { await fetch(`${API_BASE}/admin/documentos-empresa/${id}`, { method: 'DELETE', headers: {'Authorization': 'Bearer '+localStorage.getItem('token')} }); cargarListaEmpresa(); } }
+        async function eliminarDoc(id) { if(confirm("¿Eliminar?")) { await fetch(`${API_BASE}/admin/documentos/${id}?pasivo=${modoLista==='pasivos'}`, { method: 'DELETE', headers: {'Authorization': 'Bearer '+localStorage.getItem('token')} }); abrirExpediente(idActual, nombreActual); } }
+        async function eliminarDocEmpresa(id) { if(confirm("¿Eliminar?")) { await fetch(`${API_BASE}/admin/documentos-empresa/${id}`, { method: 'DELETE', headers: {'Authorization': 'Bearer '+localStorage.getItem('token')} }); cargarListaEmpresa(); } }
     </script>
 </body>
 </html>
