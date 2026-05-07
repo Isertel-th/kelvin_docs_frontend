@@ -199,7 +199,7 @@
 
                 <div id="footerSubida" class="hidden p-6 bg-indigo-50 border-t flex flex-wrap gap-2">
                     <div class="flex-1">
-                        <p class="text-[10px] font-bold text-indigo-400 uppercase mb-1">Tipo de documento en <span id="folderLabel"></span></p>
+                        <p class="text-[10px] font-bold text-indigo-400 uppercase mb-1">Documento en <span id="folderLabel"></span></p>
                         <select id="tipoDocAdmin" class="w-full p-2 border rounded-lg text-sm font-bold">
                             </select>
                     </div>
@@ -220,8 +220,8 @@
         let idActual = null; let nombreActual = ""; let modoEmpresa = false; let subiendoTipo = "";
         let todosLosEmpleados = []; 
         let modoLista = 'activos'; 
-        let documentosCargados = []; // Cache de docs del usuario actual
-        let carpetaActual = null; // null = raíz, 'Contrato de trabajo', 'Vacaciones', etc.
+        let documentosCargados = [];
+        let carpetaActual = null;
 
         function previewImage(input) {
             if (input.files && input.files[0]) {
@@ -292,38 +292,25 @@
         async function crearTrabajador() {
             const formData = new FormData();
             const fields = ['nombre_completo', 'cedula', 'fecha_ingreso', 'correo', 'celular', 'direccion'];
-            
             for (const f of fields) {
                 const val = document.getElementById(f).value;
                 if(!val && f !== 'fecha_ingreso') return alert("Por favor complete: " + f.replace('_',' '));
                 formData.append(f, val);
             }
-
             const foto = document.getElementById('foto_usuario').files[0];
             if(foto) formData.append('foto', foto);
-
             const res = await fetch(`${API_BASE}/admin/crear-usuario`, {
                 method: 'POST',
                 headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
                 body: formData
             });
-
-            if(res.ok) {
-                alert("Empleado registrado con éxito");
-                location.reload();
-            } else {
-                const err = await res.json();
-                alert("Error: " + err.error);
-            }
+            if(res.ok) { alert("Empleado registrado"); location.reload(); }
         }
-
-        // --- LÓGICA DE EXPEDIENTE POR CARPETAS (ACTUALIZADA) ---
 
         async function abrirExpediente(id, nombre) {
             idActual = id; nombreActual = nombre;
             document.getElementById('nEmp').innerText = nombre;
             document.getElementById('modalC').classList.remove('hidden');
-            
             const res = await fetch(`${API_BASE}/admin/documentos/${id}?pasivo=${modoLista==='pasivos'}`, { 
                 headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } 
             });
@@ -336,7 +323,6 @@
             document.getElementById('rutaCarpeta').innerText = "";
             document.getElementById('btnRetrocederCarpeta').classList.add('hidden');
             document.getElementById('footerSubida').classList.add('hidden');
-
             document.getElementById('lDocs').innerHTML = `
                 <div class="grid grid-cols-2 gap-4 pt-4">
                     <div onclick="entrarCarpeta('Contrato de trabajo')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 transition-all">
@@ -355,8 +341,7 @@
                         <i class="fas fa-exclamation-circle text-4xl text-amber-600 mb-3"></i>
                         <span class="font-bold text-xs uppercase text-slate-600">Memorándum</span>
                     </div>
-                </div>
-            `;
+                </div>`;
         }
 
         function entrarCarpeta(nombreCarpeta) {
@@ -365,10 +350,8 @@
             document.getElementById('btnRetrocederCarpeta').classList.remove('hidden');
             document.getElementById('footerSubida').classList.remove('hidden');
             document.getElementById('folderLabel').innerText = nombreCarpeta;
-
             const select = document.getElementById('tipoDocAdmin');
             
-            // Selección de opciones según carpeta
             if(nombreCarpeta === 'Contrato de trabajo') {
                 select.innerHTML = '<option>Contrato de trabajo</option><option>Anexo de contrato</option><option>Acta de finiquito</option>';
             } else if(nombreCarpeta === 'Vacaciones') {
@@ -376,29 +359,25 @@
             } else if(nombreCarpeta === 'Certificados Médicos') {
                 select.innerHTML = '<option>Certificado Médico IESS</option><option>Certificado Médico Privado</option><option>Reposo Médico</option><option>Apta médica</option>';
             } else if(nombreCarpeta === 'Memorándum') {
-                select.innerHTML = '<option>Memorándum de atención</option><option>Memorándum de felicitación</option><option>Memorándum informativo</option>';
+                // Simplificado según tu solicitud: solo opción "Memorandum"
+                select.innerHTML = '<option>Memorandum</option>';
             }
-
             renderizarArchivosCarpeta();
         }
 
         function renderizarArchivosCarpeta() {
-            // Mapeo de filtros según carpeta
             const mapeoFiltros = {
                 'Contrato de trabajo': ['contrato', 'finiquito', 'anexo'],
                 'Vacaciones': ['vacaciones', 'cronograma'],
                 'Certificados Médicos': ['médico', 'medico', 'reposo', 'apta'],
-                'Memorándum': ['memorándum', 'memorandum', 'atención', 'atencion', 'felicitación']
+                'Memorándum': ['memorandum', 'memorándum']
             };
-            
             const palabrasClave = mapeoFiltros[carpetaActual] || [];
-            
             const docsFiltrados = documentosCargados.filter(d => 
                 palabrasClave.some(p => d.tipo_documento.toLowerCase().includes(p))
             );
-
             document.getElementById('lDocs').innerHTML = docsFiltrados.map(d => `
-                <div class="flex justify-between items-center p-4 bg-white border border-slate-100 rounded-xl shadow-sm hover:shadow-md transition-all">
+                <div class="flex justify-between items-center p-4 bg-white border border-slate-100 rounded-xl shadow-sm">
                     <div class="flex items-center gap-3">
                         <i class="fas fa-file-pdf text-red-500 text-xl"></i>
                         <div>
@@ -407,19 +386,10 @@
                         </div>
                     </div>
                     <div class="flex gap-2">
-                        <a href="${d.url_cloudinary}" target="_blank" class="w-8 h-8 flex items-center justify-center bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-600 hover:text-white transition-all">
-                            <i class="fas fa-eye text-xs"></i>
-                        </a>
-                        <button onclick="eliminarDoc(${d.id})" class="w-8 h-8 flex items-center justify-center bg-red-50 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all">
-                            <i class="fas fa-trash text-xs"></i>
-                        </button>
+                        <a href="${d.url_cloudinary}" target="_blank" class="w-8 h-8 flex items-center justify-center bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-600 hover:text-white transition-all"><i class="fas fa-eye text-xs"></i></a>
+                        <button onclick="eliminarDoc(${d.id})" class="w-8 h-8 flex items-center justify-center bg-red-50 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all"><i class="fas fa-trash text-xs"></i></button>
                     </div>
-                </div>
-            `).join('') || `
-                <div class="flex flex-col items-center justify-center py-10 text-slate-300">
-                    <i class="fas fa-folder-open text-5xl mb-3"></i>
-                    <p class="text-xs font-bold uppercase italic">No hay documentos en esta carpeta</p>
-                </div>`;
+                </div>`).join('') || `<div class="flex flex-col items-center justify-center py-10 text-slate-300"><i class="fas fa-folder-open text-5xl mb-3"></i><p class="text-xs font-bold uppercase italic">Vacio</p></div>`;
         }
 
         function cerrarModal() { document.getElementById('modalC').classList.add('hidden'); }
@@ -443,9 +413,8 @@
                 body: formData 
             });
             if(res.ok) { 
-                if(modoEmpresa) {
-                    cargarListaEmpresa();
-                } else {
+                if(modoEmpresa) cargarListaEmpresa();
+                else {
                     const r = await fetch(`${API_BASE}/admin/documentos/${idActual}?pasivo=${modoLista==='pasivos'}`, { 
                         headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } 
                     });
@@ -457,11 +426,8 @@
         };
 
         async function eliminarDoc(id) { 
-            if(confirm("¿Eliminar definitivamente este documento?")) { 
-                await fetch(`${API_BASE}/admin/documentos/${id}?pasivo=${modoLista==='pasivos'}`, { 
-                    method: 'DELETE', 
-                    headers: {'Authorization': 'Bearer '+localStorage.getItem('token')} 
-                }); 
+            if(confirm("¿Eliminar?")) { 
+                await fetch(`${API_BASE}/admin/documentos/${id}?pasivo=${modoLista==='pasivos'}`, { method: 'DELETE', headers: {'Authorization': 'Bearer '+localStorage.getItem('token')} }); 
                 documentosCargados = documentosCargados.filter(d => d.id !== id);
                 renderizarArchivosCarpeta();
             } 
@@ -492,10 +458,7 @@
 
         async function transformarPasivo(id) {
             if(confirm("¿Mover a PASIVOS?")) {
-                const res = await fetch(`${API_BASE}/admin/mover-a-pasivo/${id}`, {
-                    method: 'POST',
-                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-                });
+                const res = await fetch(`${API_BASE}/admin/mover-a-pasivo/${id}`, { method: 'POST', headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
                 if(res.ok) cargarListaEmpleados();
             }
         }
