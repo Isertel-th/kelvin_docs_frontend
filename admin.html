@@ -310,7 +310,8 @@
                     <div onclick="entrarCarpeta('Vacaciones')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-emerald-500 hover:bg-emerald-50 transition-all"><i class="fas fa-umbrella-beach text-4xl text-emerald-600 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Vacaciones</span></div>
                     <div onclick="entrarCarpeta('Certificados medicos')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all"><i class="fas fa-notes-medical text-4xl text-blue-600 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Certificados Médicos</span></div>
                     <div onclick="entrarCarpeta('Memorandum')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-amber-500 hover:bg-amber-50 transition-all"><i class="fas fa-sticky-note text-4xl text-amber-600 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Memorándum</span></div>
-                    ${modoLista === 'pasivos' ? `<div onclick="entrarCarpeta('Desvinculación')" class="folder-card bg-red-50 border-2 border-dashed border-red-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-red-500 hover:bg-red-100 transition-all col-span-2"><i class="fas fa-user-minus text-4xl text-red-600 mb-3"></i><span class="font-bold text-xs uppercase text-red-600">Desvinculación</span></div>` : ''}
+                    <div onclick="entrarCarpeta('Certificados')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-purple-500 hover:bg-purple-50 transition-all"><i class="fas fa-award text-4xl text-purple-600 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Certificados</span></div>
+                    ${modoLista === 'pasivos' ? `<div onclick="entrarCarpeta('Desvinculación')" class="folder-card bg-red-50 border-2 border-dashed border-red-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-red-500 hover:bg-red-100 transition-all col-span-1"><i class="fas fa-user-minus text-4xl text-red-600 mb-3"></i><span class="font-bold text-xs uppercase text-red-600">Desvinculación</span></div>` : ''}
                 </div>`;
         }
 
@@ -328,6 +329,7 @@
             else if(nombreCarpeta === 'Vacaciones') ops = '<option>Solicitud de vacaciones</option><option>Aviso de salida vacaciones</option><option>Cronograma de vacaciones</option>';
             else if(nombreCarpeta === 'Certificados medicos') ops = '<option>Certificado médico IESS</option><option>Certificado médico privado</option><option>Reposo médico</option>';
             else if(nombreCarpeta === 'Memorandum') ops = '<option>Memorandum</option>';
+            else if(nombreCarpeta === 'Certificados') ops = '<option>Laborales</option><option>De honorabilidad</option>';
             else if(nombreCarpeta === 'Desvinculación') ops = '<option>Acta de finiquito</option><option>Comprobante de pago</option><option>Aviso de salida</option><option>Renuncia</option>';
             selectS.innerHTML = ops;
             selectF.innerHTML = '<option value="">Todos los tipos</option>' + ops;
@@ -343,13 +345,13 @@
             else if(carpetaActual === 'Vacaciones') pClave = ['vacaciones', 'cronograma'];
             else if(carpetaActual === 'Certificados medicos') pClave = ['medico', 'reposo'];
             else if(carpetaActual === 'Memorandum') pClave = ['memorandum'];
+            else if(carpetaActual === 'Certificados') pClave = ['laborales', 'honorabilidad'];
             else if(carpetaActual === 'Desvinculación') pClave = ['finiquito', 'pago', 'salida', 'renuncia'];
 
             let docs = documentosCargados.filter(d => pClave.some(p => d.tipo_documento.toLowerCase().includes(p)));
             if (fTipo) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fTipo));
             if (fFecha) docs = docs.filter(d => obtenerFechaInput(d.created_at) === fFecha);
 
-            // AGRUPACIÓN POR MESES
             const grupos = {};
             docs.forEach(d => {
                 const partes = d.tipo_documento.split(' - ');
@@ -383,7 +385,6 @@
             modoEmpresa = false; 
             const docBase = document.getElementById('tipoDocAdmin').value;
             const mesElegido = document.getElementById('periodoMes').value;
-            // Unimos el tipo con el mes para que el servidor lo guarde así
             subiendoTipo = `${docBase} - ${mesElegido}`;
             document.getElementById('fileInput').click(); 
         }
