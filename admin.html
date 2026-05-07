@@ -152,33 +152,6 @@
             </div>
         </div>
 
-        <div id="seccionEmpresa" class="hidden animate-fade-in space-y-4">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center">
-                    <i class="fas fa-file-shield mr-2 text-emerald-600"></i> Institucionales
-                </h2>
-                <div class="space-y-4" id="listaDocsBaseEmpresa">
-                    <div class="flex items-center justify-between p-4 bg-slate-50 border rounded-xl">
-                        <span class="text-xs font-bold italic uppercase">Reglamento de seguridad</span>
-                        <button onclick="prepararSubidaEmpresa('Reglamento de seguridad')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-indigo-700">SUBIR PDF</button>
-                    </div>
-                    <div class="flex items-center justify-between p-4 bg-slate-50 border rounded-xl">
-                        <span class="text-xs font-bold italic uppercase">Aprobación del reglamento</span>
-                        <button onclick="prepararSubidaEmpresa('Aprobación del reglamento')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-indigo-700">SUBIR PDF</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="seccionGestionEmpresarial" class="hidden animate-fade-in space-y-4">
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="p-6 bg-purple-600 text-white font-bold italic uppercase text-sm">Monitor de Archivos Corporativos</div>
-                <table class="w-full text-left">
-                    <tbody id="listaDocsEmpresa" class="divide-y divide-slate-100"></tbody>
-                </table>
-            </div>
-        </div>
-
         <div id="modalC" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden animate-fade-in">
                 <div class="p-6 bg-slate-50 border-b flex justify-between items-center">
@@ -361,7 +334,7 @@
             const select = document.getElementById('tipoDocAdmin');
             
             if(nombreCarpeta === 'Contratación') {
-                select.innerHTML = '<option>Contratación</option><option>Anexo de contrato</option><option>Acta de finiquito</option>';
+                select.innerHTML = '<option>Contrato de trabajo</option><option>Aviso de entrada</option><option>Extracto SUT</option>';
             } else if(nombreCarpeta === 'Vacaciones') {
                 select.innerHTML = '<option>Solicitud de vacaciones</option><option>Aviso de salida vacaciones</option><option>Cronograma de vacaciones</option>';
             } else if(nombreCarpeta === 'Certificados medicos') {
@@ -376,15 +349,15 @@
         }
 
         function renderizarArchivosCarpeta() {
-            let palabrasClave = [];
-            if(carpetaActual === 'Contratación') palabrasClave = ['contratación', 'finiquito', 'anexo de contrato'];
-            else if(carpetaActual === 'Vacaciones') palabrasClave = ['solicitud de vacaciones', 'aviso de salida vacaciones', 'cronograma de vacaciones'];
-            else if(carpetaActual === 'Certificados medicos') palabrasClave = ['certificado médico iess', 'certificado médico privado', 'reposo médico'];
-            else if(carpetaActual === 'Memorandum') palabrasClave = ['memorandum'];
-            else if(carpetaActual === 'Desvinculación') palabrasClave = ['acta de finiquito', 'comprobante de pago', 'aviso de salida', 'renuncia'];
+            let tiposPermitidos = [];
+            if(carpetaActual === 'Contratación') tiposPermitidos = ['contrato de trabajo', 'aviso de entrada', 'extracto sut'];
+            else if(carpetaActual === 'Vacaciones') tiposPermitidos = ['solicitud de vacaciones', 'aviso de salida vacaciones', 'cronograma de vacaciones'];
+            else if(carpetaActual === 'Certificados medicos') tiposPermitidos = ['certificado médico iess', 'certificado médico privado', 'reposo médico'];
+            else if(carpetaActual === 'Memorandum') tiposPermitidos = ['memorandum'];
+            else if(carpetaActual === 'Desvinculación') tiposPermitidos = ['acta de finiquito', 'comprobante de pago', 'aviso de salida', 'renuncia'];
 
             const docsFiltrados = documentosCargados.filter(d => 
-                palabrasClave.includes(d.tipo_documento.toLowerCase())
+                tiposPermitidos.includes(d.tipo_documento.toLowerCase())
             );
 
             document.getElementById('lDocs').innerHTML = docsFiltrados.map(d => `
@@ -428,15 +401,11 @@
             }
             const res = await fetch(modoEmpresa ? `${API_BASE}/subir-empresa` : `${API_BASE}/admin/subir-a-usuario`, { method: 'POST', headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }, body: formData });
             if(res.ok) { 
-                if(modoEmpresa) {
-                    cargarListaEmpresa();
-                } else {
-                    const r = await fetch(`${API_BASE}/admin/documentos/${idActual}?pasivo=${modoLista==='pasivos'}`, { 
-                        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } 
-                    });
-                    documentosCargados = await r.json();
-                    renderizarArchivosCarpeta();
-                }
+                const r = await fetch(`${API_BASE}/admin/documentos/${idActual}?pasivo=${modoLista==='pasivos'}`, { 
+                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } 
+                });
+                documentosCargados = await r.json();
+                renderizarArchivosCarpeta();
             }
             this.value = "";
         };
@@ -492,7 +461,7 @@
             const res = await fetch(`${API_BASE}/admin/estadisticas`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
             const data = await res.json();
             document.getElementById('statTotalTrabajadores').innerText = data.totalTrabajadores;
-            const tipos = ["Apta médica", "Capacitaciones de PRL", "Certificado de competencia", "Capacitación de trabajos en altura", "Acta de entrega de EPP"];
+            const tipos = ["Contrato de trabajo", "Aviso de entrada", "Extracto SUT"];
             document.getElementById('contenedorEstadisticas').innerHTML = tipos.map(t => {
                 const f = data.detalles.find(d => d.tipo_documento === t);
                 const cant = f ? parseInt(f.cantidad) : 0;
