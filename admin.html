@@ -170,14 +170,18 @@
                     <button onclick="cerrarModal()" class="text-2xl text-slate-400 hover:text-red-500 transition-colors">&times;</button>
                 </div>
 
-                <div id="barraFiltrosModal" class="hidden px-6 py-3 bg-white border-b flex gap-3 items-center">
-                    <div class="flex-1 relative">
+                <div id="barraFiltrosModal" class="hidden px-6 py-3 bg-white border-b flex flex-wrap gap-3 items-center">
+                    <div class="flex-1 min-w-[120px] relative">
                         <i class="fas fa-filter absolute left-3 top-2.5 text-slate-400 text-[10px]"></i>
                         <select id="filtroTipoDoc" onchange="renderizarArchivosCarpeta()" class="w-full pl-8 p-2 border rounded-lg text-[10px] font-bold uppercase outline-none bg-slate-50 focus:ring-2 focus:ring-indigo-500">
                             <option value="">Todos los tipos</option>
                         </select>
                     </div>
-                    <div class="flex-1 relative">
+                    <div class="flex-1 min-w-[120px] relative">
+                        <i class="fas fa-search absolute left-3 top-2.5 text-slate-400 text-[10px]"></i>
+                        <input type="text" id="filtroNombreArchivo" onkeyup="renderizarArchivosCarpeta()" placeholder="Nombre archivo..." class="w-full pl-8 p-2 border rounded-lg text-[10px] font-bold outline-none bg-slate-50 focus:ring-2 focus:ring-indigo-500 uppercase">
+                    </div>
+                    <div class="flex-1 min-w-[120px] relative">
                         <i class="fas fa-calendar absolute left-3 top-2.5 text-slate-400 text-[10px]"></i>
                         <input type="date" id="filtroFechaDoc" onchange="renderizarArchivosCarpeta()" class="w-full pl-8 p-2 border rounded-lg text-[10px] font-bold outline-none bg-slate-50 focus:ring-2 focus:ring-indigo-500">
                     </div>
@@ -340,6 +344,8 @@
         function renderizarArchivosCarpeta() {
             const fTipo = document.getElementById('filtroTipoDoc').value.toLowerCase();
             const fFecha = document.getElementById('filtroFechaDoc').value;
+            const fNombre = document.getElementById('filtroNombreArchivo').value.toLowerCase();
+
             let pClave = [];
             if(carpetaActual === 'Contratación') pClave = ['contrato', 'entrada', 'sut'];
             else if(carpetaActual === 'Vacaciones') pClave = ['vacaciones', 'cronograma'];
@@ -349,8 +355,10 @@
             else if(carpetaActual === 'Desvinculación') pClave = ['finiquito', 'pago', 'salida', 'renuncia'];
 
             let docs = documentosCargados.filter(d => pClave.some(p => d.tipo_documento.toLowerCase().includes(p)));
+            
             if (fTipo) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fTipo));
             if (fFecha) docs = docs.filter(d => obtenerFechaInput(d.created_at) === fFecha);
+            if (fNombre) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fNombre));
 
             const grupos = {};
             docs.forEach(d => {
@@ -391,7 +399,13 @@
             `).join('') || '<p class="text-center text-slate-300 text-xs py-10 uppercase italic">Sin archivos</p>';
         }
 
-        function limpiarFiltrosModal() { document.getElementById('filtroTipoDoc').value = ""; document.getElementById('filtroFechaDoc').value = ""; renderizarArchivosCarpeta(); }
+        function limpiarFiltrosModal() { 
+            document.getElementById('filtroTipoDoc').value = ""; 
+            document.getElementById('filtroFechaDoc').value = ""; 
+            document.getElementById('filtroNombreArchivo').value = "";
+            renderizarArchivosCarpeta(); 
+        }
+
         function cerrarModal() { document.getElementById('modalC').classList.add('hidden'); limpiarFiltrosModal(); }
         function prepararSubidaEmpresa(tipo) { modoEmpresa = true; subiendoTipo = tipo; document.getElementById('fileInput').click(); }
         
