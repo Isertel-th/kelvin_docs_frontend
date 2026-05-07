@@ -201,13 +201,7 @@
                     <div class="flex-1">
                         <p class="text-[10px] font-bold text-indigo-400 uppercase mb-1">Tipo de documento en <span id="folderLabel"></span></p>
                         <select id="tipoDocAdmin" class="w-full p-2 border rounded-lg text-sm font-bold">
-                            <option>Contrato de trabajo</option>
-                            <option>Anexo de contrato</option>
-                            <option>Solicitud de vacaciones</option>
-                            <option>Aviso de salida vacaciones</option>
-                            <option>Apta médica</option>
-                            <option>Capacitaciones de PRL</option>
-                        </select>
+                            </select>
                     </div>
                     <div class="flex flex-col">
                         <p class="text-[10px] font-bold text-indigo-400 uppercase mb-1">Caducidad</p>
@@ -227,7 +221,7 @@
         let todosLosEmpleados = []; 
         let modoLista = 'activos'; 
         let documentosCargados = []; // Cache de docs del usuario actual
-        let carpetaActual = null; // null = raíz, 'Contrato de trabajo', 'Vacaciones'
+        let carpetaActual = null; // null = raíz, 'Contrato de trabajo', 'Vacaciones', etc.
 
         function previewImage(input) {
             if (input.files && input.files[0]) {
@@ -323,7 +317,7 @@
             }
         }
 
-        // --- LÓGICA DE EXPEDIENTE POR CARPETAS ---
+        // --- LÓGICA DE EXPEDIENTE POR CARPETAS (ACTUALIZADA) ---
 
         async function abrirExpediente(id, nombre) {
             idActual = id; nombreActual = nombre;
@@ -353,6 +347,14 @@
                         <i class="fas fa-umbrella-beach text-4xl text-emerald-600 mb-3"></i>
                         <span class="font-bold text-xs uppercase text-slate-600">Vacaciones</span>
                     </div>
+                    <div onclick="entrarCarpeta('Certificados Médicos')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-red-500 hover:bg-red-50 transition-all">
+                        <i class="fas fa-heartbeat text-4xl text-red-600 mb-3"></i>
+                        <span class="font-bold text-xs uppercase text-slate-600">Certificados Médicos</span>
+                    </div>
+                    <div onclick="entrarCarpeta('Memorándum')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-amber-500 hover:bg-amber-50 transition-all">
+                        <i class="fas fa-exclamation-circle text-4xl text-amber-600 mb-3"></i>
+                        <span class="font-bold text-xs uppercase text-slate-600">Memorándum</span>
+                    </div>
                 </div>
             `;
         }
@@ -364,21 +366,32 @@
             document.getElementById('footerSubida').classList.remove('hidden');
             document.getElementById('folderLabel').innerText = nombreCarpeta;
 
-            // Filtrar opciones del select según carpeta
             const select = document.getElementById('tipoDocAdmin');
+            
+            // Selección de opciones según carpeta
             if(nombreCarpeta === 'Contrato de trabajo') {
                 select.innerHTML = '<option>Contrato de trabajo</option><option>Anexo de contrato</option><option>Acta de finiquito</option>';
-            } else {
+            } else if(nombreCarpeta === 'Vacaciones') {
                 select.innerHTML = '<option>Solicitud de vacaciones</option><option>Aviso de salida vacaciones</option><option>Cronograma de vacaciones</option>';
+            } else if(nombreCarpeta === 'Certificados Médicos') {
+                select.innerHTML = '<option>Certificado Médico IESS</option><option>Certificado Médico Privado</option><option>Reposo Médico</option><option>Apta médica</option>';
+            } else if(nombreCarpeta === 'Memorándum') {
+                select.innerHTML = '<option>Memorándum de atención</option><option>Memorándum de felicitación</option><option>Memorándum informativo</option>';
             }
 
             renderizarArchivosCarpeta();
         }
 
         function renderizarArchivosCarpeta() {
-            // Filtrar documentos que pertenezcan a la carpeta (por tipo o lógica similar)
-            // Para simplificar, agruparemos por palabras clave
-            const palabrasClave = carpetaActual === 'Contrato de trabajo' ? ['contrato', 'finiquito', 'anexo'] : ['vacaciones'];
+            // Mapeo de filtros según carpeta
+            const mapeoFiltros = {
+                'Contrato de trabajo': ['contrato', 'finiquito', 'anexo'],
+                'Vacaciones': ['vacaciones', 'cronograma'],
+                'Certificados Médicos': ['médico', 'medico', 'reposo', 'apta'],
+                'Memorándum': ['memorándum', 'memorandum', 'atención', 'atencion', 'felicitación']
+            };
+            
+            const palabrasClave = mapeoFiltros[carpetaActual] || [];
             
             const docsFiltrados = documentosCargados.filter(d => 
                 palabrasClave.some(p => d.tipo_documento.toLowerCase().includes(p))
@@ -424,12 +437,15 @@
                 formData.append('es_pasivo', modoLista === 'pasivos'); 
                 formData.append('fecha_caducidad', document.getElementById('fechaCaducidad').value); 
             }
-            const res = await fetch(modoEmpresa ? `${API_BASE}/subir-empresa` : `${API_BASE}/admin/subir-a-usuario`, { method: 'POST', headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }, body: formData });
+            const res = await fetch(modoEmpresa ? `${API_BASE}/subir-empresa` : `${API_BASE}/admin/subir-a-usuario`, { 
+                method: 'POST', 
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }, 
+                body: formData 
+            });
             if(res.ok) { 
                 if(modoEmpresa) {
                     cargarListaEmpresa();
                 } else {
-                    // Refrescar docs y volver a renderizar la carpeta actual
                     const r = await fetch(`${API_BASE}/admin/documentos/${idActual}?pasivo=${modoLista==='pasivos'}`, { 
                         headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } 
                     });
@@ -446,13 +462,10 @@
                     method: 'DELETE', 
                     headers: {'Authorization': 'Bearer '+localStorage.getItem('token')} 
                 }); 
-                // Actualizar cache local
                 documentosCargados = documentosCargados.filter(d => d.id !== id);
                 renderizarArchivosCarpeta();
             } 
         }
-
-        // --- RESTO DE FUNCIONES (INDICADORES, EMPRESA, ETC) ---
 
         function ejecutarFiltros() {
             const busqueda = document.getElementById('filtroNombre').value.toLowerCase();
@@ -526,7 +539,12 @@
             document.getElementById('listaDocsEmpresa').innerHTML = docs.map(d => `<tr class="hover:bg-slate-50"><td class="px-6 py-4 text-xs font-bold uppercase italic">${d.tipo_documento}</td><td class="px-6 py-4 text-right"><a href="${d.url_cloudinary}" target="_blank" class="text-blue-600 mr-4"><i class="fas fa-eye"></i></a><button onclick="eliminarDocEmpresa(${d.id})" class="text-red-500"><i class="fas fa-trash"></i></button></td></tr>`).join('');
         }
 
-        async function eliminarDocEmpresa(id) { if(confirm("¿Eliminar?")) { await fetch(`${API_BASE}/admin/documentos-empresa/${id}`, { method: 'DELETE', headers: {'Authorization': 'Bearer '+localStorage.getItem('token')} }); cargarListaEmpresa(); } }
+        async function eliminarDocEmpresa(id) { 
+            if(confirm("¿Eliminar?")) { 
+                await fetch(`${API_BASE}/admin/documentos-empresa/${id}`, { method: 'DELETE', headers: {'Authorization': 'Bearer '+localStorage.getItem('token')} }); 
+                cargarListaEmpresa(); 
+            } 
+        }
     </script>
 </body>
 </html>
