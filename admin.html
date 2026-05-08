@@ -124,20 +124,33 @@
             </div>
         </div>
 
-        <div id="seccionEmpresa" class="hidden animate-fade-in space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center">
-                    <i class="fas fa-file-pdf text-4xl text-red-500 mb-4"></i>
-                    <h3 class="font-bold uppercase text-xs mb-4">Políticas Internas</h3>
-                    <button onclick="prepararSubidaEmpresa('Politicas')" class="bg-indigo-600 text-white px-6 py-2 rounded-lg text-xs font-bold uppercase hover:bg-indigo-700">Subir PDF</button>
-                </div>
-                <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center">
-                    <i class="fas fa-handshake text-4xl text-indigo-500 mb-4"></i>
-                    <h3 class="font-bold uppercase text-xs mb-4">Código de Ética</h3>
-                    <button onclick="prepararSubidaEmpresa('Etica')" class="bg-indigo-600 text-white px-6 py-2 rounded-lg text-xs font-bold uppercase hover:bg-indigo-700">Subir PDF</button>
-                </div>
+<div id="seccionEmpresa" class="hidden animate-fade-in space-y-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center">
+            <div class="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center mb-4 text-indigo-600">
+                <i class="fas fa-file-invoice text-3xl"></i>
+            </div>
+            <h3 class="font-bold uppercase text-xs mb-4 text-slate-700">Reglamento Interno</h3>
+            <div class="flex gap-2">
+                <button onclick="prepararSubidaEmpresa('Reglamento Interno')" class="bg-indigo-600 text-white px-6 py-2 rounded-lg text-xs font-bold uppercase hover:bg-indigo-700 shadow-sm transition-all">
+                    <i class="fas fa-upload mr-2"></i>Subir PDF
+                </button>
             </div>
         </div>
+
+        <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center">
+            <div class="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mb-4 text-emerald-600">
+                <i class="fas fa-hard-hat text-3xl"></i>
+            </div>
+            <h3 class="font-bold uppercase text-xs mb-4 text-slate-700">Reglamento de SSO</h3>
+            <div class="flex gap-2">
+                <button onclick="prepararSubidaEmpresa('Reglamento de SSO')" class="bg-emerald-600 text-white px-6 py-2 rounded-lg text-xs font-bold uppercase hover:bg-emerald-700 shadow-sm transition-all">
+                    <i class="fas fa-upload mr-2"></i>Subir PDF
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
         <div id="seccionGestionEmpresarial" class="hidden animate-fade-in">
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
