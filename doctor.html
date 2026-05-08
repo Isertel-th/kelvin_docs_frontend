@@ -3,35 +3,220 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Doctor - Isertel</title>
+    <title>Panel Médico - Isertel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; display: flex; flex-direction: column; align-items: center; height: 100vh; justify-content: center;}
-        .card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; }
-        h1 { color: #2c3e50; }
-        .badge { background: #3498db; color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold; }
-        button { margin-top: 20px; padding: 10px 25px; background: #e74c3c; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;}
-        button:hover { background: #c0392b; }
+        .sidebar-item.active { background: #2563eb; color: white; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        body { background-color: #f1f5f9; font-family: 'Inter', sans-serif; }
     </style>
 </head>
-<body>
+<body class="flex min-h-screen">
 
-    <div class="card">
-        <h1>Hola Mundo</h1>
-        <p>Bienvenido al Panel de Gestión para <strong>Doctores</strong></p>
-        <p>Usuario conectado: <span class="badge" id="nombreDoctor">...</span></p>
-        <button onclick="logout()">Cerrar Sesión</button>
+    <div class="w-72 bg-slate-900 text-slate-300 flex flex-col shadow-2xl">
+        <div class="p-8 text-center border-b border-slate-800">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-500/10 mb-4">
+                <i class="fas fa-user-md text-3xl text-blue-500"></i>
+            </div>
+            <h2 class="text-white font-black uppercase text-xs tracking-widest">Servicio Médico</h2>
+            <p class="text-[10px] text-slate-500 mt-1 uppercase font-bold">Isertel S.A.</p>
+        </div>
+        
+        <nav class="flex-1 p-6 space-y-3">
+            <p class="text-[10px] font-bold text-slate-500 uppercase px-3 mb-2 tracking-widest">Navegación</p>
+            <button onclick="showTab('tab-inicio')" class="sidebar-item active w-full flex items-center p-4 rounded-xl transition-all duration-200 hover:bg-slate-800 group">
+                <i class="fas fa-th-large mr-3 w-5 group-hover:text-blue-400"></i> <span class="text-sm font-semibold">Inicio</span>
+            </button>
+            <button onclick="showTab('tab-activos'); loadData('activos')" class="sidebar-item w-full flex items-center p-4 rounded-xl transition-all duration-200 hover:bg-slate-800 group">
+                <i class="fas fa-users mr-3 w-5 group-hover:text-blue-400"></i> <span class="text-sm font-semibold">Empleados Activos</span>
+            </button>
+            <button onclick="showTab('tab-pasivos'); loadData('pasivos')" class="sidebar-item w-full flex items-center p-4 rounded-xl transition-all duration-200 hover:bg-slate-800 group">
+                <i class="fas fa-user-clock mr-3 w-5 group-hover:text-blue-400"></i> <span class="text-sm font-semibold">Empleados Pasivos</span>
+            </button>
+            <div class="pt-4 border-t border-slate-800 my-4"></div>
+            <p class="text-[10px] font-bold text-slate-500 uppercase px-3 mb-2 tracking-widest">Expedientes</p>
+            <button onclick="showTab('tab-certificados'); loadCertificados()" class="sidebar-item w-full flex items-center p-4 rounded-xl transition-all duration-200 hover:bg-slate-800 group">
+                <i class="fas fa-notes-medical mr-3 w-5 group-hover:text-blue-400"></i> <span class="text-sm font-semibold">Certificados Médicos</span>
+            </button>
+        </nav>
+
+        <div class="p-6 border-t border-slate-800">
+            <button onclick="logout()" class="w-full flex items-center p-4 rounded-xl text-red-400 hover:bg-red-500/10 transition-all font-bold text-sm">
+                <i class="fas fa-power-off mr-3"></i> Salir del Sistema
+            </button>
+        </div>
+    </div>
+
+    <div class="flex-1 p-10 overflow-y-auto">
+        <header class="flex justify-between items-center mb-10">
+            <div>
+                <h1 class="text-3xl font-black text-slate-800 tracking-tight">Panel de Control</h1>
+                <p class="text-slate-500 text-sm mt-1">Bienvenido, Dr. <span id="nombreDoctor" class="text-blue-600 font-bold">...</span></p>
+            </div>
+            <div class="bg-white p-3 rounded-2xl shadow-sm border border-slate-100">
+                <img src="https://www.isertel.com.ec/wp-content/uploads/2021/03/logo-isertel.png" alt="Logo" class="h-8">
+            </div>
+        </header>
+
+        <div id="tab-inicio" class="tab-content active">
+            <div class="bg-gradient-to-br from-blue-600 to-indigo-700 p-12 rounded-[2rem] text-white shadow-2xl shadow-blue-200 relative overflow-hidden">
+                <div class="relative z-10">
+                    <h2 class="text-4xl font-black mb-4">Gestión Médica Isertel</h2>
+                    <p class="text-blue-100 text-lg max-w-xl leading-relaxed">Sistema centralizado para el monitoreo de certificados médicos y validación de reposos del personal activo y pasivo.</p>
+                </div>
+                <i class="fas fa-heartbeat absolute -right-10 -bottom-10 text-[15rem] text-white/10 rotate-12"></i>
+            </div>
+        </div>
+
+        <div id="tab-activos" class="tab-content">
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-6 border-b border-slate-100 bg-slate-50/50">
+                    <h3 class="font-bold text-slate-800">Lista de Personal Activo</h3>
+                </div>
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-slate-50 text-slate-400 text-[10px] uppercase font-black border-b tracking-widest">
+                        <tr>
+                            <th class="px-8 py-5">Colaborador</th>
+                            <th class="px-8 py-5">Identificación</th>
+                            <th class="px-8 py-5">Correo Electrónico</th>
+                            <th class="px-8 py-5 text-right">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-activos" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-pasivos" class="tab-content">
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-6 border-b border-slate-100 bg-slate-50/50">
+                    <h3 class="font-bold text-slate-800">Archivo de Personal Pasivo</h3>
+                </div>
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-slate-50 text-slate-400 text-[10px] uppercase font-black border-b tracking-widest">
+                        <tr>
+                            <th class="px-8 py-5">Ex-Colaborador</th>
+                            <th class="px-8 py-5">Cédula</th>
+                            <th class="px-8 py-5">Contacto</th>
+                            <th class="px-8 py-5 text-right">Categoría</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-pasivos" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-certificados" class="tab-content">
+            <div class="mb-6 flex gap-4">
+                <div class="relative flex-1">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" id="searchCert" onkeyup="filterCerts()" placeholder="Buscar por nombre del empleado..." class="w-full pl-12 pr-6 py-4 rounded-2xl border-none shadow-sm ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm transition-all">
+                </div>
+            </div>
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-blue-600 text-white text-[10px] uppercase font-black tracking-widest">
+                        <tr>
+                            <th class="px-8 py-5">Fecha de Registro</th>
+                            <th class="px-8 py-5">Empleado</th>
+                            <th class="px-8 py-5">Relación</th>
+                            <th class="px-8 py-5">Documento / Periodo</th>
+                            <th class="px-8 py-5 text-center">Visualizar</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-certificados" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Verificación de seguridad
+        const API_BASE = "https://kelvin-th-docs-backend.onrender.com/api";
         const token = localStorage.getItem('token');
         const rol = localStorage.getItem('rol');
-        const nombre = localStorage.getItem('nombre');
 
-        if (!token || rol !== 'doc') {
-            window.location.href = 'index.html';
-        } else {
-            document.getElementById('nombreDoctor').innerText = nombre;
+        // Seguridad de acceso
+        if (!token || rol !== 'doc') { window.location.href = 'index.html'; }
+        document.getElementById('nombreDoctor').innerText = localStorage.getItem('nombre');
+
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        async function loadData(tipo) {
+            const url = tipo === 'activos' ? `${API_BASE}/admin/empleados` : `${API_BASE}/admin/pasivos`;
+            try {
+                const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await res.json();
+                const tbody = document.getElementById(`lista-${tipo}`);
+                tbody.innerHTML = data.map(u => `
+                    <tr class="hover:bg-slate-50/80 transition-colors">
+                        <td class="px-8 py-6">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-black text-xs">
+                                    ${u.nombre_completo.split(' ').map(n => n[0]).join('').substring(0,2)}
+                                </div>
+                                <span class="font-bold text-slate-700 text-sm">${u.nombre_completo}</span>
+                            </div>
+                        </td>
+                        <td class="px-8 py-6 text-slate-500 text-xs font-medium">${u.cedula}</td>
+                        <td class="px-8 py-6 text-slate-500 text-xs">${u.correo || u.celular || 'Sin registro'}</td>
+                        <td class="px-8 py-6 text-right">
+                            <span class="px-3 py-1 ${tipo === 'activos' ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-500'} rounded-full text-[9px] font-black uppercase tracking-tighter">
+                                ${tipo === 'activos' ? 'Activo' : 'Pasivo'}
+                            </span>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) { console.error("Error cargando usuarios:", e); }
+        }
+
+        async function loadCertificados() {
+            try {
+                const res = await fetch(`${API_BASE}/doctor/certificados-globales`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await res.json();
+                const tbody = document.getElementById('lista-certificados');
+                tbody.innerHTML = data.map(d => `
+                    <tr class="hover:bg-blue-50/50 transition-colors">
+                        <td class="px-8 py-6">
+                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">${new Date(d.created_at).toLocaleDateString()}</div>
+                            <div class="text-[9px] text-slate-300 italic">${new Date(d.created_at).toLocaleTimeString()}</div>
+                        </td>
+                        <td class="px-8 py-6">
+                            <div class="font-black text-slate-700 text-sm uppercase tracking-tight">${d.empleado_nombre}</div>
+                        </td>
+                        <td class="px-8 py-6">
+                            <span class="px-2 py-1 ${d.estado_empleado === 'Activo' ? 'text-blue-600 bg-blue-50' : 'text-slate-500 bg-slate-50'} border border-current rounded text-[9px] font-black uppercase">
+                                ${d.estado_empleado}
+                            </span>
+                        </td>
+                        <td class="px-8 py-6">
+                            <div class="text-[10px] font-black text-indigo-900 uppercase">${d.tipo_documento.split(' - ')[0]}</div>
+                            <div class="text-[9px] text-slate-400 italic font-medium uppercase tracking-widest">${d.tipo_documento.split(' - ')[1] || 'General'}</div>
+                        </td>
+                        <td class="px-8 py-6 text-center">
+                            <a href="${d.url_cloudinary}" target="_blank" class="inline-flex items-center justify-center w-10 h-10 bg-slate-900 text-white rounded-xl hover:bg-blue-600 transition-all shadow-lg hover:shadow-blue-200">
+                                <i class="fas fa-external-link-alt text-xs"></i>
+                            </a>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) { console.error("Error cargando certificados:", e); }
+        }
+
+        function filterCerts() {
+            const q = document.getElementById('searchCert').value.toLowerCase();
+            const rows = document.querySelectorAll('#lista-certificados tr');
+            rows.forEach(row => {
+                const nombre = row.cells[1].innerText.toLowerCase();
+                row.style.display = nombre.includes(q) ? '' : 'none';
+            });
         }
 
         function logout() {
