@@ -49,6 +49,8 @@
                 // Redirigir según el rol
                 if (data.rol === 'admin') {
                     window.location.href = 'admin.html';
+                } else if (data.rol === 'doc') {
+                    window.location.href = 'doctor.html';
                 } else {
                     window.location.href = 'user.html';
                 }

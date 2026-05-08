@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Médico - Isertel</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 2.5rem; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); text-align: center; width: 100%; max-width: 400px; }
+        h1 { color: #333; margin-bottom: 1rem; }
+        p { color: #666; font-size: 1.1rem; }
+        .btn-logout { margin-top: 25px; padding: 12px 24px; background: #d93025; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-logout:hover { background: #b0241b; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Hola Mundo</h1>
+        <p>Bienvenido/a al Panel de Gestión Médica</p>
+        <div id="infoUser" style="margin-top: 15px; font-weight: bold; color: #007bff;"></div>
+        <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
+    </div>
+
+    <script>
+        // Validar sesión y rol
+        const token = localStorage.getItem('token');
+        const rol = localStorage.getItem('rol');
+        const nombre = localStorage.getItem('nombre');
+
+        if (!token || rol !== 'doc') {
+            window.location.href = 'index.html';
+        } else {
+            document.getElementById('infoUser').innerText = "Usuario: " + nombre;
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
