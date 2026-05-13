@@ -41,6 +41,9 @@
             <button onclick="showTab('tab-certificados'); loadCertificados()" class="sidebar-item w-full flex items-center p-4 rounded-xl transition-all duration-200 hover:bg-slate-800 group">
                 <i class="fas fa-notes-medical mr-3 w-5 group-hover:text-blue-400"></i> <span class="text-sm font-semibold">Certificados Médicos</span>
             </button>
+            <button onclick="showTab('tab-aptitud'); loadAptitudData()" class="sidebar-item w-full flex items-center p-4 rounded-xl transition-all duration-200 hover:bg-slate-800 group">
+                <i class="fas fa-file-medical-alt mr-3 w-5 group-hover:text-blue-400"></i> <span class="text-sm font-semibold">Certificados de Aptitud</span>
+            </button>
         </nav>
 
         <div class="p-6 border-t border-slate-800">
@@ -50,7 +53,7 @@
         </div>
     </div>
 
-    <div class="flex-1 p-10 overflow-y-auto">
+    <div class="flex-1 p-10 overflow-y-auto relative">
         <header class="flex justify-between items-center mb-10">
             <div>
                 <h1 class="text-3xl font-black text-slate-800 tracking-tight">Panel de Control</h1>
@@ -131,6 +134,83 @@
                 </table>
             </div>
         </div>
+
+        <div id="tab-aptitud" class="tab-content">
+            <div class="flex gap-4 mb-6">
+                <button onclick="setAptitudMode('activos')" id="btnAptActivos" class="bg-blue-600 text-white px-6 py-2 rounded-xl font-bold shadow-sm transition-all text-sm uppercase">Personal Activo</button>
+                <button onclick="setAptitudMode('pasivos')" id="btnAptPasivos" class="bg-white text-slate-600 px-6 py-2 rounded-xl font-bold shadow-sm transition-all hover:bg-slate-50 border border-slate-200 text-sm uppercase">Archivo Pasivo</button>
+            </div>
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-6 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                    <h3 class="font-bold text-slate-800" id="tituloAptitud">Gestión de Aptitud - Activos</h3>
+                </div>
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-slate-50 text-slate-400 text-[10px] uppercase font-black border-b tracking-widest">
+                        <tr>
+                            <th class="px-8 py-5">Colaborador (Seleccionar)</th>
+                            <th class="px-8 py-5">Identificación</th>
+                            <th class="px-8 py-5 text-right">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-aptitud" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="modalAptitud" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden">
+                <div class="p-6 bg-slate-50 border-b flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-folder-open text-blue-600 text-xl"></i>
+                        <h3 class="font-bold text-slate-800 italic uppercase text-sm">Expediente Aptitud: <span id="nApt" class="text-blue-600"></span></h3>
+                    </div>
+                    <button onclick="cerrarModalAptitud()" class="text-2xl text-slate-400 hover:text-red-500 transition-colors">&times;</button>
+                </div>
+
+                <div id="barraFiltrosAptitud" class="px-6 py-3 bg-white border-b flex flex-wrap gap-3 items-center">
+                    <div class="flex-1 min-w-[120px] relative">
+                        <i class="fas fa-filter absolute left-3 top-2.5 text-slate-400 text-[10px]"></i>
+                        <select id="filtroTipoAptitud" onchange="renderizarArchivosAptitud()" class="w-full pl-8 p-2 border rounded-lg text-[10px] font-bold uppercase outline-none bg-slate-50 focus:ring-2 focus:ring-blue-500">
+                            <option value="">Todos los tipos</option>
+                            <option value="ingreso">Ingreso</option>
+                            <option value="periodo">Periodo</option>
+                            <option value="salida">Salida</option>
+                        </select>
+                    </div>
+                    <div class="flex-1 min-w-[120px] relative">
+                        <i class="fas fa-search absolute left-3 top-2.5 text-slate-400 text-[10px]"></i>
+                        <input type="text" id="filtroNombreAptitud" onkeyup="renderizarArchivosAptitud()" placeholder="Nombre archivo original..." class="w-full pl-8 p-2 border rounded-lg text-[10px] font-bold outline-none bg-slate-50 focus:ring-2 focus:ring-blue-500 uppercase">
+                    </div>
+                    <div class="flex-1 min-w-[120px] relative">
+                        <i class="fas fa-calendar absolute left-3 top-2.5 text-slate-400 text-[10px]"></i>
+                        <input type="date" id="filtroFechaAptitud" onchange="renderizarArchivosAptitud()" class="w-full pl-8 p-2 border rounded-lg text-[10px] font-bold outline-none bg-slate-50 focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <button onclick="limpiarFiltrosAptitud()" class="text-slate-400 hover:text-red-500 transition-all p-2" title="Limpiar filtros"><i class="fas fa-undo-alt text-xs"></i></button>
+                </div>
+                
+                <div id="lAptDocs" class="p-6 space-y-3 max-h-80 overflow-y-auto bg-white min-h-[300px]"></div>
+
+                <div class="p-6 bg-blue-50 border-t flex flex-wrap gap-2">
+                    <div class="flex-1 min-w-[120px]">
+                        <p class="text-[10px] font-bold text-blue-500 uppercase mb-1">Mes de subida</p>
+                        <select id="periodoMesAptitud" class="w-full p-2 border rounded-lg text-sm font-bold">
+                            <option value="ENERO">Enero</option><option value="FEBRERO">Febrero</option><option value="MARZO">Marzo</option><option value="ABRIL">Abril</option><option value="MAYO">Mayo</option><option value="JUNIO">Junio</option><option value="JULIO">Julio</option><option value="AGOSTO">Agosto</option><option value="SEPTIEMBRE">Septiembre</option><option value="OCTUBRE">Octubre</option><option value="NOVIEMBRE">Noviembre</option><option value="DICIEMBRE">Diciembre</option>
+                        </select>
+                    </div>
+                    <div class="flex-[2] min-w-[200px]">
+                        <p class="text-[10px] font-bold text-blue-500 uppercase mb-1">Tipo de Certificado</p>
+                        <select id="tipoDocAptitud" class="w-full p-2 border rounded-lg text-sm font-bold">
+                            <option value="Ingreso">Ingreso</option>
+                            <option value="Periodo">Periodo</option>
+                            <option value="Salida">Salida</option>
+                        </select>
+                    </div>
+                    <button onclick="document.getElementById('fileAptitud').click()" class="mt-auto bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-blue-700 uppercase shadow-sm transition-all"><i class="fas fa-upload mr-2"></i>Subir PDF</button>
+                </div>
+            </div>
+        </div>
+        <input type="file" id="fileAptitud" class="hidden" accept=".pdf">
+
     </div>
 
     <script>
@@ -222,6 +302,200 @@
         function logout() {
             localStorage.clear();
             window.location.href = 'index.html';
+        }
+
+        // ==========================================
+        // NUEVA LÓGICA: CERTIFICADOS DE APTITUD
+        // ==========================================
+        
+        let aptitudMode = 'activos';
+        let aptitudUsuarios = [];
+        let currentAptitudId = null;
+        let currentAptitudPasivo = false;
+        let aptitudDocs = [];
+
+        const mesesOrden = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
+
+        async function loadAptitudData() {
+            const url = aptitudMode === 'activos' ? `${API_BASE}/admin/empleados` : `${API_BASE}/admin/pasivos`;
+            try {
+                const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+                aptitudUsuarios = await res.json();
+                renderListaAptitud();
+            } catch (e) { console.error("Error cargando usuarios aptitud:", e); }
+        }
+
+        function setAptitudMode(mode) {
+            aptitudMode = mode;
+            // Estilos de los botones
+            document.getElementById('btnAptActivos').className = mode === 'activos' 
+                ? "bg-blue-600 text-white px-6 py-2 rounded-xl font-bold shadow-sm transition-all text-sm uppercase" 
+                : "bg-white text-slate-600 px-6 py-2 rounded-xl font-bold shadow-sm transition-all hover:bg-slate-50 border border-slate-200 text-sm uppercase";
+            document.getElementById('btnAptPasivos').className = mode === 'pasivos' 
+                ? "bg-blue-600 text-white px-6 py-2 rounded-xl font-bold shadow-sm transition-all text-sm uppercase" 
+                : "bg-white text-slate-600 px-6 py-2 rounded-xl font-bold shadow-sm transition-all hover:bg-slate-50 border border-slate-200 text-sm uppercase";
+            
+            document.getElementById('tituloAptitud').innerText = mode === 'activos' ? "Gestión de Aptitud - Activos" : "Gestión de Aptitud - Pasivos";
+            loadAptitudData();
+        }
+
+        function renderListaAptitud() {
+            const tbody = document.getElementById('lista-aptitud');
+            tbody.innerHTML = aptitudUsuarios.map(u => `
+                <tr class="hover:bg-slate-50/80 transition-colors cursor-pointer" onclick="abrirExpedienteAptitud(${u.id}, '${u.nombre_completo}', ${aptitudMode === 'pasivos'})">
+                    <td class="px-8 py-6">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-black text-xs border border-indigo-100">
+                                ${u.nombre_completo.split(' ').map(n => n[0]).join('').substring(0,2)}
+                            </div>
+                            <span class="font-bold text-slate-700 text-sm">${u.nombre_completo}</span>
+                        </div>
+                    </td>
+                    <td class="px-8 py-6 text-slate-500 text-xs font-medium">${u.cedula}</td>
+                    <td class="px-8 py-6 text-right">
+                        <button onclick="event.stopPropagation(); abrirExpedienteAptitud(${u.id}, '${u.nombre_completo}', ${aptitudMode === 'pasivos'})" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-blue-700 shadow-sm uppercase"><i class="fas fa-folder-open mr-2"></i>Expediente</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function abrirExpedienteAptitud(id, nombre, isPasivo) {
+            currentAptitudId = id;
+            currentAptitudPasivo = isPasivo;
+            document.getElementById('nApt').innerText = nombre;
+            document.getElementById('modalAptitud').classList.remove('hidden');
+            await cargarDocsAptitud();
+        }
+
+        function cerrarModalAptitud() {
+            document.getElementById('modalAptitud').classList.add('hidden');
+            limpiarFiltrosAptitud();
+        }
+
+        async function cargarDocsAptitud() {
+            try {
+                const res = await fetch(`${API_BASE}/doctor/aptitud/${currentAptitudId}?pasivo=${currentAptitudPasivo}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                aptitudDocs = await res.json();
+                renderizarArchivosAptitud();
+            } catch(e) { console.error("Error cargando docs de aptitud", e); }
+        }
+
+        function limpiarFiltrosAptitud() {
+            document.getElementById('filtroTipoAptitud').value = "";
+            document.getElementById('filtroNombreAptitud').value = "";
+            document.getElementById('filtroFechaAptitud').value = "";
+            renderizarArchivosAptitud();
+        }
+
+        function obtenerFechaInput(fechaString) {
+            if (!fechaString) return "";
+            return new Date(fechaString).toISOString().split('T')[0];
+        }
+
+        function formatearFechaUTC(fechaString) {
+            if (!fechaString) return "N/A";
+            const fecha = new Date(fechaString);
+            return `${fecha.getUTCDate()}/${fecha.getUTCMonth() + 1}/${fecha.getUTCFullYear()}`;
+        }
+
+        function renderizarArchivosAptitud() {
+            const fTipo = document.getElementById('filtroTipoAptitud').value.toLowerCase();
+            const fFecha = document.getElementById('filtroFechaAptitud').value;
+            const fNombre = document.getElementById('filtroNombreAptitud').value.toLowerCase();
+
+            let docs = aptitudDocs;
+
+            // Filtrados
+            if (fTipo) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fTipo));
+            if (fFecha) docs = docs.filter(d => obtenerFechaInput(d.created_at) === fFecha);
+            if (fNombre) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fNombre));
+
+            const grupos = {};
+            docs.forEach(d => {
+                const partes = d.tipo_documento.split(' - ');
+                const mes = partes.length > 1 ? partes[1].toUpperCase() : "SIN PERIODO";
+                if(!grupos[mes]) grupos[mes] = [];
+                grupos[mes].push(d);
+            });
+
+            const mesesPresentes = Object.keys(grupos).sort((a, b) => mesesOrden.indexOf(a) - mesesOrden.indexOf(b));
+
+            document.getElementById('lAptDocs').innerHTML = mesesPresentes.map(mes => `
+                <div class="bg-slate-50/50 p-2 rounded-r-xl mb-4 border-l-4 border-blue-500">
+                    <h4 class="text-[10px] font-black text-blue-600 mb-2 px-2 italic"><i class="fas fa-calendar-alt mr-1"></i> PERIODO: ${mes}</h4>
+                    <div class="space-y-2">
+                        ${grupos[mes].map(d => {
+                            const partes = d.tipo_documento.split(' - ');
+                            const tipoLabel = partes[0] || "Documento";
+                            const nombreOriginal = partes[2] || "Archivo sin nombre";
+                            return `
+                            <div class="flex justify-between items-center p-3 bg-white border border-slate-100 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-file-medical text-red-500 text-lg"></i>
+                                    <div>
+                                        <p class="text-[10px] font-black uppercase text-slate-800">${tipoLabel}</p>
+                                        <p class="text-[9px] text-slate-500 italic truncate max-w-[200px] font-medium">${nombreOriginal}</p>
+                                        <p class="text-[8px] text-slate-400">Subido: ${formatearFechaUTC(d.created_at)}</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-2">
+                                    <a href="${d.url_cloudinary}" target="_blank" class="w-8 h-8 flex items-center justify-center bg-blue-50 text-blue-600 rounded-lg transition-colors hover:bg-blue-600 hover:text-white" title="Ver archivo"><i class="fas fa-eye text-[10px]"></i></a>
+                                    <button onclick="eliminarDocAptitud(${d.id})" class="w-8 h-8 flex items-center justify-center bg-red-50 text-red-500 rounded-lg transition-colors hover:bg-red-500 hover:text-white" title="Eliminar archivo"><i class="fas fa-trash text-[10px]"></i></button>
+                                </div>
+                            </div>`;
+                        }).join('')}
+                    </div>
+                </div>
+            `).join('') || '<div class="h-full flex flex-col items-center justify-center py-10 opacity-50"><i class="fas fa-folder-open text-4xl mb-3 text-slate-300"></i><p class="text-center text-slate-400 text-xs uppercase font-bold tracking-widest">Sin registros de aptitud</p></div>';
+        }
+
+        document.getElementById('fileAptitud').onchange = async function() {
+            const file = this.files[0]; if(!file) return;
+            
+            const docBase = document.getElementById('tipoDocAptitud').value;
+            const mesElegido = document.getElementById('periodoMesAptitud').value;
+            // Se formatea igual que en admin: "Ingreso - ENERO - archivo.pdf"
+            const tipoFinal = `${docBase} - ${mesElegido} - ${file.name}`;
+
+            const formData = new FormData();
+            formData.append('archivo', file);
+            formData.append('tipo_documento', tipoFinal);
+            formData.append('usuario_id', currentAptitudId);
+            formData.append('es_pasivo', currentAptitudPasivo);
+            
+            try {
+                // Notificación visual de carga
+                document.getElementById('lAptDocs').innerHTML = '<div class="flex items-center justify-center py-10"><i class="fas fa-spinner fa-spin text-3xl text-blue-500"></i></div>';
+
+                const res = await fetch(`${API_BASE}/doctor/subir-aptitud`, { 
+                    method: 'POST', 
+                    headers: { 'Authorization': 'Bearer ' + token }, 
+                    body: formData 
+                });
+                
+                if(res.ok) { 
+                    await cargarDocsAptitud();
+                } else {
+                    alert("Error al subir el documento.");
+                    await cargarDocsAptitud();
+                }
+            } catch(e) { 
+                console.error(e); 
+                alert("Ocurrió un error en la subida."); 
+            }
+            this.value = ""; // Limpiar el input
+        };
+
+        async function eliminarDocAptitud(id) {
+            if(confirm("¿Estás seguro de que deseas eliminar este certificado de aptitud?")) {
+                try {
+                    await fetch(`${API_BASE}/doctor/aptitud/${id}`, { 
+                        method: 'DELETE', 
+                        headers: {'Authorization': 'Bearer '+ token} 
+                    });
+                    await cargarDocsAptitud();
+                } catch(e) { console.error(e); }
+            }
         }
     </script>
 </body>
