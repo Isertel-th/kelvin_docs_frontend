@@ -12,178 +12,189 @@
         .tab-content.active { display: block; animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         body { background-color: #f1f5f9; font-family: 'Inter', sans-serif; }
-        .mes-block { border-left: 4px solid #3b82f6; margin-bottom: 1.5rem; padding-left: 1rem; }
     </style>
 </head>
 <body class="flex min-h-screen">
 
     <div class="w-72 bg-slate-900 text-slate-300 flex flex-col shadow-2xl">
         <div class="p-8 text-center border-b border-slate-800">
-            <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl mb-4 shadow-lg shadow-blue-500/20">
-                <i class="fas fa-user-md text-3xl text-white"></i>
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-500/10 mb-4">
+                <i class="fas fa-user-md text-3xl text-blue-500"></i>
             </div>
-            <h2 class="text-xl font-black text-white tracking-tighter italic uppercase">Panel Médico</h2>
-            <p class="text-[10px] text-slate-500 font-bold tracking-[0.2em] mt-1">SISTEMA ISERTEL</p>
+            <h2 class="text-white font-black uppercase text-xs tracking-widest">Servicio Médico</h2>
+            <p class="text-[10px] text-slate-500 mt-1 uppercase font-bold">Isertel S.A.</p>
         </div>
-
-        <nav class="flex-1 p-4 space-y-2 mt-4">
-            <p class="text-[10px] font-bold text-slate-500 uppercase px-3 mb-2 tracking-widest">Expedientes</p>
-            <button onclick="showTab('tab-certificados'); loadCertificados()" class="sidebar-item active w-full flex items-center p-4 rounded-xl transition-all duration-200 hover:bg-slate-800 group">
-                <i class="fas fa-notes-medical mr-3 w-5 group-hover:text-blue-400"></i>
-                <span class="text-sm font-semibold">Certificados Médicos</span>
+        
+        <nav class="flex-1 p-6 space-y-3">
+            <p class="text-[10px] font-bold text-slate-500 uppercase px-3 mb-2 tracking-widest">Navegación</p>
+            <button onclick="showTab('tab-inicio')" class="sidebar-item active w-full flex items-center p-4 rounded-xl transition-all duration-200 hover:bg-slate-800 group">
+                <i class="fas fa-th-large mr-3 w-5 group-hover:text-blue-400"></i> <span class="text-sm font-semibold">Inicio</span>
             </button>
-            <button onclick="showTab('tab-aptitud'); cargarSeccionAptitud()" class="sidebar-item w-full flex items-center p-4 rounded-xl transition-all duration-200 hover:bg-slate-800 group">
-                <i class="fas fa-file-medical-alt mr-3 w-5 group-hover:text-blue-400"></i>
-                <span class="text-sm font-semibold">Certificados de Aptitud</span>
+            <button onclick="showTab('tab-activos'); loadData('activos')" class="sidebar-item w-full flex items-center p-4 rounded-xl transition-all duration-200 hover:bg-slate-800 group">
+                <i class="fas fa-users mr-3 w-5 group-hover:text-blue-400"></i> <span class="text-sm font-semibold">Empleados Activos</span>
+            </button>
+            <button onclick="showTab('tab-pasivos'); loadData('pasivos')" class="sidebar-item w-full flex items-center p-4 rounded-xl transition-all duration-200 hover:bg-slate-800 group">
+                <i class="fas fa-user-clock mr-3 w-5 group-hover:text-blue-400"></i> <span class="text-sm font-semibold">Empleados Pasivos</span>
+            </button>
+            <div class="pt-4 border-t border-slate-800 my-4"></div>
+            <p class="text-[10px] font-bold text-slate-500 uppercase px-3 mb-2 tracking-widest">Expedientes</p>
+            <button onclick="showTab('tab-certificados'); loadCertificados()" class="sidebar-item w-full flex items-center p-4 rounded-xl transition-all duration-200 hover:bg-slate-800 group">
+                <i class="fas fa-notes-medical mr-3 w-5 group-hover:text-blue-400"></i> <span class="text-sm font-semibold">Certificados Médicos</span>
             </button>
         </nav>
 
-        <div class="p-4 border-t border-slate-800">
-            <button onclick="logout()" class="w-full flex items-center p-4 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all font-bold text-sm">
-                <i class="fas fa-sign-out-alt mr-3"></i> Cerrar Sesión
+        <div class="p-6 border-t border-slate-800">
+            <button onclick="logout()" class="w-full flex items-center p-4 rounded-xl text-red-400 hover:bg-red-500/10 transition-all font-bold text-sm">
+                <i class="fas fa-power-off mr-3"></i> Salir del Sistema
             </button>
         </div>
     </div>
 
-    <div class="flex-1 flex flex-col h-screen overflow-hidden">
-        <header class="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-10 shrink-0">
-            <div class="flex items-center gap-3">
-                <span class="w-2 h-8 bg-blue-600 rounded-full"></span>
-                <h1 id="tab-title" class="text-lg font-black text-slate-800 uppercase italic tracking-tight">Certificados Médicos</h1>
+    <div class="flex-1 p-10 overflow-y-auto">
+        <header class="flex justify-between items-center mb-10">
+            <div>
+                <h1 class="text-3xl font-black text-slate-800 tracking-tight">Panel de Control</h1>
+                <p class="text-slate-500 text-sm mt-1">Bienvenido, Dr. <span id="nombreDoctor" class="text-blue-600 font-bold">...</span></p>
+            </div>
+            <div class="bg-white p-3 rounded-2xl shadow-sm border border-slate-100">
+                <img src="https://www.isertel.com.ec/wp-content/uploads/2021/03/logo-isertel.png" alt="Logo" class="h-8">
             </div>
         </header>
 
-        <main class="flex-1 overflow-y-auto p-10">
-            
-            <div id="tab-certificados" class="tab-content active">
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 mb-8 flex items-center gap-4">
-                    <div class="relative flex-1">
-                        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-                        <input type="text" id="searchCert" onkeyup="filterCerts()" placeholder="Filtrar por nombre de colaborador..." class="w-full pl-12 pr-6 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none text-sm font-medium transition-all">
-                    </div>
+        <div id="tab-inicio" class="tab-content active">
+            <div class="bg-gradient-to-br from-blue-600 to-indigo-700 p-12 rounded-[2rem] text-white shadow-2xl shadow-blue-200 relative overflow-hidden">
+                <div class="relative z-10">
+                    <h2 class="text-4xl font-black mb-4">Gestión Médica Isertel</h2>
+                    <p class="text-blue-100 text-lg max-w-xl leading-relaxed">Sistema centralizado para el monitoreo de certificados médicos y validación de reposos del personal activo y pasivo.</p>
                 </div>
+                <i class="fas fa-heartbeat absolute -right-10 -bottom-10 text-[15rem] text-white/10 rotate-12"></i>
+            </div>
+        </div>
 
-                <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden">
-                    <table class="w-full">
-                        <thead>
-                            <tr class="bg-slate-50/50 border-b border-slate-100">
-                                <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Colaborador</th>
-                                <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Documento / Detalle</th>
-                                <th class="px-8 py-5 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody id="lista-certificados" class="divide-y divide-slate-50 text-sm font-semibold text-slate-600">
-                            </tbody>
-                    </table>
+        <div id="tab-activos" class="tab-content">
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-6 border-b border-slate-100 bg-slate-50/50">
+                    <h3 class="font-bold text-slate-800">Lista de Personal Activo</h3>
+                </div>
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-slate-50 text-slate-400 text-[10px] uppercase font-black border-b tracking-widest">
+                        <tr>
+                            <th class="px-8 py-5">Colaborador</th>
+                            <th class="px-8 py-5">Identificación</th>
+                            <th class="px-8 py-5">Correo Electrónico</th>
+                            <th class="px-8 py-5 text-right">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-activos" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-pasivos" class="tab-content">
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-6 border-b border-slate-100 bg-slate-50/50">
+                    <h3 class="font-bold text-slate-800">Archivo de Personal Pasivo</h3>
+                </div>
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-slate-50 text-slate-400 text-[10px] uppercase font-black border-b tracking-widest">
+                        <tr>
+                            <th class="px-8 py-5">Ex-Colaborador</th>
+                            <th class="px-8 py-5">Cédula</th>
+                            <th class="px-8 py-5">Contacto</th>
+                            <th class="px-8 py-5 text-right">Categoría</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-pasivos" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-certificados" class="tab-content">
+            <div class="mb-6 flex gap-4">
+                <div class="relative flex-1">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" id="searchCert" onkeyup="filterCerts()" placeholder="Buscar por nombre del empleado..." class="w-full pl-12 pr-6 py-4 rounded-2xl border-none shadow-sm ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm transition-all">
                 </div>
             </div>
-
-            <div id="tab-aptitud" class="tab-content">
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 mb-8 flex flex-wrap gap-4 items-center">
-                    <div class="flex-1 min-w-[300px] relative">
-                        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                        <input type="text" id="filtroAptitud" onkeyup="filtrarTablaAptitud()" placeholder="Buscar colaborador por nombre..." class="w-full pl-12 p-4 bg-slate-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 text-sm font-medium">
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden">
-                    <table class="w-full text-left">
-                        <thead class="bg-slate-50 text-[10px] uppercase font-black tracking-widest text-slate-400 border-b">
-                            <tr>
-                                <th class="px-8 py-5">Colaborador (Doble clic para abrir expediente)</th>
-                                <th class="px-8 py-5 text-right">Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody id="lista-aptitud-users" class="divide-y divide-slate-100">
-                            </tbody>
-                    </table>
-                </div>
-            </div>
-
-        </main>
-    </div>
-
-    <div id="modalAptitud" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-fade-in">
-            <div class="p-8 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
-                <div>
-                    <h3 class="font-black text-slate-800 uppercase italic text-sm tracking-tight">Expediente de Aptitud</h3>
-                    <p id="nEmpAptitud" class="text-blue-600 font-bold text-xs mt-1 uppercase"></p>
-                </div>
-                <button onclick="cerrarModalAptitud()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-sm hover:text-red-500 transition-all text-2xl">&times;</button>
-            </div>
-            
-            <div id="lDocsAptitud" class="p-8 space-y-6 max-h-[400px] overflow-y-auto min-h-[250px] bg-white">
-                </div>
-
-            <div class="p-8 bg-blue-50 border-t border-blue-100 grid grid-cols-2 gap-4">
-                <div>
-                    <label class="text-[10px] font-black text-blue-900 uppercase mb-2 block tracking-widest">Tipo de Certificado</label>
-                    <select id="tipoDocAptitud" class="w-full p-3 border-none bg-white rounded-xl text-sm font-bold shadow-sm focus:ring-2 focus:ring-blue-500 outline-none">
-                        <option value="Ingreso">Ingreso</option>
-                        <option value="Periodo">Periodo</option>
-                        <option value="Salida">Salida</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="text-[10px] font-black text-blue-900 uppercase mb-2 block tracking-widest">Periodo / Mes</label>
-                    <select id="periodoMesAptitud" class="w-full p-3 border-none bg-white rounded-xl text-sm font-bold shadow-sm focus:ring-2 focus:ring-blue-500 outline-none">
-                        <option value="ENERO">Enero</option><option value="FEBRERO">Febrero</option>
-                        <option value="MARZO">Marzo</option><option value="ABRIL">Abril</option>
-                        <option value="MAYO">Mayo</option><option value="JUNIO">Junio</option>
-                        <option value="JULIO">Julio</option><option value="AGOSTO">Agosto</option>
-                        <option value="SEPTIEMBRE">Septiembre</option><option value="OCTUBRE">Octubre</option>
-                        <option value="NOVIEMBRE">Noviembre</option><option value="DICIEMBRE">Diciembre</option>
-                    </select>
-                </div>
-                <button onclick="prepararSubidaAptitud()" class="col-span-2 bg-blue-600 text-white py-4 rounded-2xl font-black uppercase text-xs hover:bg-blue-700 shadow-xl shadow-blue-200 transition-all active:scale-95">
-                    <i class="fas fa-cloud-upload-alt mr-2 text-sm"></i> Subir Documento PDF
-                </button>
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-blue-600 text-white text-[10px] uppercase font-black tracking-widest">
+                        <tr>
+                            <th class="px-8 py-5">Fecha de Registro</th>
+                            <th class="px-8 py-5">Empleado</th>
+                            <th class="px-8 py-5">Relación</th>
+                            <th class="px-8 py-5">Documento / Periodo</th>
+                            <th class="px-8 py-5 text-center">Visualizar</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-certificados" class="divide-y divide-slate-100"></tbody>
+                </table>
             </div>
         </div>
     </div>
 
-    <input type="file" id="fileInputAptitud" class="hidden" accept=".pdf">
-
     <script>
-        const API_BASE = 'https://sistema-isertel-production.up.railway.app/api';
-        let aptitudUserActual = null;
+        const API_BASE = "https://kelvin-th-docs-backend.onrender.com/api";
+        const token = localStorage.getItem('token');
+        const rol = localStorage.getItem('rol');
 
-        document.addEventListener('DOMContentLoaded', () => {
-            loadCertificados();
-        });
+        // Seguridad de acceso
+        if (!token || rol !== 'doc') { window.location.href = 'index.html'; }
+        document.getElementById('nombreDoctor').innerText = localStorage.getItem('nombre');
 
         function showTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
-            
+            document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             event.currentTarget.classList.add('active');
-
-            const titles = {
-                'tab-certificados': 'Certificados Médicos',
-                'tab-aptitud': 'Certificados de Aptitud'
-            };
-            document.getElementById('tab-title').innerText = titles[tabId];
         }
 
-        // --- LÓGICA CERTIFICADOS MÉDICOS (EXISTENTE) ---
+        async function loadData(tipo) {
+            const url = tipo === 'activos' ? `${API_BASE}/admin/empleados` : `${API_BASE}/admin/pasivos`;
+            try {
+                const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await res.json();
+                const tbody = document.getElementById(`lista-${tipo}`);
+                tbody.innerHTML = data.map(u => `
+                    <tr class="hover:bg-slate-50/80 transition-colors">
+                        <td class="px-8 py-6">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-black text-xs">
+                                    ${u.nombre_completo.split(' ').map(n => n[0]).join('').substring(0,2)}
+                                </div>
+                                <span class="font-bold text-slate-700 text-sm">${u.nombre_completo}</span>
+                            </div>
+                        </td>
+                        <td class="px-8 py-6 text-slate-500 text-xs font-medium">${u.cedula}</td>
+                        <td class="px-8 py-6 text-slate-500 text-xs">${u.correo || u.celular || 'Sin registro'}</td>
+                        <td class="px-8 py-6 text-right">
+                            <span class="px-3 py-1 ${tipo === 'activos' ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-500'} rounded-full text-[9px] font-black uppercase tracking-tighter">
+                                ${tipo === 'activos' ? 'Activo' : 'Pasivo'}
+                            </span>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) { console.error("Error cargando usuarios:", e); }
+        }
+
         async function loadCertificados() {
             try {
-                const res = await fetch(`${API_BASE}/medico/certificados`, {
-                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-                });
-                const docs = await res.json();
-                const container = document.getElementById('lista-certificados');
-                container.innerHTML = docs.map(d => `
-                    <tr class="hover:bg-slate-50 transition-all group">
+                const res = await fetch(`${API_BASE}/doctor/certificados-globales`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await res.json();
+                const tbody = document.getElementById('lista-certificados');
+                tbody.innerHTML = data.map(d => `
+                    <tr class="hover:bg-blue-50/50 transition-colors">
                         <td class="px-8 py-6">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center font-black text-xs uppercase shadow-sm group-hover:bg-blue-600 group-hover:text-white transition-all">
-                                    ${d.nombre_completo.split(' ').map(n => n[0]).join('').substring(0,2)}
-                                </div>
-                                <span class="uppercase tracking-tight text-slate-800">${d.nombre_completo}</span>
-                            </div>
+                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">${new Date(d.created_at).toLocaleDateString()}</div>
+                            <div class="text-[9px] text-slate-300 italic">${new Date(d.created_at).toLocaleTimeString()}</div>
+                        </td>
+                        <td class="px-8 py-6">
+                            <div class="font-black text-slate-700 text-sm uppercase tracking-tight">${d.empleado_nombre}</div>
+                        </td>
+                        <td class="px-8 py-6">
+                            <span class="px-2 py-1 ${d.estado_empleado === 'Activo' ? 'text-blue-600 bg-blue-50' : 'text-slate-500 bg-slate-50'} border border-current rounded text-[9px] font-black uppercase">
+                                ${d.estado_empleado}
+                            </span>
                         </td>
                         <td class="px-8 py-6">
                             <div class="text-[10px] font-black text-indigo-900 uppercase">${d.tipo_documento.split(' - ')[0]}</div>
@@ -203,129 +214,7 @@
             const q = document.getElementById('searchCert').value.toLowerCase();
             const rows = document.querySelectorAll('#lista-certificados tr');
             rows.forEach(row => {
-                const nombre = row.cells[0].innerText.toLowerCase();
-                row.style.display = nombre.includes(q) ? '' : 'none';
-            });
-        }
-
-        // --- LÓGICA CERTIFICADOS DE APTITUD (NUEVA) ---
-        async function cargarSeccionAptitud() {
-            try {
-                const [resAct, resPas] = await Promise.all([
-                    fetch(`${API_BASE}/admin/empleados`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } }),
-                    fetch(`${API_BASE}/admin/pasivos`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } })
-                ]);
-                
-                const activos = (await resAct.json()).map(u => ({...u, tipo: 'activo'}));
-                const pasivos = (await resPas.json()).map(u => ({...u, tipo: 'pasivo'}));
-                const todos = [...activos, ...pasivos];
-                
-                document.getElementById('lista-aptitud-users').innerHTML = todos.map(u => `
-                    <tr class="hover:bg-blue-50 cursor-pointer transition-all group" ondblclick="abrirExpedienteAptitud(${u.id}, '${u.nombre_completo}', '${u.tipo}')">
-                        <td class="px-8 py-5 flex items-center gap-4">
-                            <div class="w-10 h-10 bg-slate-100 group-hover:bg-blue-600 group-hover:text-white rounded-xl flex items-center justify-center font-black text-slate-400 text-xs transition-all">
-                                ${u.nombre_completo[0]}
-                            </div>
-                            <div>
-                                <div class="text-xs font-black text-slate-800 uppercase tracking-tight">${u.nombre_completo}</div>
-                                <div class="text-[9px] ${u.tipo === 'activo' ? 'text-green-500' : 'text-orange-500'} font-black uppercase tracking-widest">${u.tipo}</div>
-                            </div>
-                        </td>
-                        <td class="px-8 py-5 text-right">
-                            <button onclick="abrirExpedienteAptitud(${u.id}, '${u.nombre_completo}', '${u.tipo}')" class="w-10 h-10 bg-slate-50 text-slate-400 hover:bg-blue-100 hover:text-blue-600 rounded-xl transition-all shadow-sm">
-                                <i class="fas fa-folder-open"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `).join('');
-            } catch (error) { console.error("Error al cargar usuarios:", error); }
-        }
-
-        async function abrirExpedienteAptitud(id, nombre, tipo) {
-            aptitudUserActual = { id, nombre, tipo };
-            document.getElementById('nEmpAptitud').innerText = nombre;
-            document.getElementById('modalAptitud').classList.remove('hidden');
-            cargarDocumentosAptitud();
-        }
-
-        async function cargarDocumentosAptitud() {
-            try {
-                const res = await fetch(`${API_BASE}/medico/certificados-aptitud`, {
-                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-                });
-                const todos = await res.json();
-                const filtrados = todos.filter(d => d.usuario_id == aptitudUserActual.id && d.tipo_usuario == aptitudUserActual.tipo);
-                
-                const meses = [...new Set(filtrados.map(d => d.periodo_mes))];
-                
-                document.getElementById('lDocsAptitud').innerHTML = meses.length ? meses.map(mes => `
-                    <div class="mes-block">
-                        <h4 class="text-[10px] font-black text-blue-400 uppercase mb-3 tracking-widest italic">${mes}</h4>
-                        <div class="grid grid-cols-1 gap-2">
-                            ${filtrados.filter(d => d.periodo_mes === mes).map(d => `
-                                <div class="flex justify-between items-center bg-slate-50 p-4 rounded-2xl border border-slate-100 group hover:border-blue-200 transition-all">
-                                    <span class="text-[11px] font-black text-slate-700 uppercase tracking-tight">${d.tipo_documento}</span>
-                                    <div class="flex gap-2">
-                                        <a href="${d.url_cloudinary}" target="_blank" class="w-8 h-8 flex items-center justify-center bg-white text-blue-600 rounded-lg shadow-sm hover:bg-blue-600 hover:text-white transition-all"><i class="fas fa-eye text-xs"></i></a>
-                                        <button onclick="eliminarDocAptitud(${d.id})" class="w-8 h-8 flex items-center justify-center bg-white text-red-400 rounded-lg shadow-sm hover:bg-red-500 hover:text-white transition-all"><i class="fas fa-trash text-xs"></i></button>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `).join('') : '<div class="flex flex-col items-center justify-center py-10 text-slate-300"><i class="fas fa-folder-open text-4xl mb-3"></i><p class="text-[10px] font-black uppercase tracking-widest">Sin documentos cargados</p></div>';
-            } catch (error) { console.error("Error cargando documentos:", error); }
-        }
-
-        function prepararSubidaAptitud() { document.getElementById('fileInputAptitud').click(); }
-
-        document.getElementById('fileInputAptitud').onchange = async function() {
-            if(!this.files[0]) return;
-            
-            const btn = event.currentTarget;
-            const originalText = "Subir Documento PDF";
-            
-            const formData = new FormData();
-            formData.append('archivo', this.files[0]);
-            formData.append('usuario_id', aptitudUserActual.id);
-            formData.append('tipo_usuario', aptitudUserActual.tipo);
-            formData.append('nombre_user', aptitudUserActual.nombre);
-            formData.append('tipo_documento', document.getElementById('tipoDocAptitud').value);
-            formData.append('periodo_mes', document.getElementById('periodoMesAptitud').value);
-
-            try {
-                const res = await fetch(`${API_BASE}/medico/subir-aptitud`, {
-                    method: 'POST',
-                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
-                    body: formData
-                });
-                if(res.ok) {
-                    alert("Documento subido correctamente");
-                    this.value = '';
-                    cargarDocumentosAptitud();
-                }
-            } catch (error) { alert("Error al subir archivo"); }
-        };
-
-        async function eliminarDocAptitud(id) {
-            if(confirm("¿Estás seguro de eliminar este certificado?")) {
-                try {
-                    await fetch(`${API_BASE}/medico/certificados-aptitud/${id}`, {
-                        method: 'DELETE',
-                        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-                    });
-                    cargarDocumentosAptitud();
-                } catch (error) { console.error(error); }
-            }
-        }
-
-        function cerrarModalAptitud() { document.getElementById('modalAptitud').classList.add('hidden'); }
-
-        function filtrarTablaAptitud() {
-            const q = document.getElementById('filtroAptitud').value.toLowerCase();
-            const rows = document.querySelectorAll('#lista-aptitud-users tr');
-            rows.forEach(row => {
-                const nombre = row.innerText.toLowerCase();
+                const nombre = row.cells[1].innerText.toLowerCase();
                 row.style.display = nombre.includes(q) ? '' : 'none';
             });
         }
