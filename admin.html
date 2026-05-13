@@ -351,7 +351,7 @@
             else if(nombreCarpeta === 'Vacaciones') ops = '<option>Solicitud de vacaciones</option><option>Aviso de salida vacaciones</option><option>Cronograma de vacaciones</option>';
             else if(nombreCarpeta === 'Certificado de competencia') ops = '<option>Certificado de competencia</option>';
             else if(nombreCarpeta === 'Acta de epps') ops = '<option>Acta de epp\'s</option>';
-            else if(nombreCarpeta.includes('Certificados medicos')) ops = '<option>Certificado médico IESS</option><option>Certificado médico privado</option><option>Reposo médico</option>';
+            else if(nombreCarpeta.includes('Certificados medicos')) ops = '<option>Certificado médico IESS</option><option>Certificado médico privado</option><option>Certificado médico MSP</option><option>Reposo médico</option>';
             else if(nombreCarpeta === 'Memorandum') ops = '<option>Memorandum</option>';
             else if(nombreCarpeta === 'Certificados') ops = '<option>Laborales</option><option>De honorabilidad</option>';
             else if(nombreCarpeta === 'Desvinculación') ops = '<option>Acta de finiquito</option><option>Comprobante de pago</option><option>Aviso de salida</option><option>Renuncia</option>';
@@ -372,7 +372,7 @@
             else if(carpetaActual === 'Vacaciones') pClave = ['vacaciones', 'cronograma'];
             else if(carpetaActual === 'Certificado de competencia') pClave = ['competencia'];
             else if(carpetaActual === 'Acta de epps') pClave = ['epp'];
-            else if(carpetaActual.includes('Certificados medicos')) pClave = ['medico', 'médico', 'reposo', 'iess', 'privado'];
+            else if(carpetaActual.includes('Certificados medicos')) pClave = ['medico', 'médico', 'reposo', 'iess', 'privado', 'msp'];
             else if(carpetaActual === 'Memorandum') pClave = ['memorandum'];
             else if(carpetaActual === 'Certificados') pClave = ['laborales', 'honorabilidad'];
             else if(carpetaActual === 'Desvinculación') pClave = ['finiquito', 'pago', 'salida', 'renuncia'];
