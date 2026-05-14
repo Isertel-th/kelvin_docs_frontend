@@ -12,489 +12,316 @@
         .tab-content.active { display: block; animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         body { background-color: #f1f5f9; font-family: 'Inter', sans-serif; }
+        .expediente-container { border-left: 4px solid #2563eb; transition: all 0.2s; }
+        .expediente-container:hover { transform: translateX(5px); }
     </style>
 </head>
 <body class="flex min-h-screen">
 
     <div class="w-72 bg-slate-900 text-slate-300 flex flex-col shadow-2xl">
         <div class="p-8 text-center border-b border-slate-800">
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-500/10 mb-4">
-                <i class="fas fa-user-md text-3xl text-blue-500"></i>
+            <div class="w-20 h-20 bg-blue-600 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                <i class="fas fa-user-md text-4xl text-white"></i>
             </div>
-            <h2 class="text-white font-black uppercase text-xs tracking-widest">Servicio Médico</h2>
-            <p class="text-[10px] text-slate-500 mt-1 uppercase font-bold">Isertel S.A.</p>
+            <h2 class="text-xl font-bold text-white tracking-tight">Panel Médico</h2>
+            <p class="text-xs text-slate-500 mt-1 uppercase tracking-widest font-semibold">Salud Ocupacional</p>
         </div>
-        
-        <nav class="flex-1 p-6 space-y-3">
-            <p class="text-[10px] font-bold text-slate-500 uppercase px-3 mb-2 tracking-widest">Navegación</p>
-            <button onclick="showTab('tab-inicio')" class="sidebar-item active w-full flex items-center p-4 rounded-xl transition-all duration-200 hover:bg-slate-800 group">
-                <i class="fas fa-th-large mr-3 w-5 group-hover:text-blue-400"></i> <span class="text-sm font-semibold">Inicio</span>
+        <nav class="flex-1 p-4 space-y-2 mt-4">
+            <button onclick="showTab('personal')" class="sidebar-item w-full flex items-center p-4 rounded-xl transition-all duration-200 hover:bg-slate-800 active" id="btn-personal">
+                <i class="fas fa-users mr-4 text-lg"></i> <span class="font-medium">Gestión de Personal</span>
             </button>
-            <button onclick="showTab('tab-activos'); loadData('activos')" class="sidebar-item w-full flex items-center p-4 rounded-xl transition-all duration-200 hover:bg-slate-800 group">
-                <i class="fas fa-users mr-3 w-5 group-hover:text-blue-400"></i> <span class="text-sm font-semibold">Empleados Activos</span>
-            </button>
-            <button onclick="showTab('tab-pasivos'); loadData('pasivos')" class="sidebar-item w-full flex items-center p-4 rounded-xl transition-all duration-200 hover:bg-slate-800 group">
-                <i class="fas fa-user-clock mr-3 w-5 group-hover:text-blue-400"></i> <span class="text-sm font-semibold">Empleados Pasivos</span>
-            </button>
-            <div class="pt-4 border-t border-slate-800 my-4"></div>
-            <p class="text-[10px] font-bold text-slate-500 uppercase px-3 mb-2 tracking-widest">Expedientes</p>
-            <button onclick="showTab('tab-certificados'); loadCertificados()" class="sidebar-item w-full flex items-center p-4 rounded-xl transition-all duration-200 hover:bg-slate-800 group">
-                <i class="fas fa-notes-medical mr-3 w-5 group-hover:text-blue-400"></i> <span class="text-sm font-semibold">Certificados Médicos</span>
-            </button>
-            <button onclick="showTab('tab-aptitud'); loadAptitudData()" class="sidebar-item w-full flex items-center p-4 rounded-xl transition-all duration-200 hover:bg-slate-800 group">
-                <i class="fas fa-file-medical-alt mr-3 w-5 group-hover:text-blue-400"></i> <span class="text-sm font-semibold">Certificados de Aptitud</span>
+            <button onclick="showTab('aptitud')" class="sidebar-item w-full flex items-center p-4 rounded-xl transition-all duration-200 hover:bg-slate-800" id="btn-aptitud">
+                <i class="fas fa-file-medical mr-4 text-lg"></i> <span class="font-medium">Certificados Aptitud</span>
             </button>
         </nav>
-
         <div class="p-6 border-t border-slate-800">
-            <button onclick="logout()" class="w-full flex items-center p-4 rounded-xl text-red-400 hover:bg-red-500/10 transition-all font-bold text-sm">
-                <i class="fas fa-power-off mr-3"></i> Salir del Sistema
+            <button onclick="logout()" class="w-full bg-slate-800 hover:bg-red-900/40 hover:text-red-400 text-slate-400 py-3 rounded-xl transition-all flex items-center justify-center font-medium">
+                <i class="fas fa-sign-out-alt mr-2"></i> Cerrar Sesión
             </button>
         </div>
     </div>
 
-    <div class="flex-1 p-10 overflow-y-auto relative">
-        <header class="flex justify-between items-center mb-10">
-            <div>
-                <h1 class="text-3xl font-black text-slate-800 tracking-tight">Panel de Control</h1>
-                <p class="text-slate-500 text-sm mt-1">Bienvenido, Dr. <span id="nombreDoctor" class="text-blue-600 font-bold">...</span></p>
+    <div class="flex-1 p-10 overflow-y-auto">
+        
+        <div id="personal" class="tab-content active">
+            <div id="headerPersonal" class="mb-8">
+                <h1 class="text-3xl font-extrabold text-slate-800">Control de Personal</h1>
+                <p class="text-slate-500 mt-2">Visualice y gestione los expedientes médicos de los colaboradores.</p>
             </div>
-            <div class="bg-white p-3 rounded-2xl shadow-sm border border-slate-100">
-                <img src="https://www.isertel.com.ec/wp-content/uploads/2021/03/logo-isertel.png" alt="Logo" class="h-8">
-            </div>
-        </header>
 
-        <div id="tab-inicio" class="tab-content active">
-            <div class="bg-gradient-to-br from-blue-600 to-indigo-700 p-12 rounded-[2rem] text-white shadow-2xl shadow-blue-200 relative overflow-hidden">
-                <div class="relative z-10">
-                    <h2 class="text-4xl font-black mb-4">Gestión Médica Isertel</h2>
-                    <p class="text-blue-100 text-lg max-w-xl leading-relaxed">Sistema centralizado para el monitoreo de certificados médicos y validación de reposos del personal activo y pasivo.</p>
-                </div>
-                <i class="fas fa-heartbeat absolute -right-10 -bottom-10 text-[15rem] text-white/10 rotate-12"></i>
-            </div>
-        </div>
-
-        <div id="tab-activos" class="tab-content">
-            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="p-6 border-b border-slate-100 bg-slate-50/50">
-                    <h3 class="font-bold text-slate-800">Lista de Personal Activo</h3>
-                </div>
-                <table class="w-full text-left border-collapse">
-                    <thead class="bg-slate-50 text-slate-400 text-[10px] uppercase font-black border-b tracking-widest">
-                        <tr>
-                            <th class="px-8 py-5">Colaborador</th>
-                            <th class="px-8 py-5">Identificación</th>
-                            <th class="px-8 py-5">Correo Electrónico</th>
-                            <th class="px-8 py-5 text-right">Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody id="lista-activos" class="divide-y divide-slate-100"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <div id="tab-pasivos" class="tab-content">
-            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="p-6 border-b border-slate-100 bg-slate-50/50">
-                    <h3 class="font-bold text-slate-800">Archivo de Personal Pasivo</h3>
-                </div>
-                <table class="w-full text-left border-collapse">
-                    <thead class="bg-slate-50 text-slate-400 text-[10px] uppercase font-black border-b tracking-widest">
-                        <tr>
-                            <th class="px-8 py-5">Ex-Colaborador</th>
-                            <th class="px-8 py-5">Cédula</th>
-                            <th class="px-8 py-5">Contacto</th>
-                            <th class="px-8 py-5 text-right">Categoría</th>
-                        </tr>
-                    </thead>
-                    <tbody id="lista-pasivos" class="divide-y divide-slate-100"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <div id="tab-certificados" class="tab-content">
-            <div class="mb-6 flex gap-4">
-                <div class="relative flex-1">
-                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                    <input type="text" id="searchCert" onkeyup="filterCerts()" placeholder="Buscar por nombre del empleado..." class="w-full pl-12 pr-6 py-4 rounded-2xl border-none shadow-sm ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm transition-all">
-                </div>
-            </div>
-            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-                <table class="w-full text-left border-collapse">
-                    <thead class="bg-blue-600 text-white text-[10px] uppercase font-black tracking-widest">
-                        <tr>
-                            <th class="px-8 py-5">Fecha de Registro</th>
-                            <th class="px-8 py-5">Empleado</th>
-                            <th class="px-8 py-5">Relación</th>
-                            <th class="px-8 py-5">Documento / Periodo</th>
-                            <th class="px-8 py-5 text-center">Visualizar</th>
-                        </tr>
-                    </thead>
-                    <tbody id="lista-certificados" class="divide-y divide-slate-100"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <div id="tab-aptitud" class="tab-content">
-            <div class="flex gap-4 mb-6">
-                <button onclick="setAptitudMode('activos')" id="btnAptActivos" class="bg-blue-600 text-white px-6 py-2 rounded-xl font-bold shadow-sm transition-all text-sm uppercase">Personal Activo</button>
-                <button onclick="setAptitudMode('pasivos')" id="btnAptPasivos" class="bg-white text-slate-600 px-6 py-2 rounded-xl font-bold shadow-sm transition-all hover:bg-slate-50 border border-slate-200 text-sm uppercase">Archivo Pasivo</button>
-            </div>
-            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="p-6 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
-                    <h3 class="font-bold text-slate-800" id="tituloAptitud">Gestión de Aptitud - Activos</h3>
-                </div>
-                <table class="w-full text-left border-collapse">
-                    <thead class="bg-slate-50 text-slate-400 text-[10px] uppercase font-black border-b tracking-widest">
-                        <tr>
-                            <th class="px-8 py-5">Colaborador (Seleccionar)</th>
-                            <th class="px-8 py-5">Identificación</th>
-                            <th class="px-8 py-5 text-right">Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody id="lista-aptitud" class="divide-y divide-slate-100"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <div id="modalAptitud" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden">
-                <div class="p-6 bg-slate-50 border-b flex justify-between items-center">
-                    <div class="flex items-center gap-3">
-                        <i class="fas fa-folder-open text-blue-600 text-xl"></i>
-                        <h3 class="font-bold text-slate-800 italic uppercase text-sm">Expediente Aptitud: <span id="nApt" class="text-blue-600"></span></h3>
+            <div id="contenedorTablasPersonal" class="space-y-10">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="bg-blue-600 px-6 py-4 flex justify-between items-center">
+                        <h3 class="text-white font-bold flex items-center"><i class="fas fa-check-circle mr-2"></i> Personal Activo</h3>
+                        <span id="countActivos" class="bg-blue-500 text-white text-xs px-3 py-1 rounded-full border border-blue-400">Cargando...</span>
                     </div>
-                    <button onclick="cerrarModalAptitud()" class="text-2xl text-slate-400 hover:text-red-500 transition-colors">&times;</button>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-50 border-b border-slate-200">
+                                <tr>
+                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Colaborador</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Cargo</th>
+                                    <th class="px-6 py-4 text-right">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tActivos" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
                 </div>
 
-                <div id="barraFiltrosAptitud" class="px-6 py-3 bg-white border-b flex flex-wrap gap-3 items-center">
-                    <div class="flex-1 min-w-[120px] relative">
-                        <i class="fas fa-filter absolute left-3 top-2.5 text-slate-400 text-[10px]"></i>
-                        <select id="filtroTipoAptitud" onchange="renderizarArchivosAptitud()" class="w-full pl-8 p-2 border rounded-lg text-[10px] font-bold uppercase outline-none bg-slate-50 focus:ring-2 focus:ring-blue-500">
-                            <option value="">Todos los tipos</option>
-                            <option value="ingreso">Ingreso</option>
-                            <option value="periodo">Periodo</option>
-                            <option value="salida">Salida</option>
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="bg-slate-600 px-6 py-4 flex justify-between items-center">
+                        <h3 class="text-white font-bold flex items-center"><i class="fas fa-history mr-2"></i> Personal Pasivo</h3>
+                        <span id="countPasivos" class="bg-slate-500 text-white text-xs px-3 py-1 rounded-full border border-slate-400">Cargando...</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-50 border-b border-slate-200">
+                                <tr>
+                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Colaborador</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Estado</th>
+                                    <th class="px-6 py-4 text-right">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tPasivos" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="seccionExpediente" class="hidden animate-fade-in">
+                <div class="flex items-center mb-6">
+                    <button onclick="volverALista()" class="mr-4 bg-white p-2 rounded-full shadow hover:bg-blue-50 text-blue-600 transition-all">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-800" id="nombreEmpleadoExpediente">---</h2>
+                        <p class="text-sm text-slate-500">Expediente Digital Consolidado</p>
+                    </div>
+                </div>
+
+                <div class="bg-slate-200 p-8 rounded-2xl border-2 border-dashed border-slate-300">
+                    <div id="listaDocumentosExpediente" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="aptitud" class="tab-content">
+            <div class="mb-8">
+                <h1 class="text-3xl font-extrabold text-slate-800">Certificados de Aptitud</h1>
+                <p class="text-slate-500 mt-2">Registro de certificados médicos y reposos.</p>
+            </div>
+            
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 mb-8">
+                <div class="flex flex-col md:flex-row gap-6 items-end">
+                    <div class="flex-1">
+                        <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide">Seleccionar Colaborador</label>
+                        <select id="selUserApt" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"></select>
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide">Tipo de Documento</label>
+                        <select id="selTipoApt" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                            <option value="Certificado médico de Aptitud">Certificado médico de Aptitud</option>
+                            <option value="Certificado médico de Reposo">Certificado médico de Reposo</option>
                         </select>
                     </div>
-                    <div class="flex-1 min-w-[120px] relative">
-                        <i class="fas fa-search absolute left-3 top-2.5 text-slate-400 text-[10px]"></i>
-                        <input type="text" id="filtroNombreAptitud" onkeyup="renderizarArchivosAptitud()" placeholder="Nombre archivo original..." class="w-full pl-8 p-2 border rounded-lg text-[10px] font-bold outline-none bg-slate-50 focus:ring-2 focus:ring-blue-500 uppercase">
+                    <div>
+                        <input type="file" id="fileApt" class="hidden" accept="application/pdf,image/*">
+                        <button onclick="document.getElementById('fileApt').click()" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold shadow-lg shadow-blue-500/20 transition-all flex items-center">
+                            <i class="fas fa-cloud-upload-alt mr-2"></i> Subir Documento
+                        </button>
                     </div>
-                    <div class="flex-1 min-w-[120px] relative">
-                        <i class="fas fa-calendar absolute left-3 top-2.5 text-slate-400 text-[10px]"></i>
-                        <input type="date" id="filtroFechaAptitud" onchange="renderizarArchivosAptitud()" class="w-full pl-8 p-2 border rounded-lg text-[10px] font-bold outline-none bg-slate-50 focus:ring-2 focus:ring-blue-500">
-                    </div>
-                    <button onclick="limpiarFiltrosAptitud()" class="text-slate-400 hover:text-red-500 transition-all p-2" title="Limpiar filtros"><i class="fas fa-undo-alt text-xs"></i></button>
-                </div>
-                
-                <div id="lAptDocs" class="p-6 space-y-3 max-h-80 overflow-y-auto bg-white min-h-[300px]"></div>
-
-                <div class="p-6 bg-blue-50 border-t flex flex-wrap gap-2">
-                    <div class="flex-1 min-w-[120px]">
-                        <p class="text-[10px] font-bold text-blue-500 uppercase mb-1">Mes de subida</p>
-                        <select id="periodoMesAptitud" class="w-full p-2 border rounded-lg text-sm font-bold">
-                            <option value="ENERO">Enero</option><option value="FEBRERO">Febrero</option><option value="MARZO">Marzo</option><option value="ABRIL">Abril</option><option value="MAYO">Mayo</option><option value="JUNIO">Junio</option><option value="JULIO">Julio</option><option value="AGOSTO">Agosto</option><option value="SEPTIEMBRE">Septiembre</option><option value="OCTUBRE">Octubre</option><option value="NOVIEMBRE">Noviembre</option><option value="DICIEMBRE">Diciembre</option>
-                        </select>
-                    </div>
-                    <div class="flex-[2] min-w-[200px]">
-                        <p class="text-[10px] font-bold text-blue-500 uppercase mb-1">Tipo de Certificado</p>
-                        <select id="tipoDocAptitud" class="w-full p-2 border rounded-lg text-sm font-bold">
-                            <option value="Ingreso">Ingreso</option>
-                            <option value="Periodo">Periodo</option>
-                            <option value="Salida">Salida</option>
-                        </select>
-                    </div>
-                    <button onclick="document.getElementById('fileAptitud').click()" class="mt-auto bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-blue-700 uppercase shadow-sm transition-all"><i class="fas fa-upload mr-2"></i>Subir PDF</button>
                 </div>
             </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                    <h3 class="font-bold text-slate-800 uppercase tracking-wider">Últimos Registros</h3>
+                </div>
+                <div id="lAptDocs" class="divide-y divide-slate-100"></div>
+            </div>
         </div>
-        <input type="file" id="fileAptitud" class="hidden" accept=".pdf">
 
     </div>
 
     <script>
-        const API_BASE = "https://kelvin-th-docs-backend.onrender.com/api";
+        const API_BASE = "https://isertel-backend.onrender.com/api";
         const token = localStorage.getItem('token');
-        const rol = localStorage.getItem('rol');
 
-        // Seguridad de acceso
-        if (!token || rol !== 'doc') { window.location.href = 'index.html'; }
-        document.getElementById('nombreDoctor').innerText = localStorage.getItem('nombre');
+        function logout() { localStorage.clear(); window.location.href = 'index.html'; }
 
         function showTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
-        }
-
-        async function loadData(tipo) {
-            const url = tipo === 'activos' ? `${API_BASE}/admin/empleados` : `${API_BASE}/admin/pasivos`;
-            try {
-                const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
-                const data = await res.json();
-                const tbody = document.getElementById(`lista-${tipo}`);
-                tbody.innerHTML = data.map(u => `
-                    <tr class="hover:bg-slate-50/80 transition-colors">
-                        <td class="px-8 py-6">
-                            <div class="flex items-center gap-4">
-                                <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-black text-xs">
-                                    ${u.nombre_completo.split(' ').map(n => n[0]).join('').substring(0,2)}
-                                </div>
-                                <span class="font-bold text-slate-700 text-sm">${u.nombre_completo}</span>
-                            </div>
-                        </td>
-                        <td class="px-8 py-6 text-slate-500 text-xs font-medium">${u.cedula}</td>
-                        <td class="px-8 py-6 text-slate-500 text-xs">${u.correo || u.celular || 'Sin registro'}</td>
-                        <td class="px-8 py-6 text-right">
-                            <span class="px-3 py-1 ${tipo === 'activos' ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-500'} rounded-full text-[9px] font-black uppercase tracking-tighter">
-                                ${tipo === 'activos' ? 'Activo' : 'Pasivo'}
-                            </span>
-                        </td>
-                    </tr>
-                `).join('');
-            } catch (e) { console.error("Error cargando usuarios:", e); }
-        }
-
-        async function loadCertificados() {
-            try {
-                const res = await fetch(`${API_BASE}/doctor/certificados-globales`, { headers: { 'Authorization': `Bearer ${token}` } });
-                const data = await res.json();
-                const tbody = document.getElementById('lista-certificados');
-                tbody.innerHTML = data.map(d => `
-                    <tr class="hover:bg-blue-50/50 transition-colors">
-                        <td class="px-8 py-6">
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">${new Date(d.created_at).toLocaleDateString()}</div>
-                            <div class="text-[9px] text-slate-300 italic">${new Date(d.created_at).toLocaleTimeString()}</div>
-                        </td>
-                        <td class="px-8 py-6">
-                            <div class="font-black text-slate-700 text-sm uppercase tracking-tight">${d.empleado_nombre}</div>
-                        </td>
-                        <td class="px-8 py-6">
-                            <span class="px-2 py-1 ${d.estado_empleado === 'Activo' ? 'text-blue-600 bg-blue-50' : 'text-slate-500 bg-slate-50'} border border-current rounded text-[9px] font-black uppercase">
-                                ${d.estado_empleado}
-                            </span>
-                        </td>
-                        <td class="px-8 py-6">
-                            <div class="text-[10px] font-black text-indigo-900 uppercase">${d.tipo_documento.split(' - ')[0]}</div>
-                            <div class="text-[9px] text-slate-400 italic font-medium uppercase tracking-widest">${d.tipo_documento.split(' - ')[1] || 'General'}</div>
-                        </td>
-                        <td class="px-8 py-6 text-center">
-                            <a href="${d.url_cloudinary}" target="_blank" class="inline-flex items-center justify-center w-10 h-10 bg-slate-900 text-white rounded-xl hover:bg-blue-600 transition-all shadow-lg hover:shadow-blue-200">
-                                <i class="fas fa-external-link-alt text-xs"></i>
-                            </a>
-                        </td>
-                    </tr>
-                `).join('');
-            } catch (e) { console.error("Error cargando certificados:", e); }
-        }
-
-        function filterCerts() {
-            const q = document.getElementById('searchCert').value.toLowerCase();
-            const rows = document.querySelectorAll('#lista-certificados tr');
-            rows.forEach(row => {
-                const nombre = row.cells[1].innerText.toLowerCase();
-                row.style.display = nombre.includes(q) ? '' : 'none';
-            });
-        }
-
-        function logout() {
-            localStorage.clear();
-            window.location.href = 'index.html';
-        }
-
-        // ==========================================
-        // NUEVA LÓGICA: CERTIFICADOS DE APTITUD
-        // ==========================================
-        
-        let aptitudMode = 'activos';
-        let aptitudUsuarios = [];
-        let currentAptitudId = null;
-        let currentAptitudPasivo = false;
-        let aptitudDocs = [];
-
-        const mesesOrden = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
-
-        async function loadAptitudData() {
-            const url = aptitudMode === 'activos' ? `${API_BASE}/admin/empleados` : `${API_BASE}/admin/pasivos`;
-            try {
-                const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
-                aptitudUsuarios = await res.json();
-                renderListaAptitud();
-            } catch (e) { console.error("Error cargando usuarios aptitud:", e); }
-        }
-
-        function setAptitudMode(mode) {
-            aptitudMode = mode;
-            // Estilos de los botones
-            document.getElementById('btnAptActivos').className = mode === 'activos' 
-                ? "bg-blue-600 text-white px-6 py-2 rounded-xl font-bold shadow-sm transition-all text-sm uppercase" 
-                : "bg-white text-slate-600 px-6 py-2 rounded-xl font-bold shadow-sm transition-all hover:bg-slate-50 border border-slate-200 text-sm uppercase";
-            document.getElementById('btnAptPasivos').className = mode === 'pasivos' 
-                ? "bg-blue-600 text-white px-6 py-2 rounded-xl font-bold shadow-sm transition-all text-sm uppercase" 
-                : "bg-white text-slate-600 px-6 py-2 rounded-xl font-bold shadow-sm transition-all hover:bg-slate-50 border border-slate-200 text-sm uppercase";
+            document.getElementById('btn-' + tabId).classList.add('active');
             
-            document.getElementById('tituloAptitud').innerText = mode === 'activos' ? "Gestión de Aptitud - Activos" : "Gestión de Aptitud - Pasivos";
-            loadAptitudData();
+            // Al cambiar a personal, asegurarnos de que se vea la lista y no el expediente anterior
+            if(tabId === 'personal') volverALista();
         }
 
-        function renderListaAptitud() {
-            const tbody = document.getElementById('lista-aptitud');
-            tbody.innerHTML = aptitudUsuarios.map(u => `
-                <tr class="hover:bg-slate-50/80 transition-colors cursor-pointer" onclick="abrirExpedienteAptitud(${u.id}, '${u.nombre_completo}', ${aptitudMode === 'pasivos'})">
-                    <td class="px-8 py-6">
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-black text-xs border border-indigo-100">
-                                ${u.nombre_completo.split(' ').map(n => n[0]).join('').substring(0,2)}
+        async function cargarTodo() {
+            await Promise.all([cargarPersonal(), cargarDocsAptitud()]);
+        }
+        window.onload = cargarTodo;
+
+        async function cargarPersonal() {
+            try {
+                const res = await fetch(`${API_BASE}/admin/personal`, { headers: { 'Authorization': 'Bearer ' + token } });
+                const data = await res.json();
+                
+                // Render Activos
+                document.getElementById('countActivos').innerText = data.activos.length + ' Empleados';
+                document.getElementById('tActivos').innerHTML = data.activos.map(u => `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="font-bold text-slate-800">${u.nombre}</div>
+                            <div class="text-xs text-slate-400">${u.cedula}</div>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-slate-600">${u.cargo || 'No asignado'}</td>
+                        <td class="px-6 py-4 text-right">
+                            <button onclick="verExpediente(${u.id}, '${u.nombre}')" class="bg-blue-50 text-blue-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-blue-600 hover:text-white transition-all">
+                                <i class="fas fa-folder-open mr-1"></i> EXPEDIENTE
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+
+                // Render Pasivos
+                document.getElementById('countPasivos').innerText = data.pasivos.length + ' Ex-empleados';
+                document.getElementById('tPasivos').innerHTML = data.pasivos.map(u => `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="px-6 py-4 font-bold text-slate-700">${u.nombre}</td>
+                        <td class="px-6 py-4 italic text-xs text-red-500 font-medium uppercase tracking-widest">Inactivo</td>
+                        <td class="px-6 py-4 text-right">
+                            <button onclick="verExpediente(${u.id}, '${u.nombre}')" class="bg-slate-100 text-slate-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-slate-600 hover:text-white transition-all">
+                                <i class="fas fa-folder-open mr-1"></i> EXPEDIENTE
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+
+                // Cargar Select para Aptitud (Solo activos)
+                document.getElementById('selUserApt').innerHTML = data.activos.map(u => `<option value="${u.id}">${u.nombre}</option>`).join('');
+
+            } catch(e) { console.error(e); }
+        }
+
+        // --- FUNCIONES DEL EXPEDIENTE ---
+        async function verExpediente(id, nombre) {
+            document.getElementById('nombreEmpleadoExpediente').innerText = nombre;
+            
+            // Ocultar tablas y mostrar contenedor de expediente
+            document.getElementById('contenedorTablasPersonal').classList.add('hidden');
+            document.getElementById('headerPersonal').classList.add('hidden');
+            document.getElementById('seccionExpediente').classList.remove('hidden');
+            
+            await cargarDocumentosDelUsuario(id);
+        }
+
+        async function cargarDocumentosDelUsuario(id) {
+            const container = document.getElementById('listaDocumentosExpediente');
+            container.innerHTML = '<div class="col-span-full text-center py-10 text-slate-500"><i class="fas fa-spinner fa-spin mr-2"></i> Consultando base de datos...</div>';
+
+            try {
+                // Llamada al nuevo endpoint en server.js
+                const res = await fetch(`${API_BASE}/doctor/documentos-usuario/${id}`, {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const docs = await res.json();
+
+                if (docs.length === 0) {
+                    container.innerHTML = '<div class="col-span-full text-center py-10 text-slate-400 bg-white/50 rounded-xl border-2 border-dotted border-slate-300 italic">No hay documentos registrados para este usuario.</div>';
+                    return;
+                }
+
+                container.innerHTML = docs.map(d => `
+                    <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-blue-500 expediente-container flex justify-between items-center">
+                        <div class="flex items-center">
+                            <div class="bg-blue-50 p-3 rounded-lg mr-4">
+                                <i class="fas fa-file-pdf text-blue-600 text-xl"></i>
                             </div>
-                            <span class="font-bold text-slate-700 text-sm">${u.nombre_completo}</span>
+                            <div>
+                                <p class="font-bold text-slate-800 text-sm uppercase leading-tight">${d.tipo_documento}</p>
+                                <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Subido el: ${new Date(d.created_at).toLocaleDateString()}</p>
+                            </div>
                         </div>
-                    </td>
-                    <td class="px-8 py-6 text-slate-500 text-xs font-medium">${u.cedula}</td>
-                    <td class="px-8 py-6 text-right">
-                        <button onclick="event.stopPropagation(); abrirExpedienteAptitud(${u.id}, '${u.nombre_completo}', ${aptitudMode === 'pasivos'})" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-blue-700 shadow-sm uppercase"><i class="fas fa-folder-open mr-2"></i>Expediente</button>
-                    </td>
-                </tr>
-            `).join('');
+                        <a href="${d.url_cloudinary}" target="_blank" class="bg-slate-100 hover:bg-blue-600 hover:text-white p-3 rounded-full transition-all">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                container.innerHTML = '<div class="col-span-full text-red-500">Error al cargar el expediente.</div>';
+            }
         }
 
-        async function abrirExpedienteAptitud(id, nombre, isPasivo) {
-            currentAptitudId = id;
-            currentAptitudPasivo = isPasivo;
-            document.getElementById('nApt').innerText = nombre;
-            document.getElementById('modalAptitud').classList.remove('hidden');
-            await cargarDocsAptitud();
+        function volverALista() {
+            document.getElementById('seccionExpediente').classList.add('hidden');
+            document.getElementById('contenedorTablasPersonal').classList.remove('hidden');
+            document.getElementById('headerPersonal').classList.remove('hidden');
         }
 
-        function cerrarModalAptitud() {
-            document.getElementById('modalAptitud').classList.add('hidden');
-            limpiarFiltrosAptitud();
-        }
-
+        // --- LÓGICA DE APTITUD ---
         async function cargarDocsAptitud() {
             try {
-                const res = await fetch(`${API_BASE}/doctor/aptitud/${currentAptitudId}?pasivo=${currentAptitudPasivo}`, { headers: { 'Authorization': `Bearer ${token}` } });
-                aptitudDocs = await res.json();
-                renderizarArchivosAptitud();
-            } catch(e) { console.error("Error cargando docs de aptitud", e); }
-        }
-
-        function limpiarFiltrosAptitud() {
-            document.getElementById('filtroTipoAptitud').value = "";
-            document.getElementById('filtroNombreAptitud').value = "";
-            document.getElementById('filtroFechaAptitud').value = "";
-            renderizarArchivosAptitud();
-        }
-
-        function obtenerFechaInput(fechaString) {
-            if (!fechaString) return "";
-            return new Date(fechaString).toISOString().split('T')[0];
-        }
-
-        function formatearFechaUTC(fechaString) {
-            if (!fechaString) return "N/A";
-            const fecha = new Date(fechaString);
-            return `${fecha.getUTCDate()}/${fecha.getUTCMonth() + 1}/${fecha.getUTCFullYear()}`;
-        }
-
-        function renderizarArchivosAptitud() {
-            const fTipo = document.getElementById('filtroTipoAptitud').value.toLowerCase();
-            const fFecha = document.getElementById('filtroFechaAptitud').value;
-            const fNombre = document.getElementById('filtroNombreAptitud').value.toLowerCase();
-
-            let docs = aptitudDocs;
-
-            // Filtrados
-            if (fTipo) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fTipo));
-            if (fFecha) docs = docs.filter(d => obtenerFechaInput(d.created_at) === fFecha);
-            if (fNombre) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fNombre));
-
-            const grupos = {};
-            docs.forEach(d => {
-                const partes = d.tipo_documento.split(' - ');
-                const mes = partes.length > 1 ? partes[1].toUpperCase() : "SIN PERIODO";
-                if(!grupos[mes]) grupos[mes] = [];
-                grupos[mes].push(d);
-            });
-
-            const mesesPresentes = Object.keys(grupos).sort((a, b) => mesesOrden.indexOf(a) - mesesOrden.indexOf(b));
-
-            document.getElementById('lAptDocs').innerHTML = mesesPresentes.map(mes => `
-                <div class="bg-slate-50/50 p-2 rounded-r-xl mb-4 border-l-4 border-blue-500">
-                    <h4 class="text-[10px] font-black text-blue-600 mb-2 px-2 italic"><i class="fas fa-calendar-alt mr-1"></i> PERIODO: ${mes}</h4>
-                    <div class="space-y-2">
-                        ${grupos[mes].map(d => {
-                            const partes = d.tipo_documento.split(' - ');
-                            const tipoLabel = partes[0] || "Documento";
-                            const nombreOriginal = partes[2] || "Archivo sin nombre";
-                            return `
-                            <div class="flex justify-between items-center p-3 bg-white border border-slate-100 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                                <div class="flex items-center gap-3">
-                                    <i class="fas fa-file-medical text-red-500 text-lg"></i>
-                                    <div>
-                                        <p class="text-[10px] font-black uppercase text-slate-800">${tipoLabel}</p>
-                                        <p class="text-[9px] text-slate-500 italic truncate max-w-[200px] font-medium">${nombreOriginal}</p>
-                                        <p class="text-[8px] text-slate-400">Subido: ${formatearFechaUTC(d.created_at)}</p>
-                                    </div>
-                                </div>
-                                <div class="flex gap-2">
-                                    <a href="${d.url_cloudinary}" target="_blank" class="w-8 h-8 flex items-center justify-center bg-blue-50 text-blue-600 rounded-lg transition-colors hover:bg-blue-600 hover:text-white" title="Ver archivo"><i class="fas fa-eye text-[10px]"></i></a>
-                                    <button onclick="eliminarDocAptitud(${d.id})" class="w-8 h-8 flex items-center justify-center bg-red-50 text-red-500 rounded-lg transition-colors hover:bg-red-500 hover:text-white" title="Eliminar archivo"><i class="fas fa-trash text-[10px]"></i></button>
-                                </div>
-                            </div>`;
-                        }).join('')}
+                const res = await fetch(`${API_BASE}/doctor/documentos-aptitud`, { headers: { 'Authorization': 'Bearer ' + token } });
+                const docs = await res.json();
+                document.getElementById('lAptDocs').innerHTML = docs.map(d => `
+                    <div class="flex justify-between items-center p-6 hover:bg-slate-50 transition-colors">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-file-medical text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-slate-800 uppercase text-sm">${d.nombre_usuario}</p>
+                                <p class="text-xs text-blue-600 font-semibold">${d.tipo_documento}</p>
+                                <p class="text-[10px] text-slate-400 mt-1 italic">${new Date(d.created_at).toLocaleString()}</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <a href="${d.url_cloudinary}" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-lg bg-slate-100 text-slate-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <button onclick="eliminarDocAptitud(${d.id})" class="w-10 h-10 flex items-center justify-center rounded-lg bg-slate-100 text-slate-400 hover:bg-red-600 hover:text-white transition-all shadow-sm">
+                                <i class="fas fa-trash-alt text-xs"></i>
+                            </button>
+                        </div>
                     </div>
-                </div>
-            `).join('') || '<div class="h-full flex flex-col items-center justify-center py-10 opacity-50"><i class="fas fa-folder-open text-4xl mb-3 text-slate-300"></i><p class="text-center text-slate-400 text-xs uppercase font-bold tracking-widest">Sin registros de aptitud</p></div>';
+                `).join('');
+            } catch(e) { console.error(e); }
         }
 
-        document.getElementById('fileAptitud').onchange = async function() {
-            const file = this.files[0]; if(!file) return;
+        document.getElementById('fileApt').onchange = async function() {
+            const user_id = document.getElementById('selUserApt').value;
+            const tipo = document.getElementById('selTipoApt').value;
+            if(!this.files[0] || !user_id) return;
             
-            const docBase = document.getElementById('tipoDocAptitud').value;
-            const mesElegido = document.getElementById('periodoMesAptitud').value;
-            // Se formatea igual que en admin: "Ingreso - ENERO - archivo.pdf"
-            const tipoFinal = `${docBase} - ${mesElegido} - ${file.name}`;
-
             const formData = new FormData();
-            formData.append('archivo', file);
-            formData.append('tipo_documento', tipoFinal);
-            formData.append('usuario_id', currentAptitudId);
-            formData.append('es_pasivo', currentAptitudPasivo);
+            formData.append('archivo', this.files[0]);
+            formData.append('usuario_id', user_id);
+            formData.append('tipo_documento', tipo);
             
             try {
-                // Notificación visual de carga
-                document.getElementById('lAptDocs').innerHTML = '<div class="flex items-center justify-center py-10"><i class="fas fa-spinner fa-spin text-3xl text-blue-500"></i></div>';
-
+                document.getElementById('lAptDocs').innerHTML = '<div class="py-10 text-center"><i class="fas fa-spinner fa-spin text-3xl text-blue-600"></i></div>';
                 const res = await fetch(`${API_BASE}/doctor/subir-aptitud`, { 
                     method: 'POST', 
                     headers: { 'Authorization': 'Bearer ' + token }, 
                     body: formData 
                 });
                 
-                if(res.ok) { 
-                    await cargarDocsAptitud();
-                } else {
-                    alert("Error al subir el documento.");
-                    await cargarDocsAptitud();
-                }
-            } catch(e) { 
-                console.error(e); 
-                alert("Ocurrió un error en la subida."); 
-            }
-            this.value = ""; // Limpiar el input
+                if(res.ok) { await cargarDocsAptitud(); } 
+                else { alert("Error al subir"); await cargarDocsAptitud(); }
+            } catch(e) { alert("Error"); }
+            this.value = "";
         };
 
         async function eliminarDocAptitud(id) {
-            if(confirm("¿Estás seguro de que deseas eliminar este certificado de aptitud?")) {
-                try {
-                    await fetch(`${API_BASE}/doctor/aptitud/${id}`, { 
-                        method: 'DELETE', 
-                        headers: {'Authorization': 'Bearer '+ token} 
-                    });
-                    await cargarDocsAptitud();
-                } catch(e) { console.error(e); }
+            if(confirm("¿Eliminar este certificado?")) {
+                await fetch(`${API_BASE}/doctor/aptitud/${id}`, { method: 'DELETE', headers: {'Authorization': 'Bearer '+ token} });
+                await cargarDocsAptitud();
             }
         }
     </script>
