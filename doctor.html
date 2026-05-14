@@ -80,14 +80,13 @@
                     <h3 class="font-bold text-slate-800">Lista de Personal Activo</h3>
                 </div>
                 <table class="w-full text-left border-collapse">
-                    <thead class="bg-slate-50 text-slate-400 text-[10px] uppercase font-black border-b tracking-widest">
-                        <tr>
-                            <th class="px-8 py-5">Colaborador</th>
-                            <th class="px-8 py-5">Identificación</th>
-                            <th class="px-8 py-5">Correo Electrónico</th>
-                            <th class="px-8 py-5 text-right">Estado</th>
-                        </tr>
-                    </thead>
+<thead class="bg-slate-50 text-slate-400 text-[10px] uppercase font-black border-b tracking-widest">
+    <tr>
+        <th class="px-8 py-5">Colaborador</th>
+        <th class="px-8 py-5">Identificación</th>
+        <th class="px-8 py-5">Correo / Contacto</th>
+        <th class="px-8 py-5 text-right">Acción</th> </tr>
+</thead>
                     <tbody id="lista-activos" class="divide-y divide-slate-100"></tbody>
                 </table>
             </div>
@@ -99,14 +98,13 @@
                     <h3 class="font-bold text-slate-800">Archivo de Personal Pasivo</h3>
                 </div>
                 <table class="w-full text-left border-collapse">
-                    <thead class="bg-slate-50 text-slate-400 text-[10px] uppercase font-black border-b tracking-widest">
-                        <tr>
-                            <th class="px-8 py-5">Ex-Colaborador</th>
-                            <th class="px-8 py-5">Cédula</th>
-                            <th class="px-8 py-5">Contacto</th>
-                            <th class="px-8 py-5 text-right">Categoría</th>
-                        </tr>
-                    </thead>
+<thead class="bg-slate-50 text-slate-400 text-[10px] uppercase font-black border-b tracking-widest">
+    <tr>
+        <th class="px-8 py-5">Ex-Colaborador</th>
+        <th class="px-8 py-5">Cédula</th>
+        <th class="px-8 py-5">Contacto</th>
+        <th class="px-8 py-5 text-right">Acción</th> </tr>
+</thead>
                     <tbody id="lista-pasivos" class="divide-y divide-slate-100"></tbody>
                 </table>
             </div>
@@ -229,33 +227,41 @@
             event.currentTarget.classList.add('active');
         }
 
-        async function loadData(tipo) {
-            const url = tipo === 'activos' ? `${API_BASE}/admin/empleados` : `${API_BASE}/admin/pasivos`;
-            try {
-                const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
-                const data = await res.json();
-                const tbody = document.getElementById(`lista-${tipo}`);
-                tbody.innerHTML = data.map(u => `
-                    <tr class="hover:bg-slate-50/80 transition-colors">
-                        <td class="px-8 py-6">
-                            <div class="flex items-center gap-4">
-                                <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-black text-xs">
-                                    ${u.nombre_completo.split(' ').map(n => n[0]).join('').substring(0,2)}
-                                </div>
-                                <span class="font-bold text-slate-700 text-sm">${u.nombre_completo}</span>
-                            </div>
-                        </td>
-                        <td class="px-8 py-6 text-slate-500 text-xs font-medium">${u.cedula}</td>
-                        <td class="px-8 py-6 text-slate-500 text-xs">${u.correo || u.celular || 'Sin registro'}</td>
-                        <td class="px-8 py-6 text-right">
-                            <span class="px-3 py-1 ${tipo === 'activos' ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-500'} rounded-full text-[9px] font-black uppercase tracking-tighter">
-                                ${tipo === 'activos' ? 'Activo' : 'Pasivo'}
-                            </span>
-                        </td>
-                    </tr>
-                `).join('');
-            } catch (e) { console.error("Error cargando usuarios:", e); }
-        }
+async function loadData(tipo) {
+    const url = tipo === 'activos' ? `${API_BASE}/admin/empleados` : `${API_BASE}/admin/pasivos`;
+    const isPasivo = tipo === 'pasivos';
+    
+    try {
+        const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+        const data = await res.json();
+        const tbody = document.getElementById(`lista-${tipo}`);
+        
+        tbody.innerHTML = data.map(u => `
+            <tr class="hover:bg-slate-50/80 transition-colors">
+                <td class="px-8 py-6">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-black text-xs">
+                            ${u.nombre_completo.split(' ').map(n => n[0]).join('').substring(0,2)}
+                        </div>
+                        <span class="font-bold text-slate-700 text-sm">${u.nombre_completo}</span>
+                    </div>
+                </td>
+                <td class="px-8 py-6 text-slate-500 text-xs font-medium">${u.cedula}</td>
+                <td class="px-8 py-6 text-slate-500 text-xs">${u.correo || u.celular || 'Sin registro'}</td>
+                <td class="px-8 py-6 text-right">
+                    <button onclick="abrirExpedienteAptitud(${u.id}, '${u.nombre_completo}', ${isPasivo})" 
+                            class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-indigo-700 shadow-sm uppercase transition-all">
+                        <i class="fas fa-folder-open mr-2"></i>Expediente
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    } catch (e) { 
+        console.error("Error cargando usuarios:", e); 
+        const tbody = document.getElementById(`lista-${tipo}`);
+        tbody.innerHTML = `<tr><td colspan="4" class="p-10 text-center text-red-500 font-bold">Error al conectar con el servidor</td></tr>`;
+    }
+}
 
         async function loadCertificados() {
             try {
