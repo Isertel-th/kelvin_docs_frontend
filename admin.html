@@ -422,65 +422,107 @@ async function abrirExpediente(id, nombre) {
             renderizarArchivosCarpeta();
         }
 
-        function renderizarArchivosCarpeta() {
-            const fTipo = document.getElementById('filtroTipoDoc').value.toLowerCase();
-            const fFecha = document.getElementById('filtroFechaDoc').value;
-            const fNombre = document.getElementById('filtroNombreArchivo').value.toLowerCase();
+function renderizarArchivosCarpeta() {
+    const fTipo = document.getElementById('filtroTipoDoc').value.toLowerCase();
+    const fFecha = document.getElementById('filtroFechaDoc').value;
+    const fNombre = document.getElementById('filtroNombreArchivo').value.toLowerCase();
 
-            let pClave = [];
-            if(carpetaActual === 'Contratación') pClave = ['contrato', 'entrada', 'sut'];
-            else if(carpetaActual === 'Vacaciones') pClave = ['vacaciones', 'cronograma'];
-            else if(carpetaActual === 'Certificado de competencia') pClave = ['competencia'];
-            else if(carpetaActual === 'Acta de epps') pClave = ['epp'];
-            else if(carpetaActual.includes('Certificados medicos')) pClave = ['medico', 'médico', 'reposo', 'iess', 'privado', 'msp'];
-            else if(carpetaActual === 'Memorandum') pClave = ['memorandum'];
-            else if(carpetaActual === 'Certificados') pClave = ['laborales', 'honorabilidad'];
-            else if(carpetaActual === 'Desvinculación') pClave = ['finiquito', 'pago', 'salida', 'renuncia'];
+    let pClave = [];
+    if(carpetaActual === 'Contratación') pClave = ['contrato', 'entrada', 'sut'];
+    else if(carpetaActual === 'Vacaciones') pClave = ['vacaciones', 'cronograma'];
+    else if(carpetaActual === 'Certificado de competencia') pClave = ['competencia'];
+    else if(carpetaActual === 'Acta de epps') pClave = ['epp'];
+    // CORRECCIÓN AQUÍ: Asegurar que coincida con lo que guardamos en docus_medicos
+    else if(carpetaActual.includes('Certificados medicos')) pClave = ['medico', 'médico', 'reposo', 'iess', 'privado', 'msp'];
+    else if(carpetaActual === 'Memorandum') pClave = ['memorandum'];
+    else if(carpetaActual === 'Certificados') pClave = ['laborales', 'honorabilidad'];
+    else if(carpetaActual === 'Desvinculación') pClave = ['finiquito', 'pago', 'salida', 'renuncia'];
 
-            let docs = documentosCargados.filter(d => pClave.some(p => d.tipo_documento.toLowerCase().includes(p)));
-            
-            if (fTipo) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fTipo));
-            if (fFecha) docs = docs.filter(d => obtenerFechaInput(d.created_at) === fFecha);
-            if (fNombre) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fNombre));
+    // Filtramos los documentos cargados basándonos en las palabras clave de la carpeta
+    let docs = documentosCargados.filter(d => pClave.some(p => d.tipo_documento.toLowerCase().includes(p)));
+    
+    // Aplicar filtros de búsqueda de la interfaz
+    if (fTipo) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fTipo));
+    if (fFecha) docs = docs.filter(d => obtenerFechaInput(d.created_at) === fFecha);
+    if (fNombre) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fNombre));
 
-            const grupos = {};
-            docs.forEach(d => {
-                const partes = d.tipo_documento.split(' - ');
-                const mes = partes.length > 1 ? partes[1].toUpperCase() : "SIN PERIODO";
-                if(!grupos[mes]) grupos[mes] = [];
-                grupos[mes].push(d);
+    const grupos = {};
+    docs.forEach(d => {
+        // Usamos un try-catch por si acaso d.tipo_documento es nulo
+        try {
+            const partes = d.tipo_documento.split(' - ');
+            const mes = partes.length > 1 ? partes[1].toUpperCase() : "SIN PERIODO";
+            if(!grupos[mes]) grupos[mes] = [];
+            grupos[mes].push(d);
+        } catch(e) { console.error("Error procesando documento:", d); }
+    });
+
+    const mesesPresentes = Object.keys(grupos).sort((a, b) => mesesOrden.indexOf(a) - mesesOrden.indexOf(b));
+
+    // Si mesesPresentes está vacío, mostrar mensaje de "Sin archivos" para que no se vea "pegado"
+    if (mesesPresentes.length === 0) {
+        document.getElementById('lDocs').innerHTML = '<div class="flex flex-col items-center justify-center py-10 text-slate-300"><i class="fas fa-folder-open text-4xl mb-2"></i><p class="text-xs uppercase italic">No hay archivos en esta categoría</p></div>';
+        return;
+    }
+
+    document.getElementById('lDocs').innerHTML = mesesPresentes.map(mes => `
+        <div class="mes-block bg-slate-50/50 p-2 rounded-r-xl mb-4">
+            <h4 class="text-[10px] font-black text-indigo-600 mb-2 px-2 italic"><i class="fas fa-calendar-alt mr-1"></i> PERIODO: ${mes}</h4>
+            <div class="space-y-2">
+                ${grupos[mes].map(d => {
+                    const partes = d.tipo_documento.split(' - ');
+                    const tipoLabel = partes[0] || "Doc";
+                    const nombreOriginal = partes[2] || "Archivo";
+                    return `
+                    <div class="flex justify-between items-center p-3 bg-white border border-slate-100 rounded-xl shadow-sm animate-fade-in">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-file-pdf text-red-500"></i>
+                            <div>
+                                <p class="text-[10px] font-black uppercase text-indigo-900">${tipoLabel}</p>
+                                <p class="text-[9px] text-slate-500 italic truncate max-w-[200px] font-medium">${nombreOriginal}</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <a href="${d.url_cloudinary}" target="_blank" class="w-7 h-7 flex items-center justify-center bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-600 hover:text-white transition-all"><i class="fas fa-eye text-[10px]"></i></a>
+                            <button onclick="eliminarDocGeneral(${d.id}, '${d.tipo_documento}')" class="w-7 h-7 flex items-center justify-center bg-red-50 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all"><i class="fas fa-trash text-[10px]"></i></button>
+                        </div>
+                    </div>`;
+                }).join('')}
+            </div>
+        </div>
+    `).join('');
+}
+
+
+
+async function eliminarDocGeneral(id, tipoDoc) {
+    if(confirm("¿Seguro que desea eliminar este documento?")) {
+        // Importante: enviamos el tipoDoc para que el servidor sepa si debe borrar de 'docus_medicos'
+        const url = `${API_BASE}/admin/documentos/${id}?pasivo=${modoLista==='pasivos'}&tipo=${encodeURIComponent(tipoDoc)}`;
+        
+        try {
+            const res = await fetch(url, { 
+                method: 'DELETE', 
+                headers: {'Authorization': 'Bearer '+ localStorage.getItem('token')} 
             });
 
-            const mesesPresentes = Object.keys(grupos).sort((a, b) => mesesOrden.indexOf(a) - mesesOrden.indexOf(b));
-
-            document.getElementById('lDocs').innerHTML = mesesPresentes.map(mes => `
-                <div class="mes-block bg-slate-50/50 p-2 rounded-r-xl mb-4">
-                    <h4 class="text-[10px] font-black text-indigo-600 mb-2 px-2 italic"><i class="fas fa-calendar-alt mr-1"></i> PERIODO: ${mes}</h4>
-                    <div class="space-y-2">
-                        ${grupos[mes].map(d => {
-                            const partes = d.tipo_documento.split(' - ');
-                            const tipoLabel = partes[0] || "Doc";
-                            const nombreOriginal = partes[2] || "Archivo sin nombre";
-                            return `
-                            <div class="flex justify-between items-center p-3 bg-white border border-slate-100 rounded-xl shadow-sm animate-fade-in">
-                                <div class="flex items-center gap-3">
-                                    <i class="fas fa-file-pdf text-red-500"></i>
-                                    <div>
-                                        <p class="text-[10px] font-black uppercase text-indigo-900">${tipoLabel}</p>
-                                        <p class="text-[9px] text-slate-500 italic truncate max-w-[200px] font-medium">${nombreOriginal}</p>
-                                        <p class="text-[8px] text-slate-400">Subido: ${formatearFechaUTC(d.created_at)}</p>
-                                    </div>
-                                </div>
-                                <div class="flex gap-2">
-                                    <a href="${d.url_cloudinary}" target="_blank" class="w-7 h-7 flex items-center justify-center bg-indigo-50 text-indigo-600 rounded-lg transition-colors hover:bg-indigo-600 hover:text-white"><i class="fas fa-eye text-[10px]"></i></a>
-                                    <button onclick="eliminarDoc(${d.id})" class="w-7 h-7 flex items-center justify-center bg-red-50 text-red-500 rounded-lg transition-colors hover:bg-red-500 hover:text-white"><i class="fas fa-trash text-[10px]"></i></button>
-                                </div>
-                            </div>`;
-                        }).join('')}
-                    </div>
-                </div>
-            `).join('') || '<p class="text-center text-slate-300 text-xs py-10 uppercase italic">Sin archivos</p>';
+            if(res.ok) {
+                // Recargar los documentos para actualizar la vista sin cerrar el modal
+                const resDocs = await fetch(`${API_BASE}/admin/documentos/${idActual}?pasivo=${modoLista==='pasivos'}`, { 
+                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } 
+                });
+                documentosCargados = await resDocs.json();
+                renderizarArchivosCarpeta(); // Esto refresca la lista automáticamente
+            }
+        } catch (error) {
+            console.error("Error al eliminar:", error);
+            alert("No se pudo eliminar el archivo");
         }
+    }
+}
+
+
+
 
         function limpiarFiltrosModal() { 
             document.getElementById('filtroTipoDoc').value = ""; 
