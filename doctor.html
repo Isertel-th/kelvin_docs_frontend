@@ -448,42 +448,49 @@ async function loadData(tipo) {
             `).join('') || '<div class="h-full flex flex-col items-center justify-center py-10 opacity-50"><i class="fas fa-folder-open text-4xl mb-3 text-slate-300"></i><p class="text-center text-slate-400 text-xs uppercase font-bold tracking-widest">Sin registros de aptitud</p></div>';
         }
 
-        document.getElementById('fileAptitud').onchange = async function() {
-            const file = this.files[0]; if(!file) return;
-            
-            const docBase = document.getElementById('tipoDocAptitud').value;
-            const mesElegido = document.getElementById('periodoMesAptitud').value;
-            // Se formatea igual que en admin: "Ingreso - ENERO - archivo.pdf"
-            const tipoFinal = `${docBase} - ${mesElegido} - ${file.name}`;
+document.getElementById('fileAptitud').onchange = async function() {
+    const file = this.files[0]; 
+    if(!file) return;
+    
+    const docBase = document.getElementById('tipoDocAptitud').value;
+    const mesElegido = document.getElementById('periodoMesAptitud').value;
+    const tipoFinal = `${docBase} - ${mesElegido} - ${file.name}`;
 
-            const formData = new FormData();
-            formData.append('archivo', file);
-            formData.append('tipo_documento', tipoFinal);
-            formData.append('usuario_id', currentAptitudId);
-            formData.append('es_pasivo', currentAptitudPasivo);
-            
-            try {
-                // Notificación visual de carga
-                document.getElementById('lAptDocs').innerHTML = '<div class="flex items-center justify-center py-10"><i class="fas fa-spinner fa-spin text-3xl text-blue-500"></i></div>';
+    console.log("Iniciando subida...");
+    console.log("Datos:", { id: currentAptitudId, tipo: tipoFinal, pasivo: currentAptitudPasivo });
 
-                const res = await fetch(`${API_BASE}/doctor/subir-aptitud`, { 
-                    method: 'POST', 
-                    headers: { 'Authorization': 'Bearer ' + token }, 
-                    body: formData 
-                });
-                
-                if(res.ok) { 
-                    await cargarDocsAptitud();
-                } else {
-                    alert("Error al subir el documento.");
-                    await cargarDocsAptitud();
-                }
-            } catch(e) { 
-                console.error(e); 
-                alert("Ocurrió un error en la subida."); 
-            }
-            this.value = ""; // Limpiar el input
-        };
+    const formData = new FormData();
+    formData.append('archivo', file);
+    formData.append('tipo_documento', tipoFinal);
+    formData.append('usuario_id', currentAptitudId);
+    formData.append('es_pasivo', currentAptitudPasivo);
+    
+    try {
+        document.getElementById('lAptDocs').innerHTML = '<div class="flex items-center justify-center py-10"><i class="fas fa-spinner fa-spin text-3xl text-blue-500"></i><p class="ml-3">Subiendo...</p></div>';
+
+        const res = await fetch(`${API_BASE}/doctor/subir-aptitud`, { 
+            method: 'POST', 
+            headers: { 'Authorization': 'Bearer ' + token }, 
+            body: formData 
+        });
+        
+        const data = await res.json();
+        console.log("Respuesta del servidor:", data);
+
+        if(res.ok) { 
+            console.log("Subida exitosa");
+            await cargarDocsAptitud();
+        } else {
+            console.error("Error en respuesta:", data.error);
+            alert("Error del servidor: " + (data.error || "Desconocido"));
+            await cargarDocsAptitud();
+        }
+    } catch(e) { 
+        console.error("Error de red/petición:", e); 
+        alert("Ocurrió un error en la conexión."); 
+    }
+    this.value = ""; 
+};
 
         async function eliminarDocAptitud(id) {
             if(confirm("¿Estás seguro de que deseas eliminar este certificado de aptitud?")) {
