@@ -467,57 +467,64 @@ async function cargarDocsAptitud() {
         }
     }
 
-    function renderizarArchivosAptitud() {
-        const fTipo = document.getElementById('filtroTipoAptitud').value.toLowerCase();
-        const fFecha = document.getElementById('filtroFechaAptitud').value;
-        const fNombre = document.getElementById('filtroNombreAptitud').value.toLowerCase();
+function renderizarArchivosAptitud() {
+    const fTipo = document.getElementById('filtroTipoAptitud').value.toLowerCase();
+    const fFecha = document.getElementById('filtroFechaAptitud').value;
+    const fNombre = document.getElementById('filtroNombreAptitud').value.toLowerCase();
 
-        let pClave = carpetaActual === 'Certificados medicos' 
-            ? ['medico', 'médico', 'reposo', 'iess', 'privado', 'msp']
-            : ['aptitud', 'ficha'];
+    // Palabras clave más amplias para asegurar que encuentre los archivos
+    let pClave = carpetaActual === 'Certificados medicos' 
+        ? ['medico', 'médico', 'reposo', 'iess', 'privado', 'msp']
+        : ['aptitud', 'ficha', 'ocupacional'];
 
-        let docs = aptitudDocs.filter(d => pClave.some(p => d.tipo_documento.toLowerCase().includes(p)));
+    // Filtramos los documentos que pertenecen a la carpeta actual
+    let docs = aptitudDocs.filter(d => {
+        const tipoDoc = d.tipo_documento.toLowerCase();
+        return pClave.some(p => tipoDoc.includes(p));
+    });
 
-        if (fTipo) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fTipo));
-        if (fFecha) docs = docs.filter(d => d.created_at.startsWith(fFecha));
-        if (fNombre) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fNombre));
+    // Aplicar filtros de búsqueda (inputs)
+    if (fTipo) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fTipo));
+    if (fFecha) docs = docs.filter(d => d.created_at.startsWith(fFecha));
+    if (fNombre) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fNombre));
 
-        const grupos = {};
-        docs.forEach(d => {
-            const partes = d.tipo_documento.split(' - ');
-            const mes = partes.length > 1 ? partes[1].toUpperCase() : "SIN PERIODO";
-            if(!grupos[mes]) grupos[mes] = [];
-            grupos[mes].push(d);
-        });
+    const grupos = {};
+    docs.forEach(d => {
+        const partes = d.tipo_documento.split(' - ');
+        // Si el formato es "Tipo - Mes - Nombre", el mes es el índice 1
+        const mes = partes.length > 1 ? partes[1].toUpperCase().trim() : "VARIOS";
+        if(!grupos[mes]) grupos[mes] = [];
+        grupos[mes].push(d);
+    });
 
-        const mesesPresentes = Object.keys(grupos).sort((a, b) => mesesOrden.indexOf(a) - mesesOrden.indexOf(b));
+    const mesesPresentes = Object.keys(grupos).sort((a, b) => mesesOrden.indexOf(a) - mesesOrden.indexOf(b));
 
-        document.getElementById('lAptDocs').innerHTML = mesesPresentes.map(mes => `
-            <div class="bg-slate-50/50 p-2 rounded-r-xl mb-4 border-l-4 border-blue-500 animate-fade-in">
-                <h4 class="text-[10px] font-black text-blue-600 mb-2 px-2 italic"><i class="fas fa-calendar-alt mr-1"></i> PERIODO: ${mes}</h4>
-                <div class="space-y-2">
-                    ${grupos[mes].map(d => {
-                        const partes = d.tipo_documento.split(' - ');
-                        return `
-                        <div class="flex justify-between items-center p-3 bg-white border border-slate-100 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                            <div class="flex items-center gap-3">
-                                <i class="fas fa-file-medical text-red-500 text-lg"></i>
-                                <div>
-                                    <p class="text-[10px] font-black uppercase text-slate-800">${partes[0] || "Documento"}</p>
-                                    <p class="text-[9px] text-slate-500 italic truncate max-w-[200px] font-medium">${partes[2] || "Archivo sin nombre"}</p>
-                                    <p class="text-[8px] text-slate-400">Subido: ${new Date(d.created_at).toLocaleDateString()}</p>
-                                </div>
+    document.getElementById('lAptDocs').innerHTML = mesesPresentes.map(mes => `
+        <div class="bg-slate-50/50 p-2 rounded-r-xl mb-4 border-l-4 border-blue-500 animate-fade-in">
+            <h4 class="text-[10px] font-black text-blue-600 mb-2 px-2 italic"><i class="fas fa-calendar-alt mr-1"></i> PERIODO: ${mes}</h4>
+            <div class="space-y-2">
+                ${grupos[mes].map(d => {
+                    const partes = d.tipo_documento.split(' - ');
+                    return `
+                    <div class="flex justify-between items-center p-3 bg-white border border-slate-100 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-file-medical text-red-500 text-lg"></i>
+                            <div>
+                                <p class="text-[10px] font-black uppercase text-slate-800">${partes[0] || "Documento"}</p>
+                                <p class="text-[9px] text-slate-500 italic truncate max-w-[200px] font-medium">${partes[2] || "Ver archivo"}</p>
+                                <p class="text-[8px] text-slate-400">Subido: ${new Date(d.created_at).toLocaleDateString()}</p>
                             </div>
-                            <div class="flex gap-2">
-                                <a href="${d.url_cloudinary}" target="_blank" class="w-8 h-8 flex items-center justify-center bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition-colors"><i class="fas fa-eye text-[10px]"></i></a>
-                                <button onclick="eliminarDocAptitud(${d.id})" class="w-8 h-8 flex items-center justify-center bg-red-50 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-colors"><i class="fas fa-trash text-[10px]"></i></button>
-                            </div>
-                        </div>`;
-                    }).join('')}
-                </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <a href="${d.url_cloudinary}" target="_blank" class="w-8 h-8 flex items-center justify-center bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition-colors"><i class="fas fa-eye text-[10px]"></i></a>
+                            <button onclick="eliminarDocAptitud(${d.id})" class="w-8 h-8 flex items-center justify-center bg-red-50 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-colors"><i class="fas fa-trash text-[10px]"></i></button>
+                        </div>
+                    </div>`;
+                }).join('')}
             </div>
-        `).join('') || '<div class="py-10 text-center opacity-50"><p class="text-xs font-bold uppercase">Sin registros en esta carpeta</p></div>';
-    }
+        </div>
+    `).join('') || '<div class="py-10 text-center opacity-50"><p class="text-xs font-bold uppercase">No hay archivos guardados en esta categoría</p></div>';
+}
 
     document.getElementById('fileAptitud').onchange = async function() {
         const file = this.files[0]; 
