@@ -518,20 +518,18 @@
             this.value = "";
         };
 
-        async function eliminarDoc(id) { if(confirm("¿Eliminar?")) { await fetch(`${API_BASE}/admin/documentos/${id}?pasivo=${modoLista==='pasivos'}`, { method: 'DELETE', headers: {'Authorization': 'Bearer '+localStorage.getItem('token')} }); documentosCargados = documentosCargados.filter(d => d.id !== id); renderizarArchivosCarpeta(); } }
+async function eliminarDoc(id) { 
+    if(confirm("¿Estás seguro de eliminar este documento?")) { 
+        // Agregamos un query param para que el backend intente borrar en todas las tablas posibles
+        await fetch(`${API_BASE}/admin/documentos/${id}?pasivo=${modoLista==='pasivos'}`, { 
+            method: 'DELETE', 
+            headers: {'Authorization': 'Bearer '+localStorage.getItem('token')} 
+        }); 
         
-        function ejecutarFiltros() {
-            const bus = document.getElementById('filtroNombre').value.toLowerCase();
-            const mes = document.getElementById('filtroMes').value;
-            const anio = document.getElementById('filtroAnio').value;
-            const fil = todosLosEmpleados.filter(e => {
-                const cT = e.nombre_completo.toLowerCase().includes(bus) || e.cedula.includes(bus);
-                let cF = true;
-                if (e.fecha_ingreso && (mes !== "" || anio !== "")) { const f = new Date(e.fecha_ingreso); cF = (mes === "" || f.getUTCMonth() == mes) && (anio === "" || f.getUTCFullYear() == anio); }
-                return cT && cF;
-            });
-            renderizarTablaEmpleados(fil);
-        }
+        documentosCargados = documentosCargados.filter(d => d.id !== id); 
+        renderizarArchivosCarpeta(); 
+    } 
+}
 
         function limpiarFiltros() { document.getElementById('filtroNombre').value = ""; document.getElementById('filtroMes').value = ""; document.getElementById('filtroAnio').value = ""; renderizarTablaEmpleados(todosLosEmpleados); }
 
