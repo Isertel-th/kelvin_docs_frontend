@@ -477,32 +477,32 @@ function renderizarArchivosAptitud() {
     const fFecha = document.getElementById('filtroFechaAptitud').value;
     const fNombre = document.getElementById('filtroNombreAptitud').value.toLowerCase();
 
-    // Definimos qué palabras clave buscar según la carpeta donde estemos
+    // Palabras clave según la carpeta actual
     let pClave = carpetaActual === 'Certificados medicos' 
         ? ['medico', 'médico', 'reposo', 'iess', 'privado', 'msp']
         : ['aptitud', 'ficha'];
 
-    // Filtramos los documentos que pertenecen a esta "carpeta" visual
+    // Filtramos los documentos cargados
     let docs = aptitudDocs.filter(d => pClave.some(p => d.tipo_documento.toLowerCase().includes(p)));
 
-    // Aplicamos filtros de búsqueda si existen
+    // Aplicar filtros de búsqueda
     if (fTipo) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fTipo));
     if (fFecha) docs = docs.filter(d => d.created_at.startsWith(fFecha));
     if (fNombre) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fNombre));
 
     const contenedor = document.getElementById('lAptDocs');
 
-    // SI NO HAY DOCUMENTOS, MOSTRAR MENSAJE DE "VACÍO"
+    // SI LA LISTA ESTÁ VACÍA (Tu requerimiento principal)
     if (docs.length === 0) {
         contenedor.innerHTML = `
-            <div class="py-20 text-center opacity-60">
+            <div class="py-20 text-center opacity-60 animate-fade-in">
                 <i class="fas fa-folder-open text-4xl text-slate-300 mb-3"></i>
-                <p class="text-xs font-bold uppercase text-slate-500">No hay documentos cargados en esta sección</p>
+                <p class="text-[10px] font-black uppercase text-slate-400 tracking-widest">No hay ningún documento cargado aquí</p>
             </div>`;
         return;
     }
 
-    // Agrupar por meses
+    // Agrupación por meses (se mantiene igual)
     const grupos = {};
     docs.forEach(d => {
         const partes = d.tipo_documento.split(' - ');
@@ -526,7 +526,6 @@ function renderizarArchivosAptitud() {
                             <div>
                                 <p class="text-[10px] font-black uppercase text-slate-800">${partes[0] || "Documento"}</p>
                                 <p class="text-[9px] text-slate-500 italic truncate max-w-[200px] font-medium">${partes[2] || "Archivo sin nombre"}</p>
-                                <p class="text-[8px] text-slate-400">Subido: ${new Date(d.created_at).toLocaleDateString()}</p>
                             </div>
                         </div>
                         <div class="flex gap-2">
