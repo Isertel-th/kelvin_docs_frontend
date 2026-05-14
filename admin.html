@@ -367,9 +367,10 @@
             document.getElementById('nEmp').innerText = nombre;
             document.getElementById('modalC').classList.remove('hidden');
             const res = await fetch(`${API_BASE}/admin/documentos/${id}?pasivo=${modoLista==='pasivos'}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
-            documentosCargados = await res.json();
-            renderizarVistaCarpetas();
-        }
+documentosCargados = await res.json();
+    console.log("Documentos recibidos del servidor:", documentosCargados); // AGREGA ESTO
+    renderizarVistaCarpetas();
+}
 
         function renderizarVistaCarpetas() {
             carpetaActual = null;
@@ -411,8 +412,10 @@ function entrarCarpeta(nombreCarpeta) {
     else if(nombreCarpeta === 'Certificado de competencia') ops = '<option>Certificado de competencia</option>';
     else if(nombreCarpeta === 'Acta de epps') ops = '<option>Acta de epp\'s</option>';
     // Ajuste aquí para coincidir con el nombre de tu carpeta en el HTML
-    else if(nombreCarpeta === 'Certificados medicos') ops = '<option>Certificado médico IESS</option><option>Certificado médico privado</option><option>Certificado médico MSP</option><option>Reposo médico</option>';
-    else if(nombreCarpeta === 'Memorandum') ops = '<option>Memorandum</option>';
+// Verifica que 'Certificados medicos' sea idéntico al texto en el card de la carpeta
+else if(nombreCarpeta === 'Certificados medicos') {
+    ops = '<option>Certificado médico IESS</option><option>Certificado médico privado</option><option>Certificado médico MSP</option><option>Reposo médico</option>';
+}    else if(nombreCarpeta === 'Memorandum') ops = '<option>Memorandum</option>';
     else if(nombreCarpeta === 'Certificados') ops = '<option>Laborales</option><option>De honorabilidad</option>';
     else if(nombreCarpeta === 'Desvinculación') ops = '<option>Acta de finiquito</option><option>Comprobante de pago</option><option>Aviso de salida</option><option>Renuncia</option>';
     
@@ -429,18 +432,22 @@ function renderizarArchivosCarpeta() {
     const fFecha = document.getElementById('filtroFechaDoc').value;
     const fNombre = document.getElementById('filtroNombreArchivo').value.toLowerCase();
 
-    let pClave = [];
+let pClave = [];
     if(carpetaActual === 'Contratación') pClave = ['contrato', 'entrada', 'sut'];
     else if(carpetaActual === 'Vacaciones') pClave = ['vacaciones', 'cronograma'];
     else if(carpetaActual === 'Certificado de competencia') pClave = ['competencia'];
     else if(carpetaActual === 'Acta de epps') pClave = ['epp'];
+    // IMPORTANTE: Asegúrate de que estas palabras cubran lo que devuelve docus_medicos
     else if(carpetaActual === 'Certificados medicos') pClave = ['medico', 'médico', 'reposo', 'iess', 'privado', 'msp'];
     else if(carpetaActual === 'Memorandum') pClave = ['memorandum'];
     else if(carpetaActual === 'Certificados') pClave = ['laborales', 'honorabilidad'];
     else if(carpetaActual === 'Desvinculación') pClave = ['finiquito', 'pago', 'salida', 'renuncia'];
 
-    // Filtrar documentos que pertenecen a esta carpeta
-    let docs = documentosCargados.filter(d => pClave.some(p => d.tipo_documento.toLowerCase().includes(p)));
+    // Si la tabla no muestra nada, es porque esta línea devuelve un array vacío:
+    let docs = documentosCargados.filter(d => {
+        const tipo = d.tipo_documento.toLowerCase();
+        return pClave.some(p => tipo.includes(p.toLowerCase()));
+    });
     
     // Aplicar filtros de búsqueda del modal
     if (fTipo) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fTipo));
