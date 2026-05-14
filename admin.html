@@ -362,14 +362,20 @@
             }
         }
 
-        async function abrirExpediente(id, nombre) {
-            idActual = id; nombreActual = nombre;
-            document.getElementById('nEmp').innerText = nombre;
-            document.getElementById('modalC').classList.remove('hidden');
-            const res = await fetch(`${API_BASE}/admin/documentos/${id}?pasivo=${modoLista==='pasivos'}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
-            documentosCargados = await res.json();
-            renderizarVistaCarpetas();
-        }
+async function abrirExpediente(id, nombre) {
+    idActual = id; nombreActual = nombre;
+    document.getElementById('nEmp').innerText = nombre;
+    document.getElementById('modalC').classList.remove('hidden');
+
+    // Ahora pedimos los documentos normales + los médicos
+    const res = await fetch(`${API_BASE}/admin/documentos/${id}?pasivo=${modoLista==='pasivos'}`, { 
+        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } 
+    });
+    
+    // Necesitamos crear una ruta en el backend que traiga también lo médico o manejarlo aquí
+    documentosCargados = await res.json();
+    renderizarVistaCarpetas();
+}
 
         function renderizarVistaCarpetas() {
             carpetaActual = null;
