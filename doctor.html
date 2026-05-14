@@ -451,73 +451,94 @@ async function abrirExpedienteAptitud(id, nombre, isPasivo) {
     }
 
 async function cargarDocsAptitud() {
-        const contenedor = document.getElementById('lAptDocs');
-        // Mostrar carga
-        contenedor.innerHTML = '<div class="text-center py-10"><i class="fas fa-circle-notch fa-spin text-blue-500 text-2xl"></i><p class="text-[10px] mt-2 font-bold uppercase">Buscando documentos...</p></div>';
+    const contenedor = document.getElementById('lAptDocs');
+    contenedor.innerHTML = '<div class="text-center py-10"><i class="fas fa-circle-notch fa-spin text-blue-500 text-2xl"></i><p class="text-[10px] mt-2 font-bold uppercase">Buscando documentos...</p></div>';
 
-        try {
-            const res = await fetch(`${API_BASE}/doctor/aptitud/${currentAptitudId}?pasivo=${currentAptitudPasivo}`, { 
-                headers: { 'Authorization': `Bearer ${token}` } 
-            });
-            aptitudDocs = await res.json();
-            renderizarArchivosAptitud();
-        } catch(e) { 
-            console.error("Error cargando docs de aptitud", e);
-            contenedor.innerHTML = '<div class="text-center py-10 text-red-500 font-bold uppercase text-[10px]">Error al cargar archivos</div>';
-        }
-    }
-
-    function renderizarArchivosAptitud() {
-        const fTipo = document.getElementById('filtroTipoAptitud').value.toLowerCase();
-        const fFecha = document.getElementById('filtroFechaAptitud').value;
-        const fNombre = document.getElementById('filtroNombreAptitud').value.toLowerCase();
-
-        let pClave = carpetaActual === 'Certificados medicos' 
-            ? ['medico', 'médico', 'reposo', 'iess', 'privado', 'msp']
-            : ['aptitud', 'ficha'];
-
-        let docs = aptitudDocs.filter(d => pClave.some(p => d.tipo_documento.toLowerCase().includes(p)));
-
-        if (fTipo) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fTipo));
-        if (fFecha) docs = docs.filter(d => d.created_at.startsWith(fFecha));
-        if (fNombre) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fNombre));
-
-        const grupos = {};
-        docs.forEach(d => {
-            const partes = d.tipo_documento.split(' - ');
-            const mes = partes.length > 1 ? partes[1].toUpperCase() : "SIN PERIODO";
-            if(!grupos[mes]) grupos[mes] = [];
-            grupos[mes].push(d);
+    try {
+        const res = await fetch(`${API_BASE}/doctor/aptitud/${currentAptitudId}?pasivo=${currentAptitudPasivo}`, { 
+            headers: { 'Authorization': `Bearer ${token}` } 
         });
-
-        const mesesPresentes = Object.keys(grupos).sort((a, b) => mesesOrden.indexOf(a) - mesesOrden.indexOf(b));
-
-        document.getElementById('lAptDocs').innerHTML = mesesPresentes.map(mes => `
-            <div class="bg-slate-50/50 p-2 rounded-r-xl mb-4 border-l-4 border-blue-500 animate-fade-in">
-                <h4 class="text-[10px] font-black text-blue-600 mb-2 px-2 italic"><i class="fas fa-calendar-alt mr-1"></i> PERIODO: ${mes}</h4>
-                <div class="space-y-2">
-                    ${grupos[mes].map(d => {
-                        const partes = d.tipo_documento.split(' - ');
-                        return `
-                        <div class="flex justify-between items-center p-3 bg-white border border-slate-100 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                            <div class="flex items-center gap-3">
-                                <i class="fas fa-file-medical text-red-500 text-lg"></i>
-                                <div>
-                                    <p class="text-[10px] font-black uppercase text-slate-800">${partes[0] || "Documento"}</p>
-                                    <p class="text-[9px] text-slate-500 italic truncate max-w-[200px] font-medium">${partes[2] || "Archivo sin nombre"}</p>
-                                    <p class="text-[8px] text-slate-400">Subido: ${new Date(d.created_at).toLocaleDateString()}</p>
-                                </div>
-                            </div>
-                            <div class="flex gap-2">
-                                <a href="${d.url_cloudinary}" target="_blank" class="w-8 h-8 flex items-center justify-center bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition-colors"><i class="fas fa-eye text-[10px]"></i></a>
-                                <button onclick="eliminarDocAptitud(${d.id})" class="w-8 h-8 flex items-center justify-center bg-red-50 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-colors"><i class="fas fa-trash text-[10px]"></i></button>
-                            </div>
-                        </div>`;
-                    }).join('')}
-                </div>
-            </div>
-        `).join('') || '<div class="py-10 text-center opacity-50"><p class="text-xs font-bold uppercase">Sin registros en esta carpeta</p></div>';
+        
+        // Verificamos si la respuesta es correcta
+        if (!res.ok) throw new Error("Error en la respuesta del servidor");
+        
+        aptitudDocs = await res.json();
+        
+        // Si llegamos aquí, los datos se cargaron (aunque sea una lista vacía)
+        renderizarArchivosAptitud();
+    } catch(e) { 
+        console.error("Error cargando docs de aptitud", e);
+        contenedor.innerHTML = '<div class="text-center py-10 text-red-500 font-bold uppercase text-[10px]">Error al conectar con el servidor</div>';
     }
+}
+
+function renderizarArchivosAptitud() {
+    const fTipo = document.getElementById('filtroTipoAptitud').value.toLowerCase();
+    const fFecha = document.getElementById('filtroFechaAptitud').value;
+    const fNombre = document.getElementById('filtroNombreAptitud').value.toLowerCase();
+
+    // Definimos qué palabras clave buscar según la carpeta donde estemos
+    let pClave = carpetaActual === 'Certificados medicos' 
+        ? ['medico', 'médico', 'reposo', 'iess', 'privado', 'msp']
+        : ['aptitud', 'ficha'];
+
+    // Filtramos los documentos que pertenecen a esta "carpeta" visual
+    let docs = aptitudDocs.filter(d => pClave.some(p => d.tipo_documento.toLowerCase().includes(p)));
+
+    // Aplicamos filtros de búsqueda si existen
+    if (fTipo) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fTipo));
+    if (fFecha) docs = docs.filter(d => d.created_at.startsWith(fFecha));
+    if (fNombre) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fNombre));
+
+    const contenedor = document.getElementById('lAptDocs');
+
+    // SI NO HAY DOCUMENTOS, MOSTRAR MENSAJE DE "VACÍO"
+    if (docs.length === 0) {
+        contenedor.innerHTML = `
+            <div class="py-20 text-center opacity-60">
+                <i class="fas fa-folder-open text-4xl text-slate-300 mb-3"></i>
+                <p class="text-xs font-bold uppercase text-slate-500">No hay documentos cargados en esta sección</p>
+            </div>`;
+        return;
+    }
+
+    // Agrupar por meses
+    const grupos = {};
+    docs.forEach(d => {
+        const partes = d.tipo_documento.split(' - ');
+        const mes = partes.length > 1 ? partes[1].toUpperCase() : "SIN PERIODO";
+        if(!grupos[mes]) grupos[mes] = [];
+        grupos[mes].push(d);
+    });
+
+    const mesesPresentes = Object.keys(grupos).sort((a, b) => mesesOrden.indexOf(a) - mesesOrden.indexOf(b));
+
+    contenedor.innerHTML = mesesPresentes.map(mes => `
+        <div class="bg-slate-50/50 p-2 rounded-r-xl mb-4 border-l-4 border-blue-500 animate-fade-in">
+            <h4 class="text-[10px] font-black text-blue-600 mb-2 px-2 italic"><i class="fas fa-calendar-alt mr-1"></i> PERIODO: ${mes}</h4>
+            <div class="space-y-2">
+                ${grupos[mes].map(d => {
+                    const partes = d.tipo_documento.split(' - ');
+                    return `
+                    <div class="flex justify-between items-center p-3 bg-white border border-slate-100 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-file-medical text-red-500 text-lg"></i>
+                            <div>
+                                <p class="text-[10px] font-black uppercase text-slate-800">${partes[0] || "Documento"}</p>
+                                <p class="text-[9px] text-slate-500 italic truncate max-w-[200px] font-medium">${partes[2] || "Archivo sin nombre"}</p>
+                                <p class="text-[8px] text-slate-400">Subido: ${new Date(d.created_at).toLocaleDateString()}</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <a href="${d.url_cloudinary}" target="_blank" class="w-8 h-8 flex items-center justify-center bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition-colors"><i class="fas fa-eye text-[10px]"></i></a>
+                            <button onclick="eliminarDocAptitud(${d.id})" class="w-8 h-8 flex items-center justify-center bg-red-50 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-colors"><i class="fas fa-trash text-[10px]"></i></button>
+                        </div>
+                    </div>`;
+                }).join('')}
+            </div>
+        </div>
+    `).join('');
+}
 
     document.getElementById('fileAptitud').onchange = async function() {
         const file = this.files[0]; 
