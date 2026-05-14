@@ -390,92 +390,102 @@
                 </div>`;
         }
 
-        function entrarCarpeta(nombreCarpeta) {
-            carpetaActual = nombreCarpeta;
-            document.getElementById('rutaCarpeta').innerText = "> " + nombreCarpeta;
-            document.getElementById('btnRetrocederCarpeta').classList.remove('hidden');
-            document.getElementById('footerSubida').classList.remove('hidden');
-            document.getElementById('barraFiltrosModal').classList.remove('hidden');
-            document.getElementById('folderLabel').innerText = nombreCarpeta;
-            const selectS = document.getElementById('tipoDocAdmin');
-            const selectF = document.getElementById('filtroTipoDoc');
-            let ops = "";
-            
-            if(nombreCarpeta === 'Contratación') ops = '<option>Contrato de trabajo</option><option>Aviso de entrada</option><option>Extracto SUT</option>';
-            else if(nombreCarpeta === 'Vacaciones') ops = '<option>Solicitud de vacaciones</option><option>Aviso de salida vacaciones</option><option>Cronograma de vacaciones</option>';
-            else if(nombreCarpeta === 'Certificado de competencia') ops = '<option>Certificado de competencia</option>';
-            else if(nombreCarpeta === 'Acta de epps') ops = '<option>Acta de epp\'s</option>';
-            else if(nombreCarpeta.includes('Certificados medicos')) ops = '<option>Certificado médico IESS</option><option>Certificado médico privado</option><option>Certificado médico MSP</option><option>Reposo médico</option>';
-            else if(nombreCarpeta === 'Memorandum') ops = '<option>Memorandum</option>';
-            else if(nombreCarpeta === 'Certificados') ops = '<option>Laborales</option><option>De honorabilidad</option>';
-            else if(nombreCarpeta === 'Desvinculación') ops = '<option>Acta de finiquito</option><option>Comprobante de pago</option><option>Aviso de salida</option><option>Renuncia</option>';
-            
-            selectS.innerHTML = ops;
-            selectF.innerHTML = '<option value="">Todos los tipos</option>' + ops;
-            limpiarFiltrosModal();
-            renderizarArchivosCarpeta();
-        }
+// 1. Modifica entrarCarpeta para limpiar el contenedor de archivos
+function entrarCarpeta(nombreCarpeta) {
+    carpetaActual = nombreCarpeta;
+    document.getElementById('rutaCarpeta').innerText = "> " + nombreCarpeta;
+    document.getElementById('btnRetrocederCarpeta').classList.remove('hidden');
+    document.getElementById('footerSubida').classList.remove('hidden');
+    document.getElementById('barraFiltrosModal').classList.remove('hidden');
+    document.getElementById('folderLabel').innerText = nombreCarpeta;
+    
+    // LIMPIAR el contenedor para que las carpetas desaparezcan
+    document.getElementById('lDocs').innerHTML = ""; 
 
-        function renderizarArchivosCarpeta() {
-            const fTipo = document.getElementById('filtroTipoDoc').value.toLowerCase();
-            const fFecha = document.getElementById('filtroFechaDoc').value;
-            const fNombre = document.getElementById('filtroNombreArchivo').value.toLowerCase();
+    const selectS = document.getElementById('tipoDocAdmin');
+    const selectF = document.getElementById('filtroTipoDoc');
+    let ops = "";
+    
+    if(nombreCarpeta === 'Contratación') ops = '<option>Contrato de trabajo</option><option>Aviso de entrada</option><option>Extracto SUT</option>';
+    else if(nombreCarpeta === 'Vacaciones') ops = '<option>Solicitud de vacaciones</option><option>Aviso de salida vacaciones</option><option>Cronograma de vacaciones</option>';
+    else if(nombreCarpeta === 'Certificado de competencia') ops = '<option>Certificado de competencia</option>';
+    else if(nombreCarpeta === 'Acta de epps') ops = '<option>Acta de epp\'s</option>';
+    // Ajuste aquí para coincidir con el nombre de tu carpeta en el HTML
+    else if(nombreCarpeta === 'Certificados medicos') ops = '<option>Certificado médico IESS</option><option>Certificado médico privado</option><option>Certificado médico MSP</option><option>Reposo médico</option>';
+    else if(nombreCarpeta === 'Memorandum') ops = '<option>Memorandum</option>';
+    else if(nombreCarpeta === 'Certificados') ops = '<option>Laborales</option><option>De honorabilidad</option>';
+    else if(nombreCarpeta === 'Desvinculación') ops = '<option>Acta de finiquito</option><option>Comprobante de pago</option><option>Aviso de salida</option><option>Renuncia</option>';
+    
+    selectS.innerHTML = ops;
+    selectF.innerHTML = '<option value="">Todos los tipos</option>' + ops;
+    
+    limpiarFiltrosModal();
+    renderizarArchivosCarpeta(); // Esta función ahora llenará lDocs con la lista
+}
 
-            let pClave = [];
-            if(carpetaActual === 'Contratación') pClave = ['contrato', 'entrada', 'sut'];
-            else if(carpetaActual === 'Vacaciones') pClave = ['vacaciones', 'cronograma'];
-            else if(carpetaActual === 'Certificado de competencia') pClave = ['competencia'];
-            else if(carpetaActual === 'Acta de epps') pClave = ['epp'];
-            else if(carpetaActual.includes('Certificados medicos')) pClave = ['medico', 'médico', 'reposo', 'iess', 'privado', 'msp'];
-            else if(carpetaActual === 'Memorandum') pClave = ['memorandum'];
-            else if(carpetaActual === 'Certificados') pClave = ['laborales', 'honorabilidad'];
-            else if(carpetaActual === 'Desvinculación') pClave = ['finiquito', 'pago', 'salida', 'renuncia'];
+// 2. Asegúrate de que renderizarArchivosCarpeta maneje bien el filtrado
+function renderizarArchivosCarpeta() {
+    const fTipo = document.getElementById('filtroTipoDoc').value.toLowerCase();
+    const fFecha = document.getElementById('filtroFechaDoc').value;
+    const fNombre = document.getElementById('filtroNombreArchivo').value.toLowerCase();
 
-            let docs = documentosCargados.filter(d => pClave.some(p => d.tipo_documento.toLowerCase().includes(p)));
-            
-            if (fTipo) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fTipo));
-            if (fFecha) docs = docs.filter(d => obtenerFechaInput(d.created_at) === fFecha);
-            if (fNombre) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fNombre));
+    let pClave = [];
+    if(carpetaActual === 'Contratación') pClave = ['contrato', 'entrada', 'sut'];
+    else if(carpetaActual === 'Vacaciones') pClave = ['vacaciones', 'cronograma'];
+    else if(carpetaActual === 'Certificado de competencia') pClave = ['competencia'];
+    else if(carpetaActual === 'Acta de epps') pClave = ['epp'];
+    else if(carpetaActual === 'Certificados medicos') pClave = ['medico', 'médico', 'reposo', 'iess', 'privado', 'msp'];
+    else if(carpetaActual === 'Memorandum') pClave = ['memorandum'];
+    else if(carpetaActual === 'Certificados') pClave = ['laborales', 'honorabilidad'];
+    else if(carpetaActual === 'Desvinculación') pClave = ['finiquito', 'pago', 'salida', 'renuncia'];
 
-            const grupos = {};
-            docs.forEach(d => {
-                const partes = d.tipo_documento.split(' - ');
-                const mes = partes.length > 1 ? partes[1].toUpperCase() : "SIN PERIODO";
-                if(!grupos[mes]) grupos[mes] = [];
-                grupos[mes].push(d);
-            });
+    // Filtrar documentos que pertenecen a esta carpeta
+    let docs = documentosCargados.filter(d => pClave.some(p => d.tipo_documento.toLowerCase().includes(p)));
+    
+    // Aplicar filtros de búsqueda del modal
+    if (fTipo) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fTipo));
+    if (fFecha) docs = docs.filter(d => obtenerFechaInput(d.created_at) === fFecha);
+    if (fNombre) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fNombre));
 
-            const mesesPresentes = Object.keys(grupos).sort((a, b) => mesesOrden.indexOf(a) - mesesOrden.indexOf(b));
+    // Agrupar por mes para la vista de lista
+    const grupos = {};
+    docs.forEach(d => {
+        const partes = d.tipo_documento.split(' - ');
+        const mes = partes.length > 1 ? partes[1].toUpperCase() : "SIN PERIODO";
+        if(!grupos[mes]) grupos[mes] = [];
+        grupos[mes].push(d);
+    });
 
-            document.getElementById('lDocs').innerHTML = mesesPresentes.map(mes => `
-                <div class="mes-block bg-slate-50/50 p-2 rounded-r-xl mb-4">
-                    <h4 class="text-[10px] font-black text-indigo-600 mb-2 px-2 italic"><i class="fas fa-calendar-alt mr-1"></i> PERIODO: ${mes}</h4>
-                    <div class="space-y-2">
-                        ${grupos[mes].map(d => {
-                            const partes = d.tipo_documento.split(' - ');
-                            const tipoLabel = partes[0] || "Doc";
-                            const nombreOriginal = partes[2] || "Archivo sin nombre";
-                            return `
-                            <div class="flex justify-between items-center p-3 bg-white border border-slate-100 rounded-xl shadow-sm animate-fade-in">
-                                <div class="flex items-center gap-3">
-                                    <i class="fas fa-file-pdf text-red-500"></i>
-                                    <div>
-                                        <p class="text-[10px] font-black uppercase text-indigo-900">${tipoLabel}</p>
-                                        <p class="text-[9px] text-slate-500 italic truncate max-w-[200px] font-medium">${nombreOriginal}</p>
-                                        <p class="text-[8px] text-slate-400">Subido: ${formatearFechaUTC(d.created_at)}</p>
-                                    </div>
-                                </div>
-                                <div class="flex gap-2">
-                                    <a href="${d.url_cloudinary}" target="_blank" class="w-7 h-7 flex items-center justify-center bg-indigo-50 text-indigo-600 rounded-lg transition-colors hover:bg-indigo-600 hover:text-white"><i class="fas fa-eye text-[10px]"></i></a>
-                                    <button onclick="eliminarDoc(${d.id})" class="w-7 h-7 flex items-center justify-center bg-red-50 text-red-500 rounded-lg transition-colors hover:bg-red-500 hover:text-white"><i class="fas fa-trash text-[10px]"></i></button>
-                                </div>
-                            </div>`;
-                        }).join('')}
-                    </div>
-                </div>
-            `).join('') || '<p class="text-center text-slate-300 text-xs py-10 uppercase italic">Sin archivos</p>';
-        }
+    const mesesPresentes = Object.keys(grupos).sort((a, b) => mesesOrden.indexOf(a) - mesesOrden.indexOf(b));
 
+    // RENDERIZADO FINAL: Esto reemplaza las carpetas por la lista de archivos
+    document.getElementById('lDocs').innerHTML = mesesPresentes.map(mes => `
+        <div class="mes-block bg-slate-50/50 p-2 rounded-r-xl mb-4">
+            <h4 class="text-[10px] font-black text-indigo-600 mb-2 px-2 italic"><i class="fas fa-calendar-alt mr-1"></i> PERIODO: ${mes}</h4>
+            <div class="space-y-2">
+                ${grupos[mes].map(d => {
+                    const partes = d.tipo_documento.split(' - ');
+                    const tipoLabel = partes[0] || "Doc";
+                    const nombreOriginal = partes[2] || "Archivo";
+                    return `
+                    <div class="flex justify-between items-center p-3 bg-white border border-slate-100 rounded-xl shadow-sm animate-fade-in">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-file-pdf text-red-500"></i>
+                            <div>
+                                <p class="text-[10px] font-black uppercase text-indigo-900">${tipoLabel}</p>
+                                <p class="text-[9px] text-slate-500 italic truncate max-w-[200px] font-medium">${nombreOriginal}</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <a href="${d.url_cloudinary}" target="_blank" class="w-7 h-7 flex items-center justify-center bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-600 hover:text-white"><i class="fas fa-eye text-[10px]"></i></a>
+                            <button onclick="eliminarDoc(${d.id})" class="w-7 h-7 flex items-center justify-center bg-red-50 text-red-500 rounded-lg hover:bg-red-500 hover:text-white"><i class="fas fa-trash text-[10px]"></i></button>
+                        </div>
+                    </div>`;
+                }).join('')}
+            </div>
+        </div>
+    `).join('') || '<p class="text-center text-slate-300 text-xs py-10 uppercase italic">Sin archivos en esta categoría</p>';
+}
         function limpiarFiltrosModal() { 
             document.getElementById('filtroTipoDoc').value = ""; 
             document.getElementById('filtroFechaDoc').value = ""; 
