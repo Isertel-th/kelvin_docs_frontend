@@ -13,6 +13,7 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         body { background-color: #f1f5f9; font-family: 'Inter', sans-serif; }
         .folder-card:hover { transform: scale(1.02); transition: all 0.2s; }
+        .animate-fade-in { animation: fadeIn 0.3s ease-in-out; }
     </style>
 </head>
 <body class="flex min-h-screen">
@@ -61,7 +62,7 @@
             <div class="bg-gradient-to-br from-blue-600 to-indigo-700 p-12 rounded-[2rem] text-white shadow-2xl shadow-blue-200 relative overflow-hidden">
                 <div class="relative z-10">
                     <h2 class="text-4xl font-black mb-4">Gestión Médica Isertel</h2>
-                    <p class="text-blue-100 text-lg max-w-xl leading-relaxed">Doble clic sobre un empleado en las listas de activos o pasivos para gestionar su expediente médico.</p>
+                    <p class="text-blue-100 text-lg max-w-xl leading-relaxed">Acceda a los expedientes del personal para gestionar certificados médicos y de aptitud de forma centralizada.</p>
                 </div>
                 <i class="fas fa-heartbeat absolute -right-10 -bottom-10 text-[15rem] text-white/10 rotate-12"></i>
             </div>
@@ -76,18 +77,22 @@
             </div>
 
             <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="p-6 border-b border-slate-100 bg-slate-50/50">
+                <div class="p-6 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
                     <h3 class="font-bold text-slate-800 uppercase text-xs tracking-widest" id="tituloLista">Lista de Personal</h3>
+                    <span id="contadorCarga" class="text-[10px] font-bold text-blue-500 bg-blue-50 px-3 py-1 rounded-full uppercase">Cargando...</span>
                 </div>
-                <table class="w-full text-left border-collapse">
-                    <thead class="bg-slate-50 text-slate-400 text-[10px] uppercase font-black border-b tracking-widest">
-                        <tr>
-                            <th class="px-8 py-5">Colaborador (Doble clic para abrir)</th>
-                            <th class="px-8 py-5 text-right">Identificación</th>
-                        </tr>
-                    </thead>
-                    <tbody id="listaEmps" class="divide-y divide-slate-100"></tbody>
-                </table>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-slate-50 text-slate-400 text-[10px] uppercase font-black border-b tracking-widest">
+                            <tr>
+                                <th class="px-8 py-5">Colaborador (Doble clic para abrir)</th>
+                                <th class="px-8 py-5 text-right">Identificación</th>
+                            </tr>
+                        </thead>
+                        <tbody id="listaEmps" class="divide-y divide-slate-100">
+                            </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -95,7 +100,7 @@
             <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden animate-fade-in">
                 <div class="p-6 bg-slate-50 border-b flex justify-between items-center">
                     <div class="flex items-center gap-3">
-                        <button id="btnRetrocederCarpeta" onclick="renderizarVistaCarpetas()" class="hidden bg-slate-200 p-2 rounded-lg hover:bg-slate-300"><i class="fas fa-arrow-left"></i></button>
+                        <button id="btnRetrocederCarpeta" onclick="renderizarVistaCarpetas()" class="hidden bg-slate-200 p-2 rounded-lg hover:bg-slate-300 transition-colors"><i class="fas fa-arrow-left"></i></button>
                         <h3 class="font-bold text-slate-800 italic uppercase text-sm">📂 Expediente: <span id="nEmp" class="text-blue-600"></span> <span id="rutaCarpeta" class="text-slate-400 ml-2"></span></h3>
                     </div>
                     <button onclick="cerrarModal()" class="text-2xl text-slate-400 hover:text-red-500 transition-colors">&times;</button>
@@ -113,7 +118,8 @@
                     </div>
                 </div>
 
-                <div id="cuerpoModal" class="p-8 max-h-[60vh] overflow-y-auto"></div>
+                <div id="cuerpoModal" class="p-8 max-h-[60vh] overflow-y-auto">
+                    </div>
 
                 <div id="footerModal" class="hidden p-6 bg-slate-50 border-t">
                     <div class="flex items-center justify-between">
@@ -121,7 +127,9 @@
                             <label class="text-[10px] font-black text-slate-400 uppercase mb-1">Subir nuevo documento</label>
                             <input type="file" id="archivoNuevo" accept="application/pdf,image/*" class="text-xs">
                         </div>
-                        <button onclick="subirArchivo()" class="bg-blue-600 text-white px-6 py-2 rounded-xl text-xs font-bold uppercase hover:bg-blue-700 shadow-lg transition-all">Subir</button>
+                        <button onclick="subirArchivo()" id="btnSubir" class="bg-blue-600 text-white px-6 py-2 rounded-xl text-xs font-bold uppercase hover:bg-blue-700 shadow-lg transition-all flex items-center gap-2">
+                            <i class="fas fa-upload"></i> Subir
+                        </button>
                     </div>
                 </div>
             </div>
@@ -138,7 +146,9 @@
 
         window.onload = () => {
             const token = localStorage.getItem('token');
-            if (!token || localStorage.getItem('rol') !== 'doc') { window.location.href = 'index.html'; }
+            const rol = localStorage.getItem('rol');
+            if (!token || rol !== 'doc') { window.location.href = 'index.html'; }
+            
             document.getElementById('nombreDoctor').innerText = localStorage.getItem('nombre') || 'Médico';
             loadData('activos');
         };
@@ -147,34 +157,57 @@
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
-            event.currentTarget.classList.add('active');
+            if(event) event.currentTarget.classList.add('active');
         }
 
         async function loadData(modo) {
             modoLista = modo;
-            document.getElementById('tituloLista').innerText = `Lista de Personal ${modo === 'activos' ? 'Activo' : 'Pasivo'}`;
+            const titulo = document.getElementById('tituloLista');
+            const contador = document.getElementById('contadorCarga');
+            const tbody = document.getElementById('listaEmps');
+
+            titulo.innerText = `Lista de Personal ${modo === 'activos' ? 'Activo' : 'Pasivo'}`;
+            contador.innerText = "Cargando...";
+            tbody.innerHTML = '<tr><td colspan="2" class="text-center py-10"><i class="fas fa-spinner fa-spin text-blue-500 text-2xl"></i></td></tr>';
+
             try {
-                const res = await fetch(`${API_BASE}/admin/${modo}`, { 
+                // LLAMADA AL NUEVO ENDPOINT DE DOCTOR
+                const res = await fetch(`${API_BASE}/doctor/${modo}`, { 
                     headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } 
                 });
+                
+                if (!res.ok) throw new Error("Acceso denegado o error de servidor");
+
                 empsOriginales = await res.json();
                 renderizarLista(empsOriginales);
-            } catch (e) { console.error(e); }
+                contador.innerText = `${empsOriginales.length} Registros`;
+            } catch (e) { 
+                console.error(e);
+                tbody.innerHTML = `<tr><td colspan="2" class="text-center py-10 text-red-500 font-bold uppercase text-xs">Error: No se pudieron cargar los datos</td></tr>`;
+            }
         }
 
         function renderizarLista(data) {
             const tbody = document.getElementById('listaEmps');
+            if(data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="2" class="text-center py-10 text-slate-400 italic">No se encontraron registros</td></tr>';
+                return;
+            }
+
             tbody.innerHTML = data.map(e => `
-                <tr class="hover:bg-blue-50 cursor-pointer transition-all" ondblclick="abrirExpediente(${JSON.stringify(e).replace(/"/g, '&quot;')})">
+                <tr class="hover:bg-blue-50 cursor-pointer transition-all border-b border-slate-50 group" ondblclick='abrirExpediente(${JSON.stringify(e)})'>
                     <td class="px-8 py-5">
                         <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-xs">
-                                ${e.nombre_completo.charAt(0)}
+                            <div class="w-10 h-10 bg-gradient-to-br from-slate-100 to-slate-200 text-slate-600 rounded-xl flex items-center justify-center font-bold text-sm shadow-sm group-hover:from-blue-100 group-hover:to-blue-200 group-hover:text-blue-600 transition-all">
+                                ${e.nombre_completo.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase()}
                             </div>
-                            <span class="font-bold text-slate-700 text-sm uppercase">${e.nombre_completo}</span>
+                            <div>
+                                <p class="font-bold text-slate-700 text-sm uppercase leading-none mb-1">${e.nombre_completo}</p>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">Doble clic para abrir expediente</p>
+                            </div>
                         </div>
                     </td>
-                    <td class="px-8 py-5 text-right font-mono text-xs text-slate-500">${e.cedula}</td>
+                    <td class="px-8 py-5 text-right font-mono text-xs text-slate-500 font-bold">${e.cedula}</td>
                 </tr>
             `).join('');
         }
@@ -196,13 +229,13 @@
             const cuerpo = document.getElementById('cuerpoModal');
             cuerpo.innerHTML = `
                 <div class="grid grid-cols-2 gap-6">
-                    <div onclick="abrirCarpeta('Certificado médico')" class="folder-card bg-slate-50 p-8 rounded-2xl border-2 border-transparent hover:border-blue-500 cursor-pointer text-center transition-all">
-                        <i class="fas fa-notes-medical text-4xl text-blue-500 mb-3"></i>
-                        <h4 class="font-bold text-slate-700 text-sm uppercase">Certificados Médicos</h4>
+                    <div onclick="abrirCarpeta('Certificado médico')" class="folder-card bg-slate-50 p-8 rounded-2xl border-2 border-transparent hover:border-blue-500 cursor-pointer text-center transition-all group">
+                        <i class="fas fa-notes-medical text-5xl text-blue-500 mb-4 group-hover:scale-110 transition-transform"></i>
+                        <h4 class="font-bold text-slate-700 text-xs uppercase tracking-wider">Certificados Médicos</h4>
                     </div>
-                    <div onclick="abrirCarpeta('Certificado de aptitud')" class="folder-card bg-slate-50 p-8 rounded-2xl border-2 border-transparent hover:border-blue-500 cursor-pointer text-center transition-all">
-                        <i class="fas fa-file-medical-alt text-4xl text-emerald-500 mb-3"></i>
-                        <h4 class="font-bold text-slate-700 text-sm uppercase">Certificados de Aptitud</h4>
+                    <div onclick="abrirCarpeta('Certificado de aptitud')" class="folder-card bg-slate-50 p-8 rounded-2xl border-2 border-transparent hover:border-emerald-500 cursor-pointer text-center transition-all group">
+                        <i class="fas fa-file-medical-alt text-5xl text-emerald-500 mb-4 group-hover:scale-110 transition-transform"></i>
+                        <h4 class="font-bold text-slate-700 text-xs uppercase tracking-wider">Certificados de Aptitud</h4>
                     </div>
                 </div>
             `;
@@ -215,12 +248,20 @@
             document.getElementById('barraFiltrosModal').classList.remove('hidden');
             document.getElementById('footerModal').classList.remove('hidden');
 
+            const cuerpo = document.getElementById('cuerpoModal');
+            cuerpo.innerHTML = '<div class="text-center py-10"><i class="fas fa-spinner fa-spin text-blue-500 text-2xl"></i></div>';
+
             const endpoint = modoLista === 'activos' ? 'activo' : 'pasivo';
-            const res = await fetch(`${API_BASE}/doctor/documentos-${endpoint}/${empSeleccionado.id}`, {
-                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-            });
-            todosLosDocs = await res.json();
-            renderizarArchivosCarpeta();
+            try {
+                const res = await fetch(`${API_BASE}/doctor/documentos-${endpoint}/${empSeleccionado.id}`, {
+                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+                });
+                todosLosDocs = await res.json();
+                renderizarArchivosCarpeta();
+            } catch (e) {
+                console.error(e);
+                cuerpo.innerHTML = '<p class="text-red-500 text-center font-bold">Error al cargar documentos</p>';
+            }
         }
 
         function renderizarArchivosCarpeta() {
@@ -229,31 +270,37 @@
             
             const docsFiltrados = todosLosDocs.filter(d => {
                 const matchTipo = d.tipo_documento.includes(carpetaActual);
-                const matchNombre = d.url_cloudinary.toLowerCase().includes(query);
                 const matchAnio = anio ? d.created_at.includes(anio) : true;
-                return matchTipo && matchNombre && matchAnio;
+                // El query busca en la URL de cloudinary (nombre de archivo)
+                const matchNombre = d.url_cloudinary.toLowerCase().includes(query);
+                return matchTipo && matchAnio && matchNombre;
             });
 
             const cuerpo = document.getElementById('cuerpoModal');
             if (docsFiltrados.length === 0) {
-                cuerpo.innerHTML = `<div class="text-center py-10 text-slate-400 font-bold italic text-xs">No hay documentos en esta carpeta</div>`;
+                cuerpo.innerHTML = `<div class="text-center py-12">
+                    <i class="fas fa-folder-open text-slate-200 text-5xl mb-4"></i>
+                    <p class="text-slate-400 font-bold italic text-xs uppercase">No hay documentos cargados en esta categoría</p>
+                </div>`;
                 return;
             }
 
             cuerpo.innerHTML = `
                 <table class="w-full text-left">
                     <thead class="text-[10px] font-black text-slate-400 uppercase border-b">
-                        <tr><th class="pb-3">Archivo</th><th class="pb-3 text-right">Ver</th></tr>
+                        <tr><th class="pb-3">Detalle del Documento</th><th class="pb-3 text-right">Acción</th></tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
                         ${docsFiltrados.map(d => `
-                            <tr>
+                            <tr class="hover:bg-slate-50">
                                 <td class="py-4">
-                                    <p class="text-xs font-bold text-slate-700 uppercase">Documento ID: ${d.id}</p>
-                                    <p class="text-[10px] text-slate-400">${new Date(d.created_at).toLocaleDateString()}</p>
+                                    <p class="text-xs font-bold text-slate-700 uppercase">Certificado ID: ${d.id}</p>
+                                    <p class="text-[10px] text-slate-400 font-bold">${new Date(d.created_at).toLocaleString()}</p>
                                 </td>
                                 <td class="py-4 text-right">
-                                    <a href="${d.url_cloudinary}" target="_blank" class="text-blue-600 hover:text-blue-800"><i class="fas fa-eye"></i></a>
+                                    <a href="${d.url_cloudinary}" target="_blank" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
                                 </td>
                             </tr>
                         `).join('')}
@@ -264,24 +311,38 @@
 
         async function subirArchivo() {
             const fileInput = document.getElementById('archivoNuevo');
-            if (!fileInput.files[0]) return alert("Selecciona un archivo");
+            const btn = document.getElementById('btnSubir');
+            
+            if (!fileInput.files[0]) return alert("Por favor, selecciona un archivo primero.");
 
             const formData = new FormData();
             formData.append('archivo', fileInput.files[0]);
             formData.append('tipo_documento', carpetaActual);
 
-            const endpoint = modoLista === 'activos' ? 'subir-activo' : 'subir-pasivo';
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Subiendo...';
+
+            const subPath = modoLista === 'activos' ? 'subir-activo' : 'subir-pasivo';
             try {
-                const res = await fetch(`${API_BASE}/doctor/${endpoint}/${empSeleccionado.id}`, {
+                const res = await fetch(`${API_BASE}/doctor/${subPath}/${empSeleccionado.id}`, {
                     method: 'POST',
                     headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
                     body: formData
                 });
+
                 if (res.ok) {
                     fileInput.value = "";
-                    abrirCarpeta(carpetaActual);
+                    await abrirCarpeta(carpetaActual); // Recargar lista
+                } else {
+                    alert("Error al subir el archivo al servidor.");
                 }
-            } catch (e) { console.error(e); }
+            } catch (e) { 
+                console.error(e);
+                alert("Error de conexión al intentar subir.");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-upload"></i> Subir';
+            }
         }
 
         function ejecutarFiltros() {
