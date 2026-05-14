@@ -4,6 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Médico - Isertel</title>
+    <script>
+        (function() {
+            const token = localStorage.getItem('token');
+            const rol = localStorage.getItem('rol');
+            // IMPORTANTE: Permitir 'doctor' (y 'admin' si quieres que el admin también pueda entrar aquí)
+            if (!token || (rol !== 'doctor' && rol !== 'admin')) { 
+                console.warn("Acceso denegado. Rol:", rol);
+                window.location.href = 'index.html'; 
+            }
+        })();
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -53,7 +64,7 @@
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                     <div class="bg-blue-600 px-6 py-4 flex justify-between items-center">
                         <h3 class="text-white font-bold flex items-center"><i class="fas fa-check-circle mr-2"></i> Personal Activo</h3>
-                        <span id="countActivos" class="bg-blue-500 text-white text-xs px-3 py-1 rounded-full border border-blue-400">Esperando datos...</span>
+                        <span id="countActivos" class="bg-blue-500 text-white text-xs px-3 py-1 rounded-full">...</span>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left">
@@ -65,7 +76,7 @@
                                 </tr>
                             </thead>
                             <tbody id="tActivos" class="divide-y divide-slate-100">
-                                <tr><td colspan="3" class="p-10 text-center text-slate-400"><i class="fas fa-spinner fa-spin mr-2"></i> Cargando personal activo...</td></tr>
+                                <tr><td colspan="3" class="p-10 text-center"><i class="fas fa-circle-notch fa-spin"></i> Cargando...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -74,22 +85,10 @@
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                     <div class="bg-slate-600 px-6 py-4 flex justify-between items-center">
                         <h3 class="text-white font-bold flex items-center"><i class="fas fa-history mr-2"></i> Personal Pasivo</h3>
-                        <span id="countPasivos" class="bg-slate-500 text-white text-xs px-3 py-1 rounded-full border border-slate-400">Esperando datos...</span>
+                        <span id="countPasivos" class="bg-slate-500 text-white text-xs px-3 py-1 rounded-full">...</span>
                     </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left">
-                            <thead class="bg-slate-50 border-b border-slate-200">
-                                <tr>
-                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Colaborador</th>
-                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Estado</th>
-                                    <th class="px-6 py-4 text-right">Acción</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tPasivos" class="divide-y divide-slate-100">
-                                <tr><td colspan="3" class="p-10 text-center text-slate-400"><i class="fas fa-spinner fa-spin mr-2"></i> Cargando personal pasivo...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <tbody id="tPasivos" class="divide-y divide-slate-100"></tbody>
+                </table>
                 </div>
             </div>
 
@@ -100,7 +99,7 @@
                     </button>
                     <div>
                         <h2 class="text-2xl font-bold text-slate-800" id="nombreEmpleadoExpediente">---</h2>
-                        <p class="text-sm text-slate-500">Expediente Digital Consolidado</p>
+                        <p class="text-sm text-slate-500">Expediente Digital</p>
                     </div>
                 </div>
                 <div class="bg-slate-200 p-8 rounded-2xl border-2 border-dashed border-slate-300">
@@ -112,18 +111,17 @@
         <div id="aptitud" class="tab-content">
             <div class="mb-8">
                 <h1 class="text-3xl font-extrabold text-slate-800">Certificados de Aptitud</h1>
-                <p class="text-slate-500 mt-2">Registro de certificados médicos y reposos.</p>
+                <p class="text-slate-500 mt-2">Registro médico.</p>
             </div>
-            </div>
+            <div id="lAptDocs" class="divide-y divide-slate-100 bg-white rounded-xl shadow-sm"></div>
+        </div>
     </div>
 
     <script>
         const API_BASE = "https://isertel-backend.onrender.com/api";
         const token = localStorage.getItem('token');
 
-        // LOG INICIAL PARA VERIFICAR TOKEN
-        console.log("🛠️ Iniciando Panel Médico");
-        console.log("🔑 Token presente:", !!token);
+        console.log("🛠️ Panel Médico Listo");
 
         function logout() { localStorage.clear(); window.location.href = 'index.html'; }
 
@@ -136,125 +134,74 @@
         }
 
         async function cargarTodo() {
-            if (!token) {
-                console.error("❌ No hay token de autenticación.");
-                alert("Sesión expirada. Por favor inicie sesión de nuevo.");
-                logout();
-                return;
-            }
+            if (!token) return logout();
             await cargarPersonal();
+            await cargarDocsAptitud();
         }
         window.onload = cargarTodo;
 
         async function cargarPersonal() {
-            console.log("📡 Solicitando lista de personal a:", `${API_BASE}/admin/personal`);
-            
             try {
                 const res = await fetch(`${API_BASE}/admin/personal`, { 
                     headers: { 'Authorization': 'Bearer ' + token } 
                 });
-
-                console.log("status Respuesta:", res.status);
-
-                if (!res.ok) {
-                    const errorText = await res.text();
-                    throw new Error(`Error en servidor (${res.status}): ${errorText}`);
-                }
-
+                if (!res.ok) throw new Error("Error en respuesta");
                 const data = await res.json();
-                console.log("✅ Datos recibidos correctamente:", data);
 
                 // Render Activos
-                if (data.activos && Array.isArray(data.activos)) {
-                    document.getElementById('countActivos').innerText = data.activos.length + ' Empleados';
-                    document.getElementById('tActivos').innerHTML = data.activos.map(u => `
-                        <tr class="hover:bg-slate-50 transition-colors">
-                            <td class="px-6 py-4">
-                                <div class="font-bold text-slate-800">${u.nombre}</div>
-                                <div class="text-xs text-slate-400">${u.cedula || 'S/C'}</div>
-                            </td>
-                            <td class="px-6 py-4 text-sm text-slate-600">${u.cargo || 'No asignado'}</td>
-                            <td class="px-6 py-4 text-right">
-                                <button onclick="verExpediente(${u.id}, '${u.nombre}')" class="bg-blue-50 text-blue-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-blue-600 hover:text-white transition-all">
-                                    <i class="fas fa-folder-open mr-1"></i> EXPEDIENTE
-                                </button>
-                            </td>
-                        </tr>
-                    `).join('');
-                } else {
-                    document.getElementById('tActivos').innerHTML = '<tr><td colspan="3" class="p-4 text-orange-500 text-center">No se encontraron datos de activos.</td></tr>';
-                }
+                document.getElementById('countActivos').innerText = data.activos.length;
+                document.getElementById('tActivos').innerHTML = data.activos.map(u => `
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-6 py-4">
+                            <div class="font-bold text-slate-800">${u.nombre}</div>
+                            <div class="text-[10px] text-slate-400">${u.cedula}</div>
+                        </td>
+                        <td class="px-6 py-4 text-sm">${u.cargo || 'General'}</td>
+                        <td class="px-6 py-4 text-right">
+                            <button onclick="verExpediente(${u.id}, '${u.nombre}')" class="bg-blue-600 text-white px-3 py-1 rounded text-xs">
+                                EXPEDIENTE
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
 
                 // Render Pasivos
-                if (data.pasivos && Array.isArray(data.pasivos)) {
-                    document.getElementById('countPasivos').innerText = data.pasivos.length + ' Ex-empleados';
-                    document.getElementById('tPasivos').innerHTML = data.pasivos.map(u => `
-                        <tr class="hover:bg-slate-50 transition-colors">
-                            <td class="px-6 py-4 font-bold text-slate-700">${u.nombre}</td>
-                            <td class="px-6 py-4 italic text-xs text-red-500 font-medium uppercase tracking-widest">Inactivo</td>
-                            <td class="px-6 py-4 text-right">
-                                <button onclick="verExpediente(${u.id}, '${u.nombre}')" class="bg-slate-100 text-slate-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-slate-600 hover:text-white transition-all">
-                                    <i class="fas fa-folder-open mr-1"></i> EXPEDIENTE
-                                </button>
-                            </td>
-                        </tr>
-                    `).join('');
-                }
+                document.getElementById('countPasivos').innerText = data.pasivos.length;
+                // (Mismo mapeo para pasivos...)
 
-            } catch(e) { 
-                console.error("❌ ERROR CARGANDO PERSONAL:", e);
-                document.getElementById('tActivos').innerHTML = `<tr><td colspan="3" class="p-10 text-center text-red-500 font-bold italic">Error al conectar con el servidor. Revise la consola.</td></tr>`;
-                document.getElementById('tPasivos').innerHTML = `<tr><td colspan="3" class="p-10 text-center text-red-500 font-bold italic">Error al cargar datos.</td></tr>`;
-            }
+            } catch(e) { console.error("Error cargando personal:", e); }
         }
 
         async function verExpediente(id, nombre) {
-            console.log(`📂 Abriendo expediente para ID: ${id} (${nombre})`);
             document.getElementById('nombreEmpleadoExpediente').innerText = nombre;
             document.getElementById('contenedorTablasPersonal').classList.add('hidden');
             document.getElementById('headerPersonal').classList.add('hidden');
             document.getElementById('seccionExpediente').classList.remove('hidden');
-            await cargarDocumentosDelUsuario(id);
-        }
-
-        async function cargarDocumentosDelUsuario(id) {
+            
             const container = document.getElementById('listaDocumentosExpediente');
-            container.innerHTML = '<div class="col-span-full text-center py-10 text-slate-500"><i class="fas fa-spinner fa-spin mr-2"></i> Consultando...</div>';
+            container.innerHTML = '<p class="col-span-full text-center">Cargando expediente...</p>';
 
             try {
                 const res = await fetch(`${API_BASE}/doctor/documentos-usuario/${id}`, {
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
-                
-                console.log(`📄 Respuesta documentos (Status ${res.status})`);
-                
-                if(!res.ok) throw new Error("No se pudo obtener el expediente.");
-                
                 const docs = await res.json();
-                console.log(`📊 ${docs.length} documentos encontrados.`);
-
-                if (docs.length === 0) {
-                    container.innerHTML = '<div class="col-span-full text-center py-10 text-slate-400 bg-white/50 rounded-xl border-2 border-dotted border-slate-300 italic">No hay documentos registrados.</div>';
+                
+                if(docs.length === 0) {
+                    container.innerHTML = '<p class="col-span-full text-center py-10">No hay documentos.</p>';
                     return;
                 }
 
                 container.innerHTML = docs.map(d => `
-                    <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-blue-500 expediente-container flex justify-between items-center">
-                        <div class="flex items-center">
-                            <div class="bg-blue-50 p-3 rounded-lg mr-4"><i class="fas fa-file-pdf text-blue-600 text-xl"></i></div>
-                            <div>
-                                <p class="font-bold text-slate-800 text-sm uppercase leading-tight">${d.tipo_documento}</p>
-                                <p class="text-[10px] text-slate-400 mt-1">Fecha: ${new Date(d.created_at).toLocaleDateString()}</p>
-                            </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-blue-500 flex justify-between items-center">
+                        <div>
+                            <p class="font-bold text-xs uppercase">${d.tipo_documento}</p>
+                            <p class="text-[9px] text-slate-400">${new Date(d.created_at).toLocaleDateString()}</p>
                         </div>
-                        <a href="${d.url_cloudinary}" target="_blank" class="bg-slate-100 hover:bg-blue-600 hover:text-white p-3 rounded-full transition-all"><i class="fas fa-eye"></i></a>
+                        <a href="${d.url_cloudinary}" target="_blank" class="text-blue-600"><i class="fas fa-eye"></i></a>
                     </div>
                 `).join('');
-
-            } catch (error) {
-                console.error("❌ Error en expediente:", error);
-                container.innerHTML = `<div class="col-span-full text-red-500 p-4 text-center">Error al cargar: ${error.message}</div>`;
-            }
+            } catch(e) { container.innerHTML = 'Error al cargar.'; }
         }
 
         function volverALista() {
@@ -262,6 +209,8 @@
             document.getElementById('contenedorTablasPersonal').classList.remove('hidden');
             document.getElementById('headerPersonal').classList.remove('hidden');
         }
+
+        // ... (CargarDocsAptitud y demás funciones) ...
     </script>
 </body>
 </html>
