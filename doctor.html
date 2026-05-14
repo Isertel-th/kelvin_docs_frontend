@@ -4,50 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Médico - Isertel</title>
+    
     <script>
         (function() {
             const token = localStorage.getItem('token');
             const rol = localStorage.getItem('rol');
-            // IMPORTANTE: Permitir 'doctor' (y 'admin' si quieres que el admin también pueda entrar aquí)
+            // Validamos que el rol sea doctor o admin
             if (!token || (rol !== 'doctor' && rol !== 'admin')) { 
-                console.warn("Acceso denegado. Rol:", rol);
-                window.location.href = 'index.html'; 
+                console.warn("Acceso denegado. Redirigiendo...");
+                window.location.replace('index.html'); 
             }
         })();
     </script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <style>
-        .sidebar-item.active { background: #2563eb; color: white; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
+        .sidebar-item.active { background: #2563eb; color: white; }
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.3s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         body { background-color: #f1f5f9; font-family: 'Inter', sans-serif; }
-        .expediente-container { border-left: 4px solid #2563eb; transition: all 0.2s; }
-        .expediente-container:hover { transform: translateX(5px); }
     </style>
 </head>
 <body class="flex min-h-screen">
 
     <div class="w-72 bg-slate-900 text-slate-300 flex flex-col shadow-2xl">
         <div class="p-8 text-center border-b border-slate-800">
-            <div class="w-20 h-20 bg-blue-600 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg shadow-blue-500/20">
-                <i class="fas fa-user-md text-4xl text-white"></i>
+            <div class="w-16 h-16 bg-blue-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                <i class="fas fa-user-md text-3xl text-white"></i>
             </div>
-            <h2 class="text-xl font-bold text-white tracking-tight">Panel Médico</h2>
-            <p class="text-xs text-slate-500 mt-1 uppercase tracking-widest font-semibold">Salud Ocupacional</p>
+            <h2 class="text-lg font-bold text-white">Panel Médico</h2>
         </div>
         <nav class="flex-1 p-4 space-y-2 mt-4">
-            <button onclick="showTab('personal')" class="sidebar-item w-full flex items-center p-4 rounded-xl transition-all duration-200 hover:bg-slate-800 active" id="btn-personal">
-                <i class="fas fa-users mr-4 text-lg"></i> <span class="font-medium">Gestión de Personal</span>
+            <button onclick="showTab('personal')" class="sidebar-item w-full flex items-center p-4 rounded-xl hover:bg-slate-800 transition-all active" id="btn-personal">
+                <i class="fas fa-users mr-4"></i> <span>Personal</span>
             </button>
-            <button onclick="showTab('aptitud')" class="sidebar-item w-full flex items-center p-4 rounded-xl transition-all duration-200 hover:bg-slate-800" id="btn-aptitud">
-                <i class="fas fa-file-medical mr-4 text-lg"></i> <span class="font-medium">Certificados Aptitud</span>
+            <button onclick="showTab('aptitud')" class="sidebar-item w-full flex items-center p-4 rounded-xl hover:bg-slate-800 transition-all" id="btn-aptitud">
+                <i class="fas fa-file-medical mr-4"></i> <span>Certificados</span>
             </button>
         </nav>
         <div class="p-6 border-t border-slate-800">
-            <button onclick="logout()" class="w-full bg-slate-800 hover:bg-red-900/40 hover:text-red-400 text-slate-400 py-3 rounded-xl transition-all flex items-center justify-center font-medium">
-                <i class="fas fa-sign-out-alt mr-2"></i> Cerrar Sesión
+            <button onclick="logout()" class="w-full text-slate-400 hover:text-red-400 flex items-center justify-center py-2">
+                <i class="fas fa-sign-out-alt mr-2"></i> Salir
             </button>
         </div>
     </div>
@@ -55,65 +55,50 @@
     <div class="flex-1 p-10 overflow-y-auto">
         
         <div id="personal" class="tab-content active">
-            <div id="headerPersonal" class="mb-8">
-                <h1 class="text-3xl font-extrabold text-slate-800">Control de Personal</h1>
-                <p class="text-slate-500 mt-2">Visualice y gestione los expedientes médicos de los colaboradores.</p>
+            <div id="headerPersonal" class="mb-6">
+                <h1 class="text-3xl font-bold text-slate-800">Gestión de Personal</h1>
             </div>
 
-            <div id="contenedorTablasPersonal" class="space-y-10">
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div class="bg-blue-600 px-6 py-4 flex justify-between items-center">
-                        <h3 class="text-white font-bold flex items-center"><i class="fas fa-check-circle mr-2"></i> Personal Activo</h3>
-                        <span id="countActivos" class="bg-blue-500 text-white text-xs px-3 py-1 rounded-full">...</span>
+            <div id="contenedorTablasPersonal" class="space-y-8">
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-slate-200">
+                    <div class="bg-blue-600 px-6 py-3 flex justify-between">
+                        <span class="text-white font-bold uppercase text-sm">Personal Activo</span>
+                        <span id="countActivos" class="text-blue-100 text-xs font-bold"></span>
                     </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left">
-                            <thead class="bg-slate-50 border-b border-slate-200">
-                                <tr>
-                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Colaborador</th>
-                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Cargo</th>
-                                    <th class="px-6 py-4 text-right">Acción</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tActivos" class="divide-y divide-slate-100">
-                                <tr><td colspan="3" class="p-10 text-center"><i class="fas fa-circle-notch fa-spin"></i> Cargando...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <table class="w-full text-left">
+                        <tbody id="tActivos" class="divide-y divide-slate-100">
+                            <tr><td class="p-6 text-center text-slate-400">Cargando...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
 
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div class="bg-slate-600 px-6 py-4 flex justify-between items-center">
-                        <h3 class="text-white font-bold flex items-center"><i class="fas fa-history mr-2"></i> Personal Pasivo</h3>
-                        <span id="countPasivos" class="bg-slate-500 text-white text-xs px-3 py-1 rounded-full">...</span>
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-slate-200">
+                    <div class="bg-slate-600 px-6 py-3 flex justify-between">
+                        <span class="text-white font-bold uppercase text-sm">Personal Pasivo</span>
+                        <span id="countPasivos" class="text-slate-300 text-xs font-bold"></span>
                     </div>
-                    <tbody id="tPasivos" class="divide-y divide-slate-100"></tbody>
-                </table>
+                    <table class="w-full text-left">
+                        <tbody id="tPasivos" class="divide-y divide-slate-100">
+                            <tr><td class="p-6 text-center text-slate-400">Cargando...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
-            <div id="seccionExpediente" class="hidden animate-fade-in">
+            <div id="seccionExpediente" class="hidden">
                 <div class="flex items-center mb-6">
-                    <button onclick="volverALista()" class="mr-4 bg-white p-2 rounded-full shadow hover:bg-blue-50 text-blue-600 transition-all">
+                    <button onclick="volverALista()" class="bg-white p-2 rounded-full shadow mr-4 text-blue-600">
                         <i class="fas fa-arrow-left"></i>
                     </button>
-                    <div>
-                        <h2 class="text-2xl font-bold text-slate-800" id="nombreEmpleadoExpediente">---</h2>
-                        <p class="text-sm text-slate-500">Expediente Digital</p>
-                    </div>
+                    <h2 class="text-2xl font-bold text-slate-800" id="nombreEmpleadoExpediente"></h2>
                 </div>
-                <div class="bg-slate-200 p-8 rounded-2xl border-2 border-dashed border-slate-300">
-                    <div id="listaDocumentosExpediente" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-                </div>
+                <div id="listaDocumentosExpediente" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 bg-slate-200 p-6 rounded-xl border-2 border-dashed border-slate-300"></div>
             </div>
         </div>
 
         <div id="aptitud" class="tab-content">
-            <div class="mb-8">
-                <h1 class="text-3xl font-extrabold text-slate-800">Certificados de Aptitud</h1>
-                <p class="text-slate-500 mt-2">Registro médico.</p>
-            </div>
-            <div id="lAptDocs" class="divide-y divide-slate-100 bg-white rounded-xl shadow-sm"></div>
+            <h1 class="text-3xl font-bold text-slate-800 mb-6">Subir Certificados</h1>
+            <div id="lAptDocs" class="bg-white rounded-xl shadow-sm"></div>
         </div>
     </div>
 
@@ -121,9 +106,7 @@
         const API_BASE = "https://isertel-backend.onrender.com/api";
         const token = localStorage.getItem('token');
 
-        console.log("🛠️ Panel Médico Listo");
-
-        function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+        function logout() { localStorage.clear(); window.location.replace('index.html'); }
 
         function showTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -136,7 +119,6 @@
         async function cargarTodo() {
             if (!token) return logout();
             await cargarPersonal();
-            await cargarDocsAptitud();
         }
         window.onload = cargarTodo;
 
@@ -145,31 +127,37 @@
                 const res = await fetch(`${API_BASE}/admin/personal`, { 
                     headers: { 'Authorization': 'Bearer ' + token } 
                 });
-                if (!res.ok) throw new Error("Error en respuesta");
                 const data = await res.json();
-
-                // Render Activos
-                document.getElementById('countActivos').innerText = data.activos.length;
-                document.getElementById('tActivos').innerHTML = data.activos.map(u => `
+                
+                // Renderizar Activos
+                document.getElementById('countActivos').innerText = (data.activos || []).length;
+                document.getElementById('tActivos').innerHTML = (data.activos || []).map(u => `
                     <tr class="hover:bg-slate-50">
-                        <td class="px-6 py-4">
-                            <div class="font-bold text-slate-800">${u.nombre}</div>
-                            <div class="text-[10px] text-slate-400">${u.cedula}</div>
-                        </td>
-                        <td class="px-6 py-4 text-sm">${u.cargo || 'General'}</td>
+                        <td class="px-6 py-4 font-bold text-slate-700">${u.nombre}</td>
                         <td class="px-6 py-4 text-right">
-                            <button onclick="verExpediente(${u.id}, '${u.nombre}')" class="bg-blue-600 text-white px-3 py-1 rounded text-xs">
+                            <button onclick="verExpediente(${u.id}, '${u.nombre}')" class="bg-blue-600 text-white px-4 py-1 rounded-lg text-xs font-bold shadow-sm">
                                 EXPEDIENTE
                             </button>
                         </td>
                     </tr>
                 `).join('');
 
-                // Render Pasivos
-                document.getElementById('countPasivos').innerText = data.pasivos.length;
-                // (Mismo mapeo para pasivos...)
+                // Renderizar Pasivos
+                document.getElementById('countPasivos').innerText = (data.pasivos || []).length;
+                document.getElementById('tPasivos').innerHTML = (data.pasivos || []).map(u => `
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-6 py-4 text-slate-500">${u.nombre}</td>
+                        <td class="px-6 py-4 text-right">
+                            <button onclick="verExpediente(${u.id}, '${u.nombre}')" class="bg-slate-400 text-white px-4 py-1 rounded-lg text-xs font-bold">
+                                EXPEDIENTE
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
 
-            } catch(e) { console.error("Error cargando personal:", e); }
+            } catch (error) {
+                console.error("Error cargando personal:", error);
+            }
         }
 
         async function verExpediente(id, nombre) {
@@ -179,29 +167,33 @@
             document.getElementById('seccionExpediente').classList.remove('hidden');
             
             const container = document.getElementById('listaDocumentosExpediente');
-            container.innerHTML = '<p class="col-span-full text-center">Cargando expediente...</p>';
+            container.innerHTML = '<p class="col-span-full text-center">Cargando...</p>';
 
             try {
                 const res = await fetch(`${API_BASE}/doctor/documentos-usuario/${id}`, {
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
                 const docs = await res.json();
-                
-                if(docs.length === 0) {
-                    container.innerHTML = '<p class="col-span-full text-center py-10">No hay documentos.</p>';
+
+                if (docs.length === 0) {
+                    container.innerHTML = '<p class="col-span-full text-center text-slate-500 italic">No hay documentos en este expediente.</p>';
                     return;
                 }
 
                 container.innerHTML = docs.map(d => `
                     <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-blue-500 flex justify-between items-center">
                         <div>
-                            <p class="font-bold text-xs uppercase">${d.tipo_documento}</p>
-                            <p class="text-[9px] text-slate-400">${new Date(d.created_at).toLocaleDateString()}</p>
+                            <p class="font-bold text-slate-800 text-xs uppercase">${d.tipo_documento}</p>
+                            <p class="text-[10px] text-slate-400">${new Date(d.created_at).toLocaleDateString()}</p>
                         </div>
-                        <a href="${d.url_cloudinary}" target="_blank" class="text-blue-600"><i class="fas fa-eye"></i></a>
+                        <a href="${d.url_cloudinary}" target="_blank" class="bg-blue-50 text-blue-600 p-2 rounded-full hover:bg-blue-600 hover:text-white transition-all">
+                            <i class="fas fa-eye"></i>
+                        </a>
                     </div>
                 `).join('');
-            } catch(e) { container.innerHTML = 'Error al cargar.'; }
+            } catch (e) {
+                container.innerHTML = 'Error al cargar el expediente.';
+            }
         }
 
         function volverALista() {
@@ -209,8 +201,6 @@
             document.getElementById('contenedorTablasPersonal').classList.remove('hidden');
             document.getElementById('headerPersonal').classList.remove('hidden');
         }
-
-        // ... (CargarDocsAptitud y demás funciones) ...
     </script>
 </body>
 </html>
