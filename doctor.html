@@ -53,7 +53,7 @@
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                     <div class="bg-blue-600 px-6 py-4 flex justify-between items-center">
                         <h3 class="text-white font-bold flex items-center"><i class="fas fa-check-circle mr-2"></i> Personal Activo</h3>
-                        <span id="countActivos" class="bg-blue-500 text-white text-xs px-3 py-1 rounded-full border border-blue-400">Cargando...</span>
+                        <span id="countActivos" class="bg-blue-500 text-white text-xs px-3 py-1 rounded-full border border-blue-400">Esperando datos...</span>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left">
@@ -64,7 +64,9 @@
                                     <th class="px-6 py-4 text-right">Acción</th>
                                 </tr>
                             </thead>
-                            <tbody id="tActivos" class="divide-y divide-slate-100"></tbody>
+                            <tbody id="tActivos" class="divide-y divide-slate-100">
+                                <tr><td colspan="3" class="p-10 text-center text-slate-400"><i class="fas fa-spinner fa-spin mr-2"></i> Cargando personal activo...</td></tr>
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -72,7 +74,7 @@
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                     <div class="bg-slate-600 px-6 py-4 flex justify-between items-center">
                         <h3 class="text-white font-bold flex items-center"><i class="fas fa-history mr-2"></i> Personal Pasivo</h3>
-                        <span id="countPasivos" class="bg-slate-500 text-white text-xs px-3 py-1 rounded-full border border-slate-400">Cargando...</span>
+                        <span id="countPasivos" class="bg-slate-500 text-white text-xs px-3 py-1 rounded-full border border-slate-400">Esperando datos...</span>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left">
@@ -83,7 +85,9 @@
                                     <th class="px-6 py-4 text-right">Acción</th>
                                 </tr>
                             </thead>
-                            <tbody id="tPasivos" class="divide-y divide-slate-100"></tbody>
+                            <tbody id="tPasivos" class="divide-y divide-slate-100">
+                                <tr><td colspan="3" class="p-10 text-center text-slate-400"><i class="fas fa-spinner fa-spin mr-2"></i> Cargando personal pasivo...</td></tr>
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -99,10 +103,8 @@
                         <p class="text-sm text-slate-500">Expediente Digital Consolidado</p>
                     </div>
                 </div>
-
                 <div class="bg-slate-200 p-8 rounded-2xl border-2 border-dashed border-slate-300">
-                    <div id="listaDocumentosExpediente" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        </div>
+                    <div id="listaDocumentosExpediente" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
                 </div>
             </div>
         </div>
@@ -112,42 +114,16 @@
                 <h1 class="text-3xl font-extrabold text-slate-800">Certificados de Aptitud</h1>
                 <p class="text-slate-500 mt-2">Registro de certificados médicos y reposos.</p>
             </div>
-            
-            <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 mb-8">
-                <div class="flex flex-col md:flex-row gap-6 items-end">
-                    <div class="flex-1">
-                        <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide">Seleccionar Colaborador</label>
-                        <select id="selUserApt" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"></select>
-                    </div>
-                    <div class="flex-1">
-                        <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide">Tipo de Documento</label>
-                        <select id="selTipoApt" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all">
-                            <option value="Certificado médico de Aptitud">Certificado médico de Aptitud</option>
-                            <option value="Certificado médico de Reposo">Certificado médico de Reposo</option>
-                        </select>
-                    </div>
-                    <div>
-                        <input type="file" id="fileApt" class="hidden" accept="application/pdf,image/*">
-                        <button onclick="document.getElementById('fileApt').click()" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold shadow-lg shadow-blue-500/20 transition-all flex items-center">
-                            <i class="fas fa-cloud-upload-alt mr-2"></i> Subir Documento
-                        </button>
-                    </div>
-                </div>
             </div>
-
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="p-6 border-b border-slate-100 flex justify-between items-center">
-                    <h3 class="font-bold text-slate-800 uppercase tracking-wider">Últimos Registros</h3>
-                </div>
-                <div id="lAptDocs" class="divide-y divide-slate-100"></div>
-            </div>
-        </div>
-
     </div>
 
     <script>
         const API_BASE = "https://isertel-backend.onrender.com/api";
         const token = localStorage.getItem('token');
+
+        // LOG INICIAL PARA VERIFICAR TOKEN
+        console.log("🛠️ Iniciando Panel Médico");
+        console.log("🔑 Token presente:", !!token);
 
         function logout() { localStorage.clear(); window.location.href = 'index.html'; }
 
@@ -156,105 +132,128 @@
             document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             document.getElementById('btn-' + tabId).classList.add('active');
-            
-            // Al cambiar a personal, asegurarnos de que se vea la lista y no el expediente anterior
             if(tabId === 'personal') volverALista();
         }
 
         async function cargarTodo() {
-            await Promise.all([cargarPersonal(), cargarDocsAptitud()]);
+            if (!token) {
+                console.error("❌ No hay token de autenticación.");
+                alert("Sesión expirada. Por favor inicie sesión de nuevo.");
+                logout();
+                return;
+            }
+            await cargarPersonal();
         }
         window.onload = cargarTodo;
 
         async function cargarPersonal() {
+            console.log("📡 Solicitando lista de personal a:", `${API_BASE}/admin/personal`);
+            
             try {
-                const res = await fetch(`${API_BASE}/admin/personal`, { headers: { 'Authorization': 'Bearer ' + token } });
+                const res = await fetch(`${API_BASE}/admin/personal`, { 
+                    headers: { 'Authorization': 'Bearer ' + token } 
+                });
+
+                console.log("status Respuesta:", res.status);
+
+                if (!res.ok) {
+                    const errorText = await res.text();
+                    throw new Error(`Error en servidor (${res.status}): ${errorText}`);
+                }
+
                 const data = await res.json();
-                
+                console.log("✅ Datos recibidos correctamente:", data);
+
                 // Render Activos
-                document.getElementById('countActivos').innerText = data.activos.length + ' Empleados';
-                document.getElementById('tActivos').innerHTML = data.activos.map(u => `
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="px-6 py-4">
-                            <div class="font-bold text-slate-800">${u.nombre}</div>
-                            <div class="text-xs text-slate-400">${u.cedula}</div>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-slate-600">${u.cargo || 'No asignado'}</td>
-                        <td class="px-6 py-4 text-right">
-                            <button onclick="verExpediente(${u.id}, '${u.nombre}')" class="bg-blue-50 text-blue-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-blue-600 hover:text-white transition-all">
-                                <i class="fas fa-folder-open mr-1"></i> EXPEDIENTE
-                            </button>
-                        </td>
-                    </tr>
-                `).join('');
+                if (data.activos && Array.isArray(data.activos)) {
+                    document.getElementById('countActivos').innerText = data.activos.length + ' Empleados';
+                    document.getElementById('tActivos').innerHTML = data.activos.map(u => `
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-slate-800">${u.nombre}</div>
+                                <div class="text-xs text-slate-400">${u.cedula || 'S/C'}</div>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-slate-600">${u.cargo || 'No asignado'}</td>
+                            <td class="px-6 py-4 text-right">
+                                <button onclick="verExpediente(${u.id}, '${u.nombre}')" class="bg-blue-50 text-blue-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-blue-600 hover:text-white transition-all">
+                                    <i class="fas fa-folder-open mr-1"></i> EXPEDIENTE
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    document.getElementById('tActivos').innerHTML = '<tr><td colspan="3" class="p-4 text-orange-500 text-center">No se encontraron datos de activos.</td></tr>';
+                }
 
                 // Render Pasivos
-                document.getElementById('countPasivos').innerText = data.pasivos.length + ' Ex-empleados';
-                document.getElementById('tPasivos').innerHTML = data.pasivos.map(u => `
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="px-6 py-4 font-bold text-slate-700">${u.nombre}</td>
-                        <td class="px-6 py-4 italic text-xs text-red-500 font-medium uppercase tracking-widest">Inactivo</td>
-                        <td class="px-6 py-4 text-right">
-                            <button onclick="verExpediente(${u.id}, '${u.nombre}')" class="bg-slate-100 text-slate-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-slate-600 hover:text-white transition-all">
-                                <i class="fas fa-folder-open mr-1"></i> EXPEDIENTE
-                            </button>
-                        </td>
-                    </tr>
-                `).join('');
+                if (data.pasivos && Array.isArray(data.pasivos)) {
+                    document.getElementById('countPasivos').innerText = data.pasivos.length + ' Ex-empleados';
+                    document.getElementById('tPasivos').innerHTML = data.pasivos.map(u => `
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="px-6 py-4 font-bold text-slate-700">${u.nombre}</td>
+                            <td class="px-6 py-4 italic text-xs text-red-500 font-medium uppercase tracking-widest">Inactivo</td>
+                            <td class="px-6 py-4 text-right">
+                                <button onclick="verExpediente(${u.id}, '${u.nombre}')" class="bg-slate-100 text-slate-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-slate-600 hover:text-white transition-all">
+                                    <i class="fas fa-folder-open mr-1"></i> EXPEDIENTE
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
 
-                // Cargar Select para Aptitud (Solo activos)
-                document.getElementById('selUserApt').innerHTML = data.activos.map(u => `<option value="${u.id}">${u.nombre}</option>`).join('');
-
-            } catch(e) { console.error(e); }
+            } catch(e) { 
+                console.error("❌ ERROR CARGANDO PERSONAL:", e);
+                document.getElementById('tActivos').innerHTML = `<tr><td colspan="3" class="p-10 text-center text-red-500 font-bold italic">Error al conectar con el servidor. Revise la consola.</td></tr>`;
+                document.getElementById('tPasivos').innerHTML = `<tr><td colspan="3" class="p-10 text-center text-red-500 font-bold italic">Error al cargar datos.</td></tr>`;
+            }
         }
 
-        // --- FUNCIONES DEL EXPEDIENTE ---
         async function verExpediente(id, nombre) {
+            console.log(`📂 Abriendo expediente para ID: ${id} (${nombre})`);
             document.getElementById('nombreEmpleadoExpediente').innerText = nombre;
-            
-            // Ocultar tablas y mostrar contenedor de expediente
             document.getElementById('contenedorTablasPersonal').classList.add('hidden');
             document.getElementById('headerPersonal').classList.add('hidden');
             document.getElementById('seccionExpediente').classList.remove('hidden');
-            
             await cargarDocumentosDelUsuario(id);
         }
 
         async function cargarDocumentosDelUsuario(id) {
             const container = document.getElementById('listaDocumentosExpediente');
-            container.innerHTML = '<div class="col-span-full text-center py-10 text-slate-500"><i class="fas fa-spinner fa-spin mr-2"></i> Consultando base de datos...</div>';
+            container.innerHTML = '<div class="col-span-full text-center py-10 text-slate-500"><i class="fas fa-spinner fa-spin mr-2"></i> Consultando...</div>';
 
             try {
-                // Llamada al nuevo endpoint en server.js
                 const res = await fetch(`${API_BASE}/doctor/documentos-usuario/${id}`, {
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
+                
+                console.log(`📄 Respuesta documentos (Status ${res.status})`);
+                
+                if(!res.ok) throw new Error("No se pudo obtener el expediente.");
+                
                 const docs = await res.json();
+                console.log(`📊 ${docs.length} documentos encontrados.`);
 
                 if (docs.length === 0) {
-                    container.innerHTML = '<div class="col-span-full text-center py-10 text-slate-400 bg-white/50 rounded-xl border-2 border-dotted border-slate-300 italic">No hay documentos registrados para este usuario.</div>';
+                    container.innerHTML = '<div class="col-span-full text-center py-10 text-slate-400 bg-white/50 rounded-xl border-2 border-dotted border-slate-300 italic">No hay documentos registrados.</div>';
                     return;
                 }
 
                 container.innerHTML = docs.map(d => `
                     <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-blue-500 expediente-container flex justify-between items-center">
                         <div class="flex items-center">
-                            <div class="bg-blue-50 p-3 rounded-lg mr-4">
-                                <i class="fas fa-file-pdf text-blue-600 text-xl"></i>
-                            </div>
+                            <div class="bg-blue-50 p-3 rounded-lg mr-4"><i class="fas fa-file-pdf text-blue-600 text-xl"></i></div>
                             <div>
                                 <p class="font-bold text-slate-800 text-sm uppercase leading-tight">${d.tipo_documento}</p>
-                                <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Subido el: ${new Date(d.created_at).toLocaleDateString()}</p>
+                                <p class="text-[10px] text-slate-400 mt-1">Fecha: ${new Date(d.created_at).toLocaleDateString()}</p>
                             </div>
                         </div>
-                        <a href="${d.url_cloudinary}" target="_blank" class="bg-slate-100 hover:bg-blue-600 hover:text-white p-3 rounded-full transition-all">
-                            <i class="fas fa-eye"></i>
-                        </a>
+                        <a href="${d.url_cloudinary}" target="_blank" class="bg-slate-100 hover:bg-blue-600 hover:text-white p-3 rounded-full transition-all"><i class="fas fa-eye"></i></a>
                     </div>
                 `).join('');
 
             } catch (error) {
-                container.innerHTML = '<div class="col-span-full text-red-500">Error al cargar el expediente.</div>';
+                console.error("❌ Error en expediente:", error);
+                container.innerHTML = `<div class="col-span-full text-red-500 p-4 text-center">Error al cargar: ${error.message}</div>`;
             }
         }
 
@@ -262,67 +261,6 @@
             document.getElementById('seccionExpediente').classList.add('hidden');
             document.getElementById('contenedorTablasPersonal').classList.remove('hidden');
             document.getElementById('headerPersonal').classList.remove('hidden');
-        }
-
-        // --- LÓGICA DE APTITUD ---
-        async function cargarDocsAptitud() {
-            try {
-                const res = await fetch(`${API_BASE}/doctor/documentos-aptitud`, { headers: { 'Authorization': 'Bearer ' + token } });
-                const docs = await res.json();
-                document.getElementById('lAptDocs').innerHTML = docs.map(d => `
-                    <div class="flex justify-between items-center p-6 hover:bg-slate-50 transition-colors">
-                        <div class="flex items-center">
-                            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mr-4">
-                                <i class="fas fa-file-medical text-xl"></i>
-                            </div>
-                            <div>
-                                <p class="font-bold text-slate-800 uppercase text-sm">${d.nombre_usuario}</p>
-                                <p class="text-xs text-blue-600 font-semibold">${d.tipo_documento}</p>
-                                <p class="text-[10px] text-slate-400 mt-1 italic">${new Date(d.created_at).toLocaleString()}</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-2">
-                            <a href="${d.url_cloudinary}" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-lg bg-slate-100 text-slate-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm">
-                                <i class="fas fa-eye"></i>
-                            </a>
-                            <button onclick="eliminarDocAptitud(${d.id})" class="w-10 h-10 flex items-center justify-center rounded-lg bg-slate-100 text-slate-400 hover:bg-red-600 hover:text-white transition-all shadow-sm">
-                                <i class="fas fa-trash-alt text-xs"></i>
-                            </button>
-                        </div>
-                    </div>
-                `).join('');
-            } catch(e) { console.error(e); }
-        }
-
-        document.getElementById('fileApt').onchange = async function() {
-            const user_id = document.getElementById('selUserApt').value;
-            const tipo = document.getElementById('selTipoApt').value;
-            if(!this.files[0] || !user_id) return;
-            
-            const formData = new FormData();
-            formData.append('archivo', this.files[0]);
-            formData.append('usuario_id', user_id);
-            formData.append('tipo_documento', tipo);
-            
-            try {
-                document.getElementById('lAptDocs').innerHTML = '<div class="py-10 text-center"><i class="fas fa-spinner fa-spin text-3xl text-blue-600"></i></div>';
-                const res = await fetch(`${API_BASE}/doctor/subir-aptitud`, { 
-                    method: 'POST', 
-                    headers: { 'Authorization': 'Bearer ' + token }, 
-                    body: formData 
-                });
-                
-                if(res.ok) { await cargarDocsAptitud(); } 
-                else { alert("Error al subir"); await cargarDocsAptitud(); }
-            } catch(e) { alert("Error"); }
-            this.value = "";
-        };
-
-        async function eliminarDocAptitud(id) {
-            if(confirm("¿Eliminar este certificado?")) {
-                await fetch(`${API_BASE}/doctor/aptitud/${id}`, { method: 'DELETE', headers: {'Authorization': 'Bearer '+ token} });
-                await cargarDocsAptitud();
-            }
         }
     </script>
 </body>
