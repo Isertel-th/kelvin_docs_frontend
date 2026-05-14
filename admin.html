@@ -75,18 +75,36 @@
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                         <div class="flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-2xl p-4">
                             <img id="previewFoto" src="https://via.placeholder.com/100" class="w-24 h-24 rounded-full object-cover mb-2 border-2 border-white shadow-sm">
-                            <label class="cursor-pointer bg-indigo-50 text-indigo-600 px-3 py-1 rounded-lg text-[10px] font-bold hover:bg-indigo-100 transition-all">
-                                <i class="fas fa-camera mr-1"></i> FOTO
+                            <label class="cursor-pointer bg-indigo-50 text-indigo-600 px-3 py-1 rounded-lg text-[10px] font-bold hover:bg-indigo-100 transition-all text-center">
+                                <i class="fas fa-camera mr-1"></i> SUBIR FOTO OBLIGATORIA
                                 <input type="file" id="foto_usuario" accept="image/*" class="hidden" onchange="previewImage(this)">
                             </label>
                         </div>
                         <div class="md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-3">
-                            <input type="text" id="nombre_completo" placeholder="Nombre Completo" class="p-2 border rounded-lg text-sm bg-slate-50 uppercase font-bold outline-none focus:ring-2 focus:ring-indigo-500">
-                            <input type="text" id="cedula" placeholder="Cédula / ID" class="p-2 border rounded-lg text-sm font-bold bg-indigo-50 outline-none focus:ring-2 focus:ring-indigo-500">
-                            <input type="date" id="fecha_ingreso" title="Fecha de Ingreso" class="p-2 border rounded-lg text-sm font-bold bg-white outline-none focus:ring-2 focus:ring-indigo-500">
-                            <input type="email" id="correo" placeholder="Correo Electrónico" class="p-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                            <input type="tel" id="celular" placeholder="Celular" class="p-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                            <input type="text" id="direccion" placeholder="Dirección" class="p-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <div class="flex flex-col">
+                                <label class="text-[9px] font-bold text-slate-400 mb-1">APELLIDOS Y NOMBRES</label>
+                                <input type="text" id="nombre_completo" oninput="formatearNombre(this)" placeholder="Ej: RUALES JIMENEZ JUAN" class="p-2 border rounded-lg text-sm bg-slate-50 font-bold outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div class="flex flex-col">
+                                <label class="text-[9px] font-bold text-slate-400 mb-1">CÉDULA (10 DÍGITOS)</label>
+                                <input type="text" id="cedula" maxlength="10" placeholder="1722..." class="p-2 border rounded-lg text-sm font-bold bg-indigo-50 outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div class="flex flex-col">
+                                <label class="text-[9px] font-bold text-slate-400 mb-1">FECHA DE INGRESO</label>
+                                <input type="date" id="fecha_ingreso" class="p-2 border rounded-lg text-sm font-bold bg-white outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div class="flex flex-col">
+                                <label class="text-[9px] font-bold text-slate-400 mb-1">CORREO ELECTRÓNICO</label>
+                                <input type="email" id="correo" placeholder="ejemplo@dominio.com" class="p-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div class="flex flex-col">
+                                <label class="text-[9px] font-bold text-slate-400 mb-1">CELULAR</label>
+                                <input type="tel" id="celular" placeholder="09..." class="p-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div class="flex flex-col">
+                                <label class="text-[9px] font-bold text-slate-400 mb-1">DIRECCIÓN DE DOMICILIO</label>
+                                <input type="text" id="direccion" placeholder="Calle, Ciudad" class="p-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
                         </div>
                     </div>
                     <div class="mt-4 flex justify-end">
@@ -229,6 +247,21 @@
 
         const mesesOrden = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
 
+        // --- NUEVAS FUNCIONES DE FORMATEO Y VALIDACIÓN ---
+
+        function formatearNombre(input) {
+            let palabras = input.value.toLowerCase().split(' ');
+            for (let i = 0; i < palabras.length; i++) {
+                palabras[i] = palabras[i].charAt(0).toUpperCase() + palabras[i].slice(1);
+            }
+            input.value = palabras.join(' ');
+        }
+
+        function validarEmail(email) {
+            const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            return re.test(String(email).toLowerCase());
+        }
+
         function previewImage(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
@@ -295,15 +328,35 @@
         async function crearTrabajador() {
             const formData = new FormData();
             const fields = ['nombre_completo', 'cedula', 'fecha_ingreso', 'correo', 'celular', 'direccion'];
+            
+            // VALIDACIONES ESTRICTAS
             for (const f of fields) {
-                const val = document.getElementById(f).value;
-                if(!val && f !== 'fecha_ingreso') return alert("Complete todos los campos");
+                const val = document.getElementById(f).value.trim();
+                if(!val) return alert(`El campo ${f.replace('_',' ')} es obligatorio.`);
+                
+                if(f === 'cedula' && val.length !== 10) return alert("La cédula debe tener exactamente 10 dígitos.");
+                if(f === 'correo' && !validarEmail(val)) return alert("Ingrese un correo electrónico válido (ejemplo@dominio.com).");
+                
                 formData.append(f, val);
             }
+
             const foto = document.getElementById('foto_usuario').files[0];
-            if(foto) formData.append('foto', foto);
-            const res = await fetch(`${API_BASE}/admin/crear-usuario`, { method: 'POST', headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }, body: formData });
-            if(res.ok) { alert("Registrado"); location.reload(); }
+            if(!foto) return alert("Debe subir una foto del trabajador obligatoriamente.");
+            formData.append('foto', foto);
+
+            const res = await fetch(`${API_BASE}/admin/crear-usuario`, { 
+                method: 'POST', 
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }, 
+                body: formData 
+            });
+
+            if(res.ok) { 
+                alert("Trabajador registrado exitosamente."); 
+                location.reload(); 
+            } else {
+                const err = await res.json();
+                alert("Error: " + err.error);
+            }
         }
 
         async function abrirExpediente(id, nombre) {
