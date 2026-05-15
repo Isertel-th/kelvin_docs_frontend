@@ -217,7 +217,6 @@
         }
     }
 
-    // --- Lógica de Expediente Kelvin ---
     let currentId = null, currentNombre = "", currentPasivo = false, docsList = [], carpetaActual = null;
     const mesesOrden = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
 
@@ -255,8 +254,10 @@
         document.getElementById('rutaCarpeta').innerText = ` > ${nombre}`;
 
         const select = document.getElementById('tipoDocAptitud');
+        
+        // Cambio realizado: Se eliminó la opción "Certificado técnico"
         select.innerHTML = nombre === 'Certificados de competencia' 
-            ? '<option>Certificado de competencia</option><option>Certificado técnico</option>'
+            ? '<option>Certificado de competencia</option>'
             : '<option>Acta de epp ingreso</option><option>Acta de epp reposición</option>';
         
         await cargarDocs();
