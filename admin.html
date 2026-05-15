@@ -289,7 +289,7 @@
     </div>
 </div>
 <input type="file" id="fileInput" class="hidden" accept=".pdf">
-   <script>
+<script>
     const API_BASE = "https://kelvin-th-docs-backend.onrender.com/api";
     let idActual = null; let nombreActual = ""; let modoEmpresa = false; let subiendoTipo = "";
     let todosLosEmpleados = []; let modoLista = 'activos'; let documentosCargados = []; let carpetaActual = null;
@@ -376,139 +376,152 @@
         idActual = id; nombreActual = nombre;
         document.getElementById('nEmp').innerText = nombre;
         document.getElementById('modalC').classList.remove('hidden');
-        const res = await fetch(`${API_BASE}/admin/documentos/${id}?pasivo=${modoLista==='pasivos'}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
-        documentosCargados = await res.json();
+        await refrescarDocumentos();
+    }
+
+    async function refrescarDocumentos() {
+        // Obtenemos documentos generales
+        const resDocs = await fetch(`${API_BASE}/admin/documentos/${idActual}?pasivo=${modoLista==='pasivos'}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+        const docsGenerales = await resDocs.json();
+
+        // Obtenemos documentos de la tabla certificados_aptitud (como el doctor)
+        const resApt = await fetch(`${API_BASE}/doctor/aptitud/${idActual}?esPasivo=${modoLista==='pasivos'}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+        const docsAptitud = await resApt.json();
+
+        // Combinamos ambos para la búsqueda y renderizado
+        documentosCargados = [...docsGenerales, ...docsAptitud];
         renderizarVistaCarpetas();
     }
 
-function renderizarVistaCarpetas() {
-    carpetaActual = null;
-    document.getElementById('rutaCarpeta').innerText = "";
-    document.getElementById('btnRetrocederCarpeta').classList.add('hidden');
-    document.getElementById('footerSubida').classList.add('hidden');
-    document.getElementById('barraFiltrosModal').classList.add('hidden');
-    
-    // Switch de contenedores
-    const cCarpetas = document.getElementById('contenedorCarpetas');
-    const cArchivos = document.getElementById('contenedorArchivos');
-    cCarpetas.classList.remove('hidden');
-    cArchivos.classList.add('hidden');
+    function renderizarVistaCarpetas() {
+        carpetaActual = null;
+        document.getElementById('rutaCarpeta').innerText = "";
+        document.getElementById('btnRetrocederCarpeta').classList.add('hidden');
+        document.getElementById('footerSubida').classList.add('hidden');
+        document.getElementById('barraFiltrosModal').classList.add('hidden');
+        
+        const cCarpetas = document.getElementById('contenedorCarpetas');
+        const cArchivos = document.getElementById('contenedorArchivos');
+        cCarpetas.classList.remove('hidden');
+        cArchivos.classList.add('hidden');
 
-    cCarpetas.innerHTML = `
-        <div onclick="entrarCarpeta('Contratación')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 transition-all"><i class="fas fa-file-contract text-4xl text-indigo-600 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Contratación</span></div>
-        <div onclick="entrarCarpeta('Vacaciones')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-emerald-500 hover:bg-emerald-50 transition-all"><i class="fas fa-umbrella-beach text-4xl text-emerald-600 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Vacaciones</span></div>
-        <div onclick="entrarCarpeta('Certificado de competencia')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-orange-500 hover:bg-orange-50 transition-all"><i class="fas fa-certificate text-4xl text-orange-600 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Cert. Competencia</span></div>
-        <div onclick="entrarCarpeta('Acta de epps')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-yellow-600 hover:bg-yellow-50 transition-all"><i class="fas fa-hard-hat text-4xl text-yellow-700 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Acta de EPP's</span></div>
-        <div onclick="entrarCarpeta('Certificados medicos')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all"><i class="fas fa-notes-medical text-4xl text-blue-600 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Certificados Médicos</span></div>
-        <div onclick="entrarCarpeta('Memorandum')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-amber-500 hover:bg-amber-50 transition-all"><i class="fas fa-sticky-note text-4xl text-amber-600 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Memorándum</span></div>
-        <div onclick="entrarCarpeta('Certificados')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-purple-500 hover:bg-purple-50 transition-all"><i class="fas fa-award text-4xl text-purple-600 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Certificados</span></div>
-        ${modoLista === 'pasivos' ? `<div onclick="entrarCarpeta('Desvinculación')" class="folder-card bg-red-50 border-2 border-dashed border-red-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-red-500 hover:bg-red-100 transition-all col-span-1"><i class="fas fa-user-minus text-4xl text-red-600 mb-3"></i><span class="font-bold text-xs uppercase text-red-600">Desvinculación</span></div>` : ''}
-    `;
-}
-
-function entrarCarpeta(nombreCarpeta) {
-    carpetaActual = nombreCarpeta;
-    document.getElementById('rutaCarpeta').innerText = "> " + nombreCarpeta;
-    document.getElementById('btnRetrocederCarpeta').classList.remove('hidden');
-    document.getElementById('footerSubida').classList.remove('hidden');
-    document.getElementById('barraFiltrosModal').classList.remove('hidden');
-    
-    // Switch de contenedores
-    document.getElementById('contenedorCarpetas').classList.add('hidden');
-    document.getElementById('contenedorArchivos').classList.remove('hidden');
-
-    const selectS = document.getElementById('tipoDocAdmin');
-    const selectF = document.getElementById('filtroTipoDoc');
-    const contMes = document.getElementById('contenedorMes');
-    const contVac = document.getElementById('contenedorFechasVacaciones');
-
-    let ops = "";
-    if (nombreCarpeta === 'Vacaciones') {
-        ops = '<option value="Vacaciones">Vacaciones</option>';
-        contMes.classList.add('hidden');
-        contVac.classList.remove('hidden');
-    } else {
-        contMes.classList.remove('hidden');
-        contVac.classList.add('hidden');
-        if(nombreCarpeta === 'Contratación') ops = '<option>Contrato de trabajo</option><option>Aviso de entrada</option><option>Extracto SUT</option><option>Certificado bancario</option>';
-        else if(nombreCarpeta === 'Certificado de competencia') ops = '<option>Certificado de competencia</option>';
-        else if(nombreCarpeta === 'Acta de epps') ops = '<option>Acta de epp\'s</option>';
-        else if(nombreCarpeta === 'Certificados medicos') ops = '<option>Certificado médico IESS</option><option>Certificado médico privado</option><option>Certificado médico MSP</option><option>Reposo médico</option>';
-        else if(nombreCarpeta === 'Memorandum') ops = '<option>Memorandum</option>';
-        else if(nombreCarpeta === 'Certificados') ops = '<option>Laborales</option><option>De honorabilidad</option>';
-        else if(nombreCarpeta === 'Desvinculación') ops = '<option>Acta de finiquito</option><option>Comprobante de pago</option><option>Aviso de salida</option><option>Renuncia</option>';
+        cCarpetas.innerHTML = `
+            <div onclick="entrarCarpeta('Contratación')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 transition-all"><i class="fas fa-file-contract text-4xl text-indigo-600 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Contratación</span></div>
+            <div onclick="entrarCarpeta('Vacaciones')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-emerald-500 hover:bg-emerald-50 transition-all"><i class="fas fa-umbrella-beach text-4xl text-emerald-600 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Vacaciones</span></div>
+            <div onclick="entrarCarpeta('Certificado de competencia')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-orange-500 hover:bg-orange-50 transition-all"><i class="fas fa-certificate text-4xl text-orange-600 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Cert. Competencia</span></div>
+            <div onclick="entrarCarpeta('Acta de epps')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-yellow-600 hover:bg-yellow-50 transition-all"><i class="fas fa-hard-hat text-4xl text-yellow-700 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Acta de EPP's</span></div>
+            <div onclick="entrarCarpeta('Certificados medicos')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all"><i class="fas fa-notes-medical text-4xl text-blue-600 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Certificados Médicos</span></div>
+            <div onclick="entrarCarpeta('Aptitud Medica')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-cyan-500 hover:bg-cyan-50 transition-all"><i class="fas fa-user-md text-4xl text-cyan-600 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Aptitud Médica</span></div>
+            <div onclick="entrarCarpeta('Memorandum')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-amber-500 hover:bg-amber-50 transition-all"><i class="fas fa-sticky-note text-4xl text-amber-600 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Memorándum</span></div>
+            <div onclick="entrarCarpeta('Certificados')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-purple-500 hover:bg-purple-50 transition-all"><i class="fas fa-award text-4xl text-purple-600 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Certificados</span></div>
+            ${modoLista === 'pasivos' ? `<div onclick="entrarCarpeta('Desvinculación')" class="folder-card bg-red-50 border-2 border-dashed border-red-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-red-500 hover:bg-red-100 transition-all col-span-1"><i class="fas fa-user-minus text-4xl text-red-600 mb-3"></i><span class="font-bold text-xs uppercase text-red-600">Desvinculación</span></div>` : ''}
+        `;
     }
-    
-    selectS.innerHTML = ops;
-    selectF.innerHTML = '<option value="">Todos los tipos</option>' + ops;
-    renderizarArchivosCarpeta(); 
-}
 
-function renderizarArchivosCarpeta() {
-    const fTipo = document.getElementById('filtroTipoDoc').value.toLowerCase();
-    const fNombre = document.getElementById('filtroNombreArchivo').value.toLowerCase();
-    const fFecha = document.getElementById('filtroFechaDoc').value; // Nuevo filtro
+    function entrarCarpeta(nombreCarpeta) {
+        carpetaActual = nombreCarpeta;
+        document.getElementById('rutaCarpeta').innerText = "> " + nombreCarpeta;
+        document.getElementById('btnRetrocederCarpeta').classList.remove('hidden');
+        document.getElementById('footerSubida').classList.remove('hidden');
+        document.getElementById('barraFiltrosModal').classList.remove('hidden');
+        
+        document.getElementById('contenedorCarpetas').classList.add('hidden');
+        document.getElementById('contenedorArchivos').classList.remove('hidden');
 
-    let docs = documentosCargados.filter(d => {
-        const tipo = d.tipo_documento.toLowerCase();
-        // Lógica de carpetas (se mantiene igual...)
-        if(carpetaActual === 'Contratación') return tipo.includes('contrato') || tipo.includes('entrada') || tipo.includes('sut') || tipo.includes('bancario');
-        if(carpetaActual === 'Vacaciones') return tipo.includes('vacaciones');
-        if(carpetaActual === 'Certificado de competencia') return tipo.includes('competencia');
-        if(carpetaActual === 'Acta de epps') return tipo.includes('epp');
-        if(carpetaActual === 'Certificados medicos') return tipo.includes('medico') || tipo.includes('médico') || tipo.includes('reposo');
-        if(carpetaActual === 'Memorandum') return tipo.includes('memorandum');
-        if(carpetaActual === 'Certificados') return tipo.includes('laboral') || tipo.includes('honorabilidad');
-        if(carpetaActual === 'Desvinculación') return tipo.includes('finiquito') || tipo.includes('pago') || tipo.includes('salida') || tipo.includes('renuncia');
-        return false;
-    });
-    
-    // Aplicar filtros
-    if (fTipo) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fTipo));
-    if (fNombre) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fNombre));
-    if (fFecha) {
-        docs = docs.filter(d => {
-            const fechaDoc = new Date(d.created_at).toISOString().split('T')[0];
-            return fechaDoc === fFecha;
+        const selectS = document.getElementById('tipoDocAdmin');
+        const selectF = document.getElementById('filtroTipoDoc');
+        const contMes = document.getElementById('contenedorMes');
+        const contVac = document.getElementById('contenedorFechasVacaciones');
+
+        let ops = "";
+        if (nombreCarpeta === 'Vacaciones') {
+            ops = '<option value="Vacaciones">Vacaciones</option>';
+            contMes.classList.add('hidden');
+            contVac.classList.remove('hidden');
+        } else {
+            contMes.classList.remove('hidden');
+            contVac.classList.add('hidden');
+            if(nombreCarpeta === 'Contratación') ops = '<option>Contrato de trabajo</option><option>Aviso de entrada</option><option>Extracto SUT</option><option>Certificado bancario</option>';
+            else if(nombreCarpeta === 'Certificado de competencia') ops = '<option>Certificado de competencia</option>';
+            else if(nombreCarpeta === 'Acta de epps') ops = '<option>Acta de epp\'s</option>';
+            else if(nombreCarpeta === 'Certificados medicos') ops = '<option>Certificado médico IESS</option><option>Certificado médico privado</option><option>Certificado médico MSP</option><option>Reposo médico</option>';
+            else if(nombreCarpeta === 'Aptitud Medica') ops = '<option value="INGRESO">APTITUD DE INGRESO</option><option value="PERIODICO">APTITUD PERIÓDICA</option><option value="SALIDA">APTITUD DE SALIDA</option>';
+            else if(nombreCarpeta === 'Memorandum') ops = '<option>Memorandum</option>';
+            else if(nombreCarpeta === 'Certificados') ops = '<option>Laborales</option><option>De honorabilidad</option>';
+            else if(nombreCarpeta === 'Desvinculación') ops = '<option>Acta de finiquito</option><option>Comprobante de pago</option><option>Aviso de salida</option><option>Renuncia</option>';
+        }
+        
+        selectS.innerHTML = ops;
+        selectF.innerHTML = '<option value="">Todos los tipos</option>' + ops;
+        renderizarArchivosCarpeta(); 
+    }
+
+    function renderizarArchivosCarpeta() {
+        const fTipo = document.getElementById('filtroTipoDoc').value.toLowerCase();
+        const fNombre = document.getElementById('filtroNombreArchivo').value.toLowerCase();
+        const fFecha = document.getElementById('filtroFechaDoc').value;
+
+        let docs = documentosCargados.filter(d => {
+            const tipo = d.tipo_documento.toLowerCase();
+            if(carpetaActual === 'Contratación') return tipo.includes('contrato') || tipo.includes('entrada') || tipo.includes('sut') || tipo.includes('bancario');
+            if(carpetaActual === 'Vacaciones') return tipo.includes('vacaciones');
+            if(carpetaActual === 'Certificado de competencia') return tipo.includes('competencia');
+            if(carpetaActual === 'Acta de epps') return tipo.includes('epp');
+            if(carpetaActual === 'Certificados medicos') return (tipo.includes('medico') || tipo.includes('médico') || tipo.includes('reposo')) && !tipo.includes('aptitud');
+            if(carpetaActual === 'Aptitud Medica') return tipo.includes('aptitud');
+            if(carpetaActual === 'Memorandum') return tipo.includes('memorandum');
+            if(carpetaActual === 'Certificados') return tipo.includes('laboral') || tipo.includes('honorabilidad');
+            if(carpetaActual === 'Desvinculación') return tipo.includes('finiquito') || tipo.includes('pago') || tipo.includes('salida') || tipo.includes('renuncia');
+            return false;
         });
+        
+        if (fTipo) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fTipo));
+        if (fNombre) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fNombre));
+        if (fFecha) {
+            docs = docs.filter(d => {
+                const fechaDoc = new Date(d.created_at || d.fecha_subida).toISOString().split('T')[0];
+                return fechaDoc === fFecha;
+            });
+        }
+
+        const grupos = {};
+        docs.forEach(d => {
+            const partes = d.tipo_documento.split(' - ');
+            const mes = partes.length > 1 ? partes[1].toUpperCase() : "GENERAL";
+            if(!grupos[mes]) grupos[mes] = [];
+            grupos[mes].push(d);
+        });
+
+        const mesesPresentes = Object.keys(grupos).sort((a, b) => mesesOrden.indexOf(a) - mesesOrden.indexOf(b));
+
+        document.getElementById('contenedorArchivos').innerHTML = mesesPresentes.map(mes => `
+            <div class="mes-block bg-slate-50/50 p-2 rounded-r-xl mb-4">
+                <h4 class="text-[10px] font-black text-indigo-600 mb-2 px-2 italic">PERIODO: ${mes}</h4>
+                <div class="space-y-2">
+                    ${grupos[mes].map(d => {
+                        const partes = d.tipo_documento.split(' - ');
+                        const fechaRaw = d.created_at || d.fecha_subida;
+                        const fechaFormateada = fechaRaw ? new Date(fechaRaw).toLocaleDateString() : 'S/F';
+                        return `
+                        <div class="flex justify-between items-center p-3 bg-white border border-slate-100 rounded-xl shadow-sm">
+                            <div class="flex items-center gap-3">
+                                <i class="fas fa-file-pdf text-red-500 text-lg"></i>
+                                <div>
+                                    <p class="text-[10px] font-black uppercase text-indigo-900">${partes[0]}</p>
+                                    <p class="text-[9px] text-slate-500 font-bold">📅 FECHA: ${fechaFormateada}</p>
+                                    <p class="text-[8px] text-slate-400 italic truncate max-w-[200px]">${partes[2] || 'Archivo'}</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <a href="${d.url_cloudinary}" target="_blank" class="w-7 h-7 flex items-center justify-center bg-indigo-50 text-indigo-600 rounded-lg"><i class="fas fa-eye text-[10px]"></i></a>
+                                <button onclick="eliminarDoc(${d.id}, '${d.tipo_documento}')" class="w-7 h-7 flex items-center justify-center bg-red-50 text-red-500 rounded-lg"><i class="fas fa-trash text-[10px]"></i></button>
+                            </div>
+                        </div>`;
+                    }).join('')}
+                </div>
+            </div>`).join('') || '<p class="text-center text-slate-400 text-xs py-10">Sin coincidencias</p>';
     }
 
-    const grupos = {};
-    docs.forEach(d => {
-        const partes = d.tipo_documento.split(' - ');
-        const mes = partes.length > 1 ? partes[1].toUpperCase() : "GENERAL";
-        if(!grupos[mes]) grupos[mes] = [];
-        grupos[mes].push(d);
-    });
-
-    const mesesPresentes = Object.keys(grupos).sort((a, b) => mesesOrden.indexOf(a) - mesesOrden.indexOf(b));
-
-    document.getElementById('contenedorArchivos').innerHTML = mesesPresentes.map(mes => `
-        <div class="mes-block bg-slate-50/50 p-2 rounded-r-xl mb-4">
-            <h4 class="text-[10px] font-black text-indigo-600 mb-2 px-2 italic">PERIODO: ${mes}</h4>
-            <div class="space-y-2">
-                ${grupos[mes].map(d => {
-                    const partes = d.tipo_documento.split(' - ');
-                    const fechaFormateada = d.created_at ? new Date(d.created_at).toLocaleDateString() : 'S/F';
-                    return `
-                    <div class="flex justify-between items-center p-3 bg-white border border-slate-100 rounded-xl shadow-sm">
-                        <div class="flex items-center gap-3">
-                            <i class="fas fa-file-pdf text-red-500 text-lg"></i>
-                            <div>
-                                <p class="text-[10px] font-black uppercase text-indigo-900">${partes[0]}</p>
-                                <p class="text-[9px] text-slate-500 font-bold">📅 FECHA: ${fechaFormateada}</p>
-                                <p class="text-[8px] text-slate-400 italic truncate max-w-[200px]">${partes[2] || 'Archivo'}</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-2">
-                            <a href="${d.url_cloudinary}" target="_blank" class="w-7 h-7 flex items-center justify-center bg-indigo-50 text-indigo-600 rounded-lg"><i class="fas fa-eye text-[10px]"></i></a>
-                            <button onclick="eliminarDoc(${d.id})" class="w-7 h-7 flex items-center justify-center bg-red-50 text-red-500 rounded-lg"><i class="fas fa-trash text-[10px]"></i></button>
-                        </div>
-                    </div>`;
-                }).join('')}
-            </div>
-        </div>`).join('') || '<p class="text-center text-slate-400 text-xs py-10">Sin coincidencias</p>';
-}
     // --- LÓGICA DE SUBIDA ---
     function togglePanelSubida() {
         const panel = document.getElementById('panelControlesSubida');
@@ -540,25 +553,32 @@ function renderizarArchivosCarpeta() {
         let tipoFinal = "";
         const docBase = document.getElementById('tipoDocAdmin').value;
         
+        // Determinamos el endpoint basado en la carpeta
+        const esAptitud = carpetaActual === 'Aptitud Medica';
+        const endpoint = esAptitud ? '/doctor/subir-aptitud' : '/admin/subir-a-usuario';
+
         if (carpetaActual === 'Vacaciones') {
             const desde = document.getElementById('vacacionesDesde').value;
             const hasta = document.getElementById('vacacionesHasta').value;
             if(!desde || !hasta) return alert("Seleccione rango de fechas.");
             tipoFinal = `${docBase} - DEL ${desde} AL ${hasta} - ${file.name}`;
+        } else if (esAptitud) {
+            tipoFinal = `Aptitud Médica - ${docBase} - ${file.name}`;
         } else {
             const mesElegido = document.getElementById('periodoMes').value;
             tipoFinal = `${docBase} - ${mesElegido} - ${file.name}`;
         }
 
         const formData = new FormData();
-        formData.append('archivo', file);
+        formData.append('file', file); // 'file' para doctor, el backend lo maneja
+        formData.append('archivo', file); // 'archivo' para admin
         formData.append('tipo_documento', tipoFinal);
         formData.append('usuario_id', idActual);
         formData.append('nombre_user', nombreActual);
         formData.append('es_pasivo', modoLista === 'pasivos');
         formData.append('created_at', fechaDoc); 
 
-        const res = await fetch(`${API_BASE}/admin/subir-a-usuario`, { 
+        const res = await fetch(`${API_BASE}${endpoint}`, { 
             method: 'POST', 
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }, 
             body: formData 
@@ -568,8 +588,7 @@ function renderizarArchivosCarpeta() {
             alert("Subida exitosa.");
             resetearFormularioSubida();
             togglePanelSubida();
-            const r = await fetch(`${API_BASE}/admin/documentos/${idActual}?pasivo=${modoLista==='pasivos'}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
-            documentosCargados = await r.json();
+            await refrescarDocumentos();
             renderizarArchivosCarpeta();
         } else {
             alert("Error en el servidor.");
@@ -584,10 +603,17 @@ function renderizarArchivosCarpeta() {
     }
 
     // --- ELIMINACIÓN Y MODALES ---
-    async function eliminarDoc(id) { 
+    async function eliminarDoc(id, tipoDoc) { 
         if(confirm("¿Eliminar documento?")) { 
-            await fetch(`${API_BASE}/admin/documentos/${id}?pasivo=${modoLista==='pasivos'}`, { method: 'DELETE', headers: {'Authorization': 'Bearer '+localStorage.getItem('token')} }); 
-            documentosCargados = documentosCargados.filter(d => d.id !== id); 
+            const esAptitud = tipoDoc.toLowerCase().includes('aptitud');
+            const endpoint = esAptitud ? `/doctor/aptitud/${id}` : `/admin/documentos/${id}?pasivo=${modoLista==='pasivos'}`;
+            
+            await fetch(`${API_BASE}${endpoint}`, { 
+                method: 'DELETE', 
+                headers: {'Authorization': 'Bearer '+localStorage.getItem('token')} 
+            }); 
+            
+            await refrescarDocumentos();
             renderizarArchivosCarpeta(); 
         } 
     }
@@ -602,47 +628,43 @@ function renderizarArchivosCarpeta() {
     function cerrarModal() { document.getElementById('modalC').classList.add('hidden'); resetearFormularioSubida(); }
 
     // --- GESTIÓN DE TRABAJADORES ---
-async function crearTrabajador() {
-    const formData = new FormData();
-    const fields = ['nombre_completo', 'cedula', 'fecha_ingreso', 'correo', 'celular', 'direccion'];
-    
-    // Validar campos vacíos
-    for (const f of fields) {
-        const val = document.getElementById(f).value.trim();
-        if(!val) return alert(`El campo ${f.replace('_', ' ')} es obligatorio.`);
-        formData.append(f, val);
-    }
-
-    // Validar Correo Verídico
-    const correoVal = document.getElementById('correo').value.trim();
-    if (!validarEmail(correoVal)) {
-        return alert("⚠️ Correo no válido. Por favor, ingrese un correo verídico (Ej: usuario@gmail.com, @outlook.com o @isertel.com.ec).");
-    }
-
-    const foto = document.getElementById('foto_usuario').files[0];
-    if(!foto) return alert("La foto es obligatoria para el registro.");
-    formData.append('foto', foto);
-
-    try {
-        const res = await fetch(`${API_BASE}/admin/crear-usuario`, { 
-            method: 'POST', 
-            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }, 
-            body: formData 
-        });
-        if(res.ok) {
-            alert("Colaborador registrado exitosamente.");
-            location.reload();
-        } else {
-            alert("Error al registrar. Verifique si la cédula ya existe.");
+    async function crearTrabajador() {
+        const formData = new FormData();
+        const fields = ['nombre_completo', 'cedula', 'fecha_ingreso', 'correo', 'celular', 'direccion'];
+        
+        for (const f of fields) {
+            const val = document.getElementById(f).value.trim();
+            if(!val) return alert(`El campo ${f.replace('_', ' ')} es obligatorio.`);
+            formData.append(f, val);
         }
-    } catch (error) {
-        alert("Error de conexión con el servidor.");
+
+        const correoVal = document.getElementById('correo').value.trim();
+        if (!validarEmail(correoVal)) {
+            return alert("⚠️ Correo no válido.");
+        }
+
+        const foto = document.getElementById('foto_usuario').files[0];
+        if(!foto) return alert("La foto es obligatoria.");
+        formData.append('foto', foto);
+
+        try {
+            const res = await fetch(`${API_BASE}/admin/crear-usuario`, { 
+                method: 'POST', 
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }, 
+                body: formData 
+            });
+            if(res.ok) { alert("Colaborador registrado."); location.reload(); }
+            else { alert("Error al registrar."); }
+        } catch (error) { alert("Error de conexión."); }
     }
-}
 
-    async function transformarPasivo(id) { if(confirm("¿Dar de baja?")) { await fetch(`${API_BASE}/admin/mover-a-pasivo/${id}`, { method: 'POST', headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } }); cargarListaEmpleados(); } }
+    async function transformarPasivo(id) { 
+        if(confirm("¿Dar de baja?")) { 
+            await fetch(`${API_BASE}/admin/mover-a-pasivo/${id}`, { method: 'POST', headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } }); 
+            cargarListaEmpleados(); 
+        } 
+    }
 
-    // --- SECCIONES EXTRA ---
     function cargarSeccionEmpresa() { document.getElementById('menuPrincipal').classList.add('hidden'); document.getElementById('seccionEmpresa').classList.remove('hidden'); document.getElementById('btnVolver').classList.remove('hidden'); }
     function cargarSeccionGestionEmpresarial() { document.getElementById('menuPrincipal').classList.add('hidden'); document.getElementById('seccionGestionEmpresarial').classList.remove('hidden'); document.getElementById('btnVolver').classList.remove('hidden'); cargarListaEmpresa(); }
     async function cargarListaEmpresa() {
