@@ -101,10 +101,13 @@
                                 <label class="text-[9px] font-bold text-slate-400 mb-1">APELLIDOS Y NOMBRES</label>
                                 <input type="text" id="nombre_completo" oninput="formatearNombre(this)" placeholder="Ej: RUALES JIMENEZ JUAN" class="p-2 border rounded-lg text-sm bg-slate-50 font-bold outline-none focus:ring-2 focus:ring-indigo-500">
                             </div>
-                            <div class="flex flex-col">
-                                <label class="text-[9px] font-bold text-slate-400 mb-1">CÉDULA (10 DÍGITOS)</label>
-                                <input type="text" id="cedula" maxlength="10" placeholder="1722..." class="p-2 border rounded-lg text-sm font-bold bg-indigo-50 outline-none focus:ring-2 focus:ring-indigo-500">
-                            </div>
+<div class="flex flex-col">
+    <label class="text-[9px] font-bold text-slate-400 mb-1">CÉDULA (10 DÍGITOS)</label>
+    <input type="text" id="cedula" maxlength="10" 
+           oninput="this.value = this.value.replace(/[^0-9]/g, '')" 
+           placeholder="1722..." 
+           class="p-2 border rounded-lg text-sm font-bold bg-indigo-50 outline-none focus:ring-2 focus:ring-indigo-500">
+</div>
                             <div class="flex flex-col">
                                 <label class="text-[9px] font-bold text-slate-400 mb-1">FECHA DE INGRESO</label>
                                 <input type="date" id="fecha_ingreso" class="p-2 border rounded-lg text-sm font-bold bg-white outline-none focus:ring-2 focus:ring-indigo-500">
@@ -223,11 +226,12 @@
             <button onclick="cerrarModal()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-50 text-slate-400 hover:text-red-500 font-bold text-xl">&times;</button>
         </div>
 
-        <div id="barraFiltrosModal" class="hidden px-5 py-2 bg-white border-b flex flex-wrap gap-2 items-center shrink-0">
-            <select id="filtroTipoDoc" onchange="renderizarArchivosCarpeta()" class="flex-1 min-w-[150px] p-2 border rounded-lg text-[10px] font-bold uppercase bg-slate-50 outline-none"></select>
-            <input type="text" id="filtroNombreArchivo" onkeyup="renderizarArchivosCarpeta()" placeholder="BUSCAR..." class="flex-1 min-w-[150px] p-2 border rounded-lg text-[10px] font-bold outline-none bg-slate-50 uppercase">
-            <button onclick="limpiarFiltrosModal()" class="text-slate-400 hover:text-red-500 p-2"><i class="fas fa-undo-alt text-xs"></i></button>
-        </div>
+<div id="barraFiltrosModal" class="hidden px-5 py-2 bg-white border-b flex flex-wrap gap-2 items-center shrink-0">
+    <select id="filtroTipoDoc" onchange="renderizarArchivosCarpeta()" class="flex-1 min-w-[150px] p-2 border rounded-lg text-[10px] font-bold uppercase bg-slate-50 outline-none"></select>
+    <input type="date" id="filtroFechaDoc" onchange="renderizarArchivosCarpeta()" class="p-2 border rounded-lg text-[10px] font-bold bg-slate-50 outline-none">
+    <input type="text" id="filtroNombreArchivo" onkeyup="renderizarArchivosCarpeta()" placeholder="BUSCAR..." class="flex-1 min-w-[150px] p-2 border rounded-lg text-[10px] font-bold outline-none bg-slate-50 uppercase">
+    <button onclick="limpiarFiltrosModal()" class="text-slate-400 hover:text-red-500 p-2"><i class="fas fa-undo-alt text-xs"></i></button>
+</div>
 
         <div id="lDocs" class="p-5 overflow-y-auto flex-1 bg-white min-h-[300px]">
             <div id="contenedorCarpetas" class="grid grid-cols-2 gap-4"></div>
@@ -443,9 +447,11 @@ function entrarCarpeta(nombreCarpeta) {
 function renderizarArchivosCarpeta() {
     const fTipo = document.getElementById('filtroTipoDoc').value.toLowerCase();
     const fNombre = document.getElementById('filtroNombreArchivo').value.toLowerCase();
+    const fFecha = document.getElementById('filtroFechaDoc').value; // Nuevo filtro
 
     let docs = documentosCargados.filter(d => {
         const tipo = d.tipo_documento.toLowerCase();
+        // Lógica de carpetas (se mantiene igual...)
         if(carpetaActual === 'Contratación') return tipo.includes('contrato') || tipo.includes('entrada') || tipo.includes('sut') || tipo.includes('bancario');
         if(carpetaActual === 'Vacaciones') return tipo.includes('vacaciones');
         if(carpetaActual === 'Certificado de competencia') return tipo.includes('competencia');
@@ -457,8 +463,15 @@ function renderizarArchivosCarpeta() {
         return false;
     });
     
+    // Aplicar filtros
     if (fTipo) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fTipo));
     if (fNombre) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fNombre));
+    if (fFecha) {
+        docs = docs.filter(d => {
+            const fechaDoc = new Date(d.created_at).toISOString().split('T')[0];
+            return fechaDoc === fFecha;
+        });
+    }
 
     const grupos = {};
     docs.forEach(d => {
@@ -476,13 +489,15 @@ function renderizarArchivosCarpeta() {
             <div class="space-y-2">
                 ${grupos[mes].map(d => {
                     const partes = d.tipo_documento.split(' - ');
+                    const fechaFormateada = d.created_at ? new Date(d.created_at).toLocaleDateString() : 'S/F';
                     return `
                     <div class="flex justify-between items-center p-3 bg-white border border-slate-100 rounded-xl shadow-sm">
                         <div class="flex items-center gap-3">
                             <i class="fas fa-file-pdf text-red-500 text-lg"></i>
                             <div>
                                 <p class="text-[10px] font-black uppercase text-indigo-900">${partes[0]}</p>
-                                <p class="text-[9px] text-slate-500 italic truncate max-w-[200px]">${partes[2] || 'Archivo'}</p>
+                                <p class="text-[9px] text-slate-500 font-bold">📅 FECHA: ${fechaFormateada}</p>
+                                <p class="text-[8px] text-slate-400 italic truncate max-w-[200px]">${partes[2] || 'Archivo'}</p>
                             </div>
                         </div>
                         <div class="flex gap-2">
@@ -492,7 +507,7 @@ function renderizarArchivosCarpeta() {
                     </div>`;
                 }).join('')}
             </div>
-        </div>`).join('') || '<p class="text-center text-slate-400 text-xs py-10">Carpeta vacía o sin coincidencias</p>';
+        </div>`).join('') || '<p class="text-center text-slate-400 text-xs py-10">Sin coincidencias</p>';
 }
     // --- LÓGICA DE SUBIDA ---
     function togglePanelSubida() {
@@ -587,21 +602,43 @@ function renderizarArchivosCarpeta() {
     function cerrarModal() { document.getElementById('modalC').classList.add('hidden'); resetearFormularioSubida(); }
 
     // --- GESTIÓN DE TRABAJADORES ---
-    async function crearTrabajador() {
-        const formData = new FormData();
-        const fields = ['nombre_completo', 'cedula', 'fecha_ingreso', 'correo', 'celular', 'direccion'];
-        for (const f of fields) {
-            const val = document.getElementById(f).value.trim();
-            if(!val) return alert(`Campo ${f} obligatorio`);
-            formData.append(f, val);
-        }
-        const foto = document.getElementById('foto_usuario').files[0];
-        if(!foto) return alert("Foto obligatoria");
-        formData.append('foto', foto);
-
-        const res = await fetch(`${API_BASE}/admin/crear-usuario`, { method: 'POST', headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }, body: formData });
-        if(res.ok) location.reload();
+async function crearTrabajador() {
+    const formData = new FormData();
+    const fields = ['nombre_completo', 'cedula', 'fecha_ingreso', 'correo', 'celular', 'direccion'];
+    
+    // Validar campos vacíos
+    for (const f of fields) {
+        const val = document.getElementById(f).value.trim();
+        if(!val) return alert(`El campo ${f.replace('_', ' ')} es obligatorio.`);
+        formData.append(f, val);
     }
+
+    // Validar Correo Verídico
+    const correoVal = document.getElementById('correo').value.trim();
+    if (!validarEmail(correoVal)) {
+        return alert("⚠️ Correo no válido. Por favor, ingrese un correo verídico (Ej: usuario@gmail.com, @outlook.com o @isertel.com.ec).");
+    }
+
+    const foto = document.getElementById('foto_usuario').files[0];
+    if(!foto) return alert("La foto es obligatoria para el registro.");
+    formData.append('foto', foto);
+
+    try {
+        const res = await fetch(`${API_BASE}/admin/crear-usuario`, { 
+            method: 'POST', 
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }, 
+            body: formData 
+        });
+        if(res.ok) {
+            alert("Colaborador registrado exitosamente.");
+            location.reload();
+        } else {
+            alert("Error al registrar. Verifique si la cédula ya existe.");
+        }
+    } catch (error) {
+        alert("Error de conexión con el servidor.");
+    }
+}
 
     async function transformarPasivo(id) { if(confirm("¿Dar de baja?")) { await fetch(`${API_BASE}/admin/mover-a-pasivo/${id}`, { method: 'POST', headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } }); cargarListaEmpleados(); } }
 
