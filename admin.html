@@ -426,7 +426,7 @@ function entrarCarpeta(nombreCarpeta) {
     } else {
         contMes.classList.remove('hidden');
         contVac.classList.add('hidden');
-        if(nombreCarpeta === 'Contratación') ops = '<option>Contrato de trabajo</option><option>Aviso de entrada</option><option>Extracto SUT</option>';
+        if(nombreCarpeta === 'Contratación') ops = '<option>Contrato de trabajo</option><option>Aviso de entrada</option><option>Extracto SUT</option><option>Certificado bancario</option>';
         else if(nombreCarpeta === 'Certificado de competencia') ops = '<option>Certificado de competencia</option>';
         else if(nombreCarpeta === 'Acta de epps') ops = '<option>Acta de epp\'s</option>';
         else if(nombreCarpeta === 'Certificados medicos') ops = '<option>Certificado médico IESS</option><option>Certificado médico privado</option><option>Certificado médico MSP</option><option>Reposo médico</option>';
@@ -446,7 +446,7 @@ function renderizarArchivosCarpeta() {
 
     let docs = documentosCargados.filter(d => {
         const tipo = d.tipo_documento.toLowerCase();
-        if(carpetaActual === 'Contratación') return tipo.includes('contrato') || tipo.includes('entrada') || tipo.includes('sut');
+        if(carpetaActual === 'Contratación') return tipo.includes('contrato') || tipo.includes('entrada') || tipo.includes('sut') || tipo.includes('bancario');
         if(carpetaActual === 'Vacaciones') return tipo.includes('vacaciones');
         if(carpetaActual === 'Certificado de competencia') return tipo.includes('competencia');
         if(carpetaActual === 'Acta de epps') return tipo.includes('epp');
