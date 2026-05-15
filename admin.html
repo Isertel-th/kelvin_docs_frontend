@@ -281,9 +281,9 @@
                         </button>
                     </div>
                 </div>
-<button id="btnGuardarFinal" onclick="ejecutarSubidaFinal()" class="w-full bg-emerald-600 text-white py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-700 shadow-md">
-    Subir a la Base de Datos
-</button>
+                <button onclick="ejecutarSubidaFinal()" class="w-full bg-emerald-600 text-white py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-700 shadow-md">
+                    Subir a la Base de Datos
+                </button>
             </div>
         </div>
     </div>
@@ -559,9 +559,6 @@ async function refrescarDocumentos() {
 async function ejecutarSubidaFinal() {
     const file = document.getElementById('fileInput').files[0];
     const fechaDoc = document.getElementById('fechaManualDoc').value;
-
-    const btn = document.getElementById('btnGuardarFinal'); // Referencia al botón
-
     if(!file || !fechaDoc) return alert("Complete la fecha y adjunte el archivo.");
 
     let tipoFinal = "";
@@ -618,14 +615,7 @@ async function ejecutarSubidaFinal() {
             alert("Error en el servidor: " + (errorData.error || "Desconocido"));
         }
     } catch (e) {
-alert("Error de conexión: " + e.message);
-    } finally {
-        // --- DESBLOQUEO DEL BOTÓN ---
-        // Se ejecuta siempre, incluso si hay error, para que el usuario pueda reintentar
-        btn.disabled = false;
-        btn.innerText = "Subir a la Base de Datos";
-        btn.classList.replace('bg-slate-400', 'bg-emerald-600');
-        // ----------------------------
+        alert("Error de conexión: " + e.message);
     }
 }
 
