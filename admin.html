@@ -404,7 +404,7 @@ async function refrescarDocumentos() {
     }
 }
 
-    function renderizarVistaCarpetas() {
+function renderizarVistaCarpetas() {
         carpetaActual = null;
         document.getElementById('rutaCarpeta').innerText = "";
         document.getElementById('btnRetrocederCarpeta').classList.add('hidden');
@@ -425,10 +425,12 @@ async function refrescarDocumentos() {
             <div onclick="entrarCarpeta('Aptitud Medica')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-cyan-500 hover:bg-cyan-50 transition-all"><i class="fas fa-user-md text-4xl text-cyan-600 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Aptitud Médica</span></div>
             <div onclick="entrarCarpeta('Memorandum')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-amber-500 hover:bg-amber-50 transition-all"><i class="fas fa-sticky-note text-4xl text-amber-600 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Memorándum</span></div>
             <div onclick="entrarCarpeta('Certificados')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-purple-500 hover:bg-purple-50 transition-all"><i class="fas fa-award text-4xl text-purple-600 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Certificados</span></div>
+            
+            <div onclick="entrarCarpeta('Cargas Familiares')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-pink-500 hover:bg-pink-50 transition-all"><i class="fas fa-users text-4xl text-pink-600 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Cargas Familiares</span></div>
+            
             ${modoLista === 'pasivos' ? `<div onclick="entrarCarpeta('Desvinculación')" class="folder-card bg-red-50 border-2 border-dashed border-red-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-red-500 hover:bg-red-100 transition-all col-span-1"><i class="fas fa-user-minus text-4xl text-red-600 mb-3"></i><span class="font-bold text-xs uppercase text-red-600">Desvinculación</span></div>` : ''}
         `;
     }
-
     function entrarCarpeta(nombreCarpeta) {
         carpetaActual = nombreCarpeta;
         document.getElementById('rutaCarpeta').innerText = "> " + nombreCarpeta;
@@ -460,6 +462,8 @@ async function refrescarDocumentos() {
             else if(nombreCarpeta === 'Memorandum') ops = '<option>Memorandum</option>';
             else if(nombreCarpeta === 'Certificados') ops = '<option>Laborales</option><option>De honorabilidad</option>';
             else if(nombreCarpeta === 'Desvinculación') ops = '<option>Acta de finiquito</option><option>Comprobante de pago</option><option>Aviso de salida</option><option>Renuncia</option>';
+        // Opciones de sub-tipos para la nueva carpeta
+            else if(nombreCarpeta === 'Cargas Familiares') ops = '<option>Cédula de Carga</option><option>Acta de Nacimiento</option><option>Certificado de Matrimonio/Unión de Hecho</option><option>Formulario de Registro</option>';
         }
         
         selectS.innerHTML = ops;
@@ -483,6 +487,7 @@ async function refrescarDocumentos() {
             if(carpetaActual === 'Memorandum') return tipo.includes('memorandum');
             if(carpetaActual === 'Certificados') return tipo.includes('laboral') || tipo.includes('honorabilidad');
             if(carpetaActual === 'Desvinculación') return tipo.includes('finiquito') || tipo.includes('pago') || tipo.includes('salida') || tipo.includes('renuncia');
+            if(carpetaActual === 'Cargas Familiares') return tipo.includes('carga') || tipo.includes('nacimiento') || tipo.includes('matrimonio') || tipo.includes('unión') || tipo.includes('formulario');
             return false;
         });
         
