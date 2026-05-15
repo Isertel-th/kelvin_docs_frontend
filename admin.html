@@ -379,19 +379,37 @@
         await refrescarDocumentos();
     }
 
-    async function refrescarDocumentos() {
-        // Obtenemos documentos generales
-        const resDocs = await fetch(`${API_BASE}/admin/documentos/${idActual}?pasivo=${modoLista==='pasivos'}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+async function refrescarDocumentos() {
+    const token = localStorage.getItem('token');
+    const esPasivo = modoLista === 'pasivos';
+
+    try {
+        // 1. Obtenemos documentos generales y médicos
+        const resDocs = await fetch(`${API_BASE}/admin/documentos/${idActual}?pasivo=${esPasivo}`, { 
+            headers: { 'Authorization': 'Bearer ' + token } 
+        });
         const docsGenerales = await resDocs.json();
 
-        // Obtenemos documentos de la tabla certificados_aptitud (como el doctor)
-        const resApt = await fetch(`${API_BASE}/doctor/aptitud/${idActual}?esPasivo=${modoLista==='pasivos'}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+        // 2. Obtenemos documentos de aptitud médica
+        const resApt = await fetch(`${API_BASE}/doctor/aptitud/${idActual}?pasivo=${esPasivo}`, { 
+            headers: { 'Authorization': 'Bearer ' + token } 
+        });
         const docsAptitud = await resApt.json();
 
-        // Combinamos ambos para la búsqueda y renderizado
-        documentosCargados = [...docsGenerales, ...docsAptitud];
+        // 3. NUEVO: Obtenemos documentos de Kelvin (Competencias y EPPs)
+        const resKelvin = await fetch(`${API_BASE}/kelvin/documentos/${idActual}`, { 
+            headers: { 'Authorization': 'Bearer ' + token } 
+        });
+        const docsKelvin = await resKelvin.json();
+
+        // Combinamos todos los arrays en uno solo
+        documentosCargados = [...docsGenerales, ...docsAptitud, ...docsKelvin];
+        
         renderizarVistaCarpetas();
+    } catch (error) {
+        console.error("Error al refrescar documentos:", error);
     }
+}
 
     function renderizarVistaCarpetas() {
         carpetaActual = null;
