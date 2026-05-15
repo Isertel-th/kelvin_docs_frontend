@@ -12,6 +12,29 @@
         .tab-content.active { display: block; animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         body { background-color: #f1f5f9; font-family: 'Inter', sans-serif; }
+    
+    /* Esto hace que el área de archivos tenga scroll y no empuje el botón hacia afuera */
+#lAptDocs {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    min-height: 200px;
+    max-height: 60vh; /* Ajusta el alto al 60% de la pantalla */
+    scrollbar-width: thin;
+}
+
+/* Asegura que el modal sea una columna flexible que respete el tamaño de la pantalla */
+#modalAptitud > div {
+    display: flex;
+    flex-direction: column;
+    max-height: 95vh; 
+}
+
+/* Evita que el footer se haga pequeño */
+#footerSubidaAptitud {
+    shrink: 0;
+    flex-shrink: 0;
+}
+    
     </style>
 </head>
 <body class="flex min-h-screen">
@@ -171,11 +194,11 @@
             <button onclick="limpiarFiltrosAptitud()" class="text-slate-400 hover:text-red-500 p-2"><i class="fas fa-undo-alt text-xs"></i></button>
         </div>
 
-        <div id="lAptDocs" class="p-5 overflow-y-auto flex-1 bg-white min-h-[300px]">
-            </div>
+<div id="lAptDocs" class="p-5 overflow-y-auto flex-1 bg-white">
+    </div>
 
-<div id="footerSubidaAptitud" class="hidden p-6 bg-slate-50 border-t">
-    <div class="flex justify-center mb-6">
+<div id="footerSubidaAptitud" class="hidden p-6 bg-slate-50 border-t shrink-0">
+        <div class="flex justify-center mb-6">
         <button id="btnAbrirPanel" onclick="togglePanelSubida()" class="bg-indigo-600 text-white px-8 py-3 rounded-2xl font-black text-xs hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all uppercase tracking-widest">
             <i class="fas fa-plus-circle mr-2"></i> Subir Archivo
         </button>
