@@ -379,19 +379,29 @@
         await refrescarDocumentos();
     }
 
-    async function refrescarDocumentos() {
-        // Obtenemos documentos generales
-        const resDocs = await fetch(`${API_BASE}/admin/documentos/${idActual}?pasivo=${modoLista==='pasivos'}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
-        const docsGenerales = await resDocs.json();
+async function refrescarDocumentos() {
+    // 1. Documentos generales
+    const resDocs = await fetch(`${API_BASE}/admin/documentos/${idActual}?pasivo=${modoLista==='pasivos'}`, { 
+        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } 
+    });
+    const docsGenerales = await resDocs.json();
 
-        // Obtenemos documentos de la tabla certificados_aptitud (como el doctor)
-        const resApt = await fetch(`${API_BASE}/doctor/aptitud/${idActual}?esPasivo=${modoLista==='pasivos'}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
-        const docsAptitud = await resApt.json();
+    // 2. Documentos de Aptitud (Doctor)
+    const resApt = await fetch(`${API_BASE}/doctor/aptitud/${idActual}?esPasivo=${modoLista==='pasivos'}`, { 
+        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } 
+    });
+    const docsAptitud = await resApt.json();
 
-        // Combinamos ambos para la búsqueda y renderizado
-        documentosCargados = [...docsGenerales, ...docsAptitud];
-        renderizarVistaCarpetas();
-    }
+    // 3. NUEVO: Documentos de Competencia y EPPs (Kelvin)
+    const resKelvin = await fetch(`${API_BASE}/api/kelvin/documentos/${idActual}`, { 
+        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } 
+    });
+    const docsKelvin = resKelvin.ok ? await resKelvin.json() : [];
+
+    // Combinamos todos
+    documentosCargados = [...docsGenerales, ...docsAptitud, ...docsKelvin];
+    renderizarVistaCarpetas();
+}
 
     function renderizarVistaCarpetas() {
         carpetaActual = null;
@@ -546,59 +556,71 @@
     });
 
 async function ejecutarSubidaFinal() {
-        const file = document.getElementById('fileInput').files[0];
-        const fechaDoc = document.getElementById('fechaManualDoc').value;
-        if(!file || !fechaDoc) return alert("Complete la fecha y adjunte el archivo.");
+    const file = document.getElementById('fileInput').files[0];
+    const fechaDoc = document.getElementById('fechaManualDoc').value;
+    if(!file || !fechaDoc) return alert("Complete la fecha y adjunte el archivo.");
 
-        let tipoFinal = "";
-        const docBase = document.getElementById('tipoDocAdmin').value;
-        
-        const esAptitud = carpetaActual === 'Aptitud Medica';
-        const endpoint = esAptitud ? '/doctor/subir-aptitud' : '/admin/subir-a-usuario';
+    let tipoFinal = "";
+    const docBase = document.getElementById('tipoDocAdmin').value;
+    
+    // Identificamos las carpetas especiales
+    const esAptitud = carpetaActual === 'Aptitud Medica';
+    const esKelvinTabla = carpetaActual === 'Certificado de competencia' || carpetaActual === 'Acta de epps';
 
-        if (carpetaActual === 'Vacaciones') {
-            const desde = document.getElementById('vacacionesDesde').value;
-            const hasta = document.getElementById('vacacionesHasta').value;
-            if(!desde || !hasta) return alert("Seleccione rango de fechas.");
-            tipoFinal = `${docBase} - DEL ${desde} AL ${hasta} - ${file.name}`;
-        } else if (esAptitud) {
-            tipoFinal = `Aptitud Médica - ${docBase} - ${file.name}`;
-        } else {
-            const mesElegido = document.getElementById('periodoMes').value;
-            tipoFinal = `${docBase} - ${mesElegido} - ${file.name}`;
-        }
+    // Definimos el endpoint según la carpeta
+    let endpoint = '/admin/subir-a-usuario'; // Default
 
-        const formData = new FormData();
-        // IMPORTANTE: Solo usamos 'archivo' para evitar el MulterError
-        formData.append('archivo', file); 
-        
-        formData.append('tipo_documento', tipoFinal);
-        formData.append('usuario_id', idActual);
-        formData.append('nombre_user', nombreActual);
-        formData.append('es_pasivo', modoLista === 'pasivos');
-        formData.append('created_at', fechaDoc); 
-
-        try {
-            const res = await fetch(`${API_BASE}${endpoint}`, { 
-                method: 'POST', 
-                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }, 
-                body: formData 
-            });
-            
-            if(res.ok) {
-                alert("Subida exitosa.");
-                resetearFormularioSubida();
-                togglePanelSubida();
-                await refrescarDocumentos();
-                renderizarArchivosCarpeta();
-            } else {
-                const errorData = await res.json();
-                alert("Error en el servidor: " + (errorData.error || "Desconocido"));
-            }
-        } catch (e) {
-            alert("Error de conexión: " + e.message);
-        }
+    if (esAptitud) {
+        endpoint = '/doctor/subir-aptitud';
+    } else if (esKelvinTabla) {
+        // Esta es la ruta que configuramos en el server.js para certifi_competencia y acta_epps
+        endpoint = '/api/kelvin/subir-documento'; 
     }
+
+    // Construcción del nombre/tipo para el registro
+    if (carpetaActual === 'Vacaciones') {
+        const desde = document.getElementById('vacacionesDesde').value;
+        const hasta = document.getElementById('vacacionesHasta').value;
+        if(!desde || !hasta) return alert("Seleccione rango de fechas.");
+        tipoFinal = `${docBase} - DEL ${desde} AL ${hasta} - ${file.name}`;
+    } else if (esAptitud) {
+        tipoFinal = `Aptitud Médica - ${docBase} - ${file.name}`;
+    } else {
+        const mesElegido = document.getElementById('periodoMes').value;
+        tipoFinal = `${docBase} - ${mesElegido} - ${file.name}`;
+    }
+
+    const formData = new FormData();
+    formData.append('archivo', file); 
+    formData.append('tipo_documento', tipoFinal);
+    formData.append('usuario_id', idActual);
+    formData.append('nombre_user', nombreActual);
+    formData.append('es_pasivo', modoLista === 'pasivos');
+    formData.append('created_at', fechaDoc); 
+
+    try {
+        // Si el endpoint es de Kelvin, la URL base cambia ligeramente si no está bajo /api
+        // Pero como tu API_BASE ya termina en /api, se concatena correctamente
+        const res = await fetch(`${API_BASE}${endpoint}`, { 
+            method: 'POST', 
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }, 
+            body: formData 
+        });
+        
+        if(res.ok) {
+            alert("Subida exitosa a la tabla correspondiente.");
+            resetearFormularioSubida();
+            togglePanelSubida();
+            await refrescarDocumentos();
+            renderizarArchivosCarpeta();
+        } else {
+            const errorData = await res.json();
+            alert("Error en el servidor: " + (errorData.error || "Desconocido"));
+        }
+    } catch (e) {
+        alert("Error de conexión: " + e.message);
+    }
+}
 
     function resetearFormularioSubida() {
         document.getElementById('fileInput').value = "";
