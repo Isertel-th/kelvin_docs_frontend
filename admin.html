@@ -545,7 +545,7 @@
         }
     });
 
-    async function ejecutarSubidaFinal() {
+async function ejecutarSubidaFinal() {
         const file = document.getElementById('fileInput').files[0];
         const fechaDoc = document.getElementById('fechaManualDoc').value;
         if(!file || !fechaDoc) return alert("Complete la fecha y adjunte el archivo.");
@@ -553,7 +553,6 @@
         let tipoFinal = "";
         const docBase = document.getElementById('tipoDocAdmin').value;
         
-        // Determinamos el endpoint basado en la carpeta
         const esAptitud = carpetaActual === 'Aptitud Medica';
         const endpoint = esAptitud ? '/doctor/subir-aptitud' : '/admin/subir-a-usuario';
 
@@ -570,28 +569,34 @@
         }
 
         const formData = new FormData();
-        formData.append('file', file); // 'file' para doctor, el backend lo maneja
-        formData.append('archivo', file); // 'archivo' para admin
+        // IMPORTANTE: Solo usamos 'archivo' para evitar el MulterError
+        formData.append('archivo', file); 
+        
         formData.append('tipo_documento', tipoFinal);
         formData.append('usuario_id', idActual);
         formData.append('nombre_user', nombreActual);
         formData.append('es_pasivo', modoLista === 'pasivos');
         formData.append('created_at', fechaDoc); 
 
-        const res = await fetch(`${API_BASE}${endpoint}`, { 
-            method: 'POST', 
-            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }, 
-            body: formData 
-        });
-        
-        if(res.ok) {
-            alert("Subida exitosa.");
-            resetearFormularioSubida();
-            togglePanelSubida();
-            await refrescarDocumentos();
-            renderizarArchivosCarpeta();
-        } else {
-            alert("Error en el servidor.");
+        try {
+            const res = await fetch(`${API_BASE}${endpoint}`, { 
+                method: 'POST', 
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }, 
+                body: formData 
+            });
+            
+            if(res.ok) {
+                alert("Subida exitosa.");
+                resetearFormularioSubida();
+                togglePanelSubida();
+                await refrescarDocumentos();
+                renderizarArchivosCarpeta();
+            } else {
+                const errorData = await res.json();
+                alert("Error en el servidor: " + (errorData.error || "Desconocido"));
+            }
+        } catch (e) {
+            alert("Error de conexión: " + e.message);
         }
     }
 
