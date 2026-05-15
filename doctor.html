@@ -493,7 +493,17 @@
         let docs = aptitudDocs.filter(d => pClave.some(p => d.tipo_documento.toLowerCase().includes(p)));
 
         if (fTipo) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fTipo));
-        if (fFecha) docs = docs.filter(d => d.created_at.startsWith(fFecha));
+        if (fFecha) {
+    docs = docs.filter(d => {
+        // Usamos fecha_documento que es lo que viene del calendario de subida
+        const fechaDocRaw = d.fecha_documento || d.created_at; 
+        if (!fechaDocRaw) return false;
+        
+        // Normalizamos ambas fechas a formato YYYY-MM-DD para que coincidan
+        const fechaDocFormateada = new Date(fechaDocRaw).toISOString().split('T')[0];
+        return fechaDocFormateada === fFecha;
+    });
+}
         if (fNombre) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fNombre));
 
         const contenedor = document.getElementById('lAptDocs');
@@ -519,8 +529,11 @@ contenedor.innerHTML = mesesPresentes.map(mes => `
             ${grupos[mes].map(d => {
                 const partes = d.tipo_documento.split(' - ');
                 // 1. Procesamos la fecha
-                const fechaFormat = d.fecha_documento ? new Date(d.fecha_documento).toLocaleDateString('es-EC', {timeZone: 'UTC'}) : 'Sin fecha';
-                
+// Dentro del .map de grupos[mes]...
+const fechaFormat = d.fecha_documento 
+    ? new Date(d.fecha_documento).toLocaleDateString('es-EC', {timeZone: 'UTC'}) 
+    : (d.created_at ? new Date(d.created_at).toLocaleDateString('es-EC') : 'Sin fecha');
+                    
                 return `
                 <div class="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:bg-white hover:shadow-md transition-all group">
                     <div class="flex items-center gap-3">
