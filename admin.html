@@ -207,51 +207,48 @@
             </div>
         </div>
 
-<div id="modalC" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4">
-    <div class="bg-white w-full max-w-3xl rounded-3xl shadow-2xl overflow-hidden animate-fade-in flex flex-col max-h-[95vh]">
+<div id="modalC" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-3xl rounded-3xl shadow-2xl overflow-hidden animate-fade-in flex flex-col max-h-[90vh]">
         
-        <div class="p-4 bg-slate-50 border-b flex justify-between items-center shrink-0">
+        <div class="p-5 bg-slate-50 border-b flex justify-between items-center shrink-0">
             <div class="flex items-center gap-3">
                 <button id="btnRetrocederCarpeta" onclick="renderizarVistaCarpetas()" class="hidden bg-white border border-slate-200 p-2 rounded-xl hover:bg-slate-100 shadow-sm">
-                    <i class="fas fa-arrow-left text-slate-600 text-xs"></i>
+                    <i class="fas fa-arrow-left text-slate-600"></i>
                 </button>
-                <h3 class="font-bold text-slate-800 uppercase text-[11px] sm:text-sm tracking-tight">
-                    📂 <span id="nEmp" class="text-indigo-600"></span> 
-                    <span id="rutaCarpeta" class="text-slate-400 ml-1 font-normal"></span>
+                <h3 class="font-bold text-slate-800 uppercase text-xs tracking-tight">
+                    📂 EXPEDIENTE: <span id="nEmp" class="text-indigo-600"></span> 
+                    <span id="rutaCarpeta" class="text-slate-400 ml-2 font-normal"></span>
                 </h3>
             </div>
             <button onclick="cerrarModal()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-50 text-slate-400 hover:text-red-500 font-bold text-xl">&times;</button>
         </div>
 
-        <div id="barraFiltrosModal" class="hidden px-4 py-2 bg-white border-b flex flex-wrap gap-2 items-center shrink-0">
-            <div class="flex-1 min-w-[100px]">
-                <select id="filtroTipoDoc" onchange="renderizarArchivosCarpeta()" class="w-full p-1.5 border rounded-lg text-[9px] font-bold uppercase bg-slate-50 outline-none"></select>
-            </div>
-            <div class="flex-1 min-w-[100px]">
-                <input type="text" id="filtroNombreArchivo" onkeyup="renderizarArchivosCarpeta()" placeholder="BUSCAR..." class="w-full p-1.5 border rounded-lg text-[9px] font-bold outline-none bg-slate-50 uppercase">
-            </div>
-            <button onclick="limpiarFiltrosModal()" class="text-slate-400 hover:text-red-500 p-1"><i class="fas fa-undo-alt text-[10px]"></i></button>
+        <div id="barraFiltrosModal" class="hidden px-5 py-2 bg-white border-b flex flex-wrap gap-2 items-center shrink-0">
+            <select id="filtroTipoDoc" onchange="renderizarArchivosCarpeta()" class="flex-1 min-w-[150px] p-2 border rounded-lg text-[10px] font-bold uppercase bg-slate-50 outline-none"></select>
+            <input type="text" id="filtroNombreArchivo" onkeyup="renderizarArchivosCarpeta()" placeholder="BUSCAR..." class="flex-1 min-w-[150px] p-2 border rounded-lg text-[10px] font-bold outline-none bg-slate-50 uppercase">
+            <button onclick="limpiarFiltrosModal()" class="text-slate-400 hover:text-red-500 p-2"><i class="fas fa-undo-alt text-xs"></i></button>
         </div>
 
-        <div id="lDocs" class="p-4 space-y-2 overflow-y-auto flex-1 bg-white">
-            </div>
+        <div id="lDocs" class="p-5 overflow-y-auto flex-1 bg-white min-h-[300px]">
+            <div id="contenedorCarpetas" class="grid grid-cols-2 gap-4"></div>
+            <div id="contenedorArchivos" class="hidden space-y-3"></div>
+        </div>
 
-        <div id="footerSubida" class="hidden border-t bg-slate-50 p-4 shrink-0">
+        <div id="footerSubida" class="hidden border-t bg-slate-50 p-5 shrink-0">
             <div class="flex justify-center mb-3">
-                <button id="btnDesplegarSubida" onclick="togglePanelSubida()" class="bg-indigo-600 text-white px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest shadow-md hover:bg-indigo-700 transition-all flex items-center gap-2">
+                <button id="btnDesplegarSubida" onclick="togglePanelSubida()" class="bg-indigo-600 text-white px-8 py-2.5 rounded-full font-black text-[10px] uppercase tracking-widest shadow-lg hover:bg-indigo-700 flex items-center gap-2 transition-all">
                     <i class="fas fa-plus-circle"></i> Subir Archivo
                 </button>
             </div>
 
-            <div id="panelControlesSubida" class="hidden animate-fade-in bg-white p-4 rounded-xl border border-indigo-100 shadow-inner">
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
+            <div id="panelControlesSubida" class="hidden animate-fade-in bg-white p-4 rounded-2xl border border-indigo-100 shadow-inner">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
                     <div class="flex flex-col col-span-2 md:col-span-1">
                         <label class="text-[8px] font-black text-indigo-400 uppercase mb-1">Tipo Documento</label>
                         <select id="tipoDocAdmin" class="p-2 border border-slate-200 rounded-lg text-[10px] font-bold bg-slate-50 outline-none"></select>
                     </div>
-
                     <div id="contenedorMes" class="flex flex-col">
-                        <label class="text-[8px] font-black text-indigo-400 uppercase mb-1">Periodo Mes</label>
+                        <label class="text-[8px] font-black text-indigo-400 uppercase mb-1">Mes</label>
                         <select id="periodoMes" class="p-2 border border-slate-200 rounded-lg text-[10px] font-bold bg-slate-50 outline-none">
                             <option value="ENERO">Enero</option><option value="FEBRERO">Febrero</option><option value="MARZO">Marzo</option>
                             <option value="ABRIL">Abril</option><option value="MAYO">Mayo</option><option value="JUNIO">Junio</option>
@@ -259,32 +256,28 @@
                             <option value="OCTUBRE">Octubre</option><option value="NOVIEMBRE">Noviembre</option><option value="DICIEMBRE">Diciembre</option>
                         </select>
                     </div>
-
                     <div id="contenedorFechasVacaciones" class="hidden col-span-1 grid grid-cols-2 gap-1">
                         <div class="flex flex-col">
-                            <label class="text-[8px] font-black text-indigo-400 mb-1">DESDE</label>
+                            <label class="text-[8px] font-black text-indigo-400 mb-1 uppercase">Desde</label>
                             <input type="date" id="vacacionesDesde" class="p-1.5 border rounded-lg text-[9px] font-bold">
                         </div>
                         <div class="flex flex-col">
-                            <label class="text-[8px] font-black text-indigo-400 mb-1">HASTA</label>
+                            <label class="text-[8px] font-black text-indigo-400 mb-1 uppercase">Hasta</label>
                             <input type="date" id="vacacionesHasta" class="p-1.5 border rounded-lg text-[9px] font-bold">
                         </div>
                     </div>
-
                     <div class="flex flex-col">
                         <label class="text-[8px] font-black text-indigo-400 uppercase mb-1">Fecha Doc.</label>
                         <input type="date" id="fechaManualDoc" class="p-2 border border-slate-200 rounded-lg text-[10px] font-bold bg-slate-50 outline-none">
                     </div>
-
                     <div class="flex flex-col">
                         <label class="text-[8px] font-black text-indigo-400 uppercase mb-1">PDF</label>
-                        <button onclick="document.getElementById('fileInput').click()" id="btnAdjuntar" class="p-2 bg-slate-100 border border-slate-200 rounded-lg text-[10px] font-bold text-slate-600 flex items-center justify-center gap-1">
-                            <i class="fas fa-paperclip"></i> <span id="txtAdjuntar">Adjuntar</span>
+                        <button onclick="document.getElementById('fileInput').click()" id="btnAdjuntar" class="p-2 bg-slate-100 border border-slate-200 rounded-lg text-[10px] font-bold text-slate-600 flex items-center justify-center gap-1 hover:bg-slate-200">
+                            <i class="fas fa-paperclip"></i> <span id="txtAdjuntar">Elegir PDF</span>
                         </button>
                     </div>
                 </div>
-
-                <button onclick="ejecutarSubidaFinal()" class="w-full bg-emerald-600 text-white py-2.5 rounded-lg font-black text-[10px] uppercase tracking-widest hover:bg-emerald-700 shadow-md transition-all">
+                <button onclick="ejecutarSubidaFinal()" class="w-full bg-emerald-600 text-white py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-700 shadow-md">
                     Subir a la Base de Datos
                 </button>
             </div>
@@ -384,122 +377,123 @@
         renderizarVistaCarpetas();
     }
 
-    function renderizarVistaCarpetas() {
-        carpetaActual = null;
-        document.getElementById('rutaCarpeta').innerText = "";
-        document.getElementById('btnRetrocederCarpeta').classList.add('hidden');
-        document.getElementById('footerSubida').classList.add('hidden');
-        document.getElementById('barraFiltrosModal').classList.add('hidden');
-        document.getElementById('lDocs').innerHTML = `
-            <div class="grid grid-cols-2 gap-4 pt-4">
-                <div onclick="entrarCarpeta('Contratación')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 transition-all"><i class="fas fa-file-contract text-4xl text-indigo-600 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Contratación</span></div>
-                <div onclick="entrarCarpeta('Vacaciones')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-emerald-500 hover:bg-emerald-50 transition-all"><i class="fas fa-umbrella-beach text-4xl text-emerald-600 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Vacaciones</span></div>
-                <div onclick="entrarCarpeta('Certificado de competencia')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-orange-500 hover:bg-orange-50 transition-all"><i class="fas fa-certificate text-4xl text-orange-600 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Cert. Competencia</span></div>
-                <div onclick="entrarCarpeta('Acta de epps')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-yellow-600 hover:bg-yellow-50 transition-all"><i class="fas fa-hard-hat text-4xl text-yellow-700 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Acta de EPP's</span></div>
-                <div onclick="entrarCarpeta('Certificados medicos')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all"><i class="fas fa-notes-medical text-4xl text-blue-600 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Certificados Médicos</span></div>
-                <div onclick="entrarCarpeta('Memorandum')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-amber-500 hover:bg-amber-50 transition-all"><i class="fas fa-sticky-note text-4xl text-amber-600 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Memorándum</span></div>
-                <div onclick="entrarCarpeta('Certificados')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-purple-500 hover:bg-purple-50 transition-all"><i class="fas fa-award text-4xl text-purple-600 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Certificados</span></div>
-                ${modoLista === 'pasivos' ? `<div onclick="entrarCarpeta('Desvinculación')" class="folder-card bg-red-50 border-2 border-dashed border-red-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-red-500 hover:bg-red-100 transition-all col-span-1"><i class="fas fa-user-minus text-4xl text-red-600 mb-3"></i><span class="font-bold text-xs uppercase text-red-600">Desvinculación</span></div>` : ''}
-            </div>`;
+function renderizarVistaCarpetas() {
+    carpetaActual = null;
+    document.getElementById('rutaCarpeta').innerText = "";
+    document.getElementById('btnRetrocederCarpeta').classList.add('hidden');
+    document.getElementById('footerSubida').classList.add('hidden');
+    document.getElementById('barraFiltrosModal').classList.add('hidden');
+    
+    // Switch de contenedores
+    const cCarpetas = document.getElementById('contenedorCarpetas');
+    const cArchivos = document.getElementById('contenedorArchivos');
+    cCarpetas.classList.remove('hidden');
+    cArchivos.classList.add('hidden');
+
+    cCarpetas.innerHTML = `
+        <div onclick="entrarCarpeta('Contratación')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 transition-all"><i class="fas fa-file-contract text-4xl text-indigo-600 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Contratación</span></div>
+        <div onclick="entrarCarpeta('Vacaciones')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-emerald-500 hover:bg-emerald-50 transition-all"><i class="fas fa-umbrella-beach text-4xl text-emerald-600 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Vacaciones</span></div>
+        <div onclick="entrarCarpeta('Certificado de competencia')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-orange-500 hover:bg-orange-50 transition-all"><i class="fas fa-certificate text-4xl text-orange-600 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Cert. Competencia</span></div>
+        <div onclick="entrarCarpeta('Acta de epps')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-yellow-600 hover:bg-yellow-50 transition-all"><i class="fas fa-hard-hat text-4xl text-yellow-700 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Acta de EPP's</span></div>
+        <div onclick="entrarCarpeta('Certificados medicos')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all"><i class="fas fa-notes-medical text-4xl text-blue-600 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Certificados Médicos</span></div>
+        <div onclick="entrarCarpeta('Memorandum')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-amber-500 hover:bg-amber-50 transition-all"><i class="fas fa-sticky-note text-4xl text-amber-600 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Memorándum</span></div>
+        <div onclick="entrarCarpeta('Certificados')" class="folder-card bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-purple-500 hover:bg-purple-50 transition-all"><i class="fas fa-award text-4xl text-purple-600 mb-3"></i><span class="font-bold text-xs uppercase text-slate-600">Certificados</span></div>
+        ${modoLista === 'pasivos' ? `<div onclick="entrarCarpeta('Desvinculación')" class="folder-card bg-red-50 border-2 border-dashed border-red-200 p-8 rounded-2xl flex flex-col items-center cursor-pointer hover:border-red-500 hover:bg-red-100 transition-all col-span-1"><i class="fas fa-user-minus text-4xl text-red-600 mb-3"></i><span class="font-bold text-xs uppercase text-red-600">Desvinculación</span></div>` : ''}
+    `;
+}
+
+function entrarCarpeta(nombreCarpeta) {
+    carpetaActual = nombreCarpeta;
+    document.getElementById('rutaCarpeta').innerText = "> " + nombreCarpeta;
+    document.getElementById('btnRetrocederCarpeta').classList.remove('hidden');
+    document.getElementById('footerSubida').classList.remove('hidden');
+    document.getElementById('barraFiltrosModal').classList.remove('hidden');
+    
+    // Switch de contenedores
+    document.getElementById('contenedorCarpetas').classList.add('hidden');
+    document.getElementById('contenedorArchivos').classList.remove('hidden');
+
+    const selectS = document.getElementById('tipoDocAdmin');
+    const selectF = document.getElementById('filtroTipoDoc');
+    const contMes = document.getElementById('contenedorMes');
+    const contVac = document.getElementById('contenedorFechasVacaciones');
+
+    let ops = "";
+    if (nombreCarpeta === 'Vacaciones') {
+        ops = '<option value="Vacaciones">Vacaciones</option>';
+        contMes.classList.add('hidden');
+        contVac.classList.remove('hidden');
+    } else {
+        contMes.classList.remove('hidden');
+        contVac.classList.add('hidden');
+        if(nombreCarpeta === 'Contratación') ops = '<option>Contrato de trabajo</option><option>Aviso de entrada</option><option>Extracto SUT</option>';
+        else if(nombreCarpeta === 'Certificado de competencia') ops = '<option>Certificado de competencia</option>';
+        else if(nombreCarpeta === 'Acta de epps') ops = '<option>Acta de epp\'s</option>';
+        else if(nombreCarpeta === 'Certificados medicos') ops = '<option>Certificado médico IESS</option><option>Certificado médico privado</option><option>Certificado médico MSP</option><option>Reposo médico</option>';
+        else if(nombreCarpeta === 'Memorandum') ops = '<option>Memorandum</option>';
+        else if(nombreCarpeta === 'Certificados') ops = '<option>Laborales</option><option>De honorabilidad</option>';
+        else if(nombreCarpeta === 'Desvinculación') ops = '<option>Acta de finiquito</option><option>Comprobante de pago</option><option>Aviso de salida</option><option>Renuncia</option>';
     }
+    
+    selectS.innerHTML = ops;
+    selectF.innerHTML = '<option value="">Todos los tipos</option>' + ops;
+    renderizarArchivosCarpeta(); 
+}
 
-    function entrarCarpeta(nombreCarpeta) {
-        carpetaActual = nombreCarpeta;
-        document.getElementById('rutaCarpeta').innerText = "> " + nombreCarpeta;
-        document.getElementById('btnRetrocederCarpeta').classList.remove('hidden');
-        document.getElementById('footerSubida').classList.remove('hidden');
-        document.getElementById('barraFiltrosModal').classList.remove('hidden');
-        document.getElementById('folderLabel').innerText = nombreCarpeta;
-        
-        // Reset de UI de subida
-        document.getElementById('panelControlesSubida').classList.add('hidden');
-        document.getElementById('btnDesplegarSubida').innerHTML = '<i class="fas fa-plus-circle"></i> Subir Archivo';
-        document.getElementById('btnDesplegarSubida').className = "bg-indigo-600 text-white px-8 py-3 rounded-full font-black text-xs uppercase tracking-widest shadow-lg hover:bg-indigo-700 flex items-center gap-2";
+function renderizarArchivosCarpeta() {
+    const fTipo = document.getElementById('filtroTipoDoc').value.toLowerCase();
+    const fNombre = document.getElementById('filtroNombreArchivo').value.toLowerCase();
 
-        const selectS = document.getElementById('tipoDocAdmin');
-        const selectF = document.getElementById('filtroTipoDoc');
-        const contMes = document.getElementById('contenedorMes');
-        const contVac = document.getElementById('contenedorFechasVacaciones');
+    let docs = documentosCargados.filter(d => {
+        const tipo = d.tipo_documento.toLowerCase();
+        if(carpetaActual === 'Contratación') return tipo.includes('contrato') || tipo.includes('entrada') || tipo.includes('sut');
+        if(carpetaActual === 'Vacaciones') return tipo.includes('vacaciones');
+        if(carpetaActual === 'Certificado de competencia') return tipo.includes('competencia');
+        if(carpetaActual === 'Acta de epps') return tipo.includes('epp');
+        if(carpetaActual === 'Certificados medicos') return tipo.includes('medico') || tipo.includes('médico') || tipo.includes('reposo');
+        if(carpetaActual === 'Memorandum') return tipo.includes('memorandum');
+        if(carpetaActual === 'Certificados') return tipo.includes('laboral') || tipo.includes('honorabilidad');
+        if(carpetaActual === 'Desvinculación') return tipo.includes('finiquito') || tipo.includes('pago') || tipo.includes('salida') || tipo.includes('renuncia');
+        return false;
+    });
+    
+    if (fTipo) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fTipo));
+    if (fNombre) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fNombre));
 
-        let ops = "";
-        if (nombreCarpeta === 'Vacaciones') {
-            ops = '<option value="Vacaciones">Vacaciones</option>';
-            contMes.classList.add('hidden');
-            contVac.classList.remove('hidden');
-        } else {
-            contMes.classList.remove('hidden');
-            contVac.classList.add('hidden');
-            if(nombreCarpeta === 'Contratación') ops = '<option>Contrato de trabajo</option><option>Aviso de entrada</option><option>Extracto SUT</option>';
-            else if(nombreCarpeta === 'Certificado de competencia') ops = '<option>Certificado de competencia</option>';
-            else if(nombreCarpeta === 'Acta de epps') ops = '<option>Acta de epp\'s</option>';
-            else if(nombreCarpeta === 'Certificados medicos') ops = '<option>Certificado médico IESS</option><option>Certificado médico privado</option><option>Certificado médico MSP</option><option>Reposo médico</option>';
-            else if(nombreCarpeta === 'Memorandum') ops = '<option>Memorandum</option>';
-            else if(nombreCarpeta === 'Certificados') ops = '<option>Laborales</option><option>De honorabilidad</option>';
-            else if(nombreCarpeta === 'Desvinculación') ops = '<option>Acta de finiquito</option><option>Comprobante de pago</option><option>Aviso de salida</option><option>Renuncia</option>';
-        }
-        
-        selectS.innerHTML = ops;
-        selectF.innerHTML = '<option value="">Todos los tipos</option>' + ops;
-        limpiarFiltrosModal();
-    }
+    const grupos = {};
+    docs.forEach(d => {
+        const partes = d.tipo_documento.split(' - ');
+        const mes = partes.length > 1 ? partes[1].toUpperCase() : "GENERAL";
+        if(!grupos[mes]) grupos[mes] = [];
+        grupos[mes].push(d);
+    });
 
-    function renderizarArchivosCarpeta() {
-        const fTipo = document.getElementById('filtroTipoDoc').value.toLowerCase();
-        const fFecha = document.getElementById('filtroFechaDoc').value;
-        const fNombre = document.getElementById('filtroNombreArchivo').value.toLowerCase();
+    const mesesPresentes = Object.keys(grupos).sort((a, b) => mesesOrden.indexOf(a) - mesesOrden.indexOf(b));
 
-        let docs = documentosCargados.filter(d => {
-            const tipo = d.tipo_documento.toLowerCase();
-            if(carpetaActual === 'Contratación') return tipo.includes('contrato') || tipo.includes('entrada') || tipo.includes('sut');
-            if(carpetaActual === 'Vacaciones') return tipo.includes('vacaciones');
-            if(carpetaActual === 'Certificado de competencia') return tipo.includes('competencia');
-            if(carpetaActual === 'Acta de epps') return tipo.includes('epp');
-            if(carpetaActual === 'Certificados medicos') return tipo.includes('medico') || tipo.includes('médico') || tipo.includes('reposo');
-            if(carpetaActual === 'Memorandum') return tipo.includes('memorandum');
-            if(carpetaActual === 'Certificados') return tipo.includes('laboral') || tipo.includes('honorabilidad');
-            if(carpetaActual === 'Desvinculación') return tipo.includes('finiquito') || tipo.includes('pago') || tipo.includes('salida') || tipo.includes('renuncia');
-            return false;
-        });
-        
-        if (fTipo) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fTipo));
-        if (fFecha) docs = docs.filter(d => obtenerFechaInput(d.created_at) === fFecha);
-        if (fNombre) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fNombre));
-
-        const grupos = {};
-        docs.forEach(d => {
-            const partes = d.tipo_documento.split(' - ');
-            const mes = partes.length > 1 ? partes[1].toUpperCase() : "GENERAL";
-            if(!grupos[mes]) grupos[mes] = [];
-            grupos[mes].push(d);
-        });
-
-        const mesesPresentes = Object.keys(grupos).sort((a, b) => mesesOrden.indexOf(a) - mesesOrden.indexOf(b));
-
-        document.getElementById('lDocs').innerHTML = mesesPresentes.map(mes => `
-            <div class="mes-block bg-slate-50/50 p-2 rounded-r-xl mb-4">
-                <h4 class="text-[10px] font-black text-indigo-600 mb-2 px-2 italic">PERIODO: ${mes}</h4>
-                <div class="space-y-2">
-                    ${grupos[mes].map(d => {
-                        const partes = d.tipo_documento.split(' - ');
-                        return `
-                        <div class="flex justify-between items-center p-3 bg-white border border-slate-100 rounded-xl shadow-sm">
-                            <div class="flex items-center gap-3">
-                                <i class="fas fa-file-pdf text-red-500 text-lg"></i>
-                                <div>
-                                    <p class="text-[10px] font-black uppercase text-indigo-900">${partes[0]}</p>
-                                    <p class="text-[9px] text-slate-500 italic truncate max-w-[200px]">${partes[2] || 'Archivo'}</p>
-                                </div>
+    document.getElementById('contenedorArchivos').innerHTML = mesesPresentes.map(mes => `
+        <div class="mes-block bg-slate-50/50 p-2 rounded-r-xl mb-4">
+            <h4 class="text-[10px] font-black text-indigo-600 mb-2 px-2 italic">PERIODO: ${mes}</h4>
+            <div class="space-y-2">
+                ${grupos[mes].map(d => {
+                    const partes = d.tipo_documento.split(' - ');
+                    return `
+                    <div class="flex justify-between items-center p-3 bg-white border border-slate-100 rounded-xl shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-file-pdf text-red-500 text-lg"></i>
+                            <div>
+                                <p class="text-[10px] font-black uppercase text-indigo-900">${partes[0]}</p>
+                                <p class="text-[9px] text-slate-500 italic truncate max-w-[200px]">${partes[2] || 'Archivo'}</p>
                             </div>
-                            <div class="flex gap-2">
-                                <a href="${d.url_cloudinary}" target="_blank" class="w-7 h-7 flex items-center justify-center bg-indigo-50 text-indigo-600 rounded-lg"><i class="fas fa-eye text-[10px]"></i></a>
-                                <button onclick="eliminarDoc(${d.id})" class="w-7 h-7 flex items-center justify-center bg-red-50 text-red-500 rounded-lg"><i class="fas fa-trash text-[10px]"></i></button>
-                            </div>
-                        </div>`;
-                    }).join('')}
-                </div>
-            </div>`).join('') || '<p class="text-center text-slate-400 text-xs py-10">Carpeta vacía o sin coincidencias</p>';
-    }
-
+                        </div>
+                        <div class="flex gap-2">
+                            <a href="${d.url_cloudinary}" target="_blank" class="w-7 h-7 flex items-center justify-center bg-indigo-50 text-indigo-600 rounded-lg"><i class="fas fa-eye text-[10px]"></i></a>
+                            <button onclick="eliminarDoc(${d.id})" class="w-7 h-7 flex items-center justify-center bg-red-50 text-red-500 rounded-lg"><i class="fas fa-trash text-[10px]"></i></button>
+                        </div>
+                    </div>`;
+                }).join('')}
+            </div>
+        </div>`).join('') || '<p class="text-center text-slate-400 text-xs py-10">Carpeta vacía o sin coincidencias</p>';
+}
     // --- LÓGICA DE SUBIDA ---
     function togglePanelSubida() {
         const panel = document.getElementById('panelControlesSubida');
