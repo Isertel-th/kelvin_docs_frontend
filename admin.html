@@ -474,28 +474,24 @@ async function refrescarDocumentos() {
         renderizarArchivosCarpeta(); 
     }
 
-function renderizarArchivosCarpeta() {
-    const contenedor = document.getElementById('contenedorArchivos');
-    // SEGURIDAD: Limpiar el contenedor antes de empezar a dibujar
-    contenedor.innerHTML = ''; 
+    function renderizarArchivosCarpeta() {
+        const fTipo = document.getElementById('filtroTipoDoc').value.toLowerCase();
+        const fNombre = document.getElementById('filtroNombreArchivo').value.toLowerCase();
+        const fFecha = document.getElementById('filtroFechaDoc').value;
 
-    const fTipo = document.getElementById('filtroTipoDoc').value.toLowerCase();
-    const fNombre = document.getElementById('filtroNombreArchivo').value.toLowerCase();
-    const fFecha = document.getElementById('filtroFechaDoc').value;
-
-    let docs = documentosCargados.filter(d => {
-        const tipo = d.tipo_documento.toLowerCase();
-        if(carpetaActual === 'Contratación') return tipo.includes('contrato') || tipo.includes('entrada') || tipo.includes('sut') || tipo.includes('bancario');
-        if(carpetaActual === 'Vacaciones') return tipo.includes('vacaciones');
-        if(carpetaActual === 'Certificado de competencia') return tipo.includes('competencia');
-        if(carpetaActual === 'Acta de epps') return tipo.includes('epp');
-        if(carpetaActual === 'Certificados medicos') return (tipo.includes('medico') || tipo.includes('médico') || tipo.includes('reposo')) && !tipo.includes('aptitud');
-        if(carpetaActual === 'Aptitud Medica') return tipo.includes('aptitud');
-        if(carpetaActual === 'Memorandum') return tipo.includes('memorandum');
-        if(carpetaActual === 'Certificados') return tipo.includes('laboral') || tipo.includes('honorabilidad');
-        if(carpetaActual === 'Desvinculación') return tipo.includes('finiquito') || tipo.includes('pago') || tipo.includes('salida') || tipo.includes('renuncia');
-        return false;
-    });
+        let docs = documentosCargados.filter(d => {
+            const tipo = d.tipo_documento.toLowerCase();
+            if(carpetaActual === 'Contratación') return tipo.includes('contrato') || tipo.includes('entrada') || tipo.includes('sut') || tipo.includes('bancario');
+            if(carpetaActual === 'Vacaciones') return tipo.includes('vacaciones');
+            if(carpetaActual === 'Certificado de competencia') return tipo.includes('competencia');
+            if(carpetaActual === 'Acta de epps') return tipo.includes('epp');
+            if(carpetaActual === 'Certificados medicos') return (tipo.includes('medico') || tipo.includes('médico') || tipo.includes('reposo')) && !tipo.includes('aptitud');
+            if(carpetaActual === 'Aptitud Medica') return tipo.includes('aptitud');
+            if(carpetaActual === 'Memorandum') return tipo.includes('memorandum');
+            if(carpetaActual === 'Certificados') return tipo.includes('laboral') || tipo.includes('honorabilidad');
+            if(carpetaActual === 'Desvinculación') return tipo.includes('finiquito') || tipo.includes('pago') || tipo.includes('salida') || tipo.includes('renuncia');
+            return false;
+        });
         
         if (fTipo) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fTipo));
         if (fNombre) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fNombre));
@@ -516,11 +512,11 @@ function renderizarArchivosCarpeta() {
 
         const mesesPresentes = Object.keys(grupos).sort((a, b) => mesesOrden.indexOf(a) - mesesOrden.indexOf(b));
 
-contenedor.innerHTML = mesesPresentes.map(mes => `
-        <div class="mes-block bg-slate-50/50 p-2 rounded-r-xl mb-4">
-            <h4 class="text-[10px] font-black text-indigo-600 mb-2 px-2 italic">PERIODO: ${mes}</h4>
-            <div class="space-y-2">
-                ${grupos[mes].map(d => {
+        document.getElementById('contenedorArchivos').innerHTML = mesesPresentes.map(mes => `
+            <div class="mes-block bg-slate-50/50 p-2 rounded-r-xl mb-4">
+                <h4 class="text-[10px] font-black text-indigo-600 mb-2 px-2 italic">PERIODO: ${mes}</h4>
+                <div class="space-y-2">
+                    ${grupos[mes].map(d => {
                         const partes = d.tipo_documento.split(' - ');
                         const fechaRaw = d.created_at || d.fecha_subida;
                         const fechaFormateada = fechaRaw ? new Date(fechaRaw).toLocaleDateString() : 'S/F';
@@ -539,10 +535,10 @@ contenedor.innerHTML = mesesPresentes.map(mes => `
                                 <button onclick="eliminarDoc(${d.id}, '${d.tipo_documento}')" class="w-7 h-7 flex items-center justify-center bg-red-50 text-red-500 rounded-lg"><i class="fas fa-trash text-[10px]"></i></button>
                             </div>
                         </div>`;
-}).join('')}
-            </div>
-        </div>`).join('') || '<p class="text-center text-slate-400 text-xs py-10">Sin coincidencias</p>';
-}
+                    }).join('')}
+                </div>
+            </div>`).join('') || '<p class="text-center text-slate-400 text-xs py-10">Sin coincidencias</p>';
+    }
 
     // --- LÓGICA DE SUBIDA ---
     function togglePanelSubida() {
@@ -575,13 +571,16 @@ async function ejecutarSubidaFinal() {
     let tipoFinal = "";
     const docBase = document.getElementById('tipoDocAdmin').value;
     
+    // --- Lógica de Endpoints ---
     const esAptitud = carpetaActual === 'Aptitud Medica';
+    // Nueva lógica: si es competencia o epps, usamos el endpoint de kelvin
     const esKelvin = carpetaActual === 'Certificado de competencia' || carpetaActual === 'Acta de epps';
     
-    let endpoint = '/admin/subir-a-usuario'; 
+    let endpoint = '/admin/subir-a-usuario'; // Default
     if (esAptitud) endpoint = '/doctor/subir-aptitud';
-    if (esKelvin) endpoint = '/api/kelvin/subir-certificados'; 
+    if (esKelvin) endpoint = '/api/kelvin/subir-certificados'; // Endpoint que gestiona las tablas específicas
 
+    // --- Construcción del nombre/tipo ---
     if (carpetaActual === 'Vacaciones') {
         const desde = document.getElementById('vacacionesDesde').value;
         const hasta = document.getElementById('vacacionesHasta').value;
@@ -603,6 +602,7 @@ async function ejecutarSubidaFinal() {
     formData.append('created_at', fechaDoc); 
 
     try {
+        // Si el endpoint ya tiene /api/ (como el de kelvin), no le sumamos API_BASE doble
         const urlFinal = endpoint.startsWith('/api') ? `https://kelvin-th-docs-backend.onrender.com${endpoint}` : `${API_BASE}${endpoint}`;
         
         const res = await fetch(urlFinal, { 
@@ -615,10 +615,8 @@ async function ejecutarSubidaFinal() {
             alert("Subida exitosa.");
             resetearFormularioSubida();
             togglePanelSubida();
-            // CORRECCIÓN: Solo llamamos a refrescarDocumentos. 
-            // Esta función internamente ya actualiza la vista correctamente.
             await refrescarDocumentos();
-            entrarCarpeta(carpetaActual); // Esto refresca la carpeta donde estás parado
+            renderizarArchivosCarpeta();
         } else {
             const errorData = await res.json();
             alert("Error en el servidor: " + (errorData.error || "Desconocido"));
@@ -647,7 +645,7 @@ async function ejecutarSubidaFinal() {
             }); 
             
             await refrescarDocumentos();
-            entrarCarpeta(carpetaActual);
+            renderizarArchivosCarpeta(); 
         } 
     }
 
