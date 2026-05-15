@@ -288,7 +288,7 @@
             tbody.innerHTML = data.map(d => `
                 <tr class="hover:bg-blue-50/50 transition-colors">
                     <td class="px-8 py-6">
-                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">${new Date(d.created_at).toLocaleDateString()}</div>
+                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">${d.fecha_documento ? new Date(d.fecha_documento).toLocaleDateString() : new Date(d.created_at).toLocaleDateString()}</div>
                     </td>
                     <td class="px-8 py-6"><div class="font-black text-slate-700 text-sm uppercase tracking-tight">${d.empleado_nombre}</div></td>
                     <td class="px-8 py-6">
@@ -325,7 +325,7 @@
     }
 
     // ==========================================
-    // LÓGICA DE GESTIÓN DE APTITUD (ESTILO ADMIN)
+    // LÓGICA DE GESTIÓN DE APTITUD
     // ==========================================
     let aptitudMode = 'activos';
     let aptitudUsuarios = [];
@@ -459,7 +459,7 @@
         let docs = aptitudDocs.filter(d => pClave.some(p => d.tipo_documento.toLowerCase().includes(p)));
 
         if (fTipo) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fTipo));
-        if (fFecha) docs = docs.filter(d => d.created_at.startsWith(fFecha));
+        if (fFecha) docs = docs.filter(d => d.fecha_documento && d.fecha_documento.startsWith(fFecha));
         if (fNombre) docs = docs.filter(d => d.tipo_documento.toLowerCase().includes(fNombre));
 
         const contenedor = document.getElementById('lAptDocs');
@@ -484,6 +484,7 @@
                 <div class="space-y-2">
                     ${grupos[mes].map(d => {
                         const partes = d.tipo_documento.split(' - ');
+                        const fechaFormat = d.fecha_documento ? new Date(d.fecha_documento).toLocaleDateString() : 'Sin fecha';
                         return `
                         <div class="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:bg-white hover:shadow-md transition-all group">
                             <div class="flex items-center gap-3">
@@ -492,7 +493,7 @@
                                 </div>
                                 <div>
                                     <p class="text-[10px] font-black uppercase text-slate-700">${partes[0]}</p>
-                                    <p class="text-[8px] text-slate-400 font-bold">${partes[2] || 'archivo.pdf'}</p>
+                                    <p class="text-[8px] text-slate-400 font-bold italic">${fechaFormat} | ${partes[2] || 'archivo.pdf'}</p>
                                 </div>
                             </div>
                             <div class="flex gap-2">
@@ -513,7 +514,10 @@
 
     async function ejecutarSubidaAptitud() {
         const file = document.getElementById('fileAptitud').files[0];
+        const fechaDoc = document.getElementById('fechaDocAptitud')?.value;
+
         if(!file) return alert("Por favor, selecciona un archivo PDF primero");
+        if(!fechaDoc) return alert("Por favor, selecciona la fecha del documento");
 
         const tipo = document.getElementById('tipoDocAptitud').value;
         const mes = document.getElementById('periodoMesAptitud').value;
@@ -522,12 +526,13 @@
         const formData = new FormData();
         formData.append('archivo', file);
         formData.append('tipo_documento', nombreFinal);
+        formData.append('fecha_documento', fechaDoc); // Enviamos la fecha seleccionada
         formData.append('usuario_id', currentAptitudId);
         formData.append('es_pasivo', currentAptitudPasivo);
 
         try {
-            const btn = event.target;
-            btn.disabled = true; btn.innerText = "PROCESANDO...";
+            const btnSubir = document.querySelector('button[onclick="ejecutarSubidaAptitud()"]');
+            btnSubir.disabled = true; btnSubir.innerText = "PROCESANDO...";
             
             const res = await fetch(`${API_BASE}/doctor/subir-aptitud`, { 
                 method: 'POST', 
@@ -539,6 +544,7 @@
                 document.getElementById('panelControlesSubida').classList.add('hidden');
                 document.getElementById('txtAdjuntar').innerText = "Elegir PDF";
                 document.getElementById('fileAptitud').value = "";
+                document.getElementById('fechaDocAptitud').value = "";
                 await cargarDocsAptitud();
             } else {
                 alert("Error al subir el archivo");
@@ -546,7 +552,7 @@
         } catch(e) { alert("Error de conexión con el servidor"); }
         finally { 
             const btnSubir = document.querySelector('button[onclick="ejecutarSubidaAptitud()"]');
-            btnSubir.disabled = false; btnSubir.innerText = "Subir a la Base de Datos";
+            if(btnSubir) { btnSubir.disabled = false; btnSubir.innerText = "Subir a la Base de Datos"; }
         }
     }
 
@@ -562,16 +568,11 @@
         }
     }
 
-    function limpiarFiltrosAptitud() {
+    function cerrarModalAptitud() {
+        document.getElementById('modalAptitud').classList.add('hidden');
         document.getElementById('filtroTipoAptitud').value = "";
         document.getElementById('filtroFechaAptitud').value = "";
         document.getElementById('filtroNombreAptitud').value = "";
-        renderizarArchivosAptitud();
-    }
-
-    function cerrarModalAptitud() {
-        document.getElementById('modalAptitud').classList.add('hidden');
-        limpiarFiltrosAptitud();
     }
 </script>
 </body>
