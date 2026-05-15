@@ -222,25 +222,31 @@
                 <div id="lDocs" class="p-6 space-y-3 max-h-80 overflow-y-auto bg-white min-h-[300px]"></div>
 
 <div id="footerSubida" class="hidden p-6 bg-indigo-50 border-t flex flex-wrap gap-2">
-    <div id="contenedorPeriodoOriginal" class="flex-1 min-w-[150px]">
-        <p class="text-[10px] font-bold text-indigo-400 uppercase mb-1">Periodo / Mes</p>
-        <input type="text" id="periodoDocAdmin" placeholder="Ej: ENERO 2024" class="w-full p-2 border rounded-lg text-sm font-bold">
+    <div class="flex-1 min-w-[120px]">
+        <p class="text-[10px] font-bold text-indigo-400 uppercase mb-1">Periodo (Mes)</p>
+        <select id="periodoMes" class="w-full p-2 border rounded-lg text-sm font-bold">
+            <option value="ENERO">Enero</option><option value="FEBRERO">Febrero</option><option value="MARZO">Marzo</option>
+            <option value="ABRIL">Abril</option><option value="MAYO">Mayo</option><option value="JUNIO">Junio</option>
+            <option value="JULIO">Julio</option><option value="AGOSTO">Agosto</option><option value="SEPTIEMBRE">Septiembre</option>
+            <option value="OCTUBRE">Octubre</option><option value="NOVIEMBRE">Noviembre</option><option value="DICIEMBRE">Diciembre</option>
+        </select>
     </div>
 
-    <div id="contenedorFechaDesde" class="hidden flex-1 min-w-[140px]">
-        <p class="text-[10px] font-bold text-indigo-400 uppercase mb-1">Desde</p>
-        <input type="date" id="fechaDesde" class="w-full p-2 border rounded-lg text-sm font-bold">
-    </div>
-    <div id="contenedorFechaHasta" class="hidden flex-1 min-w-[140px]">
-        <p class="text-[10px] font-bold text-indigo-400 uppercase mb-1">Hasta</p>
-        <input type="date" id="fechaHasta" class="w-full p-2 border rounded-lg text-sm font-bold">
+    <div id="contenedorFechasVacaciones" class="hidden flex gap-2 flex-[1.5]">
+        <div class="flex-1">
+            <p class="text-[10px] font-bold text-indigo-400 uppercase mb-1">Desde</p>
+            <input type="date" id="vacacionesDesde" class="w-full p-2 border rounded-lg text-sm font-bold">
+        </div>
+        <div class="flex-1">
+            <p class="text-[10px] font-bold text-indigo-400 uppercase mb-1">Hasta</p>
+            <input type="date" id="vacacionesHasta" class="w-full p-2 border rounded-lg text-sm font-bold">
+        </div>
     </div>
 
     <div class="flex-[2] min-w-[200px]">
         <p class="text-[10px] font-bold text-indigo-400 uppercase mb-1">Tipo de documento en <span id="folderLabel"></span></p>
         <select id="tipoDocAdmin" class="w-full p-2 border rounded-lg text-sm font-bold"></select>
     </div>
-    
     <button onclick="prepararSubidaTrabajador()" class="mt-auto bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-indigo-700 uppercase">Subir PDF</button>
 </div>
             </div>
@@ -403,40 +409,42 @@
 // admin.html - Función entrarCarpeta actualizada
 function entrarCarpeta(nombreCarpeta) {
     carpetaActual = nombreCarpeta;
+    document.getElementById('rutaCarpeta').innerText = "> " + nombreCarpeta;
+    document.getElementById('btnRetrocederCarpeta').classList.remove('hidden');
+    document.getElementById('footerSubida').classList.remove('hidden');
+    document.getElementById('barraFiltrosModal').classList.remove('hidden');
     document.getElementById('folderLabel').innerText = nombreCarpeta;
     
-    const pOriginal = document.getElementById('contenedorPeriodoOriginal');
-    const fDesde = document.getElementById('contenedorFechaDesde');
-    const fHasta = document.getElementById('contenedorFechaHasta');
-    const selectDoc = document.getElementById('tipoDocAdmin');
+    document.getElementById('lDocs').innerHTML = ""; 
 
-    let ops = "";
+    const selectS = document.getElementById('tipoDocAdmin');
+    const selectF = document.getElementById('filtroTipoDoc');
+    
+    // --- CAMBIO PARA VACACIONES ---
+    const contenedorPeriodo = document.getElementById('periodoMes').parentElement;
+    const contenedorFechas = document.getElementById('contenedorFechasVacaciones');
 
     if (nombreCarpeta === 'Vacaciones') {
-        // Solo para vacaciones: mostrar fechas, ocultar periodo texto
-        ops = '<option>Vacaciones</option>';
-        pOriginal.classList.add('hidden');
-        fDesde.classList.remove('hidden');
-        fHasta.classList.remove('hidden');
+        ops = '<option value="Vacaciones">Vacaciones</option>';
+        if (contenedorPeriodo) contenedorPeriodo.classList.add('hidden');
+        if (contenedorFechas) contenedorFechas.classList.remove('hidden');
     } else {
-        // Para todas las demás: ocultar fechas, mostrar periodo texto
-        pOriginal.classList.remove('hidden');
-        fDesde.classList.add('hidden');
-        fHasta.classList.add('hidden');
-
-        if (nombreCarpeta === 'Contratación') {
-            ops = '<option>Contrato de trabajo</option><option>Aviso de entrada</option><option>Extracto SUT</option>';
-        } else if (nombreCarpeta === 'Décimos') {
-            ops = '<option>Decimotercero</option><option>Decimocuarto</option>';
-        } else {
-            ops = `<option>${nombreCarpeta}</option>`;
-        }
+        if (contenedorPeriodo) contenedorPeriodo.classList.remove('hidden');
+        if (contenedorFechas) contenedorFechas.classList.add('hidden');
+        
+        if(nombreCarpeta === 'Contratación') ops = '<option>Contrato de trabajo</option><option>Aviso de entrada</option><option>Extracto SUT</option>';
+        else if(nombreCarpeta === 'Certificado de competencia') ops = '<option>Certificado de competencia</option>';
+        else if(nombreCarpeta === 'Acta de epps') ops = '<option>Acta de epp\'s</option>';
+        else if(nombreCarpeta === 'Certificados medicos') ops = '<option>Certificado médico IESS</option><option>Certificado médico privado</option><option>Certificado médico MSP</option><option>Reposo médico</option>';
+        else if(nombreCarpeta === 'Memorandum') ops = '<option>Memorandum</option>';
+        else if(nombreCarpeta === 'Certificados') ops = '<option>Laborales</option><option>De honorabilidad</option>';
+        else if(nombreCarpeta === 'Desvinculación') ops = '<option>Acta de finiquito</option><option>Comprobante de pago</option><option>Aviso de salida</option><option>Renuncia</option>';
     }
     
-    selectDoc.innerHTML = ops;
-    document.getElementById('seccionDetalleTrabajador').classList.add('hidden');
-    document.getElementById('seccionCarpeta').classList.remove('hidden');
-    renderizarArchivosCarpeta();
+    selectS.innerHTML = ops;
+    selectF.innerHTML = '<option value="">Todos los tipos</option>' + ops;
+    
+    limpiarFiltrosModal();
 }
 
 // admin.html - Función de renderizado corregida
@@ -520,39 +528,41 @@ function renderizarArchivosCarpeta() {
         }
 
 document.getElementById('fileInput').onchange = async function() {
-    const file = this.files[0];
-    if (!file) return;
-
-    let periodoFinal = "";
-    const docBase = document.getElementById('tipoDocAdmin').value;
-
-    if (carpetaActual === 'Vacaciones') {
-        const desde = document.getElementById('fechaDesde').value;
-        const hasta = document.getElementById('fechaHasta').value;
-        if(!desde || !hasta) { alert("Por favor seleccione ambas fechas"); return; }
-        periodoFinal = `PERIODO: ${desde} AL ${hasta}`;
+    const file = this.files[0]; if(!file) return;
+    
+    let tipoFinal = "";
+    if(modoEmpresa) {
+        tipoFinal = subiendoTipo;
     } else {
-        periodoFinal = document.getElementById('periodoDocAdmin').value || "GENERAL";
+        const docBase = document.getElementById('tipoDocAdmin').value;
+        
+        // --- LÓGICA DE NOMBRE PARA VACACIONES ---
+        if (carpetaActual === 'Vacaciones') {
+            const desde = document.getElementById('vacacionesDesde').value;
+            const hasta = document.getElementById('vacacionesHasta').value;
+            if(!desde || !hasta) return alert("Debe seleccionar ambas fechas (Desde/Hasta) para vacaciones.");
+            // Formato: Vacaciones - DEL 2026-05-01 AL 2026-05-15 - nombre_archivo.pdf
+            tipoFinal = `${docBase} - DEL ${desde} AL ${hasta} - ${file.name}`;
+        } else {
+            const mesElegido = document.getElementById('periodoMes').value;
+            tipoFinal = `${docBase} - ${mesElegido} - ${file.name}`;
+        }
     }
 
-    const tipoFinal = `${docBase} - ${periodoFinal} - ${file.name}`;
-    
-    // Aquí sigue tu fetch normal de subida...
     const formData = new FormData();
-    formData.append('pdf', file);
-    formData.append('usuario_id', trabajadorSeleccionado.id);
+    formData.append('archivo', file);
     formData.append('tipo_documento', tipoFinal);
             if(!modoEmpresa) { formData.append('usuario_id', idActual); formData.append('nombre_user', nombreActual); formData.append('es_pasivo', modoLista === 'pasivos'); }
-            
-            const res = await fetch(modoEmpresa ? `${API_BASE}/subir-empresa` : `${API_BASE}/admin/subir-a-usuario`, { method: 'POST', headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }, body: formData });
-            
-            if(res.ok) { 
-                const r = await fetch(`${API_BASE}/admin/documentos/${idActual}?pasivo=${modoLista==='pasivos'}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
-                documentosCargados = await r.json();
-                renderizarArchivosCarpeta();
-            }
-            this.value = "";
-        };
+    
+    const res = await fetch(modoEmpresa ? `${API_BASE}/subir-empresa` : `${API_BASE}/admin/subir-a-usuario`, { method: 'POST', headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }, body: formData });
+    
+    if(res.ok) { 
+        const r = await fetch(`${API_BASE}/admin/documentos/${idActual}?pasivo=${modoLista==='pasivos'}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+        documentosCargados = await r.json();
+        renderizarArchivosCarpeta();
+    }
+    this.value = "";
+};
 
 async function eliminarDoc(id) { 
     if(confirm("¿Estás seguro de eliminar este documento?")) { 
