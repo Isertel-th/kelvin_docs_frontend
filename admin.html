@@ -372,12 +372,13 @@
     }
 
     // --- LÓGICA DE EXPEDIENTES ---
-    async function abrirExpediente(id, nombre) {
-        idActual = id; nombreActual = nombre;
-        document.getElementById('nEmp').innerText = nombre;
-        document.getElementById('modalC').classList.remove('hidden');
-        await refrescarDocumentos();
-    }
+async function abrirExpediente(id, nombre) {
+    idActual = id; nombreActual = nombre;
+    document.getElementById('nEmp').innerText = nombre;
+    document.getElementById('modalC').classList.remove('hidden');
+    await refrescarDocumentos();
+    renderizarVistaCarpetas(); // <-- Agrega esto aquí para abrir el menú de carpetas al inicio
+}
 
 async function refrescarDocumentos() {
     const token = localStorage.getItem('token');
@@ -405,7 +406,7 @@ async function refrescarDocumentos() {
         // Combinamos todos los arrays en uno solo
         documentosCargados = [...docsGenerales, ...docsAptitud, ...docsKelvin];
         
-        renderizarVistaCarpetas();
+        //renderizarVistaCarpetas();
     } catch (error) {
         console.error("Error al refrescar documentos:", error);
     }
@@ -573,12 +574,11 @@ async function ejecutarSubidaFinal() {
     
     // --- Lógica de Endpoints ---
     const esAptitud = carpetaActual === 'Aptitud Medica';
-    // Nueva lógica: si es competencia o epps, usamos el endpoint de kelvin
     const esKelvin = carpetaActual === 'Certificado de competencia' || carpetaActual === 'Acta de epps';
     
     let endpoint = '/admin/subir-a-usuario'; // Default
     if (esAptitud) endpoint = '/doctor/subir-aptitud';
-    if (esKelvin) endpoint = '/api/kelvin/subir-certificados'; // Endpoint que gestiona las tablas específicas
+    if (esKelvin) endpoint = '/api/kelvin/subir-certificados';
 
     // --- Construcción del nombre/tipo ---
     if (carpetaActual === 'Vacaciones') {
@@ -602,7 +602,6 @@ async function ejecutarSubidaFinal() {
     formData.append('created_at', fechaDoc); 
 
     try {
-        // Si el endpoint ya tiene /api/ (como el de kelvin), no le sumamos API_BASE doble
         const urlFinal = endpoint.startsWith('/api') ? `https://kelvin-th-docs-backend.onrender.com${endpoint}` : `${API_BASE}${endpoint}`;
         
         const res = await fetch(urlFinal, { 
@@ -615,8 +614,12 @@ async function ejecutarSubidaFinal() {
             alert("Subida exitosa.");
             resetearFormularioSubida();
             togglePanelSubida();
-            await refrescarDocumentos();
-            renderizarArchivosCarpeta();
+            
+            // --- CORRECCIÓN AQUÍ ---
+            // 1. Volvemos a traer los datos limpios desde el servidor
+            await refrescarDocumentos(); 
+            // 2. Forzamos a que vuelva a listar los archivos de la carpeta actual con el array limpio
+            renderizarArchivosCarpeta(); 
         } else {
             const errorData = await res.json();
             alert("Error en el servidor: " + (errorData.error || "Desconocido"));
