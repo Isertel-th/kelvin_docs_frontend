@@ -372,41 +372,33 @@
     }
 
     // --- LÓGICA DE EXPEDIENTES ---
-async function abrirExpediente(id, nombre) {
-    idActual = id; nombreActual = nombre;
-    document.getElementById('nEmp').innerText = nombre;
-    document.getElementById('modalC').classList.remove('hidden');
-    await refrescarDocumentos();
-    renderizarVistaCarpetas(); // <-- Agrega esto aquí para abrir el menú de carpetas al inicio
-}
+    async function abrirExpediente(id, nombre) {
+        idActual = id; nombreActual = nombre;
+        document.getElementById('nEmp').innerText = nombre;
+        document.getElementById('modalC').classList.remove('hidden');
+        await refrescarDocumentos();
+    }
 
 async function refrescarDocumentos() {
     const token = localStorage.getItem('token');
     const esPasivo = modoLista === 'pasivos';
 
     try {
-        // 1. Obtenemos documentos generales y médicos
-        const resDocs = await fetch(`${API_BASE}/admin/documentos/${idActual}?pasivo=${esPasivo}`, { 
-            headers: { 'Authorization': 'Bearer ' + token } 
-        });
+        // Ejecutamos todas las consultas al mismo tiempo para mayor velocidad
+        const [resDocs, resApt, resKelvin] = await Promise.all([
+            fetch(`${API_BASE}/admin/documentos/${idActual}?pasivo=${esPasivo}`, { headers: { 'Authorization': 'Bearer ' + token } }),
+            fetch(`${API_BASE}/doctor/aptitud/${idActual}?pasivo=${esPasivo}`, { headers: { 'Authorization': 'Bearer ' + token } }),
+            fetch(`${API_BASE}/kelvin/documentos/${idActual}`, { headers: { 'Authorization': 'Bearer ' + token } })
+        ]);
+
         const docsGenerales = await resDocs.json();
-
-        // 2. Obtenemos documentos de aptitud médica
-        const resApt = await fetch(`${API_BASE}/doctor/aptitud/${idActual}?pasivo=${esPasivo}`, { 
-            headers: { 'Authorization': 'Bearer ' + token } 
-        });
         const docsAptitud = await resApt.json();
-
-        // 3. NUEVO: Obtenemos documentos de Kelvin (Competencias y EPPs)
-        const resKelvin = await fetch(`${API_BASE}/kelvin/documentos/${idActual}`, { 
-            headers: { 'Authorization': 'Bearer ' + token } 
-        });
         const docsKelvin = await resKelvin.json();
 
-        // Combinamos todos los arrays en uno solo
+        // Combinamos sin duplicados (cada endpoint ahora devuelve tablas distintas)
         documentosCargados = [...docsGenerales, ...docsAptitud, ...docsKelvin];
         
-        //renderizarVistaCarpetas();
+        renderizarVistaCarpetas();
     } catch (error) {
         console.error("Error al refrescar documentos:", error);
     }
@@ -574,11 +566,12 @@ async function ejecutarSubidaFinal() {
     
     // --- Lógica de Endpoints ---
     const esAptitud = carpetaActual === 'Aptitud Medica';
+    // Nueva lógica: si es competencia o epps, usamos el endpoint de kelvin
     const esKelvin = carpetaActual === 'Certificado de competencia' || carpetaActual === 'Acta de epps';
     
     let endpoint = '/admin/subir-a-usuario'; // Default
     if (esAptitud) endpoint = '/doctor/subir-aptitud';
-    if (esKelvin) endpoint = '/api/kelvin/subir-certificados';
+    if (esKelvin) endpoint = '/api/kelvin/subir-certificados'; // Endpoint que gestiona las tablas específicas
 
     // --- Construcción del nombre/tipo ---
     if (carpetaActual === 'Vacaciones') {
@@ -602,6 +595,7 @@ async function ejecutarSubidaFinal() {
     formData.append('created_at', fechaDoc); 
 
     try {
+        // Si el endpoint ya tiene /api/ (como el de kelvin), no le sumamos API_BASE doble
         const urlFinal = endpoint.startsWith('/api') ? `https://kelvin-th-docs-backend.onrender.com${endpoint}` : `${API_BASE}${endpoint}`;
         
         const res = await fetch(urlFinal, { 
@@ -614,12 +608,8 @@ async function ejecutarSubidaFinal() {
             alert("Subida exitosa.");
             resetearFormularioSubida();
             togglePanelSubida();
-            
-            // --- CORRECCIÓN AQUÍ ---
-            // 1. Volvemos a traer los datos limpios desde el servidor
-            await refrescarDocumentos(); 
-            // 2. Forzamos a que vuelva a listar los archivos de la carpeta actual con el array limpio
-            renderizarArchivosCarpeta(); 
+            await refrescarDocumentos();
+            renderizarArchivosCarpeta();
         } else {
             const errorData = await res.json();
             alert("Error en el servidor: " + (errorData.error || "Desconocido"));
