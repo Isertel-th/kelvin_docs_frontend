@@ -58,7 +58,32 @@
 
         /* Modales y Nueva Interfaz de Carga Profesional */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; padding: 2.5rem; border-radius: 16px; width: 95%; max-width: 1000px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+/* Cambia la regla existente de .modal-content por esta: */
+.modal-content { 
+    background: white; 
+    padding: 2rem; 
+    border-radius: 16px; 
+    width: 95%; 
+    max-width: 1000px; 
+    height: 85vh; /* Altura fija respecto a la pantalla */
+    max-height: 85vh; 
+    display: flex; 
+    flex-direction: column; 
+    overflow: hidden; /* Evita el scroll de la ventana general */
+    position: relative; 
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); 
+}
+
+/* Añade estas dos nuevas reglas justo debajo: */
+#section-paso1 { 
+    overflow-y: auto; 
+    flex-grow: 1; 
+}
+#expediente-detalles { 
+    flex-grow: 1; 
+    overflow: hidden; 
+    flex-direction: column; 
+}
         .close-modal { position: absolute; top: 20px; right: 25px; font-size: 28px; cursor: pointer; color: #94a3b8; transition: color 0.2s; }
         .close-modal:hover { color: #475569; }
 
@@ -309,9 +334,9 @@
                     </div>
                 </form>
 
-                <h3 style="color: #1e293b; font-size: 18px; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">📁 Documentos Clasificados por Periodo</h3>
-                <div class="table-responsive" style="max-height: 400px; overflow-y: auto; border: 1px solid #cbd5e1; border-radius: 8px;">
-                    <table style="width: 100%; border-collapse: collapse;">
+<h3 style="color: #1e293b; font-size: 18px; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">📁 Documentos Clasificados por Periodo</h3>
+<div class="table-responsive" style="flex-grow: 1; overflow-y: auto; border: 1px solid #cbd5e1; border-radius: 8px; min-height: 150px;">
+    <table style="width: 100%; border-collapse: collapse;">
                         <thead>
                             <tr>
                                 <th style="position: sticky; top: 0; background: #f1f5f9; z-index: 10;">Nombre de Archivo</th>
@@ -324,8 +349,8 @@
                     </table>
                 </div>
 
-                <div class="card" style="background: #f1f5f9; padding: 1.25rem; margin-top: 1.5rem; margin-bottom: 1.5rem; border: 1px solid #cbd5e1;">
-                    <h4 style="margin: 0 0 0.75rem 0; color: #334155; font-size: 14px;">🔍 Filtros Integrados:</h4>
+<div class="card" style="background: #f1f5f9; padding: 1.25rem; margin-top: 1rem; margin-bottom: 0; border: 1px solid #cbd5e1;">
+    <h4 style="margin: 0 0 0.75rem 0; color: #334155; font-size: 14px;">🔍 Filtros Integrados:</h4>
                     <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.5rem; margin-bottom: 0; align-items: flex-end;">
                         <div style="display: none;">
                             <label style="margin-bottom:2px;">Categoría:</label>
@@ -717,7 +742,7 @@
             }
 
             document.getElementById('section-paso1').style.display = 'none';
-            document.getElementById('expediente-detalles').style.display = 'block';
+            document.getElementById('expediente-detalles').style.display = 'flex';
             document.getElementById('form-upload-doc').style.display = 'none';
             document.getElementById('detalle-categoria-titulo').innerText = `📂 Carpeta: ${tipoSeleccionado}`;
 
