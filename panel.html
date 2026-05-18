@@ -129,22 +129,22 @@
                 </div>
             </div>
 
-            <div id="view-crear" class="view-section">
+<div id="view-crear" class="view-section">
                 <div class="card">
                     <h3>Registrar Nuevo Colaborador en Nómina</h3>
                     <form id="form-crear-usuario" onsubmit="crearUsuario(event)">
                         <div class="grid-form">
                             <div>
-                                <label>Cédula (10 dígitos):</label>
-                                <input type="text" id="c_cedula" required maxlength="10">
+                                <label>Cédula (10 dígitos enteros):</label>
+                                <input type="text" id="c_cedula" required pattern="[0-9]{10}" maxlength="10" placeholder="Ej. 1712345678" oninput="this.value = this.value.replace(/\D/g, '')">
                             </div>
                             <div>
                                 <label>Nombre Completo:</label>
-                                <input type="text" id="c_nombre" required>
+                                <input type="text" id="c_nombre" required placeholder="Ej. Juan Pérez">
                             </div>
                             <div>
                                 <label>Fecha de Ingreso:</label>
-                                <input type="date" id="c_fecha">
+                                <input type="date" id="c_fecha" required>
                             </div>
                         </div>
                         <div class="grid-form">
@@ -153,12 +153,12 @@
                                 <input type="email" id="c_correo" required placeholder="ejemplo@isertel.com.ec">
                             </div>
                             <div>
-                                <label>Celular:</label>
-                                <input type="text" id="c_celular">
+                                <label>Celular (10 dígitos enteros):</label>
+                                <input type="text" id="c_celular" required pattern="[0-9]{10}" maxlength="10" placeholder="Ej. 0998765432" oninput="this.value = this.value.replace(/\D/g, '')">
                             </div>
                             <div>
                                 <label>Dirección domiciliaria:</label>
-                                <input type="text" id="c_direccion">
+                                <input type="text" id="c_direccion" required placeholder="Ej. Av. Amazonas y Shyris">
                             </div>
                         </div>
                         <div style="margin-bottom: 1.5rem;">
@@ -228,7 +228,7 @@
         </div>
     </div>
 
-    <div id="modal-expediente" class="modal">
+<div id="modal-expediente" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="cerrarModal()">&times;</span>
             <h2 id="modal-emp-name">Expediente Digital</h2>
@@ -243,12 +243,27 @@
                             <select id="upload-tipo-doc" required></select>
                         </div>
                         <div>
-                            <label>Archivo:</label>
-                            <input type="file" id="upload-file" required>
+                            <label>Archivo (Solo PDF):</label>
+                            <input type="file" id="upload-file" accept=".pdf" required>
                         </div>
                     </div>
                     <button type="submit" class="btn-submit" style="padding:8px 16px; font-size:14px;">Subir Archivo</button>
                 </form>
+            </div>
+
+            <div class="card" style="background: #f1f5f9; padding: 1rem; margin-bottom: 1rem;">
+                <h4 style="margin: 0 0 0.5rem 0; color: #475569; font-size: 14px;">🔍 Filtrar documentos en esta carpeta:</h4>
+                <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.5rem; margin-bottom: 0;">
+                    <div>
+                        <input type="text" id="filter-doc-name" placeholder="Buscar por nombre de archivo..." oninput="filtrarDocumentos()">
+                    </div>
+                    <div>
+                        <input type="date" id="filter-doc-date" onchange="filtrarDocumentos()">
+                    </div>
+                    <div>
+                        <button type="button" class="btn-action" style="background:#94a3b8; color:white; padding:10px; width:100%;" onclick="limpiarFiltrosExpediente()">Limpiar Filtros</button>
+                    </div>
+                </div>
             </div>
 
             <h3>Documentos en su Carpeta</h3>
@@ -257,6 +272,7 @@
                     <thead>
                         <tr>
                             <th>Tipo de Documento</th>
+                            <th>Nombre de Archivo</th>
                             <th>Subido Por</th>
                             <th>Fecha</th>
                             <th>Ver</th>
@@ -279,6 +295,7 @@
         let currentSelectedUserId = null;
         let currentSelectedUserPasivo = false;
         let currentSelectedUserName = "";
+        let documentosActuales = [];
 
         // Redirección de seguridad inmediata
         if (!token || !rol) {
@@ -419,7 +436,7 @@
 
         // --- MANEJO DEL EXPEDIENTE DIGITAL DINÁMICO ---
         
-        async function abrirExpediente(id, nombre, cedula, esPasivo) {
+async function abrirExpediente(id, nombre, cedula, esPasivo) {
             currentSelectedUserId = id;
             currentSelectedUserPasivo = esPasivo;
             currentSelectedUserName = nombre;
@@ -427,12 +444,14 @@
             document.getElementById('modal-emp-name').innerText = `Expediente: ${nombre}`;
             document.getElementById('modal-emp-cedula').innerText = cedula;
 
+            // Limpiar los inputs de filtros al abrir un nuevo expediente
+            limpiarFiltrosExpediente();
+
             // Configurar Selector de tipos de documento permitido según ROL logeado
             const selectTipo = document.getElementById('upload-tipo-doc');
             selectTipo.innerHTML = '';
 
-                if (rol === 'admin') {
-                // Opciones base solicitadas para todo el personal
+            if (rol === 'admin') {
                 let opcionesAdmin = `
                     <option value="Contratación">Contratación</option>
                     <option value="Vacaciones">Vacaciones</option>
@@ -444,14 +463,11 @@
                     <option value="Certificados y Cargas Familiares">Certificados y Cargas Familiares</option>
                 `;
 
-                // Si el empleado es pasivo, agregamos la opción exclusiva al final
                 if (esPasivo) {
                     opcionesAdmin += `<option value="Desvinculación">Desvinculación</option>`;
                 }
-
                 selectTipo.innerHTML = opcionesAdmin;
 
-                
             } else if (rol === 'doc') {
                 selectTipo.innerHTML = `
                     <option value="Ficha Médica Ocupacional">Ficha Médica Ocupacional</option>
@@ -468,18 +484,14 @@
                 `;
             }
 
-            // Cargar tabla de documentos del empleado respectivo
-            renderizarDocumentosDeUsuario();
+            // Consultar y guardar los documentos desde el servidor
+            await obtenerDocumentosServidor();
 
             document.getElementById('modal-expediente').style.display = 'flex';
         }
 
-        async function renderizarDocumentosDeUsuario() {
-            const tbody = document.getElementById('tbody-docs-empleado');
-            tbody.innerHTML = '<tr><td colspan="5">Consultando expedientes del servidor...</td></tr>';
-
+        async function obtenerDocumentosServidor() {
             let endpoint = '';
-            // Determinamos qué ruta consultar según el rol que está mirando
             if (rol === 'admin') {
                 endpoint = `${API_URL}/admin/documentos/${currentSelectedUserId}?pasivo=${currentSelectedUserPasivo}`;
             } else if (rol === 'doc') {
@@ -490,32 +502,69 @@
 
             try {
                 const res = await fetch(endpoint, { headers: { 'Authorization': `Bearer ${token}` } });
-                const docs = await res.json();
-                tbody.innerHTML = '';
+                documentosActuales = await res.json(); // Guardamos en la variable global
+                if (!Array.isArray(documentosActuales)) documentosActuales = [];
+                dibujarTablaDocumentos(documentosActuales);
+            } catch (err) { 
+                document.getElementById('tbody-docs-empleado').innerHTML = '<tr><td colspan="6" style="color:red;">Error al enlazar datos de almacenamiento remoto.</td></tr>'; 
+            }
+        }
 
-                if(!docs || docs.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#94a3b8;">No se registran archivos en este módulo para el usuario.</td></tr>';
-                    return;
+        function dibujarTablaDocumentos(listaDocs) {
+            const tbody = document.getElementById('tbody-docs-empleado');
+            tbody.innerHTML = '';
+
+            if(!listaDocs || listaDocs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#94a3b8;">No se registran archivos con los criterios buscados.</td></tr>';
+                return;
+            }
+
+            listaDocs.forEach(doc => {
+                const fechaFormateada = new Date(doc.created_at).toLocaleDateString('es-EC', {day: '2-digit', month: '2-digit', year: 'numeric'});
+                const puedeEliminar = (rol === 'admin' || rol === 'doc');
+                
+                // Si tu backend no devuelve un campo 'nombre_archivo', usamos el 'tipo_documento' + '.pdf' por seguridad visual
+                const nombreArchivoMostrar = doc.nombre_archivo || `${doc.tipo_documento}.pdf`;
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td>📁 <strong>${doc.tipo_documento}</strong></td>
+                        <td style="font-size:13px; color:#475569; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${nombreArchivoMostrar}">${nombreArchivoMostrar}</td>
+                        <td><span style="font-size:13px;" class="user-badge">${doc.nombre_user || 'Sistema'}</span></td>
+                        <td>${fechaFormateada}</td>
+                        <td><a href="${doc.url_cloudinary}" target="_blank" class="btn-action btn-view">👁️ Descargar</a></td>
+                        ${puedeEliminar ? `<td><button class="btn-action btn-delete" onclick="eliminarDocumento('${doc.id}')">❌</button></td>` : '<td>-</td>'}
+                    </tr>`;
+            });
+        }
+
+        // FUNCIONES DE FILTRADO EN TIEMPO REAL
+        function filtrarDocumentos() {
+            const valNombre = document.getElementById('filter-doc-name').value.toLowerCase().trim();
+            const valFecha = document.getElementById('filter-doc-date').value; // Formato YYYY-MM-DD
+
+            const documentosFiltrados = documentosActuales.filter(doc => {
+                // Validación por Nombre de Archivo o Tipo de Documento
+                const matchNombre = (doc.nombre_archivo && doc.nombre_archivo.toLowerCase().includes(valNombre)) || 
+                                     doc.tipo_documento.toLowerCase().includes(valNombre);
+                
+                // Validación por Fecha de Registro
+                let matchFecha = true;
+                if (valFecha) {
+                    const fechaDoc = new Date(doc.created_at).toISOString().split('T')[0]; // Extrae YYYY-MM-DD
+                    matchFecha = (fechaDoc === valFecha);
                 }
 
-                docs.forEach(doc => {
-                    const fechaFormateada = new Date(doc.created_at).toLocaleDateString('es-EC', {day: '2-digit', month: '2-digit', year: 'numeric'});
-                    
-                    // Condición de eliminación: Admin puede borrar casi todo, Dr. borra en su flujo
-                    const puedeEliminar = (rol === 'admin' || rol === 'doc');
+                return matchNombre && matchFecha;
+            });
 
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>📁 <strong>${doc.tipo_documento}</strong></td>
-                            <td><span style="font-size:13px;" class="user-badge">${doc.nombre_user || 'Sistema'}</span></td>
-                            <td>${fechaFormateada}</td>
-                            <td><a href="${doc.url_cloudinary}" target="_blank" class="btn-action btn-view">👁️ Descargar</a></td>
-                            ${puedeEliminar ? `<td><button class="btn-action btn-delete" onclick="eliminarDocumento('${doc.id}')">❌</button></td>` : '<td>-</td>'}
-                        </tr>`;
-                });
-            } catch (err) { 
-                tbody.innerHTML = '<tr><td colspan="5" style="color:red;">Error al enlazar datos de almacenamiento remoto.</td></tr>'; 
-            }
+            dibujarTablaDocumentos(documentosFiltrados);
+        }
+
+        function limpiarFiltrosExpediente() {
+            document.getElementById('filter-doc-name').value = '';
+            document.getElementById('filter-doc-date').value = '';
+            dibujarTablaDocumentos(documentosActuales);
         }
 
         async function procesarSubidaDocumento(e) {
@@ -523,10 +572,19 @@
             const tipoDoc = document.getElementById('upload-tipo-doc').value;
             const archivoInput = document.getElementById('upload-file').files[0];
 
+            if (!archivoInput) return;
+
+            // VALIDACIÓN EXTRA DE SEGURIDAD EN CLIENTE: SOLO PDF
+            if (archivoInput.type !== "application/pdf" && !archivoInput.name.endsWith('.pdf')) {
+                alert("Error: Solo se permite subir archivos en formato PDF.");
+                return;
+            }
+
             const formData = new FormData();
             formData.append('tipo_documento', tipoDoc);
             formData.append('usuario_id', currentSelectedUserId);
             formData.append('archivo', archivoInput);
+            formData.append('nombre_archivo', archivoInput.name); // Enviamos el nombre original al backend
             formData.append('nombre_user', nombreUsuario || 'Gestor Unificado');
             formData.append('es_pasivo', currentSelectedUserPasivo);
 
@@ -542,9 +600,9 @@
                     body: formData
                 });
                 if (res.ok) {
-                    alert("Archivo procesado e indexado correctamente.");
+                    alert("Archivo PDF procesado e indexado correctamente.");
                     document.getElementById('form-upload-doc').reset();
-                    renderizarDocumentosDeUsuario();
+                    await obtenerDocumentosServidor(); // Recargar datos locales
                     if(rol === 'admin' || rol === 'doc') cargarCertificadosGlobales();
                 } else {
                     const errData = await res.json();
@@ -565,7 +623,7 @@
                 });
                 if(res.ok) {
                     alert("Registro eliminado.");
-                    renderizarDocumentosDeUsuario();
+                    await obtenerDocumentosServidor(); // Volver a consultar
                     if(rol === 'admin' || rol === 'doc') cargarCertificadosGlobales();
                 } else { alert("Denegado o error de procesamiento."); }
             } catch (err) { console.error(err); }
