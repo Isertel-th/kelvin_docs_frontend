@@ -45,6 +45,9 @@
         tr:hover { background: #f8fafc; }
         .emp-thumb { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
 
+        /* Filas de cabeceras de periodos */
+        .row-periodo-header { background: #e2e8f0 !important; font-weight: bold; color: #1e293b; }
+
         /* Botones de acción rápidos */
         .btn-action { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; margin-right: 5px; text-decoration: none; display: inline-block; }
         .btn-view { background: #3b82f6; color: white; }
@@ -54,7 +57,7 @@
 
         /* Modales */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; padding: 2rem; border-radius: 10px; width: 90%; max-width: 700px; max-height: 85vh; overflow-y: auto; position: relative; }
+        .modal-content { background: white; padding: 2rem; border-radius: 10px; width: 90%; max-width: 850px; max-height: 85vh; overflow-y: auto; position: relative; }
         .close-modal { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #94a3b8; }
         
         /* Restricciones de Roles Visuales */
@@ -129,7 +132,7 @@
                 </div>
             </div>
 
-<div id="view-crear" class="view-section">
+            <div id="view-crear" class="view-section">
                 <div class="card">
                     <h3>Registrar Nuevo Colaborador en Nómina</h3>
                     <form id="form-crear-usuario" onsubmit="crearUsuario(event)">
@@ -228,7 +231,7 @@
         </div>
     </div>
 
-<div id="modal-expediente" class="modal">
+    <div id="modal-expediente" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="cerrarModal()">&times;</span>
             <h2 id="modal-emp-name">Expediente Digital</h2>
@@ -237,10 +240,18 @@
             <div class="card" style="background: #f8fafc; border: 1px solid #e2e8f0;">
                 <h4 style="margin-top:0; color:#334155;">Cargar nuevo archivo a este expediente</h4>
                 <form id="form-upload-doc" onsubmit="procesarSubidaDocumento(event)">
-                    <div class="grid-form">
+                    <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
                         <div>
-                            <label>Seleccionar Tipo Documento:</label>
+                            <label>Tipo Documento:</label>
                             <select id="upload-tipo-doc" required></select>
+                        </div>
+                        <div>
+                            <label>Fecha Documento:</label>
+                            <input type="date" id="upload-doc-date" required>
+                        </div>
+                        <div>
+                            <label>Periodo (Mes/Año):</label>
+                            <input type="month" id="upload-doc-period" required>
                         </div>
                         <div>
                             <label>Archivo (Solo PDF):</label>
@@ -252,29 +263,28 @@
             </div>
 
             <div class="card" style="background: #f1f5f9; padding: 1rem; margin-bottom: 1rem;">
-                <h4 style="margin: 0 0 0.5rem 0; color: #475569; font-size: 14px;">🔍 Filtrar documentos en esta carpeta:</h4>
-                <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.5rem; margin-bottom: 0;">
+                <h4 style="margin: 0 0 0.5rem 0; color: #475569; font-size: 14px;">🔍 Clasificación y Filtros Integrados:</h4>
+                <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.5rem; margin-bottom: 0;">
                     <div>
-                        <input type="text" id="filter-doc-name" placeholder="Buscar por nombre de archivo..." oninput="filtrarDocumentos()">
+                        <label style="margin-bottom:2px;">Seleccionar Categoría:</label>
+                        <select id="filter-doc-tipo" onchange="filtrarDocumentos()"></select>
                     </div>
                     <div>
-                        <input type="date" id="filter-doc-date" onchange="filtrarDocumentos()">
-                    </div>
-                    <div>
-                        <button type="button" class="btn-action" style="background:#94a3b8; color:white; padding:10px; width:100%;" onclick="limpiarFiltrosExpediente()">Limpiar Filtros</button>
+                        <label style="margin-bottom:2px;">Buscar por nombre de archivo:</label>
+                        <input type="text" id="filter-doc-name" placeholder="Buscar palabra clave..." oninput="filtrarDocumentos()">
                     </div>
                 </div>
             </div>
 
-            <h3>Documentos en su Carpeta</h3>
+            <h3>Documentos Clasificados por Periodo</h3>
             <div class="table-responsive">
                 <table>
                     <thead>
                         <tr>
-                            <th>Tipo de Documento</th>
-                            <th>Nombre de Archivo</th>
+                            <th>Categoría</th>
+                            <th>Nombre Original de Archivo</th>
                             <th>Subido Por</th>
-                            <th>Fecha</th>
+                            <th>Fecha Doc.</th>
                             <th>Ver</th>
                             <th class="role-admin">Eliminar</th>
                         </tr>
@@ -291,15 +301,11 @@
         const rol = localStorage.getItem('rol');
         const nombreUsuario = localStorage.getItem('nombre');
 
-        // Variables de Control Temporal de Selección
         let currentSelectedUserId = null;
         let currentSelectedUserPasivo = false;
         let currentSelectedUserName = "";
         let documentosActuales = [];
 
-// ========================================================
-        // AQUÍ PUEDES COLOCAR LAS NUEVAS FUNCIONES UTILITARIAS:
-        // ========================================================
         function formatearNombre(texto) {
             return texto
                 .toLowerCase()
@@ -311,20 +317,23 @@
                 .trim()
                 .replace(/\s+/g, ' ');
         }
-        // ========================================================
 
+        function obtenerNombreMesEspanol(periodoStr) {
+            if (!periodoStr || !periodoStr.includes('-')) return "Periodo General / Antiguos";
+            const [anio, mes] = periodoStr.split('-');
+            const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+            const index = parseInt(mes, 10) - 1;
+            return (index >= 0 && index < 12) ? `📅 ${meses[index]} de ${anio}` : `Periodo: ${periodoStr}`;
+        }
 
-        // Redirección de seguridad inmediata
         if (!token || !rol) {
             cerrarSesion();
         }
 
         window.onload = function() {
-            // Mostrar info en Cabecera
             document.getElementById('user-role').innerText = rol.toUpperCase();
             document.getElementById('user-display-name').innerText = nombreUsuario || "Usuario Isertel";
 
-            // Control de visibilidad estructural basado en ROLES
             if (rol === 'admin') {
                 document.querySelectorAll('.role-admin').forEach(el => el.style.display = 'block');
             } else if (rol === 'doc') {
@@ -333,7 +342,6 @@
                 document.querySelectorAll('.role-kelvin').forEach(el => el.style.display = 'block');
             }
 
-            // Cargar listas iniciales
             cargarEmpleadosActivos();
             cargarEmpleadosPasivos();
             if (rol === 'admin') cargarDocumentosEmpresa();
@@ -346,11 +354,9 @@
             
             document.getElementById(`view-${viewId}`).classList.add('active');
             
-            // Buscar y activar el botón correcto de la barra de navegación
             const eventTarget = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.getAttribute('onclick').includes(viewId));
             if(eventTarget) eventTarget.classList.add('active');
 
-            // Actualizar Titulo de Cabecera descriptivo
             const titles = { 'activos': 'Personal Activo', 'pasivos': 'Personal Pasivo', 'crear': 'Registrar Empleado', 'empresa': 'Documentos Institucionales', 'global-medicos': 'Certificados Médicos Globales' };
             document.getElementById('view-title').innerText = titles[viewId] || "Panel Isertel";
         }
@@ -359,8 +365,6 @@
             localStorage.clear();
             window.location.href = 'index.html';
         }
-
-        // --- CONSUMOS DE ENDPOINTS API ---
 
         async function cargarEmpleadosActivos() {
             try {
@@ -453,7 +457,7 @@
 
         // --- MANEJO DEL EXPEDIENTE DIGITAL DINÁMICO ---
         
-async function abrirExpediente(id, nombre, cedula, esPasivo) {
+        async function abrirExpediente(id, nombre, cedula, esPasivo) {
             currentSelectedUserId = id;
             currentSelectedUserPasivo = esPasivo;
             currentSelectedUserName = nombre;
@@ -461,15 +465,17 @@ async function abrirExpediente(id, nombre, cedula, esPasivo) {
             document.getElementById('modal-emp-name').innerText = `Expediente: ${nombre}`;
             document.getElementById('modal-emp-cedula').innerText = cedula;
 
-            // Limpiar los inputs de filtros al abrir un nuevo expediente
-            limpiarFiltrosExpediente();
+            // Restablecer campos del formulario
+            document.getElementById('form-upload-doc').reset();
 
-            // Configurar Selector de tipos de documento permitido según ROL logeado
+            // Configurar Selectores según ROL
             const selectTipo = document.getElementById('upload-tipo-doc');
-            selectTipo.innerHTML = '';
+            const selectFilter = document.getElementById('filter-doc-tipo');
+            
+            let opcionesHTML = "";
 
             if (rol === 'admin') {
-                let opcionesAdmin = `
+                opcionesHTML = `
                     <option value="Contratación">Contratación</option>
                     <option value="Vacaciones">Vacaciones</option>
                     <option value="Certificado de Competencia">Certificado de Competencia</option>
@@ -479,14 +485,11 @@ async function abrirExpediente(id, nombre, cedula, esPasivo) {
                     <option value="Memorándum">Memorándum</option>
                     <option value="Certificados y Cargas Familiares">Certificados y Cargas Familiares</option>
                 `;
-
                 if (esPasivo) {
-                    opcionesAdmin += `<option value="Desvinculación">Desvinculación</option>`;
+                    opcionesHTML += `<option value="Desvinculación">Desvinculación</option>`;
                 }
-                selectTipo.innerHTML = opcionesAdmin;
-
             } else if (rol === 'doc') {
-                selectTipo.innerHTML = `
+                opcionesHTML = `
                     <option value="Ficha Médica Ocupacional">Ficha Médica Ocupacional</option>
                     <option value="Aptitud Médica Ingreso">Aptitud Médica Ingreso</option>
                     <option value="Aptitud Médica Periódico">Aptitud Médica Periódico</option>
@@ -494,16 +497,21 @@ async function abrirExpediente(id, nombre, cedula, esPasivo) {
                     <option value="Reposo médico">Reposo médico validado</option>
                 `;
             } else if (rol === 'kelvin') {
-                selectTipo.innerHTML = `
+                opcionesHTML = `
                     <option value="Certificado de Competencia Laboral">Certificado de Competencia Laboral</option>
                     <option value="Certificado Técnico Operaciones">Certificado Técnico Operaciones</option>
                     <option value="Acta de Entrega EPP">Acta de Entrega EPP</option>
                 `;
             }
 
-            // Consultar y guardar los documentos desde el servidor
-            await obtenerDocumentosServidor();
+            selectTipo.innerHTML = opcionesHTML;
+            // El filtro tendrá las mismas opciones estructurales
+            selectFilter.innerHTML = opcionesHTML;
 
+            // Limpiar campo de texto de búsqueda
+            document.getElementById('filter-doc-name').value = '';
+
+            await obtenerDocumentosServidor();
             document.getElementById('modal-expediente').style.display = 'flex';
         }
 
@@ -519,79 +527,100 @@ async function abrirExpediente(id, nombre, cedula, esPasivo) {
 
             try {
                 const res = await fetch(endpoint, { headers: { 'Authorization': `Bearer ${token}` } });
-                documentosActuales = await res.json(); // Guardamos en la variable global
+                documentosActuales = await res.json();
                 if (!Array.isArray(documentosActuales)) documentosActuales = [];
-                dibujarTablaDocumentos(documentosActuales);
+                filtrarDocumentos(); 
             } catch (err) { 
                 document.getElementById('tbody-docs-empleado').innerHTML = '<tr><td colspan="6" style="color:red;">Error al enlazar datos de almacenamiento remoto.</td></tr>'; 
             }
         }
 
-        function dibujarTablaDocumentos(listaDocs) {
+        // CLASIFICACIÓN DINÁMICA POR TIPO Y AGRUPACIÓN POR PERIODO (MES)
+        function filtrarDocumentos() {
+            const tipoSeleccionado = document.getElementById('filter-doc-tipo').value;
+            const valNombre = document.getElementById('filter-doc-name').value.toLowerCase().trim();
+
+            // 1. Filtrar de forma estricta por el tipo de documento seleccionado y palabra clave
+            const docsFiltrados = documentosActuales.filter(doc => {
+                const matchTipo = (doc.tipo_documento === tipoSeleccionado);
+                const nombreArchivo = (doc.nombre_archivo || '').toLowerCase();
+                const matchNombre = valNombre === '' || nombreArchivo.includes(valNombre);
+                return matchTipo && matchNombre;
+            });
+
+            // 2. Agrupar los resultados por Periodo (Año-Mes)
+            const gruposPorPeriodo = {};
+            docsFiltrados.forEach(doc => {
+                // Si tu BD aún no tiene la columna "periodo", extraemos el año-mes de fecha_documento o created_at como salvaguarda
+                const periodo = doc.periodo || (doc.fecha_documento || doc.created_at || '').substring(0, 7) || 'Sin Periodo';
+                if (!gruposPorPeriodo[periodo]) {
+                    gruposPorPeriodo[periodo] = [];
+                }
+                gruposPorPeriodo[periodo].push(doc);
+            });
+
+            // 3. Ordenar los periodos de manera descendente (los más recientes primero)
+            const periodosOrdenados = Object.keys(gruposPorPeriodo).sort((a, b) => b.localeCompare(a));
+
+            // 4. Dibujar la tabla estructurada
+            dibujarTablaAgrupada(gruposPorPeriodo, periodosOrdenados);
+        }
+
+        function dibujarTablaAgrupada(grupos, periodos) {
             const tbody = document.getElementById('tbody-docs-empleado');
             tbody.innerHTML = '';
 
-            if(!listaDocs || listaDocs.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#94a3b8;">No se registran archivos con los criterios buscados.</td></tr>';
+            if (periodos.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#94a3b8; padding: 2rem;">No se registran archivos en esta categoría para los criterios buscados.</td></tr>';
                 return;
             }
 
-            listaDocs.forEach(doc => {
-                const fechaFormateada = new Date(doc.created_at).toLocaleDateString('es-EC', {day: '2-digit', month: '2-digit', year: 'numeric'});
-                const puedeEliminar = (rol === 'admin' || rol === 'doc');
-                
-                // Si tu backend no devuelve un campo 'nombre_archivo', usamos el 'tipo_documento' + '.pdf' por seguridad visual
-                const nombreArchivoMostrar = doc.nombre_archivo || `${doc.tipo_documento}.pdf`;
-
+            periodos.forEach(periodo => {
+                // Inyectar la Fila Divisora de Mes / Periodo
+                const nombreMesCabecera = obtenerNombreMesEspanol(periodo);
                 tbody.innerHTML += `
-                    <tr>
-                        <td>📁 <strong>${doc.tipo_documento}</strong></td>
-                        <td style="font-size:13px; color:#475569; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${nombreArchivoMostrar}">${nombreArchivoMostrar}</td>
-                        <td><span style="font-size:13px;" class="user-badge">${doc.nombre_user || 'Sistema'}</span></td>
-                        <td>${fechaFormateada}</td>
-                        <td><a href="${doc.url_cloudinary}" target="_blank" class="btn-action btn-view">👁️ Descargar</a></td>
-                        ${puedeEliminar ? `<td><button class="btn-action btn-delete" onclick="eliminarDocumento('${doc.id}')">❌</button></td>` : '<td>-</td>'}
-                    </tr>`;
+                    <tr class="row-periodo-header">
+                        <td colspan="6" style="padding: 8px 16px; font-weight: 700; font-size:14px; letter-spacing: 0.5px;">
+                            ${nombreMesCabecera}
+                        </td>
+                    </tr>
+                `;
+
+                // Agregar los documentos que pertenecen a este periodo específico
+                grupos[periodo].forEach(doc => {
+                    // Si viene la fecha guardada del documento la usamos, sino la de creación
+                    const fechaRaw = doc.fecha_documento || doc.created_at;
+                    const fechaFormateada = fechaRaw ? new Date(fechaRaw).toLocaleDateString('es-EC', {day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC'}) : 'S/F';
+                    
+                    const puedeEliminar = (rol === 'admin' || rol === 'doc');
+                    
+                    // SOLUCIÓN: Mostramos de forma estricta el nombre_archivo original enviado desde el cliente
+                    const nombreArchivoMostrar = doc.nombre_archivo || `${doc.tipo_documento}.pdf`;
+
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>📁 <span>${doc.tipo_documento}</span></td>
+                            <td style="font-size:14px; color:#1e293b; font-weight: 500; max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${nombreArchivoMostrar}">
+                                ${nombreArchivoMostrar}
+                            </td>
+                            <td><span style="font-size:13px;" class="user-badge">${doc.nombre_user || 'Sistema'}</span></td>
+                            <td><strong>${fechaFormateada}</strong></td>
+                            <td><a href="${doc.url_cloudinary}" target="_blank" class="btn-action btn-view">👁️ Descargar</a></td>
+                            ${puedeEliminar ? `<td><button class="btn-action btn-delete" onclick="eliminarDocumento('${doc.id}')">❌</button></td>` : '<td>-</td>'}
+                        </tr>`;
+                });
             });
-        }
-
-        // FUNCIONES DE FILTRADO EN TIEMPO REAL
-        function filtrarDocumentos() {
-            const valNombre = document.getElementById('filter-doc-name').value.toLowerCase().trim();
-            const valFecha = document.getElementById('filter-doc-date').value; // Formato YYYY-MM-DD
-
-            const documentosFiltrados = documentosActuales.filter(doc => {
-                // Validación por Nombre de Archivo o Tipo de Documento
-                const matchNombre = (doc.nombre_archivo && doc.nombre_archivo.toLowerCase().includes(valNombre)) || 
-                                     doc.tipo_documento.toLowerCase().includes(valNombre);
-                
-                // Validación por Fecha de Registro
-                let matchFecha = true;
-                if (valFecha) {
-                    const fechaDoc = new Date(doc.created_at).toISOString().split('T')[0]; // Extrae YYYY-MM-DD
-                    matchFecha = (fechaDoc === valFecha);
-                }
-
-                return matchNombre && matchFecha;
-            });
-
-            dibujarTablaDocumentos(documentosFiltrados);
-        }
-
-        function limpiarFiltrosExpediente() {
-            document.getElementById('filter-doc-name').value = '';
-            document.getElementById('filter-doc-date').value = '';
-            dibujarTablaDocumentos(documentosActuales);
         }
 
         async function procesarSubidaDocumento(e) {
             e.preventDefault();
             const tipoDoc = document.getElementById('upload-tipo-doc').value;
+            const fechaDoc = document.getElementById('upload-doc-date').value;
+            const periodoDoc = document.getElementById('upload-doc-period').value; // Formato YYYY-MM
             const archivoInput = document.getElementById('upload-file').files[0];
 
             if (!archivoInput) return;
 
-            // VALIDACIÓN EXTRA DE SEGURIDAD EN CLIENTE: SOLO PDF
             if (archivoInput.type !== "application/pdf" && !archivoInput.name.endsWith('.pdf')) {
                 alert("Error: Solo se permite subir archivos en formato PDF.");
                 return;
@@ -601,7 +630,12 @@ async function abrirExpediente(id, nombre, cedula, esPasivo) {
             formData.append('tipo_documento', tipoDoc);
             formData.append('usuario_id', currentSelectedUserId);
             formData.append('archivo', archivoInput);
-            formData.append('nombre_archivo', archivoInput.name); // Enviamos el nombre original al backend
+            
+            // Garantizamos el envío de las nuevas variables de control al Backend
+            formData.append('nombre_archivo', archivoInput.name); 
+            formData.append('fecha_documento', fechaDoc);
+            formData.append('periodo', periodoDoc);
+            
             formData.append('nombre_user', nombreUsuario || 'Gestor Unificado');
             formData.append('es_pasivo', currentSelectedUserPasivo);
 
@@ -617,19 +651,23 @@ async function abrirExpediente(id, nombre, cedula, esPasivo) {
                     body: formData
                 });
                 if (res.ok) {
-                    alert("Archivo PDF procesado e indexado correctamente.");
+                    alert("Archivo PDF indexado y guardado correctamente por periodo.");
                     document.getElementById('form-upload-doc').reset();
-                    await obtenerDocumentosServidor(); // Recargar datos locales
+                    
+                    // Conservamos el filtro del tipo subido para ver la actualización inmediata
+                    document.getElementById('filter-doc-tipo').value = tipoDoc;
+                    
+                    await obtenerDocumentosServidor(); 
                     if(rol === 'admin' || rol === 'doc') cargarCertificadosGlobales();
                 } else {
                     const errData = await res.json();
-                    alert("Error crítico del servidor: " + errData.error);
+                    alert("Error del servidor: " + errData.error);
                 }
             } catch(err) { alert("Fallo de red al intentar subir."); }
         }
 
         async function eliminarDocumento(id) {
-            if(!confirm("¿Desea suprimir permanentemente este registro documental de las bases de datos?")) return;
+            if(!confirm("¿Desea suprimir permanentemente este registro documental?")) return;
             
             let deleteEndpoint = (rol === 'doc') ? `${API_URL}/doctor/aptitud/${id}` : `${API_URL}/admin/documentos/${id}`;
             
@@ -640,7 +678,7 @@ async function abrirExpediente(id, nombre, cedula, esPasivo) {
                 });
                 if(res.ok) {
                     alert("Registro eliminado.");
-                    await obtenerDocumentosServidor(); // Volver a consultar
+                    await obtenerDocumentosServidor(); 
                     if(rol === 'admin' || rol === 'doc') cargarCertificadosGlobales();
                 } else { alert("Denegado o error de procesamiento."); }
             } catch (err) { console.error(err); }
