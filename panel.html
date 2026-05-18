@@ -267,49 +267,97 @@
                 <div class="vector-grid" id="vector-container"></div>
             </div>
 
-            <div id="expediente-detalles" style="display: none; margin-top: 2rem;">
-                
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed #cbd5e1; padding-bottom: 1rem; margin-bottom: 1.5rem;">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <button type="button" class="btn-action btn-clear" onclick="regresarAPaso1()" style="padding: 8px 12px; margin: 0; border-radius: 6px; font-weight: 600; display: flex; align-items: center; gap: 4px;">
-                            ⬅️ Volver
-                        </button>
-                        <h3 id="detalle-categoria-titulo" style="margin: 0; color: #1e293b; font-size: 18px;">Carpeta</h3>
-                    </div>
-                    <button type="button" class="btn-action btn-upload" onclick="toggleUploadForm()" style="padding: 10px 20px; font-size: 14px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                        ➕ Subir Nuevo Documento
-                    </button>
-                </div>
+<div id="expediente-detalles" style="display: none; margin-top: 2rem;">
+    
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem;">
+        <button type="button" class="btn-action btn-clear" onclick="regresarAPaso1()" style="padding: 8px 12px; margin: 0; border-radius: 6px; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+            ⬅️ Volver
+        </button>
+        <h3 id="detalle-categoria-titulo" style="margin: 0; color: #1e293b; font-size: 18px;">Carpeta</h3>
+    </div>
 
-                <form id="form-upload-doc" onsubmit="procesarSubidaDocumento(event)" style="display: none; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
-                    <input type="hidden" id="upload-tipo-doc" required>
-                    <h4 style="margin: 0 0 1rem 0; color: #475569; font-size: 14px;">📋 Paso 2: Completa los detalles del archivo</h4>
-                    
-                    <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
-                        <div>
-                            <label>Subtipo Documento:</label>
-                            <select id="upload-subtipo-doc" required>
-                                <option value="General / Único">General / Único</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label>Fecha Documento:</label>
-                            <input type="date" id="upload-doc-date" required>
-                        </div>
-                        <div>
-                            <label>Periodo (Mes/Año):</label>
-                            <input type="month" id="upload-doc-period" required>
-                        </div>
-                        <div style="grid-column: span 1;">
-                            <label>Archivo (Solo PDF):</label>
-                            <input type="file" id="upload-file" accept=".pdf" required style="padding: 7px;">
-                        </div>
-                    </div>
-                    
-                    <div style="margin-top: 1.25rem; text-align: right;">
-                        <button type="submit" class="btn-submit" style="padding:10px 24px; font-size:14px; border-radius: 8px;">🚀 Indexar y Subir Archivo</button>
-                    </div>
-                </form>
+    <div class="card" style="background: #f1f5f9; padding: 1.25rem; margin-bottom: 1.5rem; border: 1px solid #cbd5e1;">
+        <h4 style="margin: 0 0 0.75rem 0; color: #334155; font-size: 14px;">🔍 Clasificación y Filtros Integrados:</h4>
+        <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.5rem; margin-bottom: 0; align-items: flex-end;">
+            <div style="display: none;">
+                <label style="margin-bottom:2px;">Categoría:</label>
+                <select id="filter-doc-tipo" onchange="actualizarSubtipos('filter'); filtrarDocumentos();"></select>
+            </div>
+            <div>
+                <label style="margin-bottom:2px;">Subcategoría:</label>
+                <select id="filter-doc-subtipo" onchange="filtrarDocumentos()">
+                    <option value="TODOS">-- Todos --</option>
+                </select>
+            </div>
+            <div>
+                <label style="margin-bottom:2px;">Buscar por nombre:</label>
+                <input type="text" id="filter-doc-name" placeholder="Palabra clave..." oninput="filtrarDocumentos()">
+            </div>
+            <div>
+                <label style="margin-bottom:2px;">Filtrar por Fecha:</label>
+                <input type="date" id="filter-doc-date" onchange="filtrarDocumentos()">
+            </div>
+            <div>
+                <button type="button" class="btn-action btn-clear" style="width: 100%; padding: 10px; margin: 0; border-radius: 6px; font-weight: 600;" onclick="limpiarFiltros()">🧹 Limpiar</button>
+            </div>
+        </div>
+    </div>
+
+    <h3 style="color: #1e293b; font-size: 18px; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">📁 Documentos Clasificados por Periodo</h3>
+    <div class="table-responsive" style="margin-bottom: 2.5rem;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Categoría</th>
+                    <th>Nombre Original de Archivo</th>
+                    <th>Subido Por</th>
+                    <th>Fecha Doc.</th>
+                    <th>Ver</th>
+                    <th class="role-admin">Eliminar</th>
+                </tr>
+            </thead>
+            <tbody id="tbody-docs-empleado"></tbody>
+        </table>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 2px dashed #cbd5e1; padding-top: 1.5rem; margin-bottom: 1.5rem;">
+        <h4 style="margin: 0; color: #475569; font-size: 16px; font-weight: 600;">¿Necesitas añadir documentación a esta carpeta?</h4>
+        <button type="button" class="btn-action btn-upload" onclick="toggleUploadForm()" style="padding: 10px 20px; font-size: 14px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            ➕ Subir Nuevo Documento
+        </button>
+    </div>
+
+    <form id="form-upload-doc" onsubmit="procesarSubidaDocumento(event)" style="display: none; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+        <input type="hidden" id="upload-tipo-doc" required>
+        <h4 style="margin: 0 0 1rem 0; color: #475569; font-size: 14px;">📋 Paso 2: Completa los detalles del archivo</h4>
+        
+        <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
+            <div>
+                <label>Subtipo Documento:</label>
+                <select id="upload-subtipo-doc" required>
+                    <option value="General / Único">General / Único</option>
+                </select>
+            </div>
+            <div>
+                <label>Fecha Documento:</label>
+                <input type="date" id="upload-doc-date" required>
+            </div>
+            <div>
+                <label>Periodo (Mes/Año):</label>
+                <input type="month" id="upload-doc-period" required>
+            </div>
+            <div style="grid-column: span 1;">
+                <label>Archivo (Solo PDF):</label>
+                <input type="file" id="upload-file" accept=".pdf" required style="padding: 7px;">
+            </div>
+        </div>
+        
+        <div style="margin-top: 1.25rem; text-align: right;">
+            <button type="submit" class="btn-submit" style="padding:10px 24px; font-size:14px; border-radius: 8px;">🚀 Indexar y Subir Archivo</button>
+        </div>
+    </form>
+
+</div>
 
                 <div class="card" style="background: #f1f5f9; padding: 1.25rem; margin-bottom: 1.5rem; border: 1px solid #cbd5e1;">
                     <h4 style="margin: 0 0 0.75rem 0; color: #334155; font-size: 14px;">🔍 Clasificación y Filtros Integrados:</h4>
@@ -703,17 +751,19 @@
             }
 
             // MODIFICACIONES DE INTERFAZ SOLICITADAS: Ocultar Paso 1 completamente y habilitar detalles
-            document.getElementById('section-paso1').style.display = 'none';
-            document.getElementById('expediente-detalles').style.display = 'block';
-            document.getElementById('form-upload-doc').style.display = 'none';
-            document.getElementById('detalle-categoria-titulo').innerText = `📂 Carpeta: ${tipoSeleccionado}`;
+document.getElementById('section-paso1').style.display = 'none';
+    document.getElementById('expediente-detalles').style.display = 'block';
+    document.getElementById('form-upload-doc').style.display = 'none';
+    
+    // Cambia exactamente esta línea para apuntar al encabezado del botón volver superior
+    document.getElementById('detalle-categoria-titulo').innerText = `📂 Carpeta: ${tipoSeleccionado}`;
 
-            // Sincronizar el filtro maestro y renderizar la tabla con la categoría específica
-            const selectFilter = document.getElementById('filter-doc-tipo');
-            if(selectFilter) selectFilter.value = tipoSeleccionado;
-            actualizarSubtipos('filter');
-            filtrarDocumentos();
-        }
+    // Sincronizar el filtro maestro y renderizar la tabla con la categoría específica
+    const selectFilter = document.getElementById('filter-doc-tipo');
+    if(selectFilter) selectFilter.value = tipoSeleccionado;
+    actualizarSubtipos('filter');
+    filtrarDocumentos();
+}
 
         // NUEVA FUNCIÓN: Regresa la interfaz al Paso 1 limpiando selecciones de tarjetas
         function regresarAPaso1() {
