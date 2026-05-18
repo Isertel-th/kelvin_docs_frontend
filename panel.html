@@ -140,7 +140,7 @@
                             </div>
                             <div>
                                 <label>Nombre Completo:</label>
-                                <input type="text" id="c_nombre" required placeholder="Ej. Juan Pérez">
+                                <input type="text" id="c_nombre" required placeholder="Ej. Juan Pérez" oninput="this.value = formatearNombre(this.value)" onblur="this.value = limpiarEspaciosNombre(this.value)">
                             </div>
                             <div>
                                 <label>Fecha de Ingreso:</label>
@@ -296,6 +296,23 @@
         let currentSelectedUserPasivo = false;
         let currentSelectedUserName = "";
         let documentosActuales = [];
+
+// ========================================================
+        // AQUÍ PUEDES COLOCAR LAS NUEVAS FUNCIONES UTILITARIAS:
+        // ========================================================
+        function formatearNombre(texto) {
+            return texto
+                .toLowerCase()
+                .replace(/(^|\s)\S/g, (match) => match.toUpperCase());
+        }
+
+        function limpiarEspaciosNombre(texto) {
+            return texto
+                .trim()
+                .replace(/\s+/g, ' ');
+        }
+        // ========================================================
+
 
         // Redirección de seguridad inmediata
         if (!token || !rol) {
