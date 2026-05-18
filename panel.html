@@ -2,689 +2,620 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Panel de Gestión Centralizado - Isertel</title>
-    <script>
-        // --- CONTROL DE ACCESO MULTI-ROL (ADMIN, DOC, KELVIN) ---
-        (function() {
-            const token = localStorage.getItem('token');
-            const rol = localStorage.getItem('rol');
-            const rolesPermitidos = ['admin', 'doc', 'kelvin'];
-            
-            if (!token || !rolesPermitidos.includes(rol)) { 
-                window.location.href = 'index.html'; 
-            }
-        })();
-    </script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-<style>
-    .animate-fade-in { animation: fadeIn 0.3s ease-in-out; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .folder-card:hover { transform: scale(1.02); transition: all 0.2s; }
-    .mes-block { border-left: 4px solid #4f46e5; margin-bottom: 1.5rem; }
-
-    /* Ajuste para que el contenedor de la lista sea flexible pero con límite */
-    #lDocs {
-        max-height: 50vh; 
-        overflow-y: auto;
-    }
-</style>
-</head>
-<body class="bg-slate-100 font-sans min-h-screen">
-
-    <header class="bg-slate-900 text-white shadow-md px-6 py-4 flex justify-between items-center">
-        <div class="flex items-center space-x-3">
-            <div class="bg-blue-600 p-2 rounded-lg text-white">
-                <i class="fas fa-folder-open text-xl"></i>
-            </div>
-            <div>
-                <h1 class="text-lg font-bold tracking-wide">Isertel S.A.</h1>
-                <p class="text-xs text-slate-400">Sistema de Gestión Documental de Talento Humano</p>
-            </div>
-        </div>
-        <div class="flex items-center space-x-4">
-            <div class="text-right">
-                <p class="text-sm font-semibold text-slate-200" id="txtNombreUsuario">Cargando...</p>
-                <span id="badgeRol" class="text-[10px] uppercase font-extrabold px-2 py-0.5 rounded bg-slate-700 text-slate-300"></span>
-            </div>
-            <button onclick="logout()" class="bg-red-600 hover:bg-red-700 text-white text-sm font-bold px-4 py-2 rounded-lg transition-all shadow flex items-center space-x-2">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Cerrar Sesión</span>
-            </button>
-        </div>
-    </header>
-
-    <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 animate-fade-in">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Gestión - Isertel</title>
+    <style>
+        :root { --primary-color: #007bff; --admin-color: #2c3e50; --doc-color: #27ae60; --kelvin-color: #8e44ad; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f6f9; margin: 0; display: flex; height: 100vh; overflow: hidden; }
         
-        <div class="mb-6 flex justify-between items-center">
-            <button id="btnVolver" onclick="volverAlMenu()" class="hidden bg-slate-600 hover:bg-slate-700 text-white font-bold px-4 py-2 rounded-lg shadow transition-all flex items-center space-x-2">
-                <i class="fas fa-arrow-left"></i>
-                <span>Volver al Menú</span>
-            </button>
+        /* Sidebar Estilos */
+        .sidebar { width: 260px; background: #1e293b; color: white; display: flex; flex-direction: column; justify-content: space-between; padding: 1rem; }
+        .sidebar h3 { text-align: center; margin-bottom: 2rem; border-bottom: 1px solid #334155; padding-bottom: 1rem; font-size: 1.2rem; }
+        .nav-menu { display: flex; flex-direction: column; gap: 0.5rem; flex-grow: 1; }
+        .nav-btn { background: none; border: none; color: #cbd5e1; padding: 12px; text-align: left; width: 100%; border-radius: 6px; cursor: pointer; font-size: 15px; font-weight: 500; display: flex; align-items: center; }
+        .nav-btn:hover, .nav-btn.active { background: var(--primary-color); color: white; }
+        .logout-btn { background: #ef4444; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; }
+        .logout-btn:hover { background: #dc2626; }
+
+        /* Contenedor Principal */
+        .main-content { flex-grow: 1; display: flex; flex-direction: column; overflow-y: auto; background: #f8fafc; }
+        .header { background: white; padding: 1rem 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .header h2 { margin: 0; color: #334155; font-size: 1.5rem; }
+        .user-badge { background: #e2e8f0; padding: 6px 12px; border-radius: 20px; font-weight: 600; color: #475569; font-size: 14px; }
+        .container { padding: 2rem; max-width: 1200px; width: -webkit-fill-available; margin: 0 auto; }
+
+        /* Módulos de Vistas */
+        .view-section { display: none; }
+        .view-section.active { display: block; }
+
+        /* Tarjetas y Formularios */
+        .card { background: white; border-radius: 8px; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
+        .card h3 { margin-top: 0; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; }
+        .grid-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+        label { font-weight: 600; color: #64748b; font-size: 14px; display: block; margin-bottom: 4px; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 15px; }
+        .btn-submit { background: var(--primary-color); color: white; font-weight: bold; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; }
+        .btn-submit:hover { opacity: 0.9; }
+
+        /* Tablas */
+        .table-responsive { overflow-x: auto; margin-top: 1rem; }
+        table { width: 100%; border-collapse: collapse; background: white; text-align: left; }
+        th, td { padding: 12px 16px; border-bottom: 1px solid #e2e8f0; font-size: 15px; }
+        th { background: #f1f5f9; color: #475569; font-weight: 600; }
+        tr:hover { background: #f8fafc; }
+        .emp-thumb { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
+
+        /* Botones de acción rápidos */
+        .btn-action { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; margin-right: 5px; text-decoration: none; display: inline-block; }
+        .btn-view { background: #3b82f6; color: white; }
+        .btn-upload { background: #10b981; color: white; }
+        .btn-passive { background: #f59e0b; color: white; }
+        .btn-delete { background: #ef4444; color: white; }
+
+        /* Modales */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 2rem; border-radius: 10px; width: 90%; max-width: 700px; max-height: 85vh; overflow-y: auto; position: relative; }
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #94a3b8; }
+        
+        /* Restricciones de Roles Visuales */
+        .role-admin, .role-doc, .role-kelvin { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div>
+            <h3 id="panel-title">Isertel Gestión</h3>
+            <div class="nav-menu">
+                <button class="nav-btn active" onclick="switchView('activos')">👥 Personal Activo</button>
+                <button class="nav-btn" onclick="switchView('pasivos')">📁 Personal Pasivo</button>
+                <button class="nav-btn role-admin" id="menu-crear" onclick="switchView('crear')">➕ Registrar Empleado</button>
+                <button class="nav-btn role-admin" id="menu-empresa" onclick="switchView('empresa')">🏢 Docs Empresa</button>
+                <button class="nav-btn role-doc" id="menu-global-med" onclick="switchView('global-medicos')">🩺 Certificados Globales</button>
+            </div>
+        </div>
+        <div>
+            <button class="logout-btn" onclick="cerrarSesion()">Cerrar Sesión</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h2 id="view-title">Personal Activo</h2>
+            <div class="user-badge">🔑 <span id="user-role">Rol</span>: <span id="user-display-name">Usuario</span></div>
+        </div>
+
+        <div class="container">
             
-            <div id="avisoPermisos" class="hidden text-xs bg-amber-50 text-amber-700 border border-amber-200 px-3 py-1.5 rounded-md">
-                <i class="fas fa-exclamation-triangle mr-1"></i> Modo vista condicional activo para tu rol.
-            </div>
-        </div>
-
-        <div id="menuPrincipal" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div onclick="cargarSeccionEmpresa()" class="folder-card bg-white p-6 rounded-2xl shadow-sm border border-slate-200 cursor-pointer flex flex-col justify-between h-48 transition-all">
-                <div class="flex justify-between items-start">
-                    <div class="bg-blue-50 p-4 rounded-xl text-blue-600">
-                        <i class="fas fa-users text-3xl"></i>
+            <div id="view-activos" class="view-section active">
+                <div class="card">
+                    <h3>Nómina General Activa</h3>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Foto</th>
+                                    <th>Nombre Completo</th>
+                                    <th>Cédula</th>
+                                    <th>Correo</th>
+                                    <th>Celular</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-activos"></tbody>
+                        </table>
                     </div>
-                    <span class="text-xs font-semibold bg-slate-100 text-slate-600 px-2 py-1 rounded">Módulo Central</span>
-                </div>
-                <div>
-                    <h3 class="text-lg font-bold text-slate-800">Expedientes de Personal</h3>
-                    <p class="text-sm text-slate-500 mt-1">Contratos, vacaciones, certificados y carpetas individuales.</p>
                 </div>
             </div>
 
-            <div onclick="cargarSeccionGestionEmpresarial()" class="folder-card bg-white p-6 rounded-2xl shadow-sm border border-slate-200 cursor-pointer flex flex-col justify-between h-48 transition-all">
-                <div class="flex justify-between items-start">
-                    <div class="bg-indigo-50 p-4 rounded-xl text-indigo-600">
-                        <i class="fas fa-building text-3xl"></i>
+            <div id="view-pasivos" class="view-section">
+                <div class="card">
+                    <h3>Historial de Personal Pasivo (Inactivos)</h3>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Foto</th>
+                                    <th>Nombre Completo</th>
+                                    <th>Cédula</th>
+                                    <th>Correo</th>
+                                    <th>Celular</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-pasivos"></tbody>
+                        </table>
                     </div>
-                    <span id="tagAdminEmpresa" class="text-xs font-semibold bg-slate-100 text-slate-600 px-2 py-1 rounded">Admin</span>
-                </div>
-                <div>
-                    <h3 class="text-lg font-bold text-slate-800">Documentos de la Empresa</h3>
-                    <p class="text-sm text-slate-500 mt-1">Reglamentos, políticas internas y actas corporativas generales.</p>
                 </div>
             </div>
+
+            <div id="view-crear" class="view-section">
+                <div class="card">
+                    <h3>Registrar Nuevo Colaborador en Nómina</h3>
+                    <form id="form-crear-usuario" onsubmit="crearUsuario(event)">
+                        <div class="grid-form">
+                            <div>
+                                <label>Cédula (10 dígitos):</label>
+                                <input type="text" id="c_cedula" required maxlength="10">
+                            </div>
+                            <div>
+                                <label>Nombre Completo:</label>
+                                <input type="text" id="c_nombre" required>
+                            </div>
+                            <div>
+                                <label>Fecha de Ingreso:</label>
+                                <input type="date" id="c_fecha">
+                            </div>
+                        </div>
+                        <div class="grid-form">
+                            <div>
+                                <label>Correo Electrónico:</label>
+                                <input type="email" id="c_correo" required placeholder="ejemplo@isertel.com.ec">
+                            </div>
+                            <div>
+                                <label>Celular:</label>
+                                <input type="text" id="c_celular">
+                            </div>
+                            <div>
+                                <label>Dirección domiciliaria:</label>
+                                <input type="text" id="c_direccion">
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 1.5rem;">
+                            <label>Foto de Perfil del Empleado:</label>
+                            <input type="file" id="c_foto" accept="image/*" required>
+                        </div>
+                        <button type="submit" class="btn-submit">Guardar en Base de Datos</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="view-empresa" class="view-section">
+                <div class="card">
+                    <h3>Subir Documento Institucional / Empresa</h3>
+                    <form id="form-empresa" onsubmit="subirDocEmpresa(event)">
+                        <div class="grid-form">
+                            <div>
+                                <label>Tipo de Documento:</label>
+                                <input type="text" id="emp_tipo" placeholder="Ej. Reglamento Interno, Políticas" required>
+                            </div>
+                            <div>
+                                <label>Archivo (PDF/Imagen):</label>
+                                <input type="file" id="emp_archivo" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-submit">Subir Archivo General</button>
+                    </form>
+                </div>
+                <div class="card">
+                    <h3>Repositorio Corporativo</h3>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Tipo de Documento</th>
+                                    <th>Enlace</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-empresa"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-global-medicos" class="view-section">
+                <div class="card">
+                    <h3>Historial Global de Descansos y Certificados Médicos</h3>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Empleado</th>
+                                    <th>Estado</th>
+                                    <th>Tipo Documento</th>
+                                    <th>Fecha de Registro</th>
+                                    <th>Archivo</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-global-medicos"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </div>
+    </div>
 
-        <div id="seccionEmpresa" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center pb-6 border-b border-slate-100 gap-4">
-                <div>
-                    <h2 class="text-xl font-bold text-slate-800">Búsqueda de Expedientes de Personal</h2>
-                    <p class="text-sm text-slate-500">Selecciona el tipo de personal e ingresa el nombre del empleado.</p>
-                </div>
-                
-                <div class="flex bg-slate-100 p-1 rounded-xl w-full md:w-auto">
-                    <button id="btnActivos" onclick="cambiarTipoPersonal(false)" class="flex-1 md:flex-none px-4 py-2 rounded-lg font-bold text-sm bg-white text-blue-600 shadow-sm transition-all">
-                        Personal Activo
-                    </button>
-                    <button id="btnPasivos" onclick="cambiarTipoPersonal(true)" class="flex-1 md:flex-none px-4 py-2 rounded-lg font-bold text-sm text-slate-600 hover:text-slate-800 transition-all">
-                        Personal Pasivo
-                    </button>
-                </div>
+    <div id="modal-expediente" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="cerrarModal()">&times;</span>
+            <h2 id="modal-emp-name">Expediente Digital</h2>
+            <p style="font-weight: bold; color:#64748b;">Cédula: <span id="modal-emp-cedula"></span></p>
+            
+            <div class="card" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                <h4 style="margin-top:0; color:#334155;">Cargar nuevo archivo a este expediente</h4>
+                <form id="form-upload-doc" onsubmit="procesarSubidaDocumento(event)">
+                    <div class="grid-form">
+                        <div>
+                            <label>Seleccionar Tipo Documento:</label>
+                            <select id="upload-tipo-doc" required></select>
+                        </div>
+                        <div>
+                            <label>Archivo:</label>
+                            <input type="file" id="upload-file" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-submit" style="padding:8px 16px; font-size:14px;">Subir Archivo</button>
+                </form>
             </div>
 
-            <div class="mt-6 max-w-xl relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                    <i class="fas fa-search"></i>
-                </div>
-                <input type="text" id="inputBusqueda" oninput="filtrarEmpleados()" placeholder="Escribe el nombre o apellido del trabajador..." class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all">
-            </div>
-
-            <div id="listaEmpleados" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
-                </div>
-        </div>
-
-        <div id="seccionGestionEmpresarial" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-            <div class="flex justify-between items-center pb-4 border-b border-slate-100">
-                <div>
-                    <h2 class="text-xl font-bold text-slate-800">Repositorio Documental Corporativo</h2>
-                    <p class="text-sm text-slate-500">Documentación legal y reglamentos internos institucionales.</p>
-                </div>
-                <button id="btnSubirDocEmpresa" onclick="abrirModalSubidaEmpresa()" class="hidden bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold px-4 py-2 rounded-lg shadow flex items-center space-x-2">
-                    <i class="fas fa-plus"></i>
-                    <span>Subir Documento</span>
-                </button>
-            </div>
-
-            <div class="overflow-x-auto mt-6">
-                <table class="w-full text-left border-collapse">
+            <h3>Documentos en su Carpeta</h3>
+            <div class="table-responsive">
+                <table>
                     <thead>
-                        <tr class="border-b border-slate-200 bg-slate-50 text-slate-600 text-xs font-bold uppercase tracking-wider">
-                            <th class="px-6 py-3">Tipo de Documento</th>
-                            <th class="px-6 py-3 text-right">Acciones</th>
+                        <tr>
+                            <th>Tipo de Documento</th>
+                            <th>Subido Por</th>
+                            <th>Fecha</th>
+                            <th>Ver</th>
+                            <th class="role-admin">Eliminar</th>
                         </tr>
                     </thead>
-                    <tbody id="listaDocsEmpresa" class="divide-y divide-slate-100 text-sm text-slate-700">
-                        </tbody>
+                    <tbody id="tbody-docs-empleado"></tbody>
                 </table>
             </div>
         </div>
-
-        <div id="panelExpediente" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 animate-fade-in">
-            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center pb-6 border-b border-slate-100 gap-4">
-                <div>
-                    <div class="flex items-center space-x-3">
-                        <div id="iconoEstadoEmpleado" class="w-3 h-3 rounded-full bg-emerald-500"></div>
-                        <h2 id="lblNombreEmpleado" class="text-2xl font-bold text-slate-800">Nombre Completo del Trabajador</h2>
-                    </div>
-                    <p class="text-sm text-slate-500 mt-0.5">Expediente Digital Único de Talento Humano</p>
-                </div>
-                
-                <div id="controlesSubida" class="flex flex-wrap gap-2 w-full lg:w-auto">
-                    <button id="btnSubirAdmin" onclick="abrirModalGenerico('ADMIN')" class="hidden bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-2 rounded-lg shadow"><i class="fas fa-upload mr-1"></i> Subir Contrato/Vacación</button>
-                    <button id="btnSubirDoc" onclick="abrirModalGenerico('MEDICO')" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-2 rounded-lg shadow"><i class="fas fa-user-md mr-1"></i> Subir Aptitud Médica</button>
-                    <button id="btnSubirKelvin" onclick="abrirModalGenerico('TECNICO')" class="hidden bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-2 rounded-lg shadow"><i class="fas fa-tools mr-1"></i> Subir Certificado/EPP</button>
-                    <button id="btnBajaEmpleado" onclick="darDeBajaActual()" class="hidden bg-red-100 text-red-700 hover:bg-red-200 text-xs font-bold px-3 py-2 rounded-lg">Dar de Baja</button>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-6">
-                <div class="space-y-2">
-                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-3">Carpetas del Expediente</span>
-                    
-                    <button onclick="cambiarFiltroCarpeta('CONTRATOS', this)" id="folder-contratos" class="w-full text-left p-3 rounded-xl flex items-center justify-between text-sm font-semibold transition-all bg-slate-50 text-slate-700 hover:bg-slate-100">
-                        <span class="flex items-center"><i class="fas fa-file-contract text-blue-500 mr-3 text-base"></i> Contratos e Incorporación</span>
-                        <i class="fas fa-chevron-right text-xs opacity-50"></i>
-                    </button>
-                    <button onclick="cambiarFiltroCarpeta('VACACIONES', this)" id="folder-vacaciones" class="w-full text-left p-3 rounded-xl flex items-center justify-between text-sm font-semibold transition-all bg-slate-50 text-slate-700 hover:bg-slate-100">
-                        <span class="flex items-center"><i class="fas fa-calendar-check text-amber-500 mr-3 text-base"></i> Solicitud de Vacaciones</span>
-                        <i class="fas fa-chevron-right text-xs opacity-50"></i>
-                    </button>
-                    <button onclick="cambiarFiltroCarpeta('CERTIFICADOS_MEDICOS', this)" id="folder-medicos" class="w-full text-left p-3 rounded-xl flex items-center justify-between text-sm font-semibold transition-all bg-slate-50 text-slate-700 hover:bg-slate-100">
-                        <span class="flex items-center"><i class="fas fa-notes-medical text-emerald-500 mr-3 text-base"></i> Certificados y Aptitudes Médicas</span>
-                        <i class="fas fa-chevron-right text-xs opacity-50"></i>
-                    </button>
-                    <button onclick="cambiarFiltroCarpeta('COMPETENCIAS_EPP', this)" id="folder-tecnicos" class="w-full text-left p-3 rounded-xl flex items-center justify-between text-sm font-semibold transition-all bg-slate-50 text-slate-700 hover:bg-slate-100">
-                        <span class="flex items-center"><i class="fas fa-hard-hat text-indigo-500 mr-3 text-base"></i> Competencias Laborales y EPP</span>
-                        <i class="fas fa-chevron-right text-xs opacity-50"></i>
-                    </button>
-                </div>
-
-                <div class="lg:col-span-2 bg-slate-50 rounded-2xl p-4 sm:p-6 border border-slate-200 flex flex-col">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 id="lblCarpetaActual" class="font-bold text-slate-700 text-base uppercase tracking-wide">Documentos cargados</h3>
-                        <span id="contadorDocs" class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full font-bold">0</span>
-                    </div>
-
-                    <div id="lDocs" class="space-y-3 flex-1">
-                        </div>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <div id="modalSubida" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex justify-center items-center p-4 z-50">
-        <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden animate-fade-in">
-            <div id="headerModal" class="p-6 text-white bg-slate-900 flex justify-between items-center">
-                <div>
-                    <h3 id="tituloModalSubida" class="font-bold text-lg">Subir Documentación</h3>
-                    <p class="text-xs text-slate-400 mt-0.5" id="subtituloModalSubida">Carga de archivos digitales</p>
-                </div>
-                <button onclick="cerrarModal()" class="text-white/70 hover:text-white"><i class="fas fa-times text-xl"></i></button>
-            </div>
-            <div class="p-6 space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Selecciona la Categoría Exacta</label>
-                    <select id="selectTipoDoc" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all">
-                        </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Archivo PDF o Imagen</label>
-                    <input type="file" id="fileDoc" accept="application/pdf, image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
-                </div>
-                <div class="pt-4 flex space-x-3">
-                    <button onclick="cerrarModal()" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-sm transition-all">Cancelar</button>
-                    <button id="btnConfirmarSubida" onclick="ejecutarSubida()" class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm transition-all shadow shadow-blue-200">Subir al Servidor</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="modalEmpresa" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex justify-center items-center p-4 z-50">
-        <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden animate-fade-in">
-            <div class="p-6 bg-slate-900 text-white flex justify-between items-center">
-                <h3 class="font-bold text-lg">Subir Documento Corporativo</h3>
-                <button onclick="cerrarModalEmpresa()" class="text-white/70 hover:text-white"><i class="fas fa-times text-xl"></i></button>
-            </div>
-            <div class="p-6 space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Nombre / Descripción del Documento</label>
-                    <input type="text" id="txtTipoEmpresa" placeholder="Ej. Reglamento de Seguridad Interna 2026" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Archivo</label>
-                    <input type="file" id="fileEmpresa" accept="application/pdf, image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
-                </div>
-                <div class="pt-4 flex space-x-3">
-                    <button onclick="cerrarModalEmpresa()" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-sm transition-all">Cancelar</button>
-                    <button onclick="ejecutarSubidaEmpresa()" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm transition-all shadow">Guardar Documento</button>
-                </div>
-            </div>
-        </div>
     </div>
 
     <script>
-        const API_BASE = "https://kelvin-th-docs-backend.onrender.com/api";
+        const API_URL = 'https://kelvin-th-docs-backend.onrender.com/api';
         const token = localStorage.getItem('token');
-        const miRol = localStorage.getItem('rol');
-        const miNombre = localStorage.getItem('nombre');
+        const rol = localStorage.getItem('rol');
+        const nombreUsuario = localStorage.getItem('nombre');
 
-        let todosLosEmpleados = [];
-        let mostrarPasivos = false;
-        let currentEmpleadoId = null;
-        let currentEmpleadoNombre = "";
-        let currentCarpetaActual = "CONTRATOS";
-        let todosLosDocsDelEmpleado = [];
+        // Variables de Control Temporal de Selección
+        let currentSelectedUserId = null;
+        let currentSelectedUserPasivo = false;
+        let currentSelectedUserName = "";
 
-        document.addEventListener("DOMContentLoaded", () => {
-            // Inicializar Datos del Usuario Firmado
-            document.getElementById('txtNombreUsuario').innerText = miNombre || "Usuario Conectado";
-            const badge = document.getElementById('badgeRol');
-            badge.innerText = miRol;
-            
-            // Colores visuales del Badge según Rol
-            if(miRol === 'admin') badge.className += " bg-blue-600 text-white";
-            else if(miRol === 'doc') badge.className += " bg-emerald-600 text-white";
-            else if(miRol === 'kelvin') badge.className += " bg-indigo-600 text-white";
-
-            // Aplicar Restricciones de Vistas por Rol
-            aplicarSeguridadDeInterfaz();
-            
-            // Cargar datos iniciales
-            cargarEmpleadosDesdeServidor();
-        });
-
-        function aplicarSeguridadDeInterfaz() {
-            // El administrador ve todo. Doctor y Kelvin tienen restricciones:
-            if (miRol !== 'admin') {
-                document.getElementById('avisoPermisos').classList.remove('hidden');
-                document.getElementById('tagAdminEmpresa').innerText = "Solo Lectura";
-                document.getElementById('btnBajaEmpleado').remove(); 
-                document.getElementById('btnSubirDocEmpresa').remove();
-            } else {
-                document.getElementById('btnSubirDocEmpresa').classList.remove('hidden');
-            }
+        // Redirección de seguridad inmediata
+        if (!token || !rol) {
+            cerrarSesion();
         }
 
-        async function cargarEmpleadosDesdeServidor() {
+        window.onload = function() {
+            // Mostrar info en Cabecera
+            document.getElementById('user-role').innerText = rol.toUpperCase();
+            document.getElementById('user-display-name').innerText = nombreUsuario || "Usuario Isertel";
+
+            // Control de visibilidad estructural basado en ROLES
+            if (rol === 'admin') {
+                document.querySelectorAll('.role-admin').forEach(el => el.style.display = 'block');
+            } else if (rol === 'doc') {
+                document.querySelectorAll('.role-doc').forEach(el => el.style.display = 'block');
+            } else if (rol === 'kelvin') {
+                document.querySelectorAll('.role-kelvin').forEach(el => el.style.display = 'block');
+            }
+
+            // Cargar listas iniciales
+            cargarEmpleadosActivos();
+            cargarEmpleadosPasivos();
+            if (rol === 'admin') cargarDocumentosEmpresa();
+            if (rol === 'admin' || rol === 'doc') cargarCertificadosGlobales();
+        };
+
+        function switchView(viewId) {
+            document.querySelectorAll('.view-section').forEach(section => section.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(`view-${viewId}`).classList.add('active');
+            
+            // Buscar y activar el botón correcto de la barra de navegación
+            const eventTarget = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.getAttribute('onclick').includes(viewId));
+            if(eventTarget) eventTarget.classList.add('active');
+
+            // Actualizar Titulo de Cabecera descriptivo
+            const titles = { 'activos': 'Personal Activo', 'pasivos': 'Personal Pasivo', 'crear': 'Registrar Empleado', 'empresa': 'Documentos Institucionales', 'global-medicos': 'Certificados Médicos Globales' };
+            document.getElementById('view-title').innerText = titles[viewId] || "Panel Isertel";
+        }
+
+        function cerrarSesion() {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+
+        // --- CONSUMOS DE ENDPOINTS API ---
+
+        async function cargarEmpleadosActivos() {
             try {
-                const res = await fetch(`${API_BASE}/admin/empleados`, {
-                    headers: { 'Authorization': 'Bearer ' + token }
+                const res = await fetch(`${API_URL}/admin/empleados`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await res.json();
+                const tbody = document.getElementById('tbody-activos');
+                tbody.innerHTML = '';
+                
+                data.forEach(emp => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><img src="${emp.foto_url || 'https://via.placeholder.com/150'}" class="emp-thumb"></td>
+                            <td><strong>${emp.nombre_completo}</strong></td>
+                            <td>${emp.cedula}</td>
+                            <td>${emp.correo}</td>
+                            <td>${emp.celular || 'S/N'}</td>
+                            <td>
+                                <button class="btn-action btn-view" onclick="abrirExpediente('${emp.id}', '${emp.nombre_completo}', '${emp.cedula}', false)">📂 Ver Carpeta</button>
+                                ${rol === 'admin' ? `<button class="btn-action btn-passive" onclick="moverAPasivo('${emp.id}')">⚠️ Liquidar / Mover Pasivo</button>` : ''}
+                            </td>
+                        </tr>`;
                 });
-                if(!res.ok) throw new Error("No autorizado");
-                todosLosEmpleados = await res.json();
-                filtrarEmpleados();
-            } catch(e) {
-                console.error(e);
-                logout();
-            }
+            } catch (err) { console.error("Error cargando activos:", err); }
         }
 
-        function cambiarTipoPersonal(esPasivo) {
-            mostrarPasivos = esPasivo;
-            const btnA = document.getElementById('btnActivos');
-            const btnP = document.getElementById('btnPasivos');
-            
-            if (esPasivo) {
-                btnP.className = "flex-1 md:flex-none px-4 py-2 rounded-lg font-bold text-sm bg-white text-blue-600 shadow-sm transition-all";
-                btnA.className = "flex-1 md:flex-none px-4 py-2 rounded-lg font-bold text-sm text-slate-600 hover:text-slate-800 transition-all";
-            } else {
-                btnA.className = "flex-1 md:flex-none px-4 py-2 rounded-lg font-bold text-sm bg-white text-blue-600 shadow-sm transition-all";
-                btnP.className = "flex-1 md:flex-none px-4 py-2 rounded-lg font-bold text-sm text-slate-600 hover:text-slate-800 transition-all";
-            }
-            filtrarEmpleados();
-        }
-
-        function filtrarEmpleados() {
-            const busqueda = document.getElementById('inputBusqueda').value.toLowerCase().trim();
-            const contenedor = document.getElementById('listaEmpleados');
-            
-            // Filtrar por estado activo/pasivo y coincidencia de nombre
-            const filtrados = todosLosEmpleados.filter(emp => {
-                const cumpleEstado = emp.es_pasivo === mostrarPasivos;
-                const cumpleNombre = emp.nombre.toLowerCase().includes(busqueda);
-                return cumpleEstado && cumpleNombre;
-            });
-
-            if(filtrados.length === 0) {
-                contenedor.innerHTML = `<div class="col-span-full text-center py-8 text-slate-400 text-sm">No se encontraron colaboradores en esta lista.</div>`;
-                return;
-            }
-
-            contenedor.innerHTML = filtrados.map(emp => `
-                <div onclick="entrarAlExpediente(${emp.id}, '${emp.nombre}', ${emp.es_pasivo})" class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm hover:shadow-md cursor-pointer hover:border-blue-400 transition-all flex justify-between items-center">
-                    <div>
-                        <h4 class="font-bold text-slate-800 text-sm">${emp.nombre}</h4>
-                        <p class="text-xs text-slate-400 mt-0.5">ID: #${emp.id}</p>
-                    </div>
-                    <div class="bg-slate-50 p-2 rounded-lg text-slate-400 hover:text-blue-600">
-                        <i class="fas fa-folder-open"></i>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        async function entrarAlExpediente(id, nombre, esPasivo) {
-            currentEmpleadoId = id;
-            currentEmpleadoNombre = nombre;
-            
-            document.getElementById('menuPrincipal').classList.add('hidden');
-            document.getElementById('seccionEmpresa').classList.add('hidden');
-            document.getElementById('panelExpediente').classList.remove('hidden');
-            document.getElementById('btnVolver').classList.remove('hidden');
-
-            document.getElementById('lblNombreEmpleado').innerText = nombre;
-            
-            const indicador = document.getElementById('iconoEstadoEmpleado');
-            const btnBaja = document.getElementById('btnBajaEmpleado');
-            
-            if(esPasivo) {
-                indicador.className = "w-3 h-3 rounded-full bg-red-500";
-                if(btnBaja) btnBaja.classList.add('hidden');
-            } else {
-                indicador.className = "w-3 h-3 rounded-full bg-emerald-500";
-                if(btnBaja && miRol === 'admin') btnBaja.classList.remove('hidden');
-            }
-
-            // Configurar visibilidad de botones de carga según el Rol de la sesión
-            evaluarBotonesDeCargaPorRol(esPasivo);
-
-            // Cargar los archivos del empleado
-            await recargarTodosLosDocumentosEmpleado();
-            // Abrir por defecto la carpeta de contratos
-            cambiarFiltroCarpeta('CONTRATOS', document.getElementById('folder-contratos'));
-        }
-
-        function evaluarBotonesDeCargaPorRol(esPasivo) {
-            // Si el empleado es Pasivo (Dado de baja), nadie sube nada jamás
-            if (esPasivo) {
-                document.getElementById('controlesSubida').querySelectorAll('button').forEach(b => b.classList.add('hidden'));
-                return;
-            }
-
-            // Ocultar todos primero
-            document.getElementById('btnSubirAdmin').classList.add('hidden');
-            document.getElementById('btnSubirDoc').classList.add('hidden');
-            document.getElementById('btnSubirKelvin').classList.add('hidden');
-
-            // Mostrar solo el correspondiente a la sesión activa
-            if (miRol === 'admin') document.getElementById('btnSubirAdmin').classList.remove('hidden');
-            if (miRol === 'doc') document.getElementById('btnSubirDoc').classList.remove('hidden');
-            if (miRol === 'kelvin') document.getElementById('btnSubirKelvin').classList.remove('hidden');
-        }
-
-        async function recargarTodosLosDocumentosEmpleado() {
+        async function cargarEmpleadosPasivos() {
             try {
-                // El endpoint requiere token y el ID del colaborador
-                const res = await fetch(`${API_BASE}/admin/documentos/${currentEmpleadoId}`, {
-                    headers: { 'Authorization': 'Bearer ' + token }
+                const res = await fetch(`${API_URL}/admin/pasivos`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await res.json();
+                const tbody = document.getElementById('tbody-pasivos');
+                tbody.innerHTML = '';
+                
+                data.forEach(emp => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><img src="${emp.foto_url || 'https://via.placeholder.com/150'}" class="emp-thumb"></td>
+                            <td><strong>${emp.nombre_completo}</strong></td>
+                            <td>${emp.cedula}</td>
+                            <td>${emp.correo}</td>
+                            <td>${emp.celular || 'S/N'}</td>
+                            <td>
+                                <button class="btn-action btn-view" onclick="abrirExpediente('${emp.id}', '${emp.nombre_completo}', '${emp.cedula}', true)">📂 Ver Carpeta</button>
+                            </td>
+                        </tr>`;
                 });
-                todosLosDocsDelEmpleado = await res.json();
-            } catch(e) {
-                console.error("Error cargando documentos del empleado:", e);
-                todosLosDocsDelEmpleado = [];
-            }
+            } catch (err) { console.error("Error cargando pasivos:", err); }
         }
 
-        function cambiarFiltroCarpeta(carpeta, elementoMenu) {
-            currentCarpetaActual = carpeta;
-            
-            // Estilos estéticos de navegación activa de carpetas
-            document.querySelectorAll('#panelExpediente div.space-y-2 button').forEach(b => {
-                b.className = "w-full text-left p-3 rounded-xl flex items-center justify-between text-sm font-semibold transition-all bg-slate-50 text-slate-700 hover:bg-slate-100";
-            });
-            elementoMenu.className = "w-full text-left p-3 rounded-xl flex items-center justify-between text-sm font-bold transition-all bg-blue-600 text-white shadow-sm shadow-blue-100";
+        async function crearUsuario(e) {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append('cedula', document.getElementById('c_cedula').value);
+            formData.append('nombre_completo', document.getElementById('c_nombre').value);
+            formData.append('fecha_ingreso', document.getElementById('c_fecha').value);
+            formData.append('correo', document.getElementById('c_correo').value);
+            formData.append('celular', document.getElementById('c_celular').value);
+            formData.append('direccion', document.getElementById('c_direccion').value);
+            formData.append('foto', document.getElementById('c_foto').files[0]);
 
-            // Titulo Dinámico de la Carpeta Abierta
-            const mapaTitulos = {
-                'CONTRATOS': 'Contratos e Incorporación',
-                'VACACIONES': 'Solicitud de Vacaciones',
-                'CERTIFICADOS_MEDICOS': 'Certificados y Aptitudes Médicas',
-                'COMPETENCIAS_EPP': 'Competencias Laborales y EPP'
-            };
-            document.getElementById('lblCarpetaActual').innerText = mapaTitulos[carpeta] || "Documentos";
-            
-            renderizarListaArchivosDeCarpeta();
-        }
-
-        function renderizarListaArchivosDeCarpeta() {
-            // Mapeo lógico de qué sub-tipos de documentos pertenecen a qué carpeta visual
-            const mapeoTipos = {
-                'CONTRATOS': ['contrato', 'incorporacion', 'cedula', 'hoja de vida'],
-                'VACACIONES': ['solicitud de vacaciones', 'formulario de vacaciones', 'vacaciones'],
-                'CERTIFICADOS_MEDICOS': ['aptitud medica', 'certificado medico', 'atencion medica', 'ficha medica'],
-                'COMPETENCIAS_EPP': ['epp', 'entrega epp', 'competencia', 'certificado_competencia']
-            };
-
-            const listaTiposPermitidos = mapeoTipos[currentCarpetaActual] || [];
-            
-            // Filtrar el gran arreglo de documentos
-            const filtrados = todosLosDocsDelEmpleado.filter(doc => {
-                const tipoLower = doc.tipo_documento.toLowerCase();
-                return listaTiposPermitidos.some(t => tipoLower.includes(t));
-            });
-
-            document.getElementById('contadorDocs').innerText = filtrados.length;
-            const contenedor = document.getElementById('lDocs');
-
-            if(filtrados.length === 0) {
-                contenedor.innerHTML = `<div class="text-center py-12 text-slate-400 text-sm italic"><i class="fas fa-folder-open text-2xl block mb-2 opacity-50"></i>No existen archivos cargados en esta categoría para este empleado.</div>`;
-                return;
-            }
-
-            contenedor.innerHTML = filtrados.map(doc => `
-                <div class="bg-white p-4 rounded-xl border border-slate-200 flex justify-between items-center shadow-sm hover:border-slate-300 transition-all">
-                    <div class="flex items-center space-x-3 truncate">
-                        <div class="text-red-500 text-xl"><i class="fas fa-file-pdf"></i></div>
-                        <div class="truncate">
-                            <h5 class="font-semibold text-slate-700 text-xs uppercase truncate">${doc.tipo_documento}</h5>
-                            <p class="text-[10px] text-slate-400 mt-0.5">Subido por: ${doc.nombre_user || 'Sistema'}</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <a href="${doc.url_cloudinary}" target="_blank" class="p-2 text-slate-500 hover:text-blue-600 hover:bg-slate-100 rounded-lg transition-all" title="Ver Documento"><i class="fas fa-eye"></i></a>
-                        ${ miRol === 'admin' ? `
-                            <button onclick="eliminarDocumentoFisico(${doc.id})" class="p-2 text-slate-500 hover:text-red-600 hover:bg-slate-100 rounded-lg transition-all" title="Eliminar"><i class="fas fa-trash-alt"></i></button>
-                        ` : '' }
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        async function eliminarDocumentoFisico(id) {
-            if(!confirm("¿Estás completamente seguro de eliminar permanentemente este documento del servidor?")) return;
             try {
-                const res = await fetch(`${API_BASE}/admin/documentos/${id}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': 'Bearer ' + token }
+                const res = await fetch(`${API_URL}/admin/crear-usuario`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+                const data = await res.json();
+                if(res.ok) {
+                    alert("Empleado creado con éxito");
+                    document.getElementById('form-crear-usuario').reset();
+                    cargarEmpleadosActivos();
+                    switchView('activos');
+                } else { alert("Error: " + data.error); }
+            } catch(err) { alert("Error de comunicación backend"); }
+        }
+
+        async function moverAPasivo(id) {
+            if(!confirm("¿Está seguro de mover este usuario a pasivos? Se transferirán todas sus carpetas e historiales médicos.")) return;
+            try {
+                const res = await fetch(`${API_URL}/admin/mover-a-pasivo/${id}`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if(res.ok) {
-                    await recargarTodosLosDocumentosEmpleado();
-                    renderizarListaArchivosDeCarpeta();
-                } else {
-                    alert("Error al intentar eliminar el archivo.");
-                }
-            } catch(e) { console.error(e); }
+                    alert("Usuario transferido al archivo pasivo exitosamente.");
+                    cargarEmpleadosActivos();
+                    cargarEmpleadosPasivos();
+                } else { alert("No se pudo procesar la migración"); }
+            } catch (err) { console.error(err); }
         }
 
-        // --- SISTEMA DE MODAL DE CARGA ADAPTATIVA ---
-        function abrirModalGenerico(tipoContexto) {
-            const select = document.getElementById('selectTipoDoc');
-            select.innerHTML = ""; // reset
+        // --- MANEJO DEL EXPEDIENTE DIGITAL DINÁMICO ---
+        
+        async function abrirExpediente(id, nombre, cedula, esPasivo) {
+            currentSelectedUserId = id;
+            currentSelectedUserPasivo = esPasivo;
+            currentSelectedUserName = nombre;
 
-            // Llenar select según el botón o sección presionada
-            if(tipoContexto === 'ADMIN') {
-                document.getElementById('headerModal').className = "p-6 text-white bg-blue-600 flex justify-between items-center";
-                document.getElementById('tituloModalSubida').innerText = "Carga Administrativa";
-                document.getElementById('btnConfirmarSubida').className = "flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm transition-all shadow shadow-blue-200";
-                select.innerHTML = `
+            document.getElementById('modal-emp-name').innerText = `Expediente: ${nombre}`;
+            document.getElementById('modal-emp-cedula').innerText = cedula;
+
+            // Configurar Selector de tipos de documento permitido según ROL logeado
+            const selectTipo = document.getElementById('upload-tipo-doc');
+            selectTipo.innerHTML = '';
+
+            if (rol === 'admin') {
+                selectTipo.innerHTML = `
                     <option value="Contrato de Trabajo">Contrato de Trabajo</option>
+                    <option value="Cédula y Papeleta">Cédula y Papeleta</option>
                     <option value="Formulario de Vacaciones">Formulario de Vacaciones</option>
-                    <option value="Cédula de Identidad">Cédula de Identidad</option>
-                    <option value="Hoja de Vida">Hoja de Vida</option>
+                    <option value="Memorándum / Sanción">Memorándum / Sanción</option>
+                    <option value="Certificado médico">Certificado médico (Manejo Administrativo)</option>
+                    <option value="Reposo médico">Reposo médico (Manejo Administrativo)</option>
                 `;
-            } 
-            else if(tipoContexto === 'MEDICO') {
-                document.getElementById('headerModal').className = "p-6 text-white bg-emerald-600 flex justify-between items-center";
-                document.getElementById('tituloModalSubida').innerText = "Carga de Salud Ocupacional";
-                document.getElementById('btnConfirmarSubida').className = "flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm transition-all shadow shadow-emerald-200";
-                select.innerHTML = `
-                    <option value="Aptitud Medica - Ingreso">Aptitud Medica - Ingreso</option>
-                    <option value="Aptitud Medica - Periodico">Aptitud Medica - Periódico</option>
-                    <option value="Aptitud Medica - Reintegro">Aptitud Medica - Reintegro</option>
-                    <option value="Aptitud Medica - Retiro">Aptitud Medica - Retiro</option>
+            } else if (rol === 'doc') {
+                selectTipo.innerHTML = `
+                    <option value="Ficha Médica Ocupacional">Ficha Médica Ocupacional</option>
+                    <option value="Aptitud Médica Ingreso">Aptitud Médica Ingreso</option>
+                    <option value="Aptitud Médica Periódico">Aptitud Médica Periódico</option>
+                    <option value="Certificado médico">Certificado médico / Atención</option>
+                    <option value="Reposo médico">Reposo médico validado</option>
                 `;
-            }
-            else if(tipoContexto === 'TECNICO') {
-                document.getElementById('headerModal').className = "p-6 text-white bg-indigo-600 flex justify-between items-center";
-                document.getElementById('tituloModalSubida').innerText = "Carga de Gestión Técnica / EPP";
-                document.getElementById('btnConfirmarSubida').className = "flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm transition-all shadow shadow-indigo-200";
-                select.innerHTML = `
-                    <option value="Certificado de Competencia Técnica">Certificado de Competencia Técnica</option>
-                    <option value="Acta de Entrega de EPP">Acta de Entrega de EPP</option>
+            } else if (rol === 'kelvin') {
+                selectTipo.innerHTML = `
+                    <option value="Certificado de Competencia Laboral">Certificado de Competencia Laboral</option>
+                    <option value="Certificado Técnico Operaciones">Certificado Técnico Operaciones</option>
+                    <option value="Acta de Entrega EPP">Acta de Entrega EPP</option>
                 `;
             }
 
-            document.getElementById('modalSubida').classList.remove('hidden');
+            // Cargar tabla de documentos del empleado respectivo
+            renderizarDocumentosDeUsuario();
+
+            document.getElementById('modal-expediente').style.display = 'flex';
+        }
+
+        async function renderizarDocumentosDeUsuario() {
+            const tbody = document.getElementById('tbody-docs-empleado');
+            tbody.innerHTML = '<tr><td colspan="5">Consultando expedientes del servidor...</td></tr>';
+
+            let endpoint = '';
+            // Determinamos qué ruta consultar según el rol que está mirando
+            if (rol === 'admin') {
+                endpoint = `${API_URL}/admin/documentos/${currentSelectedUserId}?pasivo=${currentSelectedUserPasivo}`;
+            } else if (rol === 'doc') {
+                endpoint = `${API_URL}/doctor/aptitud/${currentSelectedUserId}`;
+            } else if (rol === 'kelvin') {
+                endpoint = `${API_URL}/kelvin/documentos/${currentSelectedUserId}`;
+            }
+
+            try {
+                const res = await fetch(endpoint, { headers: { 'Authorization': `Bearer ${token}` } });
+                const docs = await res.json();
+                tbody.innerHTML = '';
+
+                if(!docs || docs.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#94a3b8;">No se registran archivos en este módulo para el usuario.</td></tr>';
+                    return;
+                }
+
+                docs.forEach(doc => {
+                    const fechaFormateada = new Date(doc.created_at).toLocaleDateString('es-EC', {day: '2-digit', month: '2-digit', year: 'numeric'});
+                    
+                    // Condición de eliminación: Admin puede borrar casi todo, Dr. borra en su flujo
+                    const puedeEliminar = (rol === 'admin' || rol === 'doc');
+
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>📁 <strong>${doc.tipo_documento}</strong></td>
+                            <td><span style="font-size:13px;" class="user-badge">${doc.nombre_user || 'Sistema'}</span></td>
+                            <td>${fechaFormateada}</td>
+                            <td><a href="${doc.url_cloudinary}" target="_blank" class="btn-action btn-view">👁️ Descargar</a></td>
+                            ${puedeEliminar ? `<td><button class="btn-action btn-delete" onclick="eliminarDocumento('${doc.id}')">❌</button></td>` : '<td>-</td>'}
+                        </tr>`;
+                });
+            } catch (err) { 
+                tbody.innerHTML = '<tr><td colspan="5" style="color:red;">Error al enlazar datos de almacenamiento remoto.</td></tr>'; 
+            }
+        }
+
+        async function procesarSubidaDocumento(e) {
+            e.preventDefault();
+            const tipoDoc = document.getElementById('upload-tipo-doc').value;
+            const archivoInput = document.getElementById('upload-file').files[0];
+
+            const formData = new FormData();
+            formData.append('tipo_documento', tipoDoc);
+            formData.append('usuario_id', currentSelectedUserId);
+            formData.append('archivo', archivoInput);
+            formData.append('nombre_user', nombreUsuario || 'Gestor Unificado');
+            formData.append('es_pasivo', currentSelectedUserPasivo);
+
+            let uploadEndpoint = '';
+            if (rol === 'admin') uploadEndpoint = `${API_URL}/admin/subir-a-usuario`;
+            else if (rol === 'doc') uploadEndpoint = `${API_URL}/doctor/subir-aptitud`;
+            else if (rol === 'kelvin') uploadEndpoint = `${API_URL}/kelvin/subir-certificados`;
+
+            try {
+                const res = await fetch(uploadEndpoint, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+                if (res.ok) {
+                    alert("Archivo procesado e indexado correctamente.");
+                    document.getElementById('form-upload-doc').reset();
+                    renderizarDocumentosDeUsuario();
+                    if(rol === 'admin' || rol === 'doc') cargarCertificadosGlobales();
+                } else {
+                    const errData = await res.json();
+                    alert("Error crítico del servidor: " + errData.error);
+                }
+            } catch(err) { alert("Fallo de red al intentar subir."); }
+        }
+
+        async function eliminarDocumento(id) {
+            if(!confirm("¿Desea suprimir permanentemente este registro documental de las bases de datos?")) return;
+            
+            let deleteEndpoint = (rol === 'doc') ? `${API_URL}/doctor/aptitud/${id}` : `${API_URL}/admin/documentos/${id}`;
+            
+            try {
+                const res = await fetch(deleteEndpoint, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if(res.ok) {
+                    alert("Registro eliminado.");
+                    renderizarDocumentosDeUsuario();
+                    if(rol === 'admin' || rol === 'doc') cargarCertificadosGlobales();
+                } else { alert("Denegado o error de procesamiento."); }
+            } catch (err) { console.error(err); }
         }
 
         function cerrarModal() {
-            document.getElementById('modalSubida').classList.add('hidden');
-            document.getElementById('fileDoc').value = "";
+            document.getElementById('modal-expediente').style.display = 'none';
         }
 
-        async function ejecutarSubida() {
-            const fileInput = document.getElementById('fileDoc');
-            const tipoDoc = document.getElementById('selectTipoDoc').value;
+        // --- MANEJO ADICIONAL CORPORATIVO / GLOBAL ---
 
-            if(!fileInput.files[0]) {
-                alert("Por favor selecciona un archivo primero.");
-                return;
-            }
-
-            const btn = document.getElementById('btnConfirmarSubida');
-            btn.disabled = true;
-            btn.innerText = "Subiendo archivo...";
-
+        async function subirDocEmpresa(e) {
+            e.preventDefault();
             const formData = new FormData();
-            formData.append('archivo', fileInput.files[0]);
-            formData.append('tipo_documento', tipoDoc);
-            formData.append('usuario_id', currentEmpleadoId);
-            formData.append('es_pasivo', mostrarPasivos ? 'true' : 'false');
-
-            // Determinar a qué endpoint pegarle según el rol del que sube para preservar las rutas nativas del backend
-            let urlDestino = `${API_BASE}/admin/subir`;
-            if (miRol === 'doc') urlDestino = `${API_BASE}/doctor/subir-aptitud`;
-            if (miRol === 'kelvin') urlDestino = `${API_BASE}/kelvin/subir-certificados`;
+            formData.append('tipo_documento', document.getElementById('emp_tipo').value);
+            formData.append('archivo', document.getElementById('emp_archivo').files[0]);
 
             try {
-                const res = await fetch(urlDestino, {
+                const res = await fetch(`${API_URL}/subir-empresa`, {
                     method: 'POST',
-                    headers: { 'Authorization': 'Bearer ' + token },
+                    headers: { 'Authorization': `Bearer ${token}` },
                     body: formData
                 });
-
                 if(res.ok) {
-                    cerrarModal();
-                    await recargarTodosLosDocumentosEmpleado();
-                    renderizarListaArchivosDeCarpeta();
-                } else {
-                    const errData = await res.json();
-                    alert("Error en el servidor: " + (errData.error || "No se pudo cargar."));
+                    alert("Documentación institucional cargada.");
+                    document.getElementById('form-empresa').reset();
+                    cargarDocumentosEmpresa();
                 }
-            } catch(e) {
-                alert("Error crítico de red.");
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "Subir al Servidor";
-            }
+            } catch(err) { console.error(err); }
         }
 
-        async function darDeBajaActual() {
-            if(!confirm("¿Estás seguro de dar de baja a este colaborador? Su expediente pasará a la lista de Personal Pasivo y se congelarán las acciones.")) return;
+        async function cargarDocumentosEmpresa() {
             try {
-                const res = await fetch(`${API_BASE}/admin/mover-a-pasivo/${currentEmpleadoId}`, {
-                    method: 'POST',
-                    headers: { 'Authorization': 'Bearer ' + token }
+                const res = await fetch(`${API_URL}/admin/documentos-empresa`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await res.json();
+                const tbody = document.getElementById('tbody-empresa');
+                tbody.innerHTML = '';
+                data.forEach(d => {
+                    tbody.innerHTML += `<tr><td>${d.id}</td><td><strong>${d.tipo_documento}</strong></td><td><a href="${d.url_cloudinary}" target="_blank" class="btn-action btn-view">Descargar</a></td><td><button class="btn-action btn-delete" onclick="eliminarDocEmpresa('${d.id}')">Eliminar</button></td></tr>`;
                 });
-                if(res.ok) {
-                    alert("Colaborador movido con éxito a Personal Pasivo.");
-                    volverAlMenu();
-                    await cargarEmpleadosDesdeServidor();
-                }
-            } catch(e) { console.error(e); }
-        }
-
-        // --- SECCIÓN EMPRESA GENERAL ---
-        function cargarSeccionEmpresa() {
-            document.getElementById('menuPrincipal').classList.add('hidden');
-            document.getElementById('seccionEmpresa').classList.remove('hidden');
-            document.getElementById('btnVolver').classList.remove('hidden');
-        }
-
-        function cargarSeccionGestionEmpresarial() {
-            document.getElementById('menuPrincipal').classList.add('hidden');
-            document.getElementById('seccionGestionEmpresarial').classList.remove('hidden');
-            document.getElementById('btnVolver').classList.remove('hidden');
-            cargarListaEmpresa();
-        }
-
-        async function cargarListaEmpresa() {
-            try {
-                const res = await fetch(`${API_BASE}/admin/documentos-empresa`, {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
-                const docs = await res.json();
-                
-                document.getElementById('listaDocsEmpresa').innerHTML = docs.map(d => `
-                    <tr class="hover:bg-slate-50 border-b border-slate-100">
-                        <td class="px-6 py-4 text-xs font-bold uppercase italic text-slate-700">${d.tipo_documento}</td>
-                        <td class="px-6 py-4 text-right">
-                            <a href="${d.url_cloudinary}" target="_blank" class="text-blue-600 hover:text-blue-800 mr-4 font-bold"><i class="fas fa-eye"></i> Ver</a>
-                            ${ miRol === 'admin' ? `
-                                <button onclick="eliminarDocEmpresa(${d.id})" class="text-red-500 hover:text-red-700 font-bold"><i class="fas fa-trash"></i> Eliminar</button>
-                            ` : '' }
-                        </td>
-                    </tr>
-                `).join('');
-            } catch(e) { console.error(e); }
+            } catch (err) { console.error(err); }
         }
 
         async function eliminarDocEmpresa(id) {
-            if(!confirm("¿Eliminar este documento institucional?")) return;
+            if(!confirm("¿Eliminar archivo general de empresa?")) return;
             try {
-                const res = await fetch(`${API_BASE}/admin/documentos-empresa/${id}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
-                if(res.ok) cargarListaEmpresa();
-            } catch(e) { console.error(e); }
+                const res = await fetch(`${API_URL}/admin/documentos-empresa/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+                if(res.ok) { cargarDocumentosEmpresa(); }
+            } catch (err) { console.error(err); }
         }
 
-        function abrirModalSubidaEmpresa() { document.getElementById('modalEmpresa').classList.remove('hidden'); }
-        function cerrarModalEmpresa() { document.getElementById('modalEmpresa').classList.add('hidden'); document.getElementById('txtTipoEmpresa').value = ""; document.getElementById('fileEmpresa').value = ""; }
-
-        async function ejecutarSubidaEmpresa() {
-            const desc = document.getElementById('txtTipoEmpresa').value.trim();
-            const fileInput = document.getElementById('fileEmpresa');
-            
-            if(!desc || !fileInput.files[0]) { alert("Llena todos los campos."); return; }
-
-            const formData = new FormData();
-            formData.append('archivo', fileInput.files[0]);
-            formData.append('tipo_documento', desc);
-
+        async function cargarCertificadosGlobales() {
             try {
-                const res = await fetch(`${API_BASE}/admin/subir-empresa`, {
-                    method: 'POST',
-                    headers: { 'Authorization': 'Bearer ' + token },
-                    body: formData
+                const res = await fetch(`${API_URL}/doctor/certificados-globales`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await res.json();
+                const tbody = document.getElementById('tbody-global-medicos');
+                tbody.innerHTML = '';
+                data.forEach(c => {
+                    const f = new Date(c.created_at).toLocaleDateString('es-EC');
+                    tbody.innerHTML += `<tr><td><strong>${c.empleado_nombre}</strong></td><td>${c.estado_empleado}</td><td>${c.tipo_documento}</td><td>${f}</td><td><a href="${c.url_cloudinary}" target="_blank" class="btn-action btn-view">Ver Documento</a></td></tr>`;
                 });
-                if(res.ok) { cerrarModalEmpresa(); cargarListaEmpresa(); }
-            } catch(e) { console.error(e); }
-        }
-
-        // --- NAVEGACIÓN ---
-        function volverAlMenu() {
-            document.getElementById('panelExpediente').classList.add('hidden');
-            document.getElementById('seccionEmpresa').classList.add('hidden');
-            document.getElementById('seccionGestionEmpresarial').classList.add('hidden');
-            document.getElementById('btnVolver').classList.add('hidden');
-            document.getElementById('menuPrincipal').classList.remove('hidden');
-        }
-
-        function logout() {
-            localStorage.clear();
-            window.location.href = 'index.html';
+            } catch (err) { console.error(err); }
         }
     </script>
 </body>

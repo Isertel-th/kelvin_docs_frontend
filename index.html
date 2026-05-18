@@ -11,26 +11,22 @@
         input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
         button { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 10px; }
         button:hover { background: #0056b3; }
-        .error-message { color: red; text-align: center; margin-top: 15px; font-size: 14px; font-weight: bold; }
+        #mensaje { color: #d93025; text-align: center; margin-top: 15px; font-size: 14px; min-height: 20px; }
     </style>
 </head>
 <body>
 
 <div class="login-card">
-    <h2>Isertel Docs</h2>
-    <form id="loginForm" onsubmit="login(event)">
-        <input type="text" id="username" placeholder="Usuario" required autocomplete="username">
-        <input type="password" id="password" placeholder="Contraseña" required autocomplete="current-password">
-        <button type="submit">Iniciar Sesión</button>
-    </form>
-    <div id="mensaje" class="error-message"></div>
+    <h2>Iniciar Sesión</h2>
+    <input type="text" id="username" placeholder="Nombre de usuario" required>
+    <input type="password" id="password" placeholder="Contraseña" required>
+    <button onclick="login()">Entrar al Sistema</button>
+    <div id="mensaje"></div>
 </div>
 
 <script>
-    async function login(event) {
-        event.preventDefault();
-        
-        const username = document.getElementById('username').value.trim();
+    async function login() {
+        const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
         const mensaje = document.getElementById('mensaje');
         mensaje.innerText = "Cargando...";
@@ -45,21 +41,19 @@
             const data = await response.json();
 
             if (response.ok) {
-                // Guardamos los datos de sesión de forma segura en el navegador
+                // Guardamos datos de sesión de forma persistente
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('rol', data.rol);
                 localStorage.setItem('nombre', data.nombre);
                 
-                // --- REDIRECCIÓN CENTRALIZADA MULTI-ROL ---
-                // Todos los roles autorizados (admin, doc, kelvin) van ahora al mismo archivo HTML
+                // --- REDIRECCIÓN UNIFICADA AL MISMO HTML ---
                 window.location.href = 'panel.html';
-                
             } else {
-                mensaje.innerText = data.error || "Error en los datos proporcionados";
+                mensaje.innerText = data.error || "Error en los datos";
             }
         } catch (error) {
             console.error(error);
-            mensaje.innerText = "No hay conexión con el servidor de Isertel";
+            mensaje.innerText = "No hay conexión con el servidor";
         }
     }
 </script>
