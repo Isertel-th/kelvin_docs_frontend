@@ -12,52 +12,48 @@
         .sidebar { width: 260px; background: #1e293b; color: white; display: flex; flex-direction: column; justify-content: space-between; padding: 1rem; }
         .sidebar h3 { text-align: center; margin-bottom: 2rem; border-bottom: 1px solid #334155; padding-bottom: 1rem; font-size: 1.2rem; }
         .nav-menu { display: flex; flex-direction: column; gap: 0.5rem; flex-grow: 1; }
-        .nav-btn { background: none; border: none; color: #cbd5e1; padding: 12px; text-align: left; width: 100%; border-radius: 6px; cursor: pointer; font-size: 15px; font-weight: 500; display: flex; align-items: center; }
-        .nav-btn:hover, .nav-btn.active { background: var(--primary-color); color: white; }
-        .logout-btn { background: #ef4444; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; }
-        .logout-btn:hover { background: #dc2626; }
-
-        /* Contenedor Principal */
-        .main-content { flex-grow: 1; display: flex; flex-direction: column; overflow-y: auto; background: #f8fafc; }
-        .header { background: white; padding: 1rem 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
-        .header h2 { margin: 0; color: #334155; font-size: 1.5rem; }
-        .user-badge { background: #e2e8f0; padding: 6px 12px; border-radius: 20px; font-weight: 600; color: #475569; font-size: 14px; }
-        .container { padding: 2rem; max-width: 1200px; width: -webkit-fill-available; margin: 0 auto; }
-
-        /* Módulos de Vistas */
+        .nav-btn { background: none; border: none; color: #cbd5e1; padding: 12px; text-align: left; width: 100%; border-radius: 6px; cursor: pointer; font-size: 1rem; transition: 0.3s; }
+        .nav-btn:hover { background: #334155; color: white; }
+        .nav-btn.active { background: var(--primary-color); color: white; }
+        .user-info { border-top: 1px solid #334155; padding-top: 1rem; text-align: center; }
+        .btn-logout { background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 0.5rem; font-weight: bold; }
+        
+        /* Main Content Estilos */
+        .main-content { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .topbar { background: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .view-container { flex-grow: 1; padding: 2rem; overflow-y: auto; }
         .view-section { display: none; }
         .view-section.active { display: block; }
-
-        /* Tarjetas y Formularios */
-        .card { background: white; border-radius: 8px; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
-        .card h3 { margin-top: 0; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; }
-        .grid-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
-        label { font-weight: 600; color: #64748b; font-size: 14px; display: block; margin-bottom: 4px; }
-        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 15px; }
-        .btn-submit { background: var(--primary-color); color: white; font-weight: bold; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; }
-        .btn-submit:hover { opacity: 0.9; }
-
-        /* Tablas */
+        
+        /* Tablas y UI Elementos */
+        .card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 2rem; }
         .table-responsive { overflow-x: auto; margin-top: 1rem; }
-        table { width: 100%; border-collapse: collapse; background: white; text-align: left; }
-        th, td { padding: 12px 16px; border-bottom: 1px solid #e2e8f0; font-size: 15px; }
-        th { background: #f1f5f9; color: #475569; font-weight: 600; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th, td { padding: 12px 16px; border-bottom: 1px solid #e2e8f0; }
+        th { background: #f8fafc; color: #64748b; font-weight: 600; }
         tr:hover { background: #f8fafc; }
-        .emp-thumb { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
-
-        /* Botones de acción rápidos */
-        .btn-action { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; margin-right: 5px; text-decoration: none; display: inline-block; }
-        .btn-view { background: #3b82f6; color: white; }
-        .btn-upload { background: #10b981; color: white; }
-        .btn-passive { background: #f59e0b; color: white; }
+        
+        /* Botones y Formulario */
+        .btn-action { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: bold; margin-right: 4px; }
+        .btn-folder { background: #f59e0b; color: white; }
+        .btn-status { background: #10b981; color: white; }
+        .btn-view { background: #3b82f6; color: white; text-decoration: none; display: inline-block; }
         .btn-delete { background: #ef4444; color: white; }
-
+        .grid-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem; }
+        label { display: block; margin-bottom: 0.5rem; color: #475569; font-weight: 500; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; }
+        .btn-submit { background: var(--primary-color); color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1rem; }
+        
         /* Modales */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; padding: 2rem; border-radius: 10px; width: 90%; max-width: 700px; max-height: 85vh; overflow-y: auto; position: relative; }
-        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #94a3b8; }
+        .modal-content { background: white; padding: 2rem; border-radius: 8px; width: 90%; max-width: 850px; max-height: 85vh; overflow-y: auto; position: relative; }
+        .close-modal { position: absolute; top: 1rem; right: 1.5rem; font-size: 1.8rem; cursor: pointer; color: #94a3b8; }
         
-        /* Restricciones de Roles Visuales */
+        /* Badges de Roles */
+        .role-badge { padding: 4px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; color: white; }
+        .user-badge { background: #e2e8f0; color: #475569; padding: 3px 8px; border-radius: 4px; font-weight: 500; }
+        
+        /* Control de Accesos por UI */
         .role-admin, .role-doc, .role-kelvin { display: none; }
     </style>
 </head>
@@ -65,40 +61,46 @@
 
     <div class="sidebar">
         <div>
-            <h3 id="panel-title">Isertel Gestión</h3>
+            <h3 id="sidebar-title">Isertel TH</h3>
             <div class="nav-menu">
-                <button class="nav-btn active" onclick="switchView('activos')">👥 Personal Activo</button>
-                <button class="nav-btn" onclick="switchView('pasivos')">📁 Personal Pasivo</button>
-                <button class="nav-btn role-admin" id="menu-crear" onclick="switchView('crear')">➕ Registrar Empleado</button>
-                <button class="nav-btn role-admin" id="menu-empresa" onclick="switchView('empresa')">🏢 Docs Empresa</button>
-                <button class="nav-btn role-doc" id="menu-global-med" onclick="switchView('global-medicos')">🩺 Certificados Globales</button>
+                <button class="nav-btn active" onclick="switchView('view-activos')">👥 Personal Activo</button>
+                <button class="nav-btn" onclick="switchView('view-pasivos')">📁 Personal Pasivo</button>
+                <button class="nav-btn role-admin" onclick="switchView('view-crear')">➕ Registrar Colaborador</button>
+                <button class="nav-btn role-admin" onclick="switchView('view-empresa')">🏢 Documentos Empresa</button>
+                <button class="nav-btn role-admin role-doc" onclick="switchView('view-global-medicos')">🩺 Certificados Médicos Globales</button>
             </div>
         </div>
-        <div>
-            <button class="logout-btn" onclick="cerrarSesion()">Cerrar Sesión</button>
+        <div class="user-info">
+            <p style="margin: 0; font-size: 0.9rem; color: #94a3b8;">Usuario Activo:</p>
+            <p style="margin: 4px 0 0 0; font-weight: bold;" id="user-display-name">-</p>
+            <span id="user-display-role" class="role-badge" style="display:inline-block; margin-top:4px;">-</span>
+            <button class="btn-logout" onclick="cerrarSesion()">Cerrar Sesión</button>
         </div>
     </div>
 
     <div class="main-content">
-        <div class="header">
+        <div class="topbar">
             <h2 id="view-title">Personal Activo</h2>
-            <div class="user-badge">🔑 <span id="user-role">Rol</span>: <span id="user-display-name">Usuario</span></div>
+            <img src="https://isertel.com.ec/wp-content/uploads/2021/04/logo-isertel.png" alt="Isertel Logo" style="height: 40px;">
         </div>
 
-        <div class="container">
-            
+        <div class="view-container">
+
             <div id="view-activos" class="view-section active">
                 <div class="card">
-                    <h3>Nómina General Activa</h3>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="margin:0;">Nómina de Personal Activo</h3>
+                        <input type="text" id="search-activos" placeholder="Buscar por Nombre o Cédula..." style="width: 300px;" oninput="filtrarTablaActivos()">
+                    </div>
                     <div class="table-responsive">
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Foto</th>
-                                    <th>Nombre Completo</th>
                                     <th>Cédula</th>
-                                    <th>Correo</th>
+                                    <th>Nombre Completo</th>
                                     <th>Celular</th>
+                                    <th>Correo</th>
+                                    <th>Fecha Ingreso</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
@@ -110,16 +112,19 @@
 
             <div id="view-pasivos" class="view-section">
                 <div class="card">
-                    <h3>Historial de Personal Pasivo (Inactivos)</h3>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="margin:0;">Historial de Personal Pasivo (Desvinculados)</h3>
+                        <input type="text" id="search-pasivos" placeholder="Buscar desvinculados..." style="width: 300px;" oninput="filtrarTablaPasivos()">
+                    </div>
                     <div class="table-responsive">
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Foto</th>
-                                    <th>Nombre Completo</th>
                                     <th>Cédula</th>
-                                    <th>Correo</th>
+                                    <th>Nombre Completo</th>
                                     <th>Celular</th>
+                                    <th>Correo</th>
+                                    <th>Fecha Registro</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
@@ -129,7 +134,7 @@
                 </div>
             </div>
 
-<div id="view-crear" class="view-section">
+            <div id="view-crear" class="view-section">
                 <div class="card">
                     <h3>Registrar Nuevo Colaborador en Nómina</h3>
                     <form id="form-crear-usuario" onsubmit="crearUsuario(event)">
@@ -172,34 +177,30 @@
 
             <div id="view-empresa" class="view-section">
                 <div class="card">
-                    <h3>Subir Documento Institucional / Empresa</h3>
-                    <form id="form-empresa" onsubmit="subirDocEmpresa(event)">
+                    <h3>Repositorio Documental Corporativo (General)</h3>
+                    <form id="form-upload-empresa" onsubmit="subirDocEmpresa(event)" style="margin-bottom: 2rem;">
                         <div class="grid-form">
                             <div>
-                                <label>Tipo de Documento:</label>
-                                <input type="text" id="emp_tipo" placeholder="Ej. Reglamento Interno, Políticas" required>
+                                <label>Nombre del Documento Corporativo:</label>
+                                <input type="text" id="emp_nombre_doc" required placeholder="Ej. Reglamento Interno 2026">
                             </div>
                             <div>
-                                <label>Archivo (PDF/Imagen):</label>
-                                <input type="file" id="emp_archivo" required>
+                                <label>Seleccionar Archivo (PDF/Imagen):</label>
+                                <input type="file" id="emp_file" required>
                             </div>
                         </div>
-                        <button type="submit" class="btn-submit">Subir Archivo General</button>
+                        <button type="submit" class="btn-submit">Subir Documento General</button>
                     </form>
-                </div>
-                <div class="card">
-                    <h3>Repositorio Corporativo</h3>
                     <div class="table-responsive">
                         <table>
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Tipo de Documento</th>
-                                    <th>Enlace</th>
-                                    <th>Acción</th>
+                                    <th>Nombre del Archivo</th>
+                                    <th>Fecha de Carga</th>
+                                    <th>Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody id="tbody-empresa"></tbody>
+                            <tbody id="tbody-empresa-docs"></tbody>
                         </table>
                     </div>
                 </div>
@@ -207,16 +208,16 @@
 
             <div id="view-global-medicos" class="view-section">
                 <div class="card">
-                    <h3>Historial Global de Descansos y Certificados Médicos</h3>
+                    <h3>Registro Unificado de Aptitudes y Certificados Médicos</h3>
                     <div class="table-responsive">
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Empleado</th>
-                                    <th>Estado</th>
-                                    <th>Tipo Documento</th>
-                                    <th>Fecha de Registro</th>
-                                    <th>Archivo</th>
+                                    <th>Colaborador</th>
+                                    <th>Estado Laboral</th>
+                                    <th>Tipo de Documento Médico</th>
+                                    <th>Fecha de Emisión</th>
+                                    <th>Acción</th>
                                 </tr>
                             </thead>
                             <tbody id="tbody-global-medicos"></tbody>
@@ -228,8 +229,8 @@
         </div>
     </div>
 
-<div id="modal-expediente" class="modal">
-        <div class="modal-content">
+    <div id="modal-expediente" class="modal">
+        <div class="modal-content" style="max-width: 850px;">
             <span class="close-modal" onclick="cerrarModal()">&times;</span>
             <h2 id="modal-emp-name">Expediente Digital</h2>
             <p style="font-weight: bold; color:#64748b;">Cédula: <span id="modal-emp-cedula"></span></p>
@@ -237,51 +238,49 @@
             <div class="card" style="background: #f8fafc; border: 1px solid #e2e8f0;">
                 <h4 style="margin-top:0; color:#334155;">Cargar nuevo archivo a este expediente</h4>
                 <form id="form-upload-doc" onsubmit="procesarSubidaDocumento(event)">
-                    <div class="grid-form">
+                    <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
                         <div>
-                            <label>Seleccionar Tipo Documento:</label>
+                            <label>Tipo Documento:</label>
                             <select id="upload-tipo-doc" required></select>
+                        </div>
+                        <div>
+                            <label>Fecha del Documento:</label>
+                            <input type="date" id="upload-fecha-doc" required>
+                        </div>
+                        <div>
+                            <label>Periodo / Mes:</label>
+                            <select id="upload-periodo-doc" required>
+                                <option value="">Seleccione Mes...</option>
+                                <option value="Enero">Enero</option>
+                                <option value="Febrero">Febrero</option>
+                                <option value="Marzo">Marzo</option>
+                                <option value="Abril">Abril</option>
+                                <option value="Mayo">Mayo</option>
+                                <option value="Junio">Junio</option>
+                                <option value="Julio">Julio</option>
+                                <option value="Agosto">Agosto</option>
+                                <option value="Septiembre">Septiembre</option>
+                                <option value="Octubre">Octubre</option>
+                                <option value="Noviembre">Noviembre</option>
+                                <option value="Diciembre">Diciembre</option>
+                            </select>
                         </div>
                         <div>
                             <label>Archivo (Solo PDF):</label>
                             <input type="file" id="upload-file" accept=".pdf" required>
                         </div>
                     </div>
-                    <button type="submit" class="btn-submit" style="padding:8px 16px; font-size:14px;">Subir Archivo</button>
+                    <button type="submit" class="btn-submit" style="padding:8px 16px; font-size:14px; margin-top: 10px;">Subir Archivo</button>
                 </form>
             </div>
 
-            <div class="card" style="background: #f1f5f9; padding: 1rem; margin-bottom: 1rem;">
-                <h4 style="margin: 0 0 0.5rem 0; color: #475569; font-size: 14px;">🔍 Filtrar documentos en esta carpeta:</h4>
-                <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.5rem; margin-bottom: 0;">
-                    <div>
-                        <input type="text" id="filter-doc-name" placeholder="Buscar por nombre de archivo..." oninput="filtrarDocumentos()">
-                    </div>
-                    <div>
-                        <input type="date" id="filter-doc-date" onchange="filtrarDocumentos()">
-                    </div>
-                    <div>
-                        <button type="button" class="btn-action" style="background:#94a3b8; color:white; padding:10px; width:100%;" onclick="limpiarFiltrosExpediente()">Limpiar Filtros</button>
-                    </div>
+            <h4 style="margin-bottom: 0.5rem; color: #334155;">📁 Seleccione Tipo de Documento para visualizar:</h4>
+            <div id="tipo-doc-tabs" style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 1.5rem;">
                 </div>
-            </div>
 
-            <h3>Documentos en su Carpeta</h3>
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Tipo de Documento</th>
-                            <th>Nombre de Archivo</th>
-                            <th>Subido Por</th>
-                            <th>Fecha</th>
-                            <th>Ver</th>
-                            <th class="role-admin">Eliminar</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbody-docs-empleado"></tbody>
-                </table>
-            </div>
+            <h3>Documentos en Carpeta: <span id="txt-tipo-seleccionado" style="color: var(--primary-color);">Seleccione un tipo</span></h3>
+            <div id="contenedor-expediente-grupos">
+                </div>
         </div>
     </div>
 
@@ -291,15 +290,22 @@
         const rol = localStorage.getItem('rol');
         const nombreUsuario = localStorage.getItem('nombre');
 
-        // Variables de Control Temporal de Selección
+        // Variables de Control Temporal de Selección y Filtrados
         let currentSelectedUserId = null;
         let currentSelectedUserPasivo = false;
         let currentSelectedUserName = "";
-        let documentosActuales = [];
+        let documentosActuales = []; 
+        let tipoDocumentoActivo = "";
+        
+        let cacheActivos = [];
+        let cachePasivos = [];
 
-// ========================================================
-        // AQUÍ PUEDES COLOCAR LAS NUEVAS FUNCIONES UTILITARIAS:
-        // ========================================================
+        // Redirección de seguridad inmediata
+        if (!token || !rol) {
+            cerrarSesion();
+        }
+
+        // --- FUNCIONES AUTOMÁTICAS PARA EL CAMPO NOMBRE COMPLETO ---
         function formatearNombre(texto) {
             return texto
                 .toLowerCase()
@@ -311,109 +317,133 @@
                 .trim()
                 .replace(/\s+/g, ' ');
         }
-        // ========================================================
-
-
-        // Redirección de seguridad inmediata
-        if (!token || !rol) {
-            cerrarSesion();
-        }
 
         window.onload = function() {
-            // Mostrar info en Cabecera
-            document.getElementById('user-role').innerText = rol.toUpperCase();
-            document.getElementById('user-display-name').innerText = nombreUsuario || "Usuario Isertel";
+            // Renderizar datos del perfil en sidebar
+            document.getElementById('user-display-name').innerText = nombreUsuario || 'Colaborador';
+            const badge = document.getElementById('user-display-role');
+            badge.innerText = rol.toUpperCase();
+            
+            // Configurar tema del sidebar según rol asignado
+            if(rol === 'admin') { badge.style.background = 'var(--admin-color)'; document.getElementById('sidebar-title').innerText = "Isertel Admin"; }
+            else if(rol === 'doc') { badge.style.background = 'var(--doc-color)'; document.getElementById('sidebar-title').innerText = "Isertel Salud"; }
+            else if(rol === 'kelvin') { badge.style.background = 'var(--kelvin-color)'; document.getElementById('sidebar-title').innerText = "Isertel Operaciones"; }
 
-            // Control de visibilidad estructural basado en ROLES
-            if (rol === 'admin') {
-                document.querySelectorAll('.role-admin').forEach(el => el.style.display = 'block');
-            } else if (rol === 'doc') {
-                document.querySelectorAll('.role-doc').forEach(el => el.style.display = 'block');
-            } else if (rol === 'kelvin') {
-                document.querySelectorAll('.role-kelvin').forEach(el => el.style.display = 'block');
-            }
+            // Aplicar clases de visibilidad CSS controladas por Rol
+            document.querySelectorAll(`.role-${rol}`).forEach(el => el.style.display = 'block');
 
-            // Cargar listas iniciales
+            // Cargar datos por defecto de la API remota
             cargarEmpleadosActivos();
             cargarEmpleadosPasivos();
-            if (rol === 'admin') cargarDocumentosEmpresa();
-            if (rol === 'admin' || rol === 'doc') cargarCertificadosGlobales();
+            if(rol === 'admin') cargarDocumentosEmpresa();
+            if(rol === 'admin' || rol === 'doc') cargarCertificadosGlobales();
         };
 
         function switchView(viewId) {
             document.querySelectorAll('.view-section').forEach(section => section.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
             
-            document.getElementById(`view-${viewId}`).classList.add('active');
+            document.getElementById(viewId).classList.add('active');
             
-            // Buscar y activar el botón correcto de la barra de navegación
-            const eventTarget = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.getAttribute('onclick').includes(viewId));
-            if(eventTarget) eventTarget.classList.add('active');
+            // Colocar botón activo en sidebar
+            const btnActivo = Array.from(document.querySelectorAll('.nav-menu button')).find(btn => btn.getAttribute('onclick').includes(viewId));
+            if(btnActivo) btnActivo.classList.add('active');
 
-            // Actualizar Titulo de Cabecera descriptivo
-            const titles = { 'activos': 'Personal Activo', 'pasivos': 'Personal Pasivo', 'crear': 'Registrar Empleado', 'empresa': 'Documentos Institucionales', 'global-medicos': 'Certificados Médicos Globales' };
-            document.getElementById('view-title').innerText = titles[viewId] || "Panel Isertel";
-        }
-
-        function cerrarSesion() {
-            localStorage.clear();
-            window.location.href = 'index.html';
+            // Modificar títulos superiores
+            const titulos = { 'view-activos': 'Personal Activo', 'view-pasivos': 'Personal Pasivo', 'view-crear': 'Registrar Colaborador', 'view-empresa': 'Documentos Empresa', 'view-global-medicos': 'Certificados Médicos Globales' };
+            document.getElementById('view-title').innerText = titulos[viewId] || 'Panel de Control';
         }
 
         // --- CONSUMOS DE ENDPOINTS API ---
 
         async function cargarEmpleadosActivos() {
             try {
-                const res = await fetch(`${API_URL}/admin/empleados`, { headers: { 'Authorization': `Bearer ${token}` } });
-                const data = await res.json();
-                const tbody = document.getElementById('tbody-activos');
-                tbody.innerHTML = '';
-                
-                data.forEach(emp => {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td><img src="${emp.foto_url || 'https://via.placeholder.com/150'}" class="emp-thumb"></td>
-                            <td><strong>${emp.nombre_completo}</strong></td>
-                            <td>${emp.cedula}</td>
-                            <td>${emp.correo}</td>
-                            <td>${emp.celular || 'S/N'}</td>
-                            <td>
-                                <button class="btn-action btn-view" onclick="abrirExpediente('${emp.id}', '${emp.nombre_completo}', '${emp.cedula}', false)">📂 Ver Carpeta</button>
-                                ${rol === 'admin' ? `<button class="btn-action btn-passive" onclick="moverAPasivo('${emp.id}')">⚠️ Liquidar / Mover Pasivo</button>` : ''}
-                            </td>
-                        </tr>`;
-                });
-            } catch (err) { console.error("Error cargando activos:", err); }
+                const res = await fetch(`${API_URL}/admin/usuarios`, { headers: { 'Authorization': `Bearer ${token}` } });
+                cacheActivos = await res.json();
+                renderizarTablaActivos(cacheActivos);
+            } catch (err) { console.error("Fallo de red en consulta de activos", err); }
+        }
+
+        function renderizarTablaActivos(lista) {
+            const tbody = document.getElementById('tbody-activos');
+            tbody.innerHTML = '';
+            lista.forEach(u => {
+                const f = new Date(u.fecha_ingreso).toLocaleDateString('es-EC');
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${u.cedula}</strong></td>
+                        <td>${u.nombre}</td>
+                        <td>${u.celular || '-'}</td>
+                        <td>${u.correo}</td>
+                        <td>${f}</td>
+                        <td>
+                            <button class="btn-action btn-folder" onclick="abrirExpediente('${u.id}', '${u.nombre}', '${u.cedula}', false)">📁 Carpeta</button>
+                            <button class="btn-action btn-status role-admin" style="display:${rol==='admin'?'inline-block':'none'}" onclick="cambiarEstadoLaboral('${u.id}', true)">⚠️ Dar de Baja</button>
+                        </td>
+                    </tr>`;
+            });
         }
 
         async function cargarEmpleadosPasivos() {
             try {
-                const res = await fetch(`${API_URL}/admin/pasivos`, { headers: { 'Authorization': `Bearer ${token}` } });
-                const data = await res.json();
-                const tbody = document.getElementById('tbody-pasivos');
-                tbody.innerHTML = '';
-                
-                data.forEach(emp => {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td><img src="${emp.foto_url || 'https://via.placeholder.com/150'}" class="emp-thumb"></td>
-                            <td><strong>${emp.nombre_completo}</strong></td>
-                            <td>${emp.cedula}</td>
-                            <td>${emp.correo}</td>
-                            <td>${emp.celular || 'S/N'}</td>
-                            <td>
-                                <button class="btn-action btn-view" onclick="abrirExpediente('${emp.id}', '${emp.nombre_completo}', '${emp.cedula}', true)">📂 Ver Carpeta</button>
-                            </td>
-                        </tr>`;
-                });
-            } catch (err) { console.error("Error cargando pasivos:", err); }
+                const res = await fetch(`${API_URL}/admin/usuarios-pasivos`, { headers: { 'Authorization': `Bearer ${token}` } });
+                cachePasivos = await res.json();
+                renderizarTablaPasivos(cachePasivos);
+            } catch (err) { console.error(err); }
+        }
+
+        function renderizarTablaPasivos(lista) {
+            const tbody = document.getElementById('tbody-pasivos');
+            tbody.innerHTML = '';
+            lista.forEach(u => {
+                const f = new Date(u.created_at || u.fecha_ingreso).toLocaleDateString('es-EC');
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${u.cedula}</strong></td>
+                        <td>${u.nombre}</td>
+                        <td>${u.celular || '-'}</td>
+                        <td>${u.correo}</td>
+                        <td>${f}</td>
+                        <td>
+                            <button class="btn-action btn-folder" onclick="abrirExpediente('${u.id}', '${u.nombre}', '${u.cedula}', true)">📁 Carpeta</button>
+                            <button class="btn-action btn-status role-admin" style="background:#22c55e; display:${rol==='admin'?'inline-block':'none'}" onclick="cambiarEstadoLaboral('${u.id}', false)">Reincorporar</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        function filtrarTablaActivos() {
+            const q = document.getElementById('search-activos').value.toLowerCase();
+            const f = cacheActivos.filter(u => u.nombre.toLowerCase().includes(q) || u.cedula.includes(q));
+            renderizarTablaActivos(f);
+        }
+
+        function filtrarTablaPasivos() {
+            const q = document.getElementById('search-pasivos').value.toLowerCase();
+            const f = cachePasivos.filter(u => u.nombre.toLowerCase().includes(q) || u.cedula.includes(q));
+            renderizarTablaPasivos(f);
+        }
+
+        async function cambiarEstadoLaboral(id, pasarAPasivo) {
+            const msg = pasarAPasivo ? "¿Seguro que desea pasar este empleado al histórico de Pasivos/Desvinculados?" : "¿Desea reincorporar a este empleado al personal activo?";
+            if(!confirm(msg)) return;
+
+            const endpoint = pasarAPasivo ? `${API_URL}/admin/usuarios/${id}/baja` : `${API_URL}/admin/usuarios/${id}/alta`;
+            try {
+                const res = await fetch(endpoint, { method: 'PUT', headers: { 'Authorization': `Bearer ${token}` } });
+                if(res.ok) {
+                    alert("Estado laboral actualizado.");
+                    cargarEmpleadosActivos();
+                    cargarEmpleadosPasivos();
+                }
+            } catch (err) { console.error(err); }
         }
 
         async function crearUsuario(e) {
             e.preventDefault();
             const formData = new FormData();
             formData.append('cedula', document.getElementById('c_cedula').value);
-            formData.append('nombre_completo', document.getElementById('c_nombre').value);
+            formData.append('nombre', document.getElementById('c_nombre').value);
             formData.append('fecha_ingreso', document.getElementById('c_fecha').value);
             formData.append('correo', document.getElementById('c_correo').value);
             formData.append('celular', document.getElementById('c_celular').value);
@@ -421,90 +451,91 @@
             formData.append('foto', document.getElementById('c_foto').files[0]);
 
             try {
-                const res = await fetch(`${API_URL}/admin/crear-usuario`, {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` },
-                    body: formData
-                });
-                const data = await res.json();
+                const res = await fetch(`${API_URL}/admin/registrar-usuario`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: formData });
                 if(res.ok) {
-                    alert("Empleado creado con éxito");
+                    alert("Colaborador registrado exitosamente.");
                     document.getElementById('form-crear-usuario').reset();
+                    switchView('view-activos');
                     cargarEmpleadosActivos();
-                    switchView('activos');
-                } else { alert("Error: " + data.error); }
-            } catch(err) { alert("Error de comunicación backend"); }
+                } else {
+                    const data = await res.json();
+                    alert("Error: " + data.error);
+                }
+            } catch (err) { alert("Error de red"); }
         }
 
-        async function moverAPasivo(id) {
-            if(!confirm("¿Está seguro de mover este usuario a pasivos? Se transferirán todas sus carpetas e historiales médicos.")) return;
-            try {
-                const res = await fetch(`${API_URL}/admin/mover-a-pasivo/${id}`, {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if(res.ok) {
-                    alert("Usuario transferido al archivo pasivo exitosamente.");
-                    cargarEmpleadosActivos();
-                    cargarEmpleadosPasivos();
-                } else { alert("No se pudo procesar la migración"); }
-            } catch (err) { console.error(err); }
-        }
+        // --- SISTEMA INTERACTIVO DE EXPEDIENTES DIGITALES POR PESTAÑAS Y MESES ---
 
-        // --- MANEJO DEL EXPEDIENTE DIGITAL DINÁMICO ---
-        
-async function abrirExpediente(id, nombre, cedula, esPasivo) {
+        async function abrirExpediente(id, nombre, cedula, esPasivo) {
             currentSelectedUserId = id;
             currentSelectedUserPasivo = esPasivo;
             currentSelectedUserName = nombre;
 
             document.getElementById('modal-emp-name').innerText = `Expediente: ${nombre}`;
             document.getElementById('modal-emp-cedula').innerText = cedula;
-
-            // Limpiar los inputs de filtros al abrir un nuevo expediente
-            limpiarFiltrosExpediente();
+            document.getElementById('form-upload-doc').reset();
+            
+            // Inicializar fecha por defecto en formulario de subida
+            document.getElementById('upload-fecha-doc').value = new Date().toISOString().split('T')[0];
 
             // Configurar Selector de tipos de documento permitido según ROL logeado
             const selectTipo = document.getElementById('upload-tipo-doc');
-            selectTipo.innerHTML = '';
+            selectTipo.innerHTML = '<option value="">Seleccione tipo...</option>';
 
+            let opciones = [];
             if (rol === 'admin') {
-                let opcionesAdmin = `
-                    <option value="Contratación">Contratación</option>
-                    <option value="Vacaciones">Vacaciones</option>
-                    <option value="Certificado de Competencia">Certificado de Competencia</option>
-                    <option value="Acta de EPP's">Acta de EPP's</option>
-                    <option value="Certificados Médicos">Certificados Médicos</option>
-                    <option value="Certificados de Aptitud">Certificados de Aptitud</option>
-                    <option value="Memorándum">Memorándum</option>
-                    <option value="Certificados y Cargas Familiares">Certificados y Cargas Familiares</option>
-                `;
-
-                if (esPasivo) {
-                    opcionesAdmin += `<option value="Desvinculación">Desvinculación</option>`;
-                }
-                selectTipo.innerHTML = opcionesAdmin;
-
+                opciones = ["Contratación", "Vacaciones", "Certificado de Competencia", "Acta de EPP's", "Certificados Médicos", "Certificados de Aptitud", "Memorándum", "Certificados y Cargas Familiares"];
+                if (esPasivo) opciones.push("Desvinculación");
             } else if (rol === 'doc') {
-                selectTipo.innerHTML = `
-                    <option value="Ficha Médica Ocupacional">Ficha Médica Ocupacional</option>
-                    <option value="Aptitud Médica Ingreso">Aptitud Médica Ingreso</option>
-                    <option value="Aptitud Médica Periódico">Aptitud Médica Periódico</option>
-                    <option value="Certificado médico">Certificado médico / Atención</option>
-                    <option value="Reposo médico">Reposo médico validado</option>
-                `;
+                opciones = ["Ficha Médica Ocupacional", "Aptitud Médica Ingreso", "Aptitud Médica Periódico", "Certificado médico", "Reposo médico"];
             } else if (rol === 'kelvin') {
-                selectTipo.innerHTML = `
-                    <option value="Certificado de Competencia Laboral">Certificado de Competencia Laboral</option>
-                    <option value="Certificado Técnico Operaciones">Certificado Técnico Operaciones</option>
-                    <option value="Acta de Entrega EPP">Acta de Entrega EPP</option>
-                `;
+                opciones = ["Certificado de Competencia Laboral", "Certificado Técnico Operaciones", "Acta de Entrega EPP"];
             }
 
-            // Consultar y guardar los documentos desde el servidor
+            opciones.forEach(opt => {
+                selectTipo.innerHTML += `<option value="${opt}">${opt}</option>`;
+            });
+
+            // Re-generar barra de pestañas de filtrado en caliente
+            const tabsContenedor = document.getElementById('tipo-doc-tabs');
+            tabsContenedor.innerHTML = '';
+            opciones.forEach((opt, index) => {
+                tabsContenedor.innerHTML += `
+                    <button class="btn-action" id="tab-${index}" style="background: #e2e8f0; color: #475569; border: 1px solid #cbd5e1;" onclick="seleccionarPestañaTipo('${opt}', 'tab-${index}')">
+                        ${opt}
+                    </button>`;
+            });
+
+            // Inicializar vista en la primera categoría disponible
+            tipoDocumentoActivo = opciones[0] || "";
+            document.getElementById('txt-tipo-seleccionado').innerText = tipoDocumentoActivo;
+
+            // Traer datos crudos del servidor
             await obtenerDocumentosServidor();
+            
+            // Forzar visualmente la selección en la pestaña 0
+            if(opciones.length > 0) seleccionarPestañaTipo(opciones[0], 'tab-0');
 
             document.getElementById('modal-expediente').style.display = 'flex';
+        }
+
+        function seleccionarPestañaTipo(tipo, tabId) {
+            tipoDocumentoActivo = tipo;
+            document.getElementById('txt-tipo-seleccionado').innerText = tipo;
+
+            // Cambiar estilos de las pestañas
+            document.querySelectorAll('#tipo-doc-tabs button').forEach(btn => {
+                btn.style.background = '#e2e8f0';
+                btn.style.color = '#475569';
+            });
+            const botonActivo = document.getElementById(tabId);
+            if(botonActivo) {
+                botonActivo.style.background = 'var(--primary-color)';
+                botonActivo.style.color = 'white';
+            }
+
+            // Filtrar y agrupar visualmente por periodos de meses
+            renderizarDocumentosAgrupados();
         }
 
         async function obtenerDocumentosServidor() {
@@ -519,89 +550,104 @@ async function abrirExpediente(id, nombre, cedula, esPasivo) {
 
             try {
                 const res = await fetch(endpoint, { headers: { 'Authorization': `Bearer ${token}` } });
-                documentosActuales = await res.json(); // Guardamos en la variable global
+                documentosActuales = await res.json();
                 if (!Array.isArray(documentosActuales)) documentosActuales = [];
-                dibujarTablaDocumentos(documentosActuales);
             } catch (err) { 
-                document.getElementById('tbody-docs-empleado').innerHTML = '<tr><td colspan="6" style="color:red;">Error al enlazar datos de almacenamiento remoto.</td></tr>'; 
+                console.error(err);
+                documentosActuales = [];
             }
         }
 
-        function dibujarTablaDocumentos(listaDocs) {
-            const tbody = document.getElementById('tbody-docs-empleado');
-            tbody.innerHTML = '';
+        function renderizarDocumentosAgrupados() {
+            const contenedor = document.getElementById('contenedor-expediente-grupos');
+            contenedor.innerHTML = '';
 
-            if(!listaDocs || listaDocs.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#94a3b8;">No se registran archivos con los criterios buscados.</td></tr>';
+            // Filtrar solo los de la categoría de la pestaña activa
+            const docsFiltrados = documentosActuales.filter(d => d.tipo_documento === tipoDocumentoActivo);
+
+            if(docsFiltrados.length === 0) {
+                contenedor.innerHTML = `<div style="text-align:center; padding: 2rem; color:#94a3b8;">No se registran archivos cargados en: <strong>${tipoDocumentoActivo}</strong></div>`;
                 return;
             }
 
-            listaDocs.forEach(doc => {
-                const fechaFormateada = new Date(doc.created_at).toLocaleDateString('es-EC', {day: '2-digit', month: '2-digit', year: 'numeric'});
-                const puedeEliminar = (rol === 'admin' || rol === 'doc');
-                
-                // Si tu backend no devuelve un campo 'nombre_archivo', usamos el 'tipo_documento' + '.pdf' por seguridad visual
-                const nombreArchivoMostrar = doc.nombre_archivo || `${doc.tipo_documento}.pdf`;
-
-                tbody.innerHTML += `
-                    <tr>
-                        <td>📁 <strong>${doc.tipo_documento}</strong></td>
-                        <td style="font-size:13px; color:#475569; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${nombreArchivoMostrar}">${nombreArchivoMostrar}</td>
-                        <td><span style="font-size:13px;" class="user-badge">${doc.nombre_user || 'Sistema'}</span></td>
-                        <td>${fechaFormateada}</td>
-                        <td><a href="${doc.url_cloudinary}" target="_blank" class="btn-action btn-view">👁️ Descargar</a></td>
-                        ${puedeEliminar ? `<td><button class="btn-action btn-delete" onclick="eliminarDocumento('${doc.id}')">❌</button></td>` : '<td>-</td>'}
-                    </tr>`;
+            // Agrupar por mes asignado (periodo)
+            const gruposPorMes = {};
+            docsFiltrados.forEach(doc => {
+                const mes = doc.periodo || "Sin Periodo Especificado";
+                if (!gruposPorMes[mes]) gruposPorMes[mes] = [];
+                gruposPorMes[mes].push(doc);
             });
-        }
 
-        // FUNCIONES DE FILTRADO EN TIEMPO REAL
-        function filtrarDocumentos() {
-            const valNombre = document.getElementById('filter-doc-name').value.toLowerCase().trim();
-            const valFecha = document.getElementById('filter-doc-date').value; // Formato YYYY-MM-DD
+            const ordenMeses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre", "Sin Periodo Especificado"];
 
-            const documentosFiltrados = documentosActuales.filter(doc => {
-                // Validación por Nombre de Archivo o Tipo de Documento
-                const matchNombre = (doc.nombre_archivo && doc.nombre_archivo.toLowerCase().includes(valNombre)) || 
-                                     doc.tipo_documento.toLowerCase().includes(valNombre);
-                
-                // Validación por Fecha de Registro
-                let matchFecha = true;
-                if (valFecha) {
-                    const fechaDoc = new Date(doc.created_at).toISOString().split('T')[0]; // Extrae YYYY-MM-DD
-                    matchFecha = (fechaDoc === valFecha);
+            ordenMeses.forEach(mes => {
+                if (gruposPorMes[mes] && gruposPorMes[mes].length > 0) {
+                    let tablaHTML = `
+                        <div class="card" style="border-left: 4px solid var(--primary-color); margin-bottom: 1.5rem; padding: 1rem;">
+                            <h4 style="margin-top:0; color:#1e293b; background:#f1f5f9; padding: 6px 12px; border-radius:4px;">📅 Periodo: ${mes}</h4>
+                            <div class="table-responsive">
+                                <table style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th>Nombre Original del Archivo</th>
+                                            <th>Subido Por</th>
+                                            <th>Fecha Doc.</th>
+                                            <th>Acción</th>
+                                            ${(rol === 'admin' || rol === 'doc') ? '<th class="role-admin">Eliminar</th>' : ''}
+                                        </tr>
+                                    </thead>
+                                    <tbody>`;
+
+                    gruposPorMes[mes].forEach(doc => {
+                        // Respetar de forma íntegra el nombre original del archivo físico
+                        let nombreReal = doc.nombre_archivo || doc.nombre_original || `${doc.tipo_documento}.pdf`;
+                        if (nombreReal.includes('\\')) nombreReal = nombreReal.split('\\').pop();
+                        if (nombreReal.includes('/')) nombreReal = nombreReal.split('/').pop();
+
+                        const fechaMostrar = doc.fecha_documento 
+                            ? new Date(doc.fecha_documento + 'T00:00:00').toLocaleDateString('es-EC')
+                            : new Date(doc.created_at).toLocaleDateString('es-EC');
+
+                        const puedeEliminar = (rol === 'admin' || rol === 'doc');
+
+                        tablaHTML += `
+                            <tr>
+                                <td style="font-size:14px; color:#1e293b; font-weight:500;" title="${nombreReal}">📄 ${nombreReal}</td>
+                                <td><span style="font-size:12px;" class="user-badge">${doc.nombre_user || 'Sistema'}</span></td>
+                                <td>${fechaMostrar}</td>
+                                <td><a href="${doc.url_cloudinary}" target="_blank" class="btn-action btn-view">👁️ Ver PDF</a></td>
+                                ${puedeEliminar ? `<td><button class="btn-action btn-delete" onclick="eliminarDocumento('${doc.id}')">❌</button></td>` : ''}
+                            </tr>`;
+                    });
+
+                    tablaHTML += `</tbody></table></div></div>`;
+                    contenedor.innerHTML += tablaHTML;
                 }
-
-                return matchNombre && matchFecha;
             });
-
-            dibujarTablaDocumentos(documentosFiltrados);
-        }
-
-        function limpiarFiltrosExpediente() {
-            document.getElementById('filter-doc-name').value = '';
-            document.getElementById('filter-doc-date').value = '';
-            dibujarTablaDocumentos(documentosActuales);
         }
 
         async function procesarSubidaDocumento(e) {
             e.preventDefault();
             const tipoDoc = document.getElementById('upload-tipo-doc').value;
+            const fechaDoc = document.getElementById('upload-fecha-doc').value;
+            const periodoDoc = document.getElementById('upload-periodo-doc').value;
             const archivoInput = document.getElementById('upload-file').files[0];
 
+            if (!tipoDoc) { alert("Seleccione un tipo de documento"); return; }
             if (!archivoInput) return;
 
-            // VALIDACIÓN EXTRA DE SEGURIDAD EN CLIENTE: SOLO PDF
+            // Restricción dura en cliente: Únicamente archivos PDF
             if (archivoInput.type !== "application/pdf" && !archivoInput.name.endsWith('.pdf')) {
-                alert("Error: Solo se permite subir archivos en formato PDF.");
+                alert("Error: El sistema solo admite la carga de archivos en formato .PDF");
                 return;
             }
 
             const formData = new FormData();
             formData.append('tipo_documento', tipoDoc);
-            formData.append('usuario_id', currentSelectedUserId);
+            formData.append('fecha_documento', fechaDoc);
+            formData.append('periodo', periodoDoc);
             formData.append('archivo', archivoInput);
-            formData.append('nombre_archivo', archivoInput.name); // Enviamos el nombre original al backend
+            formData.append('nombre_archivo', archivoInput.name); // Conserva el nombre del archivo subido original
             formData.append('nombre_user', nombreUsuario || 'Gestor Unificado');
             formData.append('es_pasivo', currentSelectedUserPasivo);
 
@@ -611,21 +657,23 @@ async function abrirExpediente(id, nombre, cedula, esPasivo) {
             else if (rol === 'kelvin') uploadEndpoint = `${API_URL}/kelvin/subir-certificados`;
 
             try {
-                const res = await fetch(uploadEndpoint, {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` },
-                    body: formData
-                });
+                const res = await fetch(uploadEndpoint, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: formData });
                 if (res.ok) {
-                    alert("Archivo PDF procesado e indexado correctamente.");
+                    alert("Archivo PDF indexado y archivado correctamente.");
                     document.getElementById('form-upload-doc').reset();
-                    await obtenerDocumentosServidor(); // Recargar datos locales
+                    document.getElementById('upload-fecha-doc').value = new Date().toISOString().split('T')[0];
+                    
+                    await obtenerDocumentosServidor();
+                    
+                    // Mantener la vista fija sobre el tipo de documento recién operado
+                    seleccionarPestañaTipo(tipoDoc, Array.from(document.querySelectorAll('#tipo-doc-tabs button')).find(b => b.innerText.trim() === tipoDoc)?.id);
+                    
                     if(rol === 'admin' || rol === 'doc') cargarCertificadosGlobales();
                 } else {
                     const errData = await res.json();
-                    alert("Error crítico del servidor: " + errData.error);
+                    alert("Error de procesamiento: " + errData.error);
                 }
-            } catch(err) { alert("Fallo de red al intentar subir."); }
+            } catch(err) { alert("Fallo de red en la carga remota."); }
         }
 
         async function eliminarDocumento(id) {
@@ -634,15 +682,13 @@ async function abrirExpediente(id, nombre, cedula, esPasivo) {
             let deleteEndpoint = (rol === 'doc') ? `${API_URL}/doctor/aptitud/${id}` : `${API_URL}/admin/documentos/${id}`;
             
             try {
-                const res = await fetch(deleteEndpoint, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                const res = await fetch(deleteEndpoint, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
                 if(res.ok) {
                     alert("Registro eliminado.");
-                    await obtenerDocumentosServidor(); // Volver a consultar
+                    await obtenerDocumentosServidor();
+                    renderizarDocumentosAgrupados();
                     if(rol === 'admin' || rol === 'doc') cargarCertificadosGlobales();
-                } else { alert("Denegado o error de procesamiento."); }
+                } else { alert("Denegado o error del servidor."); }
             } catch (err) { console.error(err); }
         }
 
@@ -650,36 +696,38 @@ async function abrirExpediente(id, nombre, cedula, esPasivo) {
             document.getElementById('modal-expediente').style.display = 'none';
         }
 
-        // --- MANEJO ADICIONAL CORPORATIVO / GLOBAL ---
+        function cerrarSesion() {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+
+        // --- GESTIÓN ADICIONAL DE REPOSITORIOS GENERALES DE EMPRESA Y CERTIFICADOS GLOBALES ---
 
         async function subirDocEmpresa(e) {
             e.preventDefault();
             const formData = new FormData();
-            formData.append('tipo_documento', document.getElementById('emp_tipo').value);
-            formData.append('archivo', document.getElementById('emp_archivo').files[0]);
+            formData.append('nombre_documento', document.getElementById('emp_nombre_doc').value);
+            formData.append('archivo', document.getElementById('emp_file').files[0]);
 
             try {
-                const res = await fetch(`${API_URL}/subir-empresa`, {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` },
-                    body: formData
-                });
+                const res = await fetch(`${API_URL}/admin/subir-documento-empresa`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: formData });
                 if(res.ok) {
-                    alert("Documentación institucional cargada.");
-                    document.getElementById('form-empresa').reset();
+                    alert("Documento de empresa guardado.");
+                    document.getElementById('form-upload-empresa').reset();
                     cargarDocumentosEmpresa();
                 }
-            } catch(err) { console.error(err); }
+            } catch (err) { console.error(err); }
         }
 
         async function cargarDocumentosEmpresa() {
             try {
                 const res = await fetch(`${API_URL}/admin/documentos-empresa`, { headers: { 'Authorization': `Bearer ${token}` } });
                 const data = await res.json();
-                const tbody = document.getElementById('tbody-empresa');
+                const tbody = document.getElementById('tbody-empresa-docs');
                 tbody.innerHTML = '';
                 data.forEach(d => {
-                    tbody.innerHTML += `<tr><td>${d.id}</td><td><strong>${d.tipo_documento}</strong></td><td><a href="${d.url_cloudinary}" target="_blank" class="btn-action btn-view">Descargar</a></td><td><button class="btn-action btn-delete" onclick="eliminarDocEmpresa('${d.id}')">Eliminar</button></td></tr>`;
+                    const f = new Date(d.created_at).toLocaleDateString('es-EC');
+                    tbody.innerHTML += `<tr><td><strong>${d.nombre_documento}</strong></td><td>${f}</td><td><a href="${d.url_cloudinary}" target="_blank" class="btn-action btn-view">Ver</a> <button class="btn-action btn-delete" onclick="eliminarDocEmpresa('${d.id}')">Eliminar</button></td></tr>`;
                 });
             } catch (err) { console.error(err); }
         }
