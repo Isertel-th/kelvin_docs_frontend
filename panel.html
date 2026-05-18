@@ -237,13 +237,19 @@
             <h2 id="modal-emp-name">Expediente Digital</h2>
             <p style="font-weight: bold; color:#64748b;">Cédula: <span id="modal-emp-cedula"></span></p>
             
-            <div class="card" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+<div class="card" style="background: #f8fafc; border: 1px solid #e2e8f0;">
                 <h4 style="margin-top:0; color:#334155;">Cargar nuevo archivo a este expediente</h4>
                 <form id="form-upload-doc" onsubmit="procesarSubidaDocumento(event)">
                     <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
                         <div>
                             <label>Tipo Documento:</label>
-                            <select id="upload-tipo-doc" required></select>
+                            <select id="upload-tipo-doc" required onchange="actualizarSubtipos('upload')"></select>
+                        </div>
+                        <div>
+                            <label>Subtipo Documento:</label>
+                            <select id="upload-subtipo-doc" required>
+                                <option value="General / Único">General / Único</option>
+                            </select>
                         </div>
                         <div>
                             <label>Fecha Documento:</label>
@@ -262,24 +268,31 @@
                 </form>
             </div>
 
-<div class="card" style="background: #f1f5f9; padding: 1rem; margin-bottom: 1rem;">
-    <h4 style="margin: 0 0 0.5rem 0; color: #475569; font-size: 14px;">🔍 Clasificación y Filtros Integrados:</h4>
-    <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.5rem; margin-bottom: 0;">
-        <div>
-            <label style="margin-bottom:2px;">Seleccionar Categoría:</label>
-            <select id="filter-doc-tipo" onchange="filtrarDocumentos()"></select>
-        </div>
-        <div>
-            <label style="margin-bottom:2px;">Buscar por nombre:</label>
-            <input type="text" id="filter-doc-name" placeholder="Buscar palabra clave..." oninput="filtrarDocumentos()">
-        </div>
-        <div>
-            <label style="margin-bottom:2px;">Filtrar por Fecha Doc.:</label>
-            <input type="date" id="filter-doc-date" onchange="filtrarDocumentos()">
-        </div>
-    </div>
-</div>
+            <div class="card" style="background: #f1f5f9; padding: 1rem; margin-bottom: 1rem;">
+                <h4 style="margin: 0 0 0.5rem 0; color: #475569; font-size: 14px;">🔍 Clasificación y Filtros Integrados:</h4>
+                <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.5rem; margin-bottom: 0;">
+                    <div>
+                        <label style="margin-bottom:2px;">Categoría:</label>
+                        <select id="filter-doc-tipo" onchange="actualizarSubtipos('filter'); filtrarDocumentos();"></select>
+                    </div>
+                    <div>
+                        <label style="margin-bottom:2px;">Subcategoría:</label>
+                        <select id="filter-doc-subtipo" onchange="filtrarDocumentos()">
+                            <option value="TODOS">-- Todos --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="margin-bottom:2px;">Buscar por nombre:</label>
+                        <input type="text" id="filter-doc-name" placeholder="Buscar palabra clave..." oninput="filtrarDocumentos()">
+                    </div>
+                    <div>
+                        <label style="margin-bottom:2px;">Filtrar por Fecha Doc.:</label>
+                        <input type="date" id="filter-doc-date" onchange="filtrarDocumentos()">
+                    </div>
+                </div>
+            </div>
 
+            
             <h3>Documentos Clasificados por Periodo</h3>
             <div class="table-responsive">
                 <table>
@@ -299,7 +312,7 @@
         </div>
     </div>
 
-    <script>
+<script>
         const API_URL = 'https://kelvin-th-docs-backend.onrender.com/api';
         const token = localStorage.getItem('token');
         const rol = localStorage.getItem('rol');
@@ -309,6 +322,46 @@
         let currentSelectedUserPasivo = false;
         let currentSelectedUserName = "";
         let documentosActuales = [];
+
+        // Diccionario Global de Subtipos asignados por Tipo de Documento
+        const mapaSubtipos = {
+            "Contratación": ["Contrato", "Aviso de entrada", "Extracto SUT", "Certificado Bancario"],
+            "Vacaciones": ["Solicitud de vacaciones"],
+            "Desvinculación": ["Renuncia", "Acta de finiquito", "Aviso de Salida", "Comprobante de Pago"],
+            "Certificados": ["Laborales", "Honorabilidad"],
+            "Certificados Médicos": ["Certificado médico IESS", "Certificado médico privado", "Certificado médico MSP", "Reposo médico"],
+            "Certificados de Aptitud": ["Ingreso", "Periódico", "Salida"],
+            "Certificados y Cargas Familiares": ["Certificados de nacimiento", "Acta de matrimonio", "Acta de unión de hecho", "Cédula de ciudadanía (porcentaje de discapacidad)"],
+            "Ficha Médica Ocupacional": ["General / Único"],
+            "Aptitud Médica Ingreso": ["General / Único"],
+            "Aptitud Médica Periódico": ["General / Único"],
+            "Certificado médico": ["Certificado médico IESS", "Certificado médico privado", "Certificado médico MSP", "Reposo médico"],
+            "Reposo médico": ["General / Único"],
+            "Certificado de Competencia Laboral": ["General / Único"],
+            "Certificado Técnico Operaciones": ["General / Único"],
+            "Acta de Entrega EPP": ["General / Único"],
+            "Certificado de Competencia": ["General / Único"],
+            "Acta de EPP's": ["General / Único"],
+            "Memorándum": ["General / Único"]
+        };
+
+        function actualizarSubtipos(contexto) {
+            const tipo = document.getElementById(contexto === 'upload' ? 'upload-tipo-doc' : 'filter-doc-tipo').value;
+            const selectSubtipo = document.getElementById(contexto === 'upload' ? 'upload-subtipo-doc' : 'filter-doc-subtipo');
+            
+            if (!selectSubtipo) return; // Validación por si acaso no existen los elementos en el HTML aún
+            
+            selectSubtipo.innerHTML = '';
+            
+            if (contexto === 'filter') {
+                selectSubtipo.innerHTML = '<option value="TODOS">-- Todos los Subtipos --</option>';
+            }
+
+            const lista = mapaSubtipos[tipo] || ["General / Único"];
+            lista.forEach(sub => {
+                selectSubtipo.innerHTML += `<option value="${sub}">${sub}</option>`;
+            });
+        }
 
         function formatearNombre(texto) {
             return texto
@@ -469,10 +522,8 @@
             document.getElementById('modal-emp-name').innerText = `Expediente: ${nombre}`;
             document.getElementById('modal-emp-cedula').innerText = cedula;
 
-            // Restablecer campos del formulario
             document.getElementById('form-upload-doc').reset();
 
-            // Configurar Selectores según ROL
             const selectTipo = document.getElementById('upload-tipo-doc');
             const selectFilter = document.getElementById('filter-doc-tipo');
             
@@ -486,6 +537,7 @@
                     <option value="Acta de EPP's">Acta de EPP's</option>
                     <option value="Certificados Médicos">Certificados Médicos</option>
                     <option value="Certificados de Aptitud">Certificados de Aptitud</option>
+                    <option value="Certificados">Certificados (Laborales/Honorabilidad)</option>
                     <option value="Memorándum">Memorándum</option>
                     <option value="Certificados y Cargas Familiares">Certificados y Cargas Familiares</option>
                 `;
@@ -509,10 +561,12 @@
             }
 
             selectTipo.innerHTML = opcionesHTML;
-            // El filtro tendrá las mismas opciones estructurales
             selectFilter.innerHTML = opcionesHTML;
 
-            // Limpiar campo de texto de búsqueda
+            // Forzar la actualización inicial de los subtipos (Carga y Filtros)
+            actualizarSubtipos('upload');
+            actualizarSubtipos('filter');
+
             document.getElementById('filter-doc-name').value = '';
             document.getElementById('filter-doc-date').value = '';
 
@@ -540,44 +594,44 @@
             }
         }
 
-        // CLASIFICACIÓN DINÁMICA POR TIPO Y AGRUPACIÓN POR PERIODO (MES)
-// REEMPLAZAR EL BLOQUE DE LA FUNCIÓN "filtrarDocumentos" POR ESTE
-function filtrarDocumentos() {
-    const tipoSeleccionado = document.getElementById('filter-doc-tipo').value;
-    const valNombre = document.getElementById('filter-doc-name').value.toLowerCase().trim();
-    const valFecha = document.getElementById('filter-doc-date').value; // Captura YYYY-MM-DD
+        // CLASIFICACIÓN DINÁMICA POR TIPO, SUBTIPO Y AGRUPACIÓN POR PERIODO (MES)
+        function filtrarDocumentos() {
+            const tipoSeleccionado = document.getElementById('filter-doc-tipo').value;
+            const subtipoSeleccionado = document.getElementById('filter-doc-subtipo') ? document.getElementById('filter-doc-subtipo').value : 'TODOS';
+            const valNombre = document.getElementById('filter-doc-name').value.toLowerCase().trim();
+            const valFecha = document.getElementById('filter-doc-date').value; 
 
-    // 1. Filtrar de forma estricta por tipo, palabra clave y fecha del calendario
-    const docsFiltrados = documentosActuales.filter(doc => {
-        const matchTipo = (doc.tipo_documento === tipoSeleccionado);
-        
-        const nombreArchivo = (doc.nombre_archivo || '').toLowerCase();
-        const matchNombre = valNombre === '' || nombreArchivo.includes(valNombre);
-        
-        // Extrae la fecha en formato YYYY-MM-DD (antepone created_at si fecha_documento no existe)
-        const fechaRaw = doc.fecha_documento || doc.created_at || '';
-        const fechaDocFormato = fechaRaw.substring(0, 10); 
-        const matchFecha = valFecha === '' || (fechaDocFormato === valFecha);
+            // 1. Filtrar de forma estricta por tipo, subtipo, palabra clave y fecha
+            const docsFiltrados = documentosActuales.filter(doc => {
+                const matchTipo = (doc.tipo_documento === tipoSeleccionado);
+                const matchSubtipo = (subtipoSeleccionado === 'TODOS' || doc.subtipo_documento === subtipoSeleccionado);
+                
+                const nombreArchivo = (doc.nombre_archivo || '').toLowerCase();
+                const matchNombre = valNombre === '' || nombreArchivo.includes(valNombre);
+                
+                const fechaRaw = doc.fecha_documento || doc.created_at || '';
+                const fechaDocFormato = fechaRaw.substring(0, 10); 
+                const matchFecha = valFecha === '' || (fechaDocFormato === valFecha);
 
-        return matchTipo && matchNombre && matchFecha;
-    });
+                return matchTipo && matchSubtipo && matchNombre && matchFecha;
+            });
 
-    // 2. Agrupar los resultados por Periodo (Año-Mes)
-    const gruposPorPeriodo = {};
-    docsFiltrados.forEach(doc => {
-        const periodo = doc.periodo || (doc.fecha_documento || doc.created_at || '').substring(0, 7) || 'Sin Periodo';
-        if (!gruposPorPeriodo[periodo]) {
-            gruposPorPeriodo[periodo] = [];
+            // 2. Agrupar los resultados por Periodo (Año-Mes)
+            const gruposPorPeriodo = {};
+            docsFiltrados.forEach(doc => {
+                const periodo = doc.periodo || (doc.fecha_documento || doc.created_at || '').substring(0, 7) || 'Sin Periodo';
+                if (!gruposPorPeriodo[periodo]) {
+                    gruposPorPeriodo[periodo] = [];
+                }
+                gruposPorPeriodo[periodo].push(doc);
+            });
+
+            // 3. Ordenar los periodos de manera descendente
+            const periodosOrdenados = Object.keys(gruposPorPeriodo).sort((a, b) => b.localeCompare(a));
+
+            // 4. Dibujar la tabla estructurada
+            dibujarTablaAgrupada(gruposPorPeriodo, periodosOrdenados);
         }
-        gruposPorPeriodo[periodo].push(doc);
-    });
-
-    // 3. Ordenar los periodos de manera descendente
-    const periodosOrdenados = Object.keys(gruposPorPeriodo).sort((a, b) => b.localeCompare(a));
-
-    // 4. Dibujar la tabla estructurada
-    dibujarTablaAgrupada(gruposPorPeriodo, periodosOrdenados);
-}
 
         function dibujarTablaAgrupada(grupos, periodos) {
             const tbody = document.getElementById('tbody-docs-empleado');
@@ -589,7 +643,6 @@ function filtrarDocumentos() {
             }
 
             periodos.forEach(periodo => {
-                // Inyectar la Fila Divisora de Mes / Periodo
                 const nombreMesCabecera = obtenerNombreMesEspanol(periodo);
                 tbody.innerHTML += `
                     <tr class="row-periodo-header">
@@ -599,20 +652,19 @@ function filtrarDocumentos() {
                     </tr>
                 `;
 
-                // Agregar los documentos que pertenecen a este periodo específico
                 grupos[periodo].forEach(doc => {
-                    // Si viene la fecha guardada del documento la usamos, sino la de creación
                     const fechaRaw = doc.fecha_documento || doc.created_at;
                     const fechaFormateada = fechaRaw ? new Date(fechaRaw).toLocaleDateString('es-EC', {day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC'}) : 'S/F';
                     
                     const puedeEliminar = (rol === 'admin' || rol === 'doc');
-                    
-                    // SOLUCIÓN: Mostramos de forma estricta el nombre_archivo original enviado desde el cliente
                     const nombreArchivoMostrar = doc.nombre_archivo || `${doc.tipo_documento}.pdf`;
+                    
+                    // Inyección Visual del Subtipo al lado del Tipo Principal
+                    const subTag = doc.subtipo_documento ? ` ➡️ <small style="color:#0284c7; font-weight:600; background:#e0f2fe; padding:2px 6px; border-radius:4px;">${doc.subtipo_documento}</small>` : '';
 
                     tbody.innerHTML += `
                         <tr>
-                            <td>📁 <span>${doc.tipo_documento}</span></td>
+                            <td>📁 <span>${doc.tipo_documento}${subTag}</span></td>
                             <td style="font-size:14px; color:#1e293b; font-weight: 500; max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${nombreArchivoMostrar}">
                                 ${nombreArchivoMostrar}
                             </td>
@@ -628,8 +680,9 @@ function filtrarDocumentos() {
         async function procesarSubidaDocumento(e) {
             e.preventDefault();
             const tipoDoc = document.getElementById('upload-tipo-doc').value;
+            const subtipoDoc = document.getElementById('upload-subtipo-doc') ? document.getElementById('upload-subtipo-doc').value : 'General / Único';
             const fechaDoc = document.getElementById('upload-doc-date').value;
-            const periodoDoc = document.getElementById('upload-doc-period').value; // Formato YYYY-MM
+            const periodoDoc = document.getElementById('upload-doc-period').value; 
             const archivoInput = document.getElementById('upload-file').files[0];
 
             if (!archivoInput) return;
@@ -641,14 +694,12 @@ function filtrarDocumentos() {
 
             const formData = new FormData();
             formData.append('tipo_documento', tipoDoc);
+            formData.append('subtipo_documento', subtipoDoc); // Inyección de la nueva variable
             formData.append('usuario_id', currentSelectedUserId);
             formData.append('archivo', archivoInput);
-            
-            // Garantizamos el envío de las nuevas variables de control al Backend
             formData.append('nombre_archivo', archivoInput.name); 
             formData.append('fecha_documento', fechaDoc);
             formData.append('periodo', periodoDoc);
-            
             formData.append('nombre_user', nombreUsuario || 'Gestor Unificado');
             formData.append('es_pasivo', currentSelectedUserPasivo);
 
@@ -667,8 +718,8 @@ function filtrarDocumentos() {
                     alert("Archivo PDF indexado y guardado correctamente por periodo.");
                     document.getElementById('form-upload-doc').reset();
                     
-                    // Conservamos el filtro del tipo subido para ver la actualización inmediata
                     document.getElementById('filter-doc-tipo').value = tipoDoc;
+                    actualizarSubtipos('filter');
                     
                     await obtenerDocumentosServidor(); 
                     if(rol === 'admin' || rol === 'doc') cargarCertificadosGlobales();
