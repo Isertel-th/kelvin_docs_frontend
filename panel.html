@@ -522,6 +522,8 @@
         
 // --- MANEJO DEL EXPEDIENTE DIGITAL DINÁMICO ---
 
+// --- MANEJO DEL EXPEDIENTE DIGITAL DINÁMICO ---
+
 async function abrirExpediente(id, nombre, cedula, esPasivo) {
     currentSelectedUserId = id;
     currentSelectedUserPasivo = esPasivo;
@@ -553,10 +555,10 @@ async function abrirExpediente(id, nombre, cedula, esPasivo) {
             opcionesHTML += `<option value="Desvinculación">Desvinculación</option>`;
         }
     } else if (rol === 'doc') {
-        // CORREGIDO: Ahora el rol médico solo tiene acceso exclusivo a estas dos opciones en el panel y filtros
+        // SOLUCIÓN: Ajustamos los 'value' exactos que el backend intercepta para docus_medicos y certificados_aptitud
         opcionesHTML = `
-            <option value="Certificados Médicos">Certificados Médicos</option>
-            <option value="Certificados de Aptitud">Certificados de Aptitud</option>
+            <option value="Certificado médico">Certificados Médicos</option>
+            <option value="Aptitud Médica">Certificados de Aptitud</option>
         `;
     } else if (rol === 'kelvin') {
         opcionesHTML = `
