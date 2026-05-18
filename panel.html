@@ -262,19 +262,23 @@
                 </form>
             </div>
 
-            <div class="card" style="background: #f1f5f9; padding: 1rem; margin-bottom: 1rem;">
-                <h4 style="margin: 0 0 0.5rem 0; color: #475569; font-size: 14px;">🔍 Clasificación y Filtros Integrados:</h4>
-                <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.5rem; margin-bottom: 0;">
-                    <div>
-                        <label style="margin-bottom:2px;">Seleccionar Categoría:</label>
-                        <select id="filter-doc-tipo" onchange="filtrarDocumentos()"></select>
-                    </div>
-                    <div>
-                        <label style="margin-bottom:2px;">Buscar por nombre de archivo:</label>
-                        <input type="text" id="filter-doc-name" placeholder="Buscar palabra clave..." oninput="filtrarDocumentos()">
-                    </div>
-                </div>
-            </div>
+<div class="card" style="background: #f1f5f9; padding: 1rem; margin-bottom: 1rem;">
+    <h4 style="margin: 0 0 0.5rem 0; color: #475569; font-size: 14px;">🔍 Clasificación y Filtros Integrados:</h4>
+    <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.5rem; margin-bottom: 0;">
+        <div>
+            <label style="margin-bottom:2px;">Seleccionar Categoría:</label>
+            <select id="filter-doc-tipo" onchange="filtrarDocumentos()"></select>
+        </div>
+        <div>
+            <label style="margin-bottom:2px;">Buscar por nombre:</label>
+            <input type="text" id="filter-doc-name" placeholder="Buscar palabra clave..." oninput="filtrarDocumentos()">
+        </div>
+        <div>
+            <label style="margin-bottom:2px;">Filtrar por Fecha Doc.:</label>
+            <input type="date" id="filter-doc-date" onchange="filtrarDocumentos()">
+        </div>
+    </div>
+</div>
 
             <h3>Documentos Clasificados por Periodo</h3>
             <div class="table-responsive">
@@ -510,6 +514,7 @@
 
             // Limpiar campo de texto de búsqueda
             document.getElementById('filter-doc-name').value = '';
+            document.getElementById('filter-doc-date').value = '';
 
             await obtenerDocumentosServidor();
             document.getElementById('modal-expediente').style.display = 'flex';
@@ -536,35 +541,43 @@
         }
 
         // CLASIFICACIÓN DINÁMICA POR TIPO Y AGRUPACIÓN POR PERIODO (MES)
-        function filtrarDocumentos() {
-            const tipoSeleccionado = document.getElementById('filter-doc-tipo').value;
-            const valNombre = document.getElementById('filter-doc-name').value.toLowerCase().trim();
+// REEMPLAZAR EL BLOQUE DE LA FUNCIÓN "filtrarDocumentos" POR ESTE
+function filtrarDocumentos() {
+    const tipoSeleccionado = document.getElementById('filter-doc-tipo').value;
+    const valNombre = document.getElementById('filter-doc-name').value.toLowerCase().trim();
+    const valFecha = document.getElementById('filter-doc-date').value; // Captura YYYY-MM-DD
 
-            // 1. Filtrar de forma estricta por el tipo de documento seleccionado y palabra clave
-            const docsFiltrados = documentosActuales.filter(doc => {
-                const matchTipo = (doc.tipo_documento === tipoSeleccionado);
-                const nombreArchivo = (doc.nombre_archivo || '').toLowerCase();
-                const matchNombre = valNombre === '' || nombreArchivo.includes(valNombre);
-                return matchTipo && matchNombre;
-            });
+    // 1. Filtrar de forma estricta por tipo, palabra clave y fecha del calendario
+    const docsFiltrados = documentosActuales.filter(doc => {
+        const matchTipo = (doc.tipo_documento === tipoSeleccionado);
+        
+        const nombreArchivo = (doc.nombre_archivo || '').toLowerCase();
+        const matchNombre = valNombre === '' || nombreArchivo.includes(valNombre);
+        
+        // Extrae la fecha en formato YYYY-MM-DD (antepone created_at si fecha_documento no existe)
+        const fechaRaw = doc.fecha_documento || doc.created_at || '';
+        const fechaDocFormato = fechaRaw.substring(0, 10); 
+        const matchFecha = valFecha === '' || (fechaDocFormato === valFecha);
 
-            // 2. Agrupar los resultados por Periodo (Año-Mes)
-            const gruposPorPeriodo = {};
-            docsFiltrados.forEach(doc => {
-                // Si tu BD aún no tiene la columna "periodo", extraemos el año-mes de fecha_documento o created_at como salvaguarda
-                const periodo = doc.periodo || (doc.fecha_documento || doc.created_at || '').substring(0, 7) || 'Sin Periodo';
-                if (!gruposPorPeriodo[periodo]) {
-                    gruposPorPeriodo[periodo] = [];
-                }
-                gruposPorPeriodo[periodo].push(doc);
-            });
+        return matchTipo && matchNombre && matchFecha;
+    });
 
-            // 3. Ordenar los periodos de manera descendente (los más recientes primero)
-            const periodosOrdenados = Object.keys(gruposPorPeriodo).sort((a, b) => b.localeCompare(a));
-
-            // 4. Dibujar la tabla estructurada
-            dibujarTablaAgrupada(gruposPorPeriodo, periodosOrdenados);
+    // 2. Agrupar los resultados por Periodo (Año-Mes)
+    const gruposPorPeriodo = {};
+    docsFiltrados.forEach(doc => {
+        const periodo = doc.periodo || (doc.fecha_documento || doc.created_at || '').substring(0, 7) || 'Sin Periodo';
+        if (!gruposPorPeriodo[periodo]) {
+            gruposPorPeriodo[periodo] = [];
         }
+        gruposPorPeriodo[periodo].push(doc);
+    });
+
+    // 3. Ordenar los periodos de manera descendente
+    const periodosOrdenados = Object.keys(gruposPorPeriodo).sort((a, b) => b.localeCompare(a));
+
+    // 4. Dibujar la tabla estructurada
+    dibujarTablaAgrupada(gruposPorPeriodo, periodosOrdenados);
+}
 
         function dibujarTablaAgrupada(grupos, periodos) {
             const tbody = document.getElementById('tbody-docs-empleado');
