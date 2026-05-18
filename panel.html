@@ -445,7 +445,7 @@
             cerrarSesion();
         }
 
-        window.onload = function() {
+window.onload = function() {
             document.getElementById('user-role').innerText = rol.toUpperCase();
             document.getElementById('user-display-name').innerText = nombreUsuario || "Usuario Isertel";
 
@@ -461,6 +461,30 @@
             cargarEmpleadosPasivos();
             if (rol === 'admin') cargarDocumentosEmpresa();
             if (rol === 'admin' || rol === 'doc') cargarCertificadosGlobales();
+
+            // --- NUEVA LÓGICA: DETECTOR DE DOBLE CLIC EN LAS TABLAS DE EMPLEADOS ---
+            const mapearDobleClic = (tbodyId) => {
+                const tbody = document.getElementById(tbodyId);
+                if (tbody) {
+                    tbody.ondblclick = function(e) {
+                        // Busca la fila (TR) más cercana al elemento donde se hizo doble clic
+                        const fila = e.target.closest('tr');
+                        if (fila && fila.dataset.id) {
+                            const id = fila.dataset.id;
+                            const nombre = fila.dataset.nombre;
+                            const cedula = fila.dataset.cedula;
+                            const esPasivo = fila.dataset.pasivo === 'true';
+                            
+                            // Llama a tu función exacta sin modificar nada de su comportamiento
+                            abrirExpediente(id, nombre, cedula, esPasivo);
+                        }
+                    };
+                }
+            };
+
+            // Activamos el doble clic tanto para la tabla de activos como para la de pasivos
+            mapearDobleClic('tbody-activos');
+            mapearDobleClic('tbody-pasivos');
         };
 
         function switchView(viewId) {
@@ -481,7 +505,7 @@
             window.location.href = 'index.html';
         }
 
-        async function cargarEmpleadosActivos() {
+async function cargarEmpleadosActivos() {
             try {
                 const res = await fetch(`${API_URL}/admin/empleados`, { headers: { 'Authorization': `Bearer ${token}` } });
                 const data = await res.json();
@@ -489,8 +513,9 @@
                 tbody.innerHTML = '';
                 
                 data.forEach(emp => {
+                    // Guardamos los datos del usuario en atributos 'data-' para el doble clic
                     tbody.innerHTML += `
-                        <tr>
+                        <tr data-id="${emp.id}" data-nombre="${emp.nombre_completo}" data-cedula="${emp.cedula}" data-pasivo="false" style="cursor: pointer;" title="Doble clic para abrir expediente">
                             <td><img src="${emp.foto_url || 'https://via.placeholder.com/150'}" class="emp-thumb"></td>
                             <td><strong>${emp.nombre_completo}</strong></td>
                             <td>${emp.cedula}</td>
@@ -513,8 +538,9 @@
                 tbody.innerHTML = '';
                 
                 data.forEach(emp => {
+                    // Guardamos los datos del usuario en atributos 'data-' para el doble clic
                     tbody.innerHTML += `
-                        <tr>
+                        <tr data-id="${emp.id}" data-nombre="${emp.nombre_completo}" data-cedula="${emp.cedula}" data-pasivo="true" style="cursor: pointer;" title="Doble clic para abrir expediente">
                             <td><img src="${emp.foto_url || 'https://via.placeholder.com/150'}" class="emp-thumb"></td>
                             <td><strong>${emp.nombre_completo}</strong></td>
                             <td>${emp.cedula}</td>
@@ -527,6 +553,7 @@
                 });
             } catch (err) { console.error("Error cargando pasivos:", err); }
         }
+
 
         async function crearUsuario(e) {
             e.preventDefault();
