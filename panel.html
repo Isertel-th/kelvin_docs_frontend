@@ -4,830 +4,683 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Gestión - Isertel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary-color: #007bff; --admin-color: #2c3e50; --doc-color: #27ae60; --kelvin-color: #8e44ad; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f6f9; margin: 0; display: flex; height: 100vh; overflow: hidden; }
-        
-        /* Sidebar Estilos */
-        .sidebar { width: 260px; background: #1e293b; color: white; display: flex; flex-direction: column; justify-content: space-between; padding: 1rem; }
-        .sidebar h3 { text-align: center; margin-bottom: 2rem; border-bottom: 1px solid #334155; padding-bottom: 1rem; font-size: 1.2rem; }
-        .nav-menu { display: flex; flex-direction: column; gap: 0.5rem; flex-grow: 1; }
-        .nav-btn { background: none; border: none; color: #cbd5e1; padding: 12px; text-align: left; width: 100%; border-radius: 6px; cursor: pointer; font-size: 15px; font-weight: 500; display: flex; align-items: center; }
-        .nav-btn:hover, .nav-btn.active { background: var(--primary-color); color: white; }
-        .logout-btn { background: #ef4444; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; }
-        .logout-btn:hover { background: #dc2626; }
-
-        /* Contenedor Principal */
-        .main-content { flex-grow: 1; display: flex; flex-direction: column; overflow-y: auto; background: #f8fafc; }
-        .header { background: white; padding: 1rem 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
-        .header h2 { margin: 0; color: #334155; font-size: 1.5rem; }
-        .user-badge { background: #e2e8f0; padding: 6px 12px; border-radius: 20px; font-weight: 600; color: #475569; font-size: 14px; }
-        .container { padding: 2rem; max-width: 1200px; width: -webkit-fill-available; margin: 0 auto; }
-
-        /* Módulos de Vistas */
-        .view-section { display: none; }
-        .view-section.active { display: block; }
-
-        /* Tarjetas y Formularios */
-        .card { background: white; border-radius: 8px; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
-        .card h3 { margin-top: 0; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; }
-        .grid-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
-        label { font-weight: 600; color: #64748b; font-size: 14px; display: block; margin-bottom: 4px; }
-        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 15px; }
-        .btn-submit { background: var(--primary-color); color: white; font-weight: bold; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; }
-        .btn-submit:hover { opacity: 0.9; }
-
-        /* Tablas */
-        .table-responsive { overflow-x: auto; margin-top: 1rem; }
-        table { width: 100%; border-collapse: collapse; background: white; text-align: left; }
-        th, td { padding: 12px 16px; border-bottom: 1px solid #e2e8f0; font-size: 15px; }
-        th { background: #f1f5f9; color: #475569; font-weight: 600; }
-        tr:hover { background: #f8fafc; }
-        .emp-thumb { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
-
-        /* Filas de cabeceras de periodos */
-        .row-periodo-header { background: #e2e8f0 !important; font-weight: bold; color: #1e293b; }
-
-        /* Botones de acción rápidos */
-        .btn-action { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; margin-right: 5px; text-decoration: none; display: inline-block; }
-        .btn-view { background: #3b82f6; color: white; }
-        .btn-upload { background: #10b981; color: white; }
-        .btn-passive { background: #f59e0b; color: white; }
-        .btn-delete { background: #ef4444; color: white; }
-
-        /* Modales */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; padding: 2rem; border-radius: 10px; width: 90%; max-width: 850px; max-height: 85vh; overflow-y: auto; position: relative; }
-        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #94a3b8; }
-        
-        /* Restricciones de Roles Visuales */
-        .role-admin, .role-doc, .role-kelvin { display: none; }
-
-        .btn-clear { background: #64748b; color: white; }
-        .btn-clear:hover { background: #475569; }
+        .animate-fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .folder-card { transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+        .folder-card:hover { transform: translateY(-4px); }
+        .mes-block { border-left: 4px solid #4f46e5; margin-bottom: 1.5rem; }
+        /* Scrollbar estético */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body>
+<body class="bg-slate-100 font-sans flex h-screen overflow-hidden antialiased text-slate-800">
 
-    <div class="sidebar">
+    <aside class="w-64 bg-slate-900 text-slate-200 flex flex-col justify-between p-4 shadow-xl z-10">
         <div>
-            <h3 id="panel-title">Isertel Gestión</h3>
-            <div class="nav-menu">
-                <button class="nav-btn active" onclick="switchView('activos')">👥 Personal Activo</button>
-                <button class="nav-btn" onclick="switchView('pasivos')">📁 Personal Pasivo</button>
-                <button class="nav-btn role-admin" id="menu-crear" onclick="switchView('crear')">➕ Registrar Empleado</button>
-                <button class="nav-btn role-admin" id="menu-empresa" onclick="switchView('empresa')">🏢 Docs Empresa</button>
-                <button class="nav-btn role-doc" id="menu-global-med" onclick="switchView('global-medicos')">🩺 Certificados Globales</button>
+            <div class="flex items-center gap-3 px-2 py-4 border-b border-slate-800 mb-6">
+                <div class="bg-indigo-600 p-2 rounded-lg text-white">
+                    <i class="fas fa-building text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg tracking-wide text-white leading-tight">ISERTEL</h3>
+                    <span class="text-xs text-indigo-400 font-medium tracking-wider uppercase">Gestión Digital</span>
+                </div>
             </div>
+            
+            <nav class="space-y-1">
+                <button onclick="showSection('sec-empleados')" class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all bg-slate-800 text-white shadow-sm hover:bg-slate-800/80" id="btn-sec-empleados">
+                    <i class="fas fa-users text-indigo-400 w-5 text-center"></i> Personal e Historial
+                </button>
+                <button onclick="showSection('sec-empresa')" class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-slate-100" id="btn-sec-empresa">
+                    <i class="fas fa-folder-open text-emerald-400 w-5 text-center"></i> Documentos Empresa
+                </button>
+                <button id="menu-medico-btn" onclick="showSection('sec-medicos')" class="w-full hidden flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all text-slate-400 hover:bg-slate-800 hover:text-slate-100" id="btn-sec-medicos">
+                    <i class="fas fa-heartbeat text-purple-400 w-5 text-center"></i> Control Médico Global
+                </button>
+            </nav>
         </div>
-        <div>
-            <button class="logout-btn" onclick="cerrarSesion()">Cerrar Sesión</button>
+
+        <div class="pt-4 border-t border-slate-800 flex flex-col gap-3">
+            <div class="flex items-center gap-3 px-2">
+                <div class="w-9 h-9 bg-slate-700 rounded-full flex items-center justify-center text-sm font-bold text-indigo-300 uppercase shadow-inner" id="user-avatar">
+                    U
+                </div>
+                <div class="overflow-hidden">
+                    <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider">Sesión como</p>
+                    <p class="text-sm font-medium text-slate-200 truncate" id="user-display-role">Cargando...</p>
+                </div>
+            </div>
+            <button onclick="logout()" class="w-full flex items-center justify-center gap-2 bg-rose-600/10 hover:bg-rose-600 text-rose-400 hover:text-white py-2.5 px-4 rounded-xl text-xs font-semibold tracking-wide transition-all border border-rose-500/20">
+                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+            </button>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col overflow-hidden">
+        
+        <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-8 shadow-sm">
+            <div class="flex items-center gap-2 text-sm font-medium text-slate-500">
+                <span>Panel</span> <i class="fas fa-chevron-right text-xs text-slate-300"></i> <span class="text-slate-800 font-semibold" id="current-breadcrumb">Personal e Historial</span>
+            </div>
+            <div class="text-xs text-slate-400 font-medium">
+                <i class="far fa-calendar-alt mr-1"></i> Ecuador, 2026
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-8 content-area">
+
+            <section id="sec-empleados" class="animate-fade-in space-y-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Expedientes del Personal</h1>
+                        <p class="text-sm text-slate-500">Haz <b>doble clic</b> sobre la tarjeta de cualquier empleado para abrir su carpeta digital.</p>
+                    </div>
+                    <div class="bg-white p-1 rounded-xl shadow-sm border border-slate-200 flex gap-1">
+                        <button onclick="filtrarPersonal('activo')" id="btn-filtro-activo" class="px-4 py-2 text-xs font-bold uppercase rounded-lg transition-all bg-indigo-600 text-white shadow-sm">Activos</button>
+                        <button onclick="filtrarPersonal('pasivo')" id="btn-filtro-pasivo" class="px-4 py-2 text-xs font-bold uppercase rounded-lg transition-all text-slate-600 hover:bg-slate-50">Pasivos</button>
+                    </div>
+                </div>
+
+                <div id="grid-empleados" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    </div>
+
+                <div id="detalle-empleado" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden animate-fade-in">
+                    <div class="bg-slate-900 px-6 py-4 flex items-center justify-between text-white">
+                        <div class="flex items-center gap-3">
+                            <button onclick="regresarALista()" class="bg-slate-800 hover:bg-slate-700 p-2 rounded-xl transition-all text-slate-300 hover:text-white">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                            <div>
+                                <h2 class="text-lg font-bold" id="det-nombre">Nombre Empleado</h2>
+                                <p class="text-xs text-slate-400 font-medium uppercase tracking-wider" id="det-cargo">Cargo</p>
+                            </div>
+                        </div>
+                        <button onclick="abrirModalTipoDoc()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm px-4 py-2.5 rounded-xl shadow-lg shadow-indigo-600/20 transition-all flex items-center gap-2">
+                            <i class="fas fa-cloud-upload-alt"></i> Adjuntar Documento
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x divide-slate-200 h-[calc(100vh-320px)] min-h-[450px]">
+                        
+                        <div class="p-6 bg-slate-50/50 flex flex-col justify-between" id="wrapper-form-upload">
+                            <div class="space-y-4">
+                                <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-4 text-center">
+                                    <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 block mb-1">Tipo Seleccionado</span>
+                                    <div class="text-slate-800 font-bold text-base" id="lbl-tipo-seleccionado">Ninguno - Use el botón de arriba</div>
+                                </div>
+                                
+                                <div class="space-y-1.5">
+                                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Seleccionar Archivo (PDF/Imágenes)</label>
+                                    <label class="flex flex-col items-center justify-center border-2 border-dashed border-slate-300 rounded-xl p-6 bg-white cursor-pointer hover:border-indigo-500 transition-all group">
+                                        <i class="fas fa-file-pdf text-3xl text-slate-400 group-hover:text-indigo-500 mb-2 transition-colors"></i>
+                                        <span class="text-xs text-slate-500 font-medium text-center truncate w-full" id="fileNamePlaceholder">Click para examinar</span>
+                                        <input type="file" id="fileDoc" class="hidden" accept=".pdf,image/*" onchange="updateFileName(this)">
+                                    </label>
+                                </div>
+                            </div>
+
+                            <button onclick="subirDocumento()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 mt-4">
+                                <i class="fas fa-check-circle"></i> Confirmar y Subir Guardado
+                            </button>
+                        </div>
+
+                        <div class="lg:col-span-2 flex flex-col h-full bg-white">
+                            <div class="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+                                <span class="text-xs font-bold uppercase text-slate-500 tracking-wider">Historial de Archivos Cargados</span>
+                                <span class="bg-slate-200 text-slate-700 text-xs px-2.5 py-0.5 rounded-full font-bold" id="counter-docs">0 docs</span>
+                            </div>
+                            <div class="flex-1 overflow-y-auto p-6" id="listaDocs">
+                                </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="sec-empresa" class="hidden animate-fade-in space-y-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Documentación Corporativa</h1>
+                        <p class="text-sm text-slate-500">Archivos y directrices globales de la empresa.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-600 border-b pb-2">Subir Archivo General</h3>
+                        <div class="space-y-1">
+                            <label class="text-xs font-bold text-slate-500 uppercase">Categoría o Nombre</label>
+                            <input type="text" id="empTipoDoc" placeholder="Ej: Reglamento Interno, Contrato Macro" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-xs font-bold text-slate-500 uppercase">Archivo</label>
+                            <label class="flex flex-col items-center justify-center border-2 border-dashed border-slate-300 rounded-xl p-6 bg-slate-50 cursor-pointer hover:border-emerald-500 transition-all text-center">
+                                <i class="fas fa-cloud-upload-alt text-2xl text-slate-400 mb-1"></i>
+                                <span class="text-xs text-slate-500 font-medium" id="lblFileEmpresa">Seleccionar archivo</span>
+                                <input type="file" id="empFile" class="hidden" onchange="document.getElementById('lblFileEmpresa').innerText = this.files[0].name">
+                            </label>
+                        </div>
+                        <button onclick="subirDocEmpresa()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition-all text-sm shadow-md shadow-emerald-600/10">
+                            Publicar Documento
+                        </button>
+                    </div>
+
+                    <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-xs font-bold uppercase text-slate-500 tracking-wider">
+                                    <th class="px-6 py-3">Documento / Categoría</th>
+                                    <th class="px-6 py-3 text-right">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-empresa" class="divide-y divide-slate-100 text-sm">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="sec-medicos" class="hidden animate-fade-in space-y-6">
+                <div>
+                    <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Historial Clínico Ocupacional</h1>
+                    <p class="text-sm text-slate-500">Certificados médicos y validaciones de salud de todo el personal.</p>
+                </div>
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-xs font-bold uppercase text-slate-500 tracking-wider">
+                                <th class="px-6 py-3">Colaborador</th>
+                                <th class="px-6 py-3">Estado</th>
+                                <th class="px-6 py-3">Tipo Registro</th>
+                                <th class="px-6 py-3">Fecha de Carga</th>
+                                <th class="px-6 py-3 text-right">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-global-medicos" class="divide-y divide-slate-100 text-sm">
+                            </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <div id="modal-tipo-doc" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+        <div class="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-slate-100 overflow-hidden">
+            <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
+                <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                    <i class="fas fa-paste text-indigo-500"></i> ¿Qué tipo de documento deseas archivar?
+                </h3>
+                <button onclick="cerrarModalTipoDoc()" class="text-slate-400 hover:text-slate-600 text-lg transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="p-6 grid grid-cols-2 sm:grid-cols-3 gap-4">
+                
+                <button onclick="seleccionarTipoYContinuar('CONTRATO')" class="flex flex-col items-center justify-center p-5 rounded-2xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/50 transition-all group text-center gap-3">
+                    <div class="w-14 h-14 rounded-full bg-amber-50 group-hover:bg-amber-100 flex items-center justify-center text-amber-600 text-2xl transition-colors">
+                        <i class="fas fa-file-signature"></i>
+                    </div>
+                    <div>
+                        <p class="font-bold text-slate-800 text-sm">Contrato</p>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Alta y anexos de relación laboral</p>
+                    </div>
+                </button>
+
+                <button onclick="seleccionarTipoYContinuar('VACACIONES')" class="flex flex-col items-center justify-center p-5 rounded-2xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/50 transition-all group text-center gap-3">
+                    <div class="w-14 h-14 rounded-full bg-sky-50 group-hover:bg-sky-100 flex items-center justify-center text-sky-600 text-2xl transition-colors">
+                        <i class="fas fa-umbrella-beach"></i>
+                    </div>
+                    <div>
+                        <p class="font-bold text-slate-800 text-sm">Vacaciones</p>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Formularios de días tomados</p>
+                    </div>
+                </button>
+
+                <button onclick="seleccionarTipoYContinuar('CERTIFICADO MEDICO')" class="flex flex-col items-center justify-center p-5 rounded-2xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/50 transition-all group text-center gap-3">
+                    <div class="w-14 h-14 rounded-full bg-rose-50 group-hover:bg-rose-100 flex items-center justify-center text-rose-600 text-2xl transition-colors">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <div>
+                        <p class="font-bold text-slate-800 text-sm">Médico</p>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Certificados y reposos de salud</p>
+                    </div>
+                </button>
+
+                <button onclick="seleccionarTipoYContinuar('ACTA TRANSACCIONAL')" class="flex flex-col items-center justify-center p-5 rounded-2xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/50 transition-all group text-center gap-3">
+                    <div class="w-14 h-14 rounded-full bg-teal-50 group-hover:bg-teal-100 flex items-center justify-center text-teal-600 text-2xl transition-colors">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <div>
+                        <p class="font-bold text-slate-800 text-sm">Actas</p>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Acuerdos bilaterales internos</p>
+                    </div>
+                </button>
+
+                <button onclick="seleccionarTipoYContinuar('LIQUIDACION')" class="flex flex-col items-center justify-center p-5 rounded-2xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/50 transition-all group text-center gap-3">
+                    <div class="w-14 h-14 rounded-full bg-purple-50 group-hover:bg-purple-100 flex items-center justify-center text-purple-600 text-2xl transition-colors">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                    </div>
+                    <div>
+                        <p class="font-bold text-slate-800 text-sm">Liquidación</p>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Finiquitos y actas de egreso</p>
+                    </div>
+                </button>
+
+                <button onclick="seleccionarTipoYContinuar('OTROS')" class="flex flex-col items-center justify-center p-5 rounded-2xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/50 transition-all group text-center gap-3">
+                    <div class="w-14 h-14 rounded-full bg-slate-100 group-hover:bg-slate-200 flex items-center justify-center text-slate-600 text-2xl transition-colors">
+                        <i class="fas fa-ellipsis-h"></i>
+                    </div>
+                    <div>
+                        <p class="font-bold text-slate-800 text-sm">Otros</p>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Documentos varios del colaborador</p>
+                    </div>
+                </button>
+
+            </div>
+            <div class="px-6 py-3 bg-slate-50 text-right text-xs text-slate-400 border-t border-slate-100">
+                Isertel Hub · Control de Expedientes Automatizado
+            </div>
         </div>
     </div>
 
-    <div class="main-content">
-        <div class="header">
-            <h2 id="view-title">Personal Activo</h2>
-            <div class="user-badge">🔑 <span id="user-role">Rol</span>: <span id="user-display-name">Usuario</span></div>
-        </div>
-
-        <div class="container">
-            
-            <div id="view-activos" class="view-section active">
-                <div class="card">
-                    <h3>Nómina General Activa</h3>
-                    <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Foto</th>
-                                    <th>Nombre Completo</th>
-                                    <th>Cédula</th>
-                                    <th>Correo</th>
-                                    <th>Celular</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-activos"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div id="view-pasivos" class="view-section">
-                <div class="card">
-                    <h3>Historial de Personal Pasivo (Inactivos)</h3>
-                    <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Foto</th>
-                                    <th>Nombre Completo</th>
-                                    <th>Cédula</th>
-                                    <th>Correo</th>
-                                    <th>Celular</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-pasivos"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div id="view-crear" class="view-section">
-                <div class="card">
-                    <h3>Registrar Nuevo Colaborador en Nómina</h3>
-                    <form id="form-crear-usuario" onsubmit="crearUsuario(event)">
-                        <div class="grid-form">
-                            <div>
-                                <label>Cédula (10 dígitos enteros):</label>
-                                <input type="text" id="c_cedula" required pattern="[0-9]{10}" maxlength="10" placeholder="Ej. 1712345678" oninput="this.value = this.value.replace(/\D/g, '')">
-                            </div>
-                            <div>
-                                <label>Nombre Completo:</label>
-                                <input type="text" id="c_nombre" required placeholder="Ej. Juan Pérez" oninput="this.value = formatearNombre(this.value)" onblur="this.value = limpiarEspaciosNombre(this.value)">
-                            </div>
-                            <div>
-                                <label>Fecha de Ingreso:</label>
-                                <input type="date" id="c_fecha" required>
-                            </div>
-                        </div>
-                        <div class="grid-form">
-                            <div>
-                                <label>Correo Electrónico:</label>
-                                <input type="email" id="c_correo" required placeholder="raulperez@gmail.com">
-                            </div>
-                            <div>
-                                <label>Celular (10 dígitos enteros):</label>
-                                <input type="text" id="c_celular" required pattern="[0-9]{10}" maxlength="10" placeholder="Ej. 0998765432" oninput="this.value = this.value.replace(/\D/g, '')">
-                            </div>
-                            <div>
-                                <label>Dirección domiciliaria:</label>
-                                <input type="text" id="c_direccion" required placeholder="Ej. Av. Amazonas y Shyris">
-                            </div>
-                        </div>
-                        <div style="margin-bottom: 1.5rem;">
-                            <label>Foto de Perfil del Empleado:</label>
-                            <input type="file" id="c_foto" accept="image/*" required>
-                        </div>
-                        <button type="submit" class="btn-submit">Guardar en Base de Datos</button>
-                    </form>
-                </div>
-            </div>
-
-            <div id="view-empresa" class="view-section">
-                <div class="card">
-                    <h3>Subir Documento Institucional / Empresa</h3>
-                    <form id="form-empresa" onsubmit="subirDocEmpresa(event)">
-                        <div class="grid-form">
-                            <div>
-                                <label>Tipo de Documento:</label>
-                                <input type="text" id="emp_tipo" placeholder="Ej. Reglamento Interno, Políticas" required>
-                            </div>
-                            <div>
-                                <label>Archivo (PDF/Imagen):</label>
-                                <input type="file" id="emp_archivo" required>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn-submit">Subir Archivo General</button>
-                    </form>
-                </div>
-                <div class="card">
-                    <h3>Repositorio Corporativo</h3>
-                    <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Tipo de Documento</th>
-                                    <th>Enlace</th>
-                                    <th>Acción</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-empresa"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div id="view-global-medicos" class="view-section">
-                <div class="card">
-                    <h3>Historial Global de Descansos y Certificados Médicos</h3>
-                    <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Empleado</th>
-                                    <th>Estado</th>
-                                    <th>Tipo Documento</th>
-                                    <th>Fecha de Registro</th>
-                                    <th>Archivo</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-global-medicos"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <div id="modal-expediente" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="cerrarModal()">&times;</span>
-            <h2 id="modal-emp-name">Expediente Digital</h2>
-            <p style="font-weight: bold; color:#64748b;">Cédula: <span id="modal-emp-cedula"></span></p>
-            
-<div class="card" style="background: #f8fafc; border: 1px solid #e2e8f0;">
-                <h4 style="margin-top:0; color:#334155;">Cargar nuevo archivo a este expediente</h4>
-                <form id="form-upload-doc" onsubmit="procesarSubidaDocumento(event)">
-                    <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
-                        <div>
-                            <label>Tipo Documento:</label>
-                            <select id="upload-tipo-doc" required onchange="actualizarSubtipos('upload')"></select>
-                        </div>
-                        <div>
-                            <label>Subtipo Documento:</label>
-                            <select id="upload-subtipo-doc" required>
-                                <option value="General / Único">General / Único</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label>Fecha Documento:</label>
-                            <input type="date" id="upload-doc-date" required>
-                        </div>
-                        <div>
-                            <label>Periodo (Mes/Año):</label>
-                            <input type="month" id="upload-doc-period" required>
-                        </div>
-                        <div>
-                            <label>Archivo (Solo PDF):</label>
-                            <input type="file" id="upload-file" accept=".pdf" required>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn-submit" style="padding:8px 16px; font-size:14px;">Subir Archivo</button>
-                </form>
-            </div>
-
-<div class="card" style="background: #f1f5f9; padding: 1rem; margin-bottom: 1rem;">
-                <h4 style="margin: 0 0 0.5rem 0; color: #475569; font-size: 14px;">🔍 Clasificación y Filtros Integrados:</h4>
-                <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.5rem; margin-bottom: 0; align-items: flex-end;">
-                    <div>
-                        <label style="margin-bottom:2px;">Categoría:</label>
-                        <select id="filter-doc-tipo" onchange="actualizarSubtipos('filter'); filtrarDocumentos();"></select>
-                    </div>
-                    <div>
-                        <label style="margin-bottom:2px;">Subcategoría:</label>
-                        <select id="filter-doc-subtipo" onchange="filtrarDocumentos()">
-                            <option value="TODOS">-- Todos --</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label style="margin-bottom:2px;">Buscar por nombre:</label>
-                        <input type="text" id="filter-doc-name" placeholder="Buscar palabra clave..." oninput="filtrarDocumentos()">
-                    </div>
-                    <div>
-                        <label style="margin-bottom:2px;">Filtrar por Fecha Doc.:</label>
-                        <input type="date" id="filter-doc-date" onchange="filtrarDocumentos()">
-                    </div>
-                    <div>
-                        <button type="button" class="btn-action btn-clear" style="width: 100%; padding: 10px; margin: 0;" onclick="limpiarFiltros()">🧹 Limpiar Filtros</button>
-                    </div>
-                </div>
-            </div>
-
-            
-            <h3>Documentos Clasificados por Periodo</h3>
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Categoría</th>
-                            <th>Nombre Original de Archivo</th>
-                            <th>Subido Por</th>
-                            <th>Fecha Doc.</th>
-                            <th>Ver</th>
-                            <th class="role-admin">Eliminar</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbody-docs-empleado"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-<script>
-        const API_URL = 'https://kelvin-th-docs-backend.onrender.com/api';
+    <script>
+        // Configuración Base de las Variables que ya tenías
+        const API_URL = "https://isertel-control.onrender.com" || window.location.origin;
         const token = localStorage.getItem('token');
         const rol = localStorage.getItem('rol');
-        const nombreUsuario = localStorage.getItem('nombre');
 
-        let currentSelectedUserId = null;
-        let currentSelectedUserPasivo = false;
-        let currentSelectedUserName = "";
-        let documentosActuales = [];
+        // Variables de Control de Estado Interno
+        let empleadosGlobal = [];
+        let filtroEstadoActual = 'activo';
+        let empleadoSeleccionadoId = null;
+        let tipoDocumentoSeleccionado = '';
 
-        // Diccionario Global de Subtipos asignados por Tipo de Documento
-        const mapaSubtipos = {
-            "Contratación": ["Contrato", "Aviso de entrada", "Extracto SUT", "Certificado Bancario"],
-            "Vacaciones": ["Solicitud de vacaciones"],
-            "Desvinculación": ["Renuncia", "Acta de finiquito", "Aviso de Salida", "Comprobante de Pago"],
-            "Certificados": ["Laborales", "Honorabilidad"],
-            "Certificados Médicos": ["Certificado médico IESS", "Certificado médico privado", "Certificado médico MSP", "Reposo médico"],
-            "Certificados de Aptitud": ["Ingreso", "Periódico", "Salida"],
-            "Certificados y Cargas Familiares": ["Certificados de nacimiento", "Acta de matrimonio", "Acta de unión de hecho", "Cédula de ciudadanía (porcentaje de discapacidad)"],
-            "Ficha Médica Ocupacional": ["General / Único"],
-            "Aptitud Médica Ingreso": ["General / Único"],
-            "Aptitud Médica Periódico": ["General / Único"],
-            "Certificado médico": ["Certificado médico IESS", "Certificado médico privado", "Certificado médico MSP", "Reposo médico"],
-            "Reposo médico": ["General / Único"],
-            "Certificado de Competencia Laboral": ["General / Único"],
-            "Certificado Técnico Operaciones": ["General / Único"],
-            "Acta de Entrega EPP": ["General / Único"],
-            "Certificado de Competencia": ["General / Único"],
-            "Acta de EPP's": ["General / Único"],
-            "Memorándum": ["General / Único"]
-        };
-
-        function actualizarSubtipos(contexto) {
-            const tipo = document.getElementById(contexto === 'upload' ? 'upload-tipo-doc' : 'filter-doc-tipo').value;
-            const selectSubtipo = document.getElementById(contexto === 'upload' ? 'upload-subtipo-doc' : 'filter-doc-subtipo');
-            
-            if (!selectSubtipo) return; // Validación por si acaso no existen los elementos en el HTML aún
-            
-            selectSubtipo.innerHTML = '';
-            
-            if (contexto === 'filter') {
-                selectSubtipo.innerHTML = '<option value="TODOS">-- Todos los Subtipos --</option>';
-            }
-
-            const lista = mapaSubtipos[tipo] || ["General / Único"];
-            lista.forEach(sub => {
-                selectSubtipo.innerHTML += `<option value="${sub}">${sub}</option>`;
-            });
-        }
-
-        function formatearNombre(texto) {
-            return texto
-                .toLowerCase()
-                .replace(/(^|\s)\S/g, (match) => match.toUpperCase());
-        }
-
-        function limpiarEspaciosNombre(texto) {
-            return texto
-                .trim()
-                .replace(/\s+/g, ' ');
-        }
-
-        function obtenerNombreMesEspanol(periodoStr) {
-            if (!periodoStr || !periodoStr.includes('-')) return "Periodo General / Antiguos";
-            const [anio, mes] = periodoStr.split('-');
-            const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-            const index = parseInt(mes, 10) - 1;
-            return (index >= 0 && index < 12) ? `📅 ${meses[index]} de ${anio}` : `Periodo: ${periodoStr}`;
-        }
-
-        if (!token || !rol) {
-            cerrarSesion();
-        }
-
-        window.onload = function() {
-            document.getElementById('user-role').innerText = rol.toUpperCase();
-            document.getElementById('user-display-name').innerText = nombreUsuario || "Usuario Isertel";
-
-            if (rol === 'admin') {
-                document.querySelectorAll('.role-admin').forEach(el => el.style.display = 'block');
-            } else if (rol === 'doc') {
-                document.querySelectorAll('.role-doc').forEach(el => el.style.display = 'block');
-            } else if (rol === 'kelvin') {
-                document.querySelectorAll('.role-kelvin').forEach(el => el.style.display = 'block');
-            }
-
-            cargarEmpleadosActivos();
-            cargarEmpleadosPasivos();
-            if (rol === 'admin') cargarDocumentosEmpresa();
-            if (rol === 'admin' || rol === 'doc') cargarCertificadosGlobales();
-        };
-
-        function switchView(viewId) {
-            document.querySelectorAll('.view-section').forEach(section => section.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            
-            document.getElementById(`view-${viewId}`).classList.add('active');
-            
-            const eventTarget = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.getAttribute('onclick').includes(viewId));
-            if(eventTarget) eventTarget.classList.add('active');
-
-            const titles = { 'activos': 'Personal Activo', 'pasivos': 'Personal Pasivo', 'crear': 'Registrar Empleado', 'empresa': 'Documentos Institucionales', 'global-medicos': 'Certificados Médicos Globales' };
-            document.getElementById('view-title').innerText = titles[viewId] || "Panel Isertel";
-        }
-
-        function cerrarSesion() {
-            localStorage.clear();
+        // Bloqueo de Seguridad inicial
+        if (!token) {
             window.location.href = 'index.html';
         }
 
-        async function cargarEmpleadosActivos() {
-            try {
-                const res = await fetch(`${API_URL}/admin/empleados`, { headers: { 'Authorization': `Bearer ${token}` } });
-                const data = await res.json();
-                const tbody = document.getElementById('tbody-activos');
-                tbody.innerHTML = '';
+        // Al cargar el documento de manera nativa
+        document.addEventListener("DOMContentLoaded", () => {
+            initSessionStyles();
+            cargarEmpleados();
+            cargarDocumentosEmpresa();
+            if (rol === 'admin' || rol === 'doctor') {
+                document.getElementById('menu-medico-btn').classList.remove('hidden');
+                cargarCertificadosGlobales();
+            }
+        });
+
+        function initSessionStyles() {
+            document.getElementById('user-display-role').innerText = rol ? rol.toUpperCase() : 'Usuario';
+            document.getElementById('user-avatar').innerText = rol ? rol.charAt(0).toUpperCase() : 'U';
+        }
+
+        // Navegación limpia de pestañas laterales
+        function showSection(sectionId) {
+            ['sec-empleados', 'sec-empresa', 'sec-medicos'].forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.classList.add('hidden');
                 
-                data.forEach(emp => {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td><img src="${emp.foto_url || 'https://via.placeholder.com/150'}" class="emp-thumb"></td>
-                            <td><strong>${emp.nombre_completo}</strong></td>
-                            <td>${emp.cedula}</td>
-                            <td>${emp.correo}</td>
-                            <td>${emp.celular || 'S/N'}</td>
-                            <td>
-                                <button class="btn-action btn-view" onclick="abrirExpediente('${emp.id}', '${emp.nombre_completo}', '${emp.cedula}', false)">📂 Ver Carpeta</button>
-                                ${rol === 'admin' ? `<button class="btn-action btn-passive" onclick="moverAPasivo('${emp.id}')">⚠️ Liquidar / Mover Pasivo</button>` : ''}
-                            </td>
-                        </tr>`;
-                });
-            } catch (err) { console.error("Error cargando activos:", err); }
+                const btn = document.getElementById(`btn-${id}`);
+                if (btn) {
+                    btn.classList.remove('bg-slate-800', 'text-white', 'shadow-sm');
+                    btn.classList.add('text-slate-400', 'hover:bg-slate-800', 'hover:text-slate-100');
+                }
+            });
+
+            document.getElementById(sectionId).classList.remove('hidden');
+            const activeBtn = document.getElementById(`btn-${sectionId}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-slate-400', 'hover:bg-slate-800', 'hover:text-slate-100');
+                activeBtn.classList.add('bg-slate-800', 'text-white', 'shadow-sm');
+            }
+
+            // Cambiar breadcrumb
+            const labelMap = { 'sec-empleados': 'Personal e Historial', 'sec-empresa': 'Documentos Empresa', 'sec-medicos': 'Control Médico Global' };
+            document.getElementById('current-breadcrumb').innerText = labelMap[sectionId];
         }
 
-        async function cargarEmpleadosPasivos() {
+        // CONTROL DE EMPLEADOS DESDE BACKEND
+        async function cargarEmpleados() {
             try {
-                const res = await fetch(`${API_URL}/admin/pasivos`, { headers: { 'Authorization': `Bearer ${token}` } });
-                const data = await res.json();
-                const tbody = document.getElementById('tbody-pasivos');
-                tbody.innerHTML = '';
-                
-                data.forEach(emp => {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td><img src="${emp.foto_url || 'https://via.placeholder.com/150'}" class="emp-thumb"></td>
-                            <td><strong>${emp.nombre_completo}</strong></td>
-                            <td>${emp.cedula}</td>
-                            <td>${emp.correo}</td>
-                            <td>${emp.celular || 'S/N'}</td>
-                            <td>
-                                <button class="btn-action btn-view" onclick="abrirExpediente('${emp.id}', '${emp.nombre_completo}', '${emp.cedula}', true)">📂 Ver Carpeta</button>
-                            </td>
-                        </tr>`;
-                });
-            } catch (err) { console.error("Error cargando pasivos:", err); }
-        }
-
-        async function crearUsuario(e) {
-            e.preventDefault();
-            const formData = new FormData();
-            formData.append('cedula', document.getElementById('c_cedula').value);
-            formData.append('nombre_completo', document.getElementById('c_nombre').value);
-            formData.append('fecha_ingreso', document.getElementById('c_fecha').value);
-            formData.append('correo', document.getElementById('c_correo').value);
-            formData.append('celular', document.getElementById('c_celular').value);
-            formData.append('direccion', document.getElementById('c_direccion').value);
-            formData.append('foto', document.getElementById('c_foto').files[0]);
-
-            try {
-                const res = await fetch(`${API_URL}/admin/crear-usuario`, {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` },
-                    body: formData
-                });
-                const data = await res.json();
-                if(res.ok) {
-                    alert("Empleado creado con éxito");
-                    document.getElementById('form-crear-usuario').reset();
-                    cargarEmpleadosActivos();
-                    switchView('activos');
-                } else { alert("Error: " + data.error); }
-            } catch(err) { alert("Error de comunicación backend"); }
-        }
-
-        async function moverAPasivo(id) {
-            if(!confirm("¿Está seguro de mover este usuario a pasivos? Se transferirán todas sus carpetas e historiales médicos.")) return;
-            try {
-                const res = await fetch(`${API_URL}/admin/mover-a-pasivo/${id}`, {
-                    method: 'POST',
+                const res = await fetch(`${API_URL}/admin/empleados`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-                if(res.ok) {
-                    alert("Usuario transferido al archivo pasivo exitosamente.");
-                    cargarEmpleadosActivos();
-                    cargarEmpleadosPasivos();
-                } else { alert("No se pudo procesar la migración"); }
+                if (!res.ok) throw new Error("Error de permisos o sesión caducada");
+                empleadosGlobal = await res.json();
+                renderizarEmpleados();
+            } catch (err) {
+                console.error(err);
+                alert("Sesión inválida o expirada. Vuelve a iniciar sesión.");
+                logout();
+            }
+        }
+
+        function renderizarEmpleados() {
+            const grid = document.getElementById('grid-empleados');
+            grid.innerHTML = '';
+
+            const filtrados = empleadosGlobal.filter(e => e.estado === filtroEstadoActual);
+
+            if(filtrados.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full bg-white border border-slate-200 rounded-xl p-8 text-center text-slate-400 text-sm font-medium">
+                        <i class="fas fa-folder-open text-3xl mb-2 block text-slate-300"></i> No hay personal registrado en esta condición.
+                    </div>`;
+                return;
+            }
+
+            filtrados.forEach(emp => {
+                // Generador de Tarjetas con la función ondblclick (Doble Clic) requerida
+                const card = document.createElement('div');
+                card.className = "bg-white border border-slate-200 rounded-2xl p-5 shadow-sm folder-card cursor-pointer select-none border-t-4 border-t-indigo-500 hover:shadow-md animate-fade-in";
+                
+                // Evento de doble clic sobre cualquier área del elemento
+                card.ondblclick = () => abrirCarpetaEmpleado(emp.id, emp.nombre, emp.cargo);
+
+                card.innerHTML = `
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="w-11 h-11 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 font-bold uppercase text-sm">
+                            ${emp.nombre.substring(0,2)}
+                        </div>
+                        <span class="px-2 py-0.5 text-[10px] font-bold uppercase rounded-md ${emp.estado === 'activo' ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-slate-100 text-slate-500'}">
+                            ${emp.estado}
+                        </span>
+                    </div>
+                    <h3 class="font-bold text-slate-900 text-sm tracking-tight truncate">${emp.nombre}</h3>
+                    <p class="text-xs text-slate-400 font-medium truncate mb-3">${emp.cargo || 'Sin Cargo Especial'}</p>
+                    <div class="pt-3 border-t border-slate-100 flex justify-between items-center text-[11px] text-slate-400">
+                        <span><i class="far fa-id-card"></i> ID: ${emp.id}</span>
+                        <span class="text-indigo-600 font-bold group-hover:underline"><i class="fas fa-mouse-pointer animate-pulse"></i> Doble clic</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filtrarPersonal(estado) {
+            filtroEstadoActual = estado;
+            document.getElementById('btn-filtro-activo').className = estado === 'activo' ? "px-4 py-2 text-xs font-bold uppercase rounded-lg transition-all bg-indigo-600 text-white shadow-sm" : "px-4 py-2 text-xs font-bold uppercase rounded-lg transition-all text-slate-600 hover:bg-slate-50";
+            document.getElementById('btn-filtro-pasivo').className = estado === 'pasivo' ? "px-4 py-2 text-xs font-bold uppercase rounded-lg transition-all bg-indigo-600 text-white shadow-sm" : "px-4 py-2 text-xs font-bold uppercase rounded-lg transition-all text-slate-600 hover:bg-slate-50";
+            renderizarEmpleados();
+        }
+
+        // CARPETA PERSONALIZADA POR EMPLEADO
+        async function abrirCarpetaEmpleado(id, nombre, cargo) {
+            empleadoSeleccionadoId = id;
+            document.getElementById('grid-empleados').classList.add('hidden');
+            document.getElementById('btn-filtro-activo').parentElement.classList.add('hidden');
+            
+            const detalle = document.getElementById('detalle-empleado');
+            detalle.classList.remove('hidden');
+
+            document.getElementById('det-nombre').innerText = nombre;
+            document.getElementById('det-cargo').innerText = cargo || 'COLABORADOR';
+
+            // Resetear seleccionador previo de documento
+            tipoDocumentoSeleccionado = '';
+            document.getElementById('lbl-tipo-seleccionado').innerText = "Ninguno - Usa el botón de arriba";
+            document.getElementById('fileNamePlaceholder').innerText = "Click para examinar";
+            document.getElementById('fileDoc').value = "";
+
+            cargarDocumentosEmpleado(id);
+        }
+
+        function regresarALista() {
+            document.getElementById('detalle-empleado').classList.add('hidden');
+            document.getElementById('grid-empleados').classList.remove('hidden');
+            document.getElementById('btn-filtro-activo').parentElement.classList.remove('hidden');
+            empleadoSeleccionadoId = null;
+        }
+
+        // DOCUMENTOS INDIVIDUALES - SEGMENTACIÓN Y RENDER
+        async function cargarDocumentosEmpleado(empleadoId) {
+            try {
+                const res = await fetch(`${API_URL}/admin/documentos/${empleadoId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const docs = await res.json();
+                
+                document.getElementById('counter-docs').innerText = `${docs.length} archivo(s)`;
+                const contenedor = document.getElementById('listaDocs');
+                contenedor.innerHTML = '';
+
+                if(docs.length === 0) {
+                    contenedor.innerHTML = `<p class="text-xs font-medium text-slate-400 text-center py-8">La carpeta digital se encuentra vacía.</p>`;
+                    return;
+                }
+
+                // Agrupación por Meses (Lógica idéntica al diseño ordenado de admin.html)
+                const meses = {};
+                docs.forEach(d => {
+                    const fecha = new Date(d.created_at);
+                    const nombreMes = fecha.toLocaleString('es-EC', { month: 'long', year: 'numeric' }).toUpperCase();
+                    if (!meses[nombreMes]) meses[nombreMes] = [];
+                    meses[nombreMes].push(d);
+                });
+
+                for (const mes in meses) {
+                    const block = document.createElement('div');
+                    block.className = "mes-block pl-4 mb-6";
+                    block.innerHTML = `<h4 class="text-xs font-black tracking-wider text-indigo-600 mb-3">${mes}</h4>`;
+                    
+                    const listUl = document.createElement('ul');
+                    listUl.className = "space-y-2";
+
+                    meses[mes].forEach(doc => {
+                        const fString = new Date(doc.created_at).toLocaleDateString('es-EC');
+                        const li = document.createElement('li');
+                        li.className = "bg-slate-50 border border-slate-200/60 rounded-xl p-3 flex justify-between items-center text-xs hover:bg-slate-100 transition-colors";
+                        li.innerHTML = `
+                            <div class="overflow-hidden pr-2">
+                                <span class="font-bold text-slate-800 uppercase block">${doc.tipo_documento}</span>
+                                <span class="text-[10px] text-slate-400 font-medium"><i class="far fa-calendar-alt"></i> Subido: ${fString}</span>
+                            </div>
+                            <div class="flex items-center gap-2 flex-shrink-0">
+                                <a href="${doc.url_cloudinary}" target="_blank" class="bg-white hover:bg-indigo-50 border border-slate-200 hover:border-indigo-200 text-indigo-600 p-2 rounded-lg transition-all" title="Ver Documento">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <button onclick="eliminarDocumentoEmpleado(${doc.id})" class="bg-white hover:bg-rose-50 border border-slate-200 hover:border-rose-200 text-rose-600 p-2 rounded-lg transition-all" title="Eliminar de la nube">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        `;
+                        listUl.appendChild(li);
+                    });
+                    block.appendChild(listUl);
+                    contenedor.appendChild(block);
+                }
+
             } catch (err) { console.error(err); }
         }
 
-        // --- MANEJO DEL EXPEDIENTE DIGITAL DINÁMICO ---
-        
-// --- MANEJO DEL EXPEDIENTE DIGITAL DINÁMICO ---
-
-// --- MANEJO DEL EXPEDIENTE DIGITAL DINÁMICO ---
-
-async function abrirExpediente(id, nombre, cedula, esPasivo) {
-    currentSelectedUserId = id;
-    currentSelectedUserPasivo = esPasivo;
-    currentSelectedUserName = nombre;
-
-    document.getElementById('modal-emp-name').innerText = `Expediente: ${nombre}`;
-    document.getElementById('modal-emp-cedula').innerText = cedula;
-
-    document.getElementById('form-upload-doc').reset();
-
-    const selectTipo = document.getElementById('upload-tipo-doc');
-    const selectFilter = document.getElementById('filter-doc-tipo');
-    
-    let opcionesHTML = "";
-
-    if (rol === 'admin') {
-        opcionesHTML = `
-            <option value="Contratación">Contratación</option>
-            <option value="Vacaciones">Vacaciones</option>
-            <option value="Certificado de Competencia">Certificado de Competencia</option>
-            <option value="Acta de EPP's">Acta de EPP's</option>
-            <option value="Certificados Médicos">Certificados Médicos</option>
-            <option value="Certificados de Aptitud">Certificados de Aptitud</option>
-            <option value="Certificados">Certificados (Laborales/Honorabilidad)</option>
-            <option value="Memorándum">Memorándum</option>
-            <option value="Certificados y Cargas Familiares">Certificados y Cargas Familiares</option>
-        `;
-        if (esPasivo) {
-            opcionesHTML += `<option value="Desvinculación">Desvinculación</option>`;
+        // CONTROL DE MODAL VECTORIAL DE SELECCIÓN ANTES DE ARCHIVAR
+        function abrirModalTipoDoc() {
+            document.getElementById('modal-tipo-doc').classList.remove('hidden');
         }
-    } else if (rol === 'doc') {
-        // SOLUCIÓN: Ajustamos los 'value' exactos que el backend intercepta para docus_medicos y certificados_aptitud
-        opcionesHTML = `
-            <option value="Certificado médico">Certificados Médicos</option>
-            <option value="Aptitud Médica">Certificados de Aptitud</option>
-        `;
-    } else if (rol === 'kelvin') {
-        opcionesHTML = `
-            <option value="Certificado de Competencia Laboral">Certificado de Competencia Laboral</option>
-            <option value="Certificado Técnico Operaciones">Certificado Técnico Operaciones</option>
-            <option value="Acta de Entrega EPP">Acta de Entrega EPP</option>
-        `;
-    }
 
-    selectTipo.innerHTML = opcionesHTML;
-    selectFilter.innerHTML = opcionesHTML;
+        function cerrarModalTipoDoc() {
+            document.getElementById('modal-tipo-doc').classList.add('hidden');
+        }
 
-    // Forzar la actualización inicial de los subtipos (Carga y Filtros)
-    actualizarSubtipos('upload');
-    actualizarSubtipos('filter');
+        function seleccionarTipoYContinuar(tipo) {
+            tipoDocumentoSeleccionado = tipo;
+            document.getElementById('lbl-tipo-seleccionado').innerText = tipo;
+            cerrarModalTipoDoc();
+            
+            // Efecto de scroll sutil directo al panel de confirmación de carga
+            document.getElementById('wrapper-form-upload').scrollIntoView({ behavior: 'smooth' });
+        }
 
-    document.getElementById('filter-doc-name').value = '';
-    document.getElementById('filter-doc-date').value = '';
-
-    await obtenerDocumentosServidor();
-    document.getElementById('modal-expediente').style.display = 'flex';
-}
-
-        async function obtenerDocumentosServidor() {
-            let endpoint = '';
-            if (rol === 'admin') {
-                endpoint = `${API_URL}/admin/documentos/${currentSelectedUserId}?pasivo=${currentSelectedUserPasivo}`;
-            } else if (rol === 'doc') {
-                endpoint = `${API_URL}/doctor/aptitud/${currentSelectedUserId}`;
-            } else if (rol === 'kelvin') {
-                endpoint = `${API_URL}/kelvin/documentos/${currentSelectedUserId}`;
-            }
-
-            try {
-                const res = await fetch(endpoint, { headers: { 'Authorization': `Bearer ${token}` } });
-                documentosActuales = await res.json();
-                if (!Array.isArray(documentosActuales)) documentosActuales = [];
-                filtrarDocumentos(); 
-            } catch (err) { 
-                document.getElementById('tbody-docs-empleado').innerHTML = '<tr><td colspan="6" style="color:red;">Error al enlazar datos de almacenamiento remoto.</td></tr>'; 
+        function updateFileName(input) {
+            const placeholder = document.getElementById('fileNamePlaceholder');
+            if (input.files && input.files[0]) {
+                placeholder.innerText = input.files[0].name;
+            } else {
+                placeholder.innerText = "Click para examinar";
             }
         }
 
-        // CLASIFICACIÓN DINÁMICA POR TIPO, SUBTIPO Y AGRUPACIÓN POR PERIODO (MES)
-        function filtrarDocumentos() {
-            const tipoSeleccionado = document.getElementById('filter-doc-tipo').value;
-            const subtipoSeleccionado = document.getElementById('filter-doc-subtipo') ? document.getElementById('filter-doc-subtipo').value : 'TODOS';
-            const valNombre = document.getElementById('filter-doc-name').value.toLowerCase().trim();
-            const valFecha = document.getElementById('filter-doc-date').value; 
-
-            // 1. Filtrar de forma estricta por tipo, subtipo, palabra clave y fecha
-            const docsFiltrados = documentosActuales.filter(doc => {
-                const matchTipo = (doc.tipo_documento === tipoSeleccionado);
-                const matchSubtipo = (subtipoSeleccionado === 'TODOS' || doc.subtipo_documento === subtipoSeleccionado);
-                
-                const nombreArchivo = (doc.nombre_archivo || '').toLowerCase();
-                const matchNombre = valNombre === '' || nombreArchivo.includes(valNombre);
-                
-                const fechaRaw = doc.fecha_documento || doc.created_at || '';
-                const fechaDocFormato = fechaRaw.substring(0, 10); 
-                const matchFecha = valFecha === '' || (fechaDocFormato === valFecha);
-
-                return matchTipo && matchSubtipo && matchNombre && matchFecha;
-            });
-
-            // 2. Agrupar los resultados por Periodo (Año-Mes)
-            const gruposPorPeriodo = {};
-            docsFiltrados.forEach(doc => {
-                const periodo = doc.periodo || (doc.fecha_documento || doc.created_at || '').substring(0, 7) || 'Sin Periodo';
-                if (!gruposPorPeriodo[periodo]) {
-                    gruposPorPeriodo[periodo] = [];
-                }
-                gruposPorPeriodo[periodo].push(doc);
-            });
-
-            // 3. Ordenar los periodos de manera descendente
-            const periodosOrdenados = Object.keys(gruposPorPeriodo).sort((a, b) => b.localeCompare(a));
-
-            // 4. Dibujar la tabla estructurada
-            dibujarTablaAgrupada(gruposPorPeriodo, periodosOrdenados);
-        }
-
-        function dibujarTablaAgrupada(grupos, periodos) {
-            const tbody = document.getElementById('tbody-docs-empleado');
-            tbody.innerHTML = '';
-
-            if (periodos.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#94a3b8; padding: 2rem;">No se registran archivos en esta categoría para los criterios buscados.</td></tr>';
+        // ENVIAR EXPEDIENTE INDIVIDUAL AL SERVIDOR
+        async function subirDocumento() {
+            const fileInput = document.getElementById('fileDoc');
+            if(!tipoDocumentoSeleccionado) {
+                alert("Por favor, haz clic primero en 'Adjuntar Documento' para seleccionar un tipo válido.");
                 return;
             }
-
-            periodos.forEach(periodo => {
-                const nombreMesCabecera = obtenerNombreMesEspanol(periodo);
-                tbody.innerHTML += `
-                    <tr class="row-periodo-header">
-                        <td colspan="6" style="padding: 8px 16px; font-weight: 700; font-size:14px; letter-spacing: 0.5px;">
-                            ${nombreMesCabecera}
-                        </td>
-                    </tr>
-                `;
-
-                grupos[periodo].forEach(doc => {
-                    const fechaRaw = doc.fecha_documento || doc.created_at;
-                    const fechaFormateada = fechaRaw ? new Date(fechaRaw).toLocaleDateString('es-EC', {day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC'}) : 'S/F';
-                    
-                    const puedeEliminar = (rol === 'admin' || rol === 'doc');
-                    const nombreArchivoMostrar = doc.nombre_archivo || `${doc.tipo_documento}.pdf`;
-                    
-                    // Inyección Visual del Subtipo al lado del Tipo Principal
-                    const subTag = doc.subtipo_documento ? ` ➡️ <small style="color:#0284c7; font-weight:600; background:#e0f2fe; padding:2px 6px; border-radius:4px;">${doc.subtipo_documento}</small>` : '';
-
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>📁 <span>${doc.tipo_documento}${subTag}</span></td>
-                            <td style="font-size:14px; color:#1e293b; font-weight: 500; max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${nombreArchivoMostrar}">
-                                ${nombreArchivoMostrar}
-                            </td>
-                            <td><span style="font-size:13px;" class="user-badge">${doc.nombre_user || 'Sistema'}</span></td>
-                            <td><strong>${fechaFormateada}</strong></td>
-                            <td><a href="${doc.url_cloudinary}" target="_blank" class="btn-action btn-view">👁️ Descargar</a></td>
-                            ${puedeEliminar ? `<td><button class="btn-action btn-delete" onclick="eliminarDocumento('${doc.id}')">❌</button></td>` : '<td>-</td>'}
-                        </tr>`;
-                });
-            });
-        }
-
-
-
-function limpiarFiltros() {
-            // Restablecer subcategoría a TODOS
-            const selectSubtipo = document.getElementById('filter-doc-subtipo');
-            if (selectSubtipo) selectSubtipo.value = 'TODOS';
-            
-            // Vaciar campos de texto y fecha
-            document.getElementById('filter-doc-name').value = '';
-            document.getElementById('filter-doc-date').value = '';
-            
-            // Volver a procesar la tabla con la categoría actual limpia
-            filtrarDocumentos();
-        }
-
-        async function procesarSubidaDocumento(e) {
-            e.preventDefault();
-            const tipoDoc = document.getElementById('upload-tipo-doc').value;
-            const subtipoDoc = document.getElementById('upload-subtipo-doc') ? document.getElementById('upload-subtipo-doc').value : 'General / Único';
-            const fechaDoc = document.getElementById('upload-doc-date').value;
-            const periodoDoc = document.getElementById('upload-doc-period').value; 
-            const archivoInput = document.getElementById('upload-file').files[0];
-
-            if (!archivoInput) return;
-
-            if (archivoInput.type !== "application/pdf" && !archivoInput.name.endsWith('.pdf')) {
-                alert("Error: Solo se permite subir archivos en formato PDF.");
+            if(!fileInput.files[0]) {
+                alert("Debes seleccionar un archivo físico de tu computadora antes de continuar.");
                 return;
             }
 
             const formData = new FormData();
-            formData.append('tipo_documento', tipoDoc);
-            formData.append('subtipo_documento', subtipoDoc); // Inyección de la nueva variable
-            formData.append('usuario_id', currentSelectedUserId);
-            formData.append('archivo', archivoInput);
-            formData.append('nombre_archivo', archivoInput.name); 
-            formData.append('fecha_documento', fechaDoc);
-            formData.append('periodo', periodoDoc);
-            formData.append('nombre_user', nombreUsuario || 'Gestor Unificado');
-            formData.append('es_pasivo', currentSelectedUserPasivo);
-
-            let uploadEndpoint = '';
-            if (rol === 'admin') uploadEndpoint = `${API_URL}/admin/subir-a-usuario`;
-            else if (rol === 'doc') uploadEndpoint = `${API_URL}/doctor/subir-aptitud`;
-            else if (rol === 'kelvin') uploadEndpoint = `${API_URL}/kelvin/subir-certificados`;
+            formData.append('empleado_id', empleadoSeleccionadoId);
+            formData.append('tipo_documento', tipoDocumentoSeleccionado);
+            formData.append('documento', fileInput.files[0]);
 
             try {
-                const res = await fetch(uploadEndpoint, {
+                // Loader visual temporal
+                document.getElementById('lbl-tipo-seleccionado').innerText = "Subiendo archivo a Cloudinary...";
+                
+                const res = await fetch(`${API_URL}/admin/subir-documento`, {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${token}` },
                     body: formData
                 });
-                if (res.ok) {
-                    alert("Archivo PDF indexado y guardado correctamente por periodo.");
-                    document.getElementById('form-upload-doc').reset();
-                    
-                    document.getElementById('filter-doc-tipo').value = tipoDoc;
-                    actualizarSubtipos('filter');
-                    
-                    await obtenerDocumentosServidor(); 
-                    if(rol === 'admin' || rol === 'doc') cargarCertificadosGlobales();
+
+                if(res.ok) {
+                    alert("¡Documento procesado, firmado y subido con éxito!");
+                    // Restablecer campos
+                    tipoDocumentoSeleccionado = '';
+                    document.getElementById('lbl-tipo-seleccionado').innerText = "Ninguno - Use el botón de arriba";
+                    document.getElementById('fileNamePlaceholder').innerText = "Click para examinar";
+                    fileInput.value = '';
+                    // Recargar datos locales
+                    cargarDocumentosEmpleado(empleadoSeleccionadoId);
                 } else {
-                    const errData = await res.json();
-                    alert("Error del servidor: " + errData.error);
+                    alert("Error crítico en el guardado. Verifica el formato.");
                 }
-            } catch(err) { alert("Fallo de red al intentar subir."); }
+            } catch (err) { console.error(err); }
         }
 
-        async function eliminarDocumento(id) {
-            if(!confirm("¿Desea suprimir permanentemente este registro documental?")) return;
-            
-            let deleteEndpoint = (rol === 'doc') ? `${API_URL}/doctor/aptitud/${id}` : `${API_URL}/admin/documentos/${id}`;
-            
+        async function eliminarDocumentoEmpleado(id) {
+            if(!confirm("¿Estás completamente seguro de borrar este registro de la base de datos de Isertel?")) return;
             try {
-                const res = await fetch(deleteEndpoint, {
+                const res = await fetch(`${API_URL}/admin/documentos/${id}`, {
                     method: 'DELETE',
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-                if(res.ok) {
-                    alert("Registro eliminado.");
-                    await obtenerDocumentosServidor(); 
-                    if(rol === 'admin' || rol === 'doc') cargarCertificadosGlobales();
-                } else { alert("Denegado o error de procesamiento."); }
+                if(res.ok) { cargarDocumentosEmpleado(empleadoSeleccionadoId); }
             } catch (err) { console.error(err); }
         }
 
-        function cerrarModal() {
-            document.getElementById('modal-expediente').style.display = 'none';
+
+        // SECCIÓN 2: LÓGICA DE ARCHIVOS GENERALES DE LA EMPRESA
+        async function cargarDocumentosEmpresa() {
+            try {
+                const res = await fetch(`${API_URL}/admin/documentos-empresa`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                const tbody = document.getElementById('tbody-empresa');
+                tbody.innerHTML = '';
+
+                data.forEach(d => {
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-slate-50/80 transition-colors">
+                            <td class="px-6 py-4 font-bold text-slate-700 uppercase tracking-wide italic text-xs">${d.tipo_documento}</td>
+                            <td class="px-6 py-4 text-right flex justify-end gap-2">
+                                <a href="${d.url_cloudinary}" target="_blank" class="bg-slate-100 hover:bg-indigo-50 text-indigo-600 p-2 rounded-xl transition-all border border-slate-200">
+                                    <i class="fas fa-eye"></i> Ver Archivo
+                                </a>
+                                <button onclick="eliminarDocEmpresa('${d.id}')" class="bg-slate-100 hover:bg-rose-50 text-rose-600 p-2 rounded-xl transition-all border border-slate-200">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        </tr>`;
+                });
+            } catch (err) { console.error(err); }
         }
 
-        // --- MANEJO ADICIONAL CORPORATIVO / GLOBAL ---
+        async function subirDocEmpresa() {
+            const tipo = document.getElementById('empTipoDoc').value;
+            const fileInput = document.getElementById('empFile');
+            if(!tipo || !fileInput.files[0]) return alert("Completa la categoría y el documento general.");
 
-        async function subirDocEmpresa(e) {
-            e.preventDefault();
             const formData = new FormData();
-            formData.append('tipo_documento', document.getElementById('emp_tipo').value);
-            formData.append('archivo', document.getElementById('emp_archivo').files[0]);
+            formData.append('tipo_documento', tipo);
+            formData.append('documento', fileInput.files[0]);
 
             try {
-                const res = await fetch(`${API_URL}/subir-empresa`, {
+                const res = await fetch(`${API_URL}/admin/subir-documento-empresa`, {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${token}` },
                     body: formData
                 });
                 if(res.ok) {
-                    alert("Documentación institucional cargada.");
-                    document.getElementById('form-empresa').reset();
+                    document.getElementById('empTipoDoc').value = '';
+                    document.getElementById('lblFileEmpresa').innerText = 'Seleccionar archivo';
+                    fileInput.value = '';
                     cargarDocumentosEmpresa();
                 }
-            } catch(err) { console.error(err); }
-        }
-
-        async function cargarDocumentosEmpresa() {
-            try {
-                const res = await fetch(`${API_URL}/admin/documentos-empresa`, { headers: { 'Authorization': `Bearer ${token}` } });
-                const data = await res.json();
-                const tbody = document.getElementById('tbody-empresa');
-                tbody.innerHTML = '';
-                data.forEach(d => {
-                    tbody.innerHTML += `<tr><td>${d.id}</td><td><strong>${d.tipo_documento}</strong></td><td><a href="${d.url_cloudinary}" target="_blank" class="btn-action btn-view">Descargar</a></td><td><button class="btn-action btn-delete" onclick="eliminarDocEmpresa('${d.id}')">Eliminar</button></td></tr>`;
-                });
             } catch (err) { console.error(err); }
         }
 
         async function eliminarDocEmpresa(id) {
-            if(!confirm("¿Eliminar archivo general de empresa?")) return;
+            if(!confirm("¿Deseas remover este documento corporativo del repositorio general?")) return;
             try {
-                const res = await fetch(`${API_URL}/admin/documentos-empresa/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+                const res = await fetch(`${API_URL}/admin/documentos-empresa/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
                 if(res.ok) { cargarDocumentosEmpresa(); }
             } catch (err) { console.error(err); }
         }
 
+
+        // SECCIÓN 3: CONTROL CLÍNICO OCUPACIONAL (DOCTORES)
         async function cargarCertificadosGlobales() {
             try {
-                const res = await fetch(`${API_URL}/doctor/certificados-globales`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const res = await fetch(`${API_URL}/doctor/certificados-globales`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
                 const data = await res.json();
                 const tbody = document.getElementById('tbody-global-medicos');
                 tbody.innerHTML = '';
+                
                 data.forEach(c => {
                     const f = new Date(c.created_at).toLocaleDateString('es-EC');
-                    tbody.innerHTML += `<tr><td><strong>${c.empleado_nombre}</strong></td><td>${c.estado_empleado}</td><td>${c.tipo_documento}</td><td>${f}</td><td><a href="${c.url_cloudinary}" target="_blank" class="btn-action btn-view">Ver Documento</a></td></tr>`;
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-slate-50/80 transition-colors">
+                            <td class="px-6 py-4 font-bold text-slate-800">${c.empleado_nombre}</td>
+                            <td class="px-6 py-4">
+                                <span class="px-2 py-0.5 rounded text-[11px] font-bold uppercase ${c.estado_empleado === 'activo' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'}">
+                                    ${c.estado_empleado}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">${c.tipo_documento}</td>
+                            <td class="px-6 py-4 text-slate-500 text-xs">${f}</td>
+                            <td class="px-6 py-4 text-right">
+                                <a href="${c.url_cloudinary}" target="_blank" class="inline-flex items-center gap-1 bg-white hover:bg-purple-50 text-purple-600 font-bold text-xs px-3 py-1.5 rounded-xl border border-purple-200 transition-all">
+                                    <i class="fas fa-file-medical"></i> Abrir Certificado
+                                </a>
+                            </td>
+                        </tr>`;
                 });
             } catch (err) { console.error(err); }
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'index.html';
         }
     </script>
 </body>
