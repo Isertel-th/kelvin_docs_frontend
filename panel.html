@@ -260,15 +260,22 @@
             <h2 id="modal-emp-name" style="margin-top: 0; color: #1e293b;">Expediente Digital</h2>
             <p style="font-weight: bold; color:#64748b; margin-bottom: 2rem;">Cédula: <span id="modal-emp-cedula"></span></p>
             
-            <h3 style="margin-top:0; color:#0f172a; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.75rem; font-size: 16px;">
-                📥 Paso 1: Selecciona el Tipo de Documento
-            </h3>
-            <div class="vector-grid" id="vector-container"></div>
+            <div id="section-paso1">
+                <h3 style="margin-top:0; color:#0f172a; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.75rem; font-size: 16px;">
+                    📥 Paso 1: Selecciona el Tipo de Documento
+                </h3>
+                <div class="vector-grid" id="vector-container"></div>
+            </div>
 
             <div id="expediente-detalles" style="display: none; margin-top: 2rem;">
                 
                 <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed #cbd5e1; padding-bottom: 1rem; margin-bottom: 1.5rem;">
-                    <h3 id="detalle-categoria-titulo" style="margin: 0; color: #1e293b; font-size: 18px;">Carpeta</h3>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <button type="button" class="btn-action btn-clear" onclick="regresarAPaso1()" style="padding: 8px 12px; margin: 0; border-radius: 6px; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                            ⬅️ Volver
+                        </button>
+                        <h3 id="detalle-categoria-titulo" style="margin: 0; color: #1e293b; font-size: 18px;">Carpeta</h3>
+                    </div>
                     <button type="button" class="btn-action btn-upload" onclick="toggleUploadForm()" style="padding: 10px 20px; font-size: 14px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                         ➕ Subir Nuevo Documento
                     </button>
@@ -406,7 +413,7 @@
             "Acta de Entrega EPP": `<svg viewBox="0 0 24 24" fill="#8b5cf6"><path d="M12 22c5.52 0 10-4.48 10-10S17.52 2 12 2 2 6.48 2 12s4.48 10 12 10zm1-15h2v6h-2V7zm0 8h2v2h-2v-2z"/></svg>`
         };
 
-        // NUEVA FUNCIÓN: Alternar la visualización del formulario de subida
+        // Alternar la visualización del formulario de subida
         function toggleUploadForm() {
             const form = document.getElementById('form-upload-doc');
             if (form.style.display === 'none' || form.style.display === '') {
@@ -615,7 +622,8 @@
 
             document.getElementById('form-upload-doc').reset();
             
-            // Ocultar la sección inferior de detalles y el formulario al abrir el modal para obligar a seleccionar una tarjeta
+            // Asegurar que el Paso 1 se muestre y los detalles se oculten al abrir un expediente fresco
+            document.getElementById('section-paso1').style.display = 'block';
             document.getElementById('expediente-detalles').style.display = 'none';
             document.getElementById('form-upload-doc').style.display = 'none';
 
@@ -694,7 +702,8 @@
                 });
             }
 
-            // MODIFICACIONES DE INTERFAZ: Mostrar la tabla y ocultar formulario para forzar el uso del botón
+            // MODIFICACIONES DE INTERFAZ SOLICITADAS: Ocultar Paso 1 completamente y habilitar detalles
+            document.getElementById('section-paso1').style.display = 'none';
             document.getElementById('expediente-detalles').style.display = 'block';
             document.getElementById('form-upload-doc').style.display = 'none';
             document.getElementById('detalle-categoria-titulo').innerText = `📂 Carpeta: ${tipoSeleccionado}`;
@@ -704,6 +713,14 @@
             if(selectFilter) selectFilter.value = tipoSeleccionado;
             actualizarSubtipos('filter');
             filtrarDocumentos();
+        }
+
+        // NUEVA FUNCIÓN: Regresa la interfaz al Paso 1 limpiando selecciones de tarjetas
+        function regresarAPaso1() {
+            document.getElementById('section-paso1').style.display = 'block';
+            document.getElementById('expediente-detalles').style.display = 'none';
+            document.getElementById('form-upload-doc').style.display = 'none';
+            document.querySelectorAll('.vector-card').forEach(card => card.classList.remove('selected'));
         }
 
         async function obtenerDocumentosServidor() {
