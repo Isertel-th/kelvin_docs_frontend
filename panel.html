@@ -5,409 +5,66 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Gestión - Isertel</title>
     <style>
-        :root {
-            /* Colores de íconos (puedes cambiarlos) */
-            --color-icon-contrato: #007bff;   /* Azul */
-            --color-icon-vacaciones: #27ae60; /* Verde */
-            --color-icon-cert: #e67e22;       /* Naranja */
-            --color-icon-acta: #d35400;       /* Marrón */
-            --color-icon-memo: #34495e;       /* Gris oscuro */
-            --color-icon-certificados: #8e44ad; /* Púrpura */
-            --color-icon-cargas: #c0392b;      /* Rojo */
-            --color-icon-desvinculacion: #e74c3c; /* Rojo vivo */
+        :root { --primary-color: #007bff; --admin-color: #2c3e50; --doc-color: #27ae60; --kelvin-color: #8e44ad; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f6f9; margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        
+        /* Sidebar Estilos */
+        .sidebar { width: 260px; background: #1e293b; color: white; display: flex; flex-direction: column; justify-content: space-between; padding: 1rem; }
+        .sidebar h3 { text-align: center; margin-bottom: 2rem; border-bottom: 1px solid #334155; padding-bottom: 1rem; font-size: 1.2rem; }
+        .nav-menu { display: flex; flex-direction: column; gap: 0.5rem; flex-grow: 1; }
+        .nav-btn { background: none; border: none; color: #cbd5e1; padding: 12px; text-align: left; width: 100%; border-radius: 6px; cursor: pointer; font-size: 15px; font-weight: 500; display: flex; align-items: center; }
+        .nav-btn:hover, .nav-btn.active { background: var(--primary-color); color: white; }
+        .logout-btn { background: #ef4444; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; }
+        .logout-btn:hover { background: #dc2626; }
 
-            /* --- Definición de íconos SVG como variables --- */
-            
-            /* Contratación (Lupa sobre documento) */
-            --icon-contrato: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%23007bff' d='M256 0c-141.4 0-256 114.6-256 256s114.6 256 256 256s256-114.6 256-256S397.4 0 256 0zM361.9 414.1l-105.9-105.9C247.9 313.4 233.1 316 218 316c-54.1 0-98-43.9-98-98s43.9-98 98-98s98 43.9 98 98c0 15.1-2.6 29.9-7.8 43.1L414.1 361.9C425.1 372.9 425.1 391.1 414.1 402.1S372.9 414.1 361.9 414.1zM218 156c-33.1 0-60 26.9-60 60s26.9 60 60 60s60-26.9 60-60S251.1 156 218 156z'/%3E%3C/svg%3E");
+        /* Contenedor Principal */
+        .main-content { flex-grow: 1; display: flex; flex-direction: column; overflow-y: auto; background: #f8fafc; }
+        .header { background: white; padding: 1rem 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .header h2 { margin: 0; color: #334155; font-size: 1.5rem; }
+        .user-badge { background: #e2e8f0; padding: 6px 12px; border-radius: 20px; font-weight: 600; color: #475569; font-size: 14px; }
+        .container { padding: 2rem; max-width: 1200px; width: -webkit-fill-available; margin: 0 auto; }
 
-            /* Vacaciones (Palmera y Sol) */
-            --icon-vacaciones: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%2327ae60' d='M256 0C114.6 0 0 114.6 0 256c0 141.4 114.6 256 256 256c141.4 0 256-114.6 256-256C512 114.6 397.4 0 256 0zM192 352c-17.7 0-32-14.3-32-32c0-1.7 .1-3.3 .3-5c-6.8 3.2-14.3 5-22.3 5c-26.5 0-48-21.5-48-48c0-26.5 21.5-48 48-48c26.5 0 48 21.5 48 48c0 1.7-.1 3.3-.3 5c6.8-3.2 14.3-5 22.3-5c17.7 0 32 14.3 32 32c0 17.7-14.3 32-32 32zM384 272c-26.5 0-48-21.5-48-48c0-26.5 21.5-48 48-48s48 21.5 48 48c0 26.5-21.5 48-48 48zM384 384c-35.3 0-64-28.7-64-64c0-3.5 .3-7 .9-10.4c-8.9 4.3-18.8 6.4-28.9 6.4c-35.3 0-64-28.7-64-64c0-3.5 .3-7 .9-10.4c-8.9 4.3-18.8 6.4-28.9 6.4c-17.7 0-32-14.3-32-32c0-17.7 14.3-32 32-32c35.3 0 64 28.7 64 64c0 3.5-.3 7-.9 10.4c8.9-4.3 18.8-6.4 28.9-6.4c35.3 0 64 28.7 64 64c0 3.5-.3 7-.9 10.4c8.9-4.3 18.8-6.4 28.9-6.4c17.7 0 32 14.3 32 32c0 17.7-14.3 32-32 32z'/%3E%3C/svg%3E");
+        /* Módulos de Vistas */
+        .view-section { display: none; }
+        .view-section.active { display: block; }
 
-            /* Certificados (Medalla con estrella) */
-            --icon-certificados: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%238e44ad' d='M256 0c-141.4 0-256 114.6-256 256s114.6 256 256 256 256-114.6 256-256S397.4 0 256 0zM368.6 368.6l-57.9-57.9c-22.3 22.3-51.9 33.3-81.5 33.3-64.1 0-116-51.9-116-116s51.9-116 116-116s116 51.9 116 116c0 29.6-11 59.2-33.3 81.5l57.9 57.9c12.1 12.1 12.1 31.7 0 43.8s-31.7 12.1-43.8 0zM229.2 136.2c-15.6 0-31.2 5.9-43.2 17.9c-23.8 23.8-23.8 62.6 0 86.4l57.9 57.9c23.8 23.8 62.6 23.8 86.4 0c23.8-23.8 23.8-62.6 0-86.4l-57.9-57.9c-12-12-27.6-17.9-43.2-17.9zM256 192a64 64 0 1 1 -64 64A64.1 64.1 0 0 1 256 192z'/%3E%3C/svg%3E");
+        /* Tarjetas y Formularios */
+        .card { background: white; border-radius: 8px; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
+        .card h3 { margin-top: 0; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; }
+        .grid-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+        label { font-weight: 600; color: #64748b; font-size: 14px; display: block; margin-bottom: 4px; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 15px; }
+        .btn-submit { background: var(--primary-color); color: white; font-weight: bold; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; }
+        .btn-submit:hover { opacity: 0.9; }
 
-            /* Memorándum (Documento con pinza) */
-            --icon-memo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%2334495e' d='M256 0c-141.4 0-256 114.6-256 256s114.6 256 256 256 256-114.6 256-256S397.4 0 256 0zM384 384c-35.3 0-64-28.7-64-64c0-3.5 .3-7 .9-10.4c-8.9 4.3-18.8 6.4-28.9 6.4c-35.3 0-64-28.7-64-64c0-3.5 .3-7 .9-10.4c-8.9 4.3-18.8 6.4-28.9 6.4c-17.7 0-32-14.3-32-32c0-17.7 14.3-32 32-32c35.3 0 64 28.7 64 64c0 3.5-.3 7-.9 10.4c8.9-4.3 18.8-6.4 28.9-6.4c35.3 0 64 28.7 64 64c0 3.5-.3 7-.9 10.4c8.9-4.3 18.8-6.4 28.9-6.4c17.7 0 32 14.3 32 32c0 17.7-14.3 32-32 32zM336 224a16 16 0 1 1 -16 16A16 16 0 0 1 336 224zM336 128a16 16 0 1 1 -16 16A16 16 0 0 1 336 128zM336 176a16 16 0 1 1 -16 16A16 16 0 0 1 336 176z'/%3E%3C/svg%3E");
-
-            /* Cargas Familiares (Grupo de personas) */
-            --icon-cargas: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%23c0392b' d='M256 0C114.6 0 0 114.6 0 256c0 141.4 114.6 256 256 256s256-114.6 256-256C512 114.6 397.4 0 256 0zM192 192a64 64 0 1 1 -64 64A64.1 64.1 0 0 1 192 192zM320 192a64 64 0 1 1 -64 64A64.1 64.1 0 0 1 320 192zM256 320a64 64 0 1 1 -64 64A64.1 64.1 0 0 1 256 320z'/%3E%3C/svg%3E");
-            
-            /* --- Colores globales --- */
-            --bg-body: #f8fafc;
-            --bg-card: #ffffff;
-            --primary: #007bff;
-            --primary-light: #e0f2fe;
-            --accent: #ff9f43;
-            --text-dark: #334155;
-            --text-light: #94a3b8;
-            --border-color: #e2e8f0;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        /* --- 2. ESTILOS BASE Y CUERPO --- */
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: var(--bg-body);
-            color: var(--text-dark);
-            margin: 0;
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        /* --- 3. SIDEBAR (Navegación lateral) --- */
-        .sidebar {
-            width: 270px;
-            background: #1e293b; /* Color oscuro profesional */
-            color: white;
-            display: flex;
-            flex-direction: column;
-            padding: 1.5rem;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-        }
-        .sidebar h3 {
-            text-align: center;
-            margin-bottom: 2.5rem;
-            border-bottom: 2px solid #334155;
-            padding-bottom: 1rem;
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #f1f5f9;
-        }
-        .nav-menu {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            flex-grow: 1;
-        }
-        .nav-btn {
-            background: none;
-            border: none;
-            color: #cbd5e1;
-            padding: 14px;
-            text-align: left;
-            width: 100%;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transition: background 0.2s, color 0.2s;
-        }
-        .nav-btn:hover, .nav-btn.active {
-            background: var(--primary);
-            color: white;
-        }
-        .logout-btn {
-            background: #ef4444;
-            color: white;
-            border: none;
-            padding: 14px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            width: 100%;
-            transition: background 0.2s;
-        }
-        .logout-btn:hover {
-            background: #dc2626;
-        }
-
-        /* --- 4. CONTENEDOR PRINCIPAL Y HEADER --- */
-        .main-content {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-            background: var(--bg-body);
-        }
-        .header {
-            background: white;
-            padding: 1.2rem 2.5rem;
-            box-shadow: var(--shadow);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        .header h2 {
-            margin: 0;
-            color: var(--text-dark);
-            font-size: 1.6rem;
-            font-weight: 700;
-        }
-        .user-badge {
-            background: var(--primary-light);
-            color: var(--primary);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .container {
-            padding: 2.5rem;
-            max-width: 1300px;
-            width: 100%;
-            margin: 0 auto;
-        }
-
-        /* --- 5. TARJETAS Y SECCIONES --- */
-        .card {
-            background: var(--bg-card);
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: var(--shadow);
-            margin-bottom: 2rem;
-            border: 1px solid var(--border-color);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .card h3 {
-            margin-top: 0;
-            color: var(--text-dark);
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 0.75rem;
-            font-size: 1.3rem;
-        }
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        /* --- 6. ELEMENTOS ESPECIALES DE VISUALIZACIÓN ---
-           Esta es la clave para la "magia" visual.
-           He creado clases que imitan la estructura de tus tarjetas de documentos
-           pero usando los íconos vectoriales definidos en :root.
-        */
-
-        /* Estilo base para las tarjetas de documentos con íconos */
-        .doc-icon-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 1.5rem;
-            text-align: center;
-            cursor: pointer;
-            border: 2px dashed var(--border-color); /* Estilo dashed elegante */
-            border-radius: 12px;
-            padding: 2.5rem 1.5rem;
-            width: 100%;
-            height: 100%;
-            transition: all 0.3s;
-        }
-
-        /* Pseudo-elemento para el ícono vectorial */
-        .doc-icon-card::before {
-            content: '';
-            display: block;
-            width: 80px; /* Tamaño del ícono vectorial */
-            height: 80px;
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-        }
-
-        /* Hover effect */
-        .doc-icon-card:hover {
-            border-color: var(--primary);
-            background-color: var(--primary-light);
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        /* Mapeo de íconos para los diferentes tipos de documentos */
-        .doc-icon-card.contrato::before { background-image: var(--icon-contrato); }
-        .doc-icon-card.vacaciones::before { background-image: var(--icon-vacaciones); }
-        .doc-icon-card.certificados::before { background-image: var(--icon-certificados); }
-        .doc-icon-card.memorandum::before { background-image: var(--icon-memo); }
-        .doc-icon-card.cargas-familiares::before { background-image: var(--icon-cargas); }
-        .doc-icon-card.desvinculacion::before { background-image: var(--icon-desvinculacion); }
-
-        /* Estilo para el texto dentro de la tarjeta de ícono */
-        .doc-icon-card span {
-            font-weight: 600;
-            color: var(--text-dark);
-            font-size: 15px;
-            transition: color 0.3s;
-        }
-        .doc-icon-card:hover span {
-            color: var(--primary);
-        }
-
-        /* Estilo para las cuadrículas donde irán estas tarjetas */
-        .doc-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1.5rem;
-        }
-
-        /* --- 7. TABLAS --- */
-        .table-responsive {
-            overflow-x: auto;
-            margin-top: 1.5rem;
-        }
-        table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            background: white;
-            text-align: left;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-        }
-        th, td {
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 15px;
-        }
-        th {
-            background: #f1f5f9;
-            color: var(--text-dark);
-            font-weight: 600;
-        }
-        tr:hover td {
-            background: #f8fafc;
-        }
-        .emp-thumb {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--primary-light);
-        }
+        /* Tablas */
+        .table-responsive { overflow-x: auto; margin-top: 1rem; }
+        table { width: 100%; border-collapse: collapse; background: white; text-align: left; }
+        th, td { padding: 12px 16px; border-bottom: 1px solid #e2e8f0; font-size: 15px; }
+        th { background: #f1f5f9; color: #475569; font-weight: 600; }
+        tr:hover { background: #f8fafc; }
+        .emp-thumb { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
 
         /* Filas de cabeceras de periodos */
-        .row-periodo-header td {
-            background: #e2e8f0 !important;
-            font-weight: 700;
-            color: var(--text-dark);
-            font-size: 14px;
-            letter-spacing: 0.5px;
-        }
+        .row-periodo-header { background: #e2e8f0 !important; font-weight: bold; color: #1e293b; }
 
-        /* --- 8. BOTONES Y ACCIONES --- */
-        .btn-action {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: bold;
-            margin-right: 5px;
-            text-decoration: none;
-            display: inline-block;
-            transition: opacity 0.2s, transform 0.1s;
-        }
-        .btn-action:hover { opacity: 0.9; transform: translateY(-1px); }
+        /* Botones de acción rápidos */
+        .btn-action { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; margin-right: 5px; text-decoration: none; display: inline-block; }
         .btn-view { background: #3b82f6; color: white; }
         .btn-upload { background: #10b981; color: white; }
-        .btn-passive { background: var(--accent); color: white; }
+        .btn-passive { background: #f59e0b; color: white; }
         .btn-delete { background: #ef4444; color: white; }
-        .btn-clear { background: var(--text-light); color: white; }
-        .btn-clear:hover { background: var(--text-dark); }
 
-        /* --- 9. FORMULARIOS --- */
-        .grid-form {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-        label {
-            font-weight: 600;
-            color: #64748b;
-            font-size: 14px;
-            display: block;
-            margin-bottom: 6px;
-        }
-        input, select, textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 15px;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-        input:focus, select:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px var(--primary-light);
-            outline: none;
-        }
-        .btn-submit {
-            background: var(--primary);
-            color: white;
-            font-weight: bold;
-            border: none;
-            padding: 14px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .btn-submit:hover {
-            background: #006ae6;
-        }
-
-        /* --- 10. MODALES --- */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(4px);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        .modal-content {
-            background: white;
-            padding: 3rem;
-            border-radius: 16px;
-            width: 90%;
-            max-width: 900px;
-            max-height: 85vh;
-            overflow-y: auto;
-            position: relative;
-            box-shadow: var(--shadow-lg);
-        }
-        .close-modal {
-            position: absolute;
-            top: 20px;
-            right: 25px;
-            font-size: 28px;
-            cursor: pointer;
-            color: var(--text-light);
-            transition: color 0.2s;
-        }
-        .close-modal:hover { color: var(--primary); }
-
-        /* Estilos específicos dentro del modal */
-        #modal-emp-name {
-            margin-bottom: 0.5rem;
-            font-size: 1.8rem;
-        }
-        #modal-emp-cedula {
-            font-weight: bold;
-            color: var(--text-light);
-            font-size: 1.1rem;
-        }
-
-        /* --- 11. RESTRICCIONES DE ROLES VISUALES (Inmutables) --- */
+        /* Modales */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 2rem; border-radius: 10px; width: 90%; max-width: 850px; max-height: 85vh; overflow-y: auto; position: relative; }
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #94a3b8; }
+        
+        /* Restricciones de Roles Visuales */
         .role-admin, .role-doc, .role-kelvin { display: none; }
+
+        .btn-clear { background: #64748b; color: white; }
+        .btn-clear:hover { background: #475569; }
     </style>
 </head>
 <body>
