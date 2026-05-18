@@ -520,65 +520,65 @@
 
         // --- MANEJO DEL EXPEDIENTE DIGITAL DINÁMICO ---
         
-        async function abrirExpediente(id, nombre, cedula, esPasivo) {
-            currentSelectedUserId = id;
-            currentSelectedUserPasivo = esPasivo;
-            currentSelectedUserName = nombre;
+// --- MANEJO DEL EXPEDIENTE DIGITAL DINÁMICO ---
 
-            document.getElementById('modal-emp-name').innerText = `Expediente: ${nombre}`;
-            document.getElementById('modal-emp-cedula').innerText = cedula;
+async function abrirExpediente(id, nombre, cedula, esPasivo) {
+    currentSelectedUserId = id;
+    currentSelectedUserPasivo = esPasivo;
+    currentSelectedUserName = nombre;
 
-            document.getElementById('form-upload-doc').reset();
+    document.getElementById('modal-emp-name').innerText = `Expediente: ${nombre}`;
+    document.getElementById('modal-emp-cedula').innerText = cedula;
 
-            const selectTipo = document.getElementById('upload-tipo-doc');
-            const selectFilter = document.getElementById('filter-doc-tipo');
-            
-            let opcionesHTML = "";
+    document.getElementById('form-upload-doc').reset();
 
-            if (rol === 'admin') {
-                opcionesHTML = `
-                    <option value="Contratación">Contratación</option>
-                    <option value="Vacaciones">Vacaciones</option>
-                    <option value="Certificado de Competencia">Certificado de Competencia</option>
-                    <option value="Acta de EPP's">Acta de EPP's</option>
-                    <option value="Certificados Médicos">Certificados Médicos</option>
-                    <option value="Certificados de Aptitud">Certificados de Aptitud</option>
-                    <option value="Certificados">Certificados (Laborales/Honorabilidad)</option>
-                    <option value="Memorándum">Memorándum</option>
-                    <option value="Certificados y Cargas Familiares">Certificados y Cargas Familiares</option>
-                `;
-                if (esPasivo) {
-                    opcionesHTML += `<option value="Desvinculación">Desvinculación</option>`;
-                }
-            } else if (rol === 'doc') {
-                opcionesHTML = `
-                    <option value="Ficha Médica Ocupacional">Ficha Médica Ocupacional</option>
-                    <option value="Aptitud Médica Ingreso">Aptitud Médica Ingreso</option>
-                    <option value="Aptitud Médica Periódico">Aptitud Médica Periódico</option>
-                    <option value="Certificado médico">Certificado médico / Atención</option>
-                    <option value="Reposo médico">Reposo médico validado</option>
-                `;
-            } else if (rol === 'kelvin') {
-                opcionesHTML = `
-                    <option value="Certificado de Competencia Laboral">Certificado de Competencia Laboral</option>
-                    <option value="Certificado Técnico Operaciones">Certificado Técnico Operaciones</option>
-                    <option value="Acta de Entrega EPP">Acta de Entrega EPP</option>
-                `;
-            }
+    const selectTipo = document.getElementById('upload-tipo-doc');
+    const selectFilter = document.getElementById('filter-doc-tipo');
+    
+    let opcionesHTML = "";
 
-            selectTipo.innerHTML = opcionesHTML;
-            selectFilter.innerHTML = opcionesHTML;
-
-            // Forzar la actualización inicial de los subtipos (Carga y Filtros)
-            actualizarSubtipos('upload');
-            actualizarSubtipos('filter');
-
-            document.getElementById('filter-doc-name').value = '';
-            document.getElementById('filter-doc-date').value = '';
-
-            await obtenerDocumentosServidor();
-            document.getElementById('modal-expediente').style.display = 'flex';
+    if (rol === 'admin') {
+        opcionesHTML = `
+            <option value="Contratación">Contratación</option>
+            <option value="Vacaciones">Vacaciones</option>
+            <option value="Certificado de Competencia">Certificado de Competencia</option>
+            <option value="Acta de EPP's">Acta de EPP's</option>
+            <option value="Certificados Médicos">Certificados Médicos</option>
+            <option value="Certificados de Aptitud">Certificados de Aptitud</option>
+            <option value="Certificados">Certificados (Laborales/Honorabilidad)</option>
+            <option value="Memorándum">Memorándum</option>
+            <option value="Certificados y Cargas Familiares">Certificados y Cargas Familiares</option>
+        `;
+        if (esPasivo) {
+            opcionesHTML += `<option value="Desvinculación">Desvinculación</option>`;
         }
+    } else if (rol === 'doc') {
+        // CORREGIDO: Ahora el rol médico solo tiene acceso exclusivo a estas dos opciones en el panel y filtros
+        opcionesHTML = `
+            <option value="Certificados Médicos">Certificados Médicos</option>
+            <option value="Certificados de Aptitud">Certificados de Aptitud</option>
+        `;
+    } else if (rol === 'kelvin') {
+        opcionesHTML = `
+            <option value="Certificado de Competencia Laboral">Certificado de Competencia Laboral</option>
+            <option value="Certificado Técnico Operaciones">Certificado Técnico Operaciones</option>
+            <option value="Acta de Entrega EPP">Acta de Entrega EPP</option>
+        `;
+    }
+
+    selectTipo.innerHTML = opcionesHTML;
+    selectFilter.innerHTML = opcionesHTML;
+
+    // Forzar la actualización inicial de los subtipos (Carga y Filtros)
+    actualizarSubtipos('upload');
+    actualizarSubtipos('filter');
+
+    document.getElementById('filter-doc-name').value = '';
+    document.getElementById('filter-doc-date').value = '';
+
+    await obtenerDocumentosServidor();
+    document.getElementById('modal-expediente').style.display = 'flex';
+}
 
         async function obtenerDocumentosServidor() {
             let endpoint = '';
