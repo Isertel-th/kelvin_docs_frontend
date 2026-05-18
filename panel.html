@@ -62,6 +62,9 @@
         
         /* Restricciones de Roles Visuales */
         .role-admin, .role-doc, .role-kelvin { display: none; }
+
+        .btn-clear { background: #64748b; color: white; }
+        .btn-clear:hover { background: #475569; }
     </style>
 </head>
 <body>
@@ -268,9 +271,9 @@
                 </form>
             </div>
 
-            <div class="card" style="background: #f1f5f9; padding: 1rem; margin-bottom: 1rem;">
+<div class="card" style="background: #f1f5f9; padding: 1rem; margin-bottom: 1rem;">
                 <h4 style="margin: 0 0 0.5rem 0; color: #475569; font-size: 14px;">🔍 Clasificación y Filtros Integrados:</h4>
-                <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.5rem; margin-bottom: 0;">
+                <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.5rem; margin-bottom: 0; align-items: flex-end;">
                     <div>
                         <label style="margin-bottom:2px;">Categoría:</label>
                         <select id="filter-doc-tipo" onchange="actualizarSubtipos('filter'); filtrarDocumentos();"></select>
@@ -288,6 +291,9 @@
                     <div>
                         <label style="margin-bottom:2px;">Filtrar por Fecha Doc.:</label>
                         <input type="date" id="filter-doc-date" onchange="filtrarDocumentos()">
+                    </div>
+                    <div>
+                        <button type="button" class="btn-action btn-clear" style="width: 100%; padding: 10px; margin: 0;" onclick="limpiarFiltros()">🧹 Limpiar Filtros</button>
                     </div>
                 </div>
             </div>
@@ -675,6 +681,21 @@
                         </tr>`;
                 });
             });
+        }
+
+
+
+function limpiarFiltros() {
+            // Restablecer subcategoría a TODOS
+            const selectSubtipo = document.getElementById('filter-doc-subtipo');
+            if (selectSubtipo) selectSubtipo.value = 'TODOS';
+            
+            // Vaciar campos de texto y fecha
+            document.getElementById('filter-doc-name').value = '';
+            document.getElementById('filter-doc-date').value = '';
+            
+            // Volver a procesar la tabla con la categoría actual limpia
+            filtrarDocumentos();
         }
 
         async function procesarSubidaDocumento(e) {
