@@ -431,15 +431,27 @@
             const selectTipo = document.getElementById('upload-tipo-doc');
             selectTipo.innerHTML = '';
 
-            if (rol === 'admin') {
-                selectTipo.innerHTML = `
-                    <option value="Contrato de Trabajo">Contrato de Trabajo</option>
-                    <option value="Cédula y Papeleta">Cédula y Papeleta</option>
-                    <option value="Formulario de Vacaciones">Formulario de Vacaciones</option>
-                    <option value="Memorándum / Sanción">Memorándum / Sanción</option>
-                    <option value="Certificado médico">Certificado médico (Manejo Administrativo)</option>
-                    <option value="Reposo médico">Reposo médico (Manejo Administrativo)</option>
+                if (rol === 'admin') {
+                // Opciones base solicitadas para todo el personal
+                let opcionesAdmin = `
+                    <option value="Contratación">Contratación</option>
+                    <option value="Vacaciones">Vacaciones</option>
+                    <option value="Certificado de Competencia">Certificado de Competencia</option>
+                    <option value="Acta de EPP's">Acta de EPP's</option>
+                    <option value="Certificados Médicos">Certificados Médicos</option>
+                    <option value="Certificados de Aptitud">Certificados de Aptitud</option>
+                    <option value="Memorándum">Memorándum</option>
+                    <option value="Certificados y Cargas Familiares">Certificados y Cargas Familiares</option>
                 `;
+
+                // Si el empleado es pasivo, agregamos la opción exclusiva al final
+                if (esPasivo) {
+                    opcionesAdmin += `<option value="Desvinculación">Desvinculación</option>`;
+                }
+
+                selectTipo.innerHTML = opcionesAdmin;
+
+                
             } else if (rol === 'doc') {
                 selectTipo.innerHTML = `
                     <option value="Ficha Médica Ocupacional">Ficha Médica Ocupacional</option>
