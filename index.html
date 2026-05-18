@@ -11,22 +11,26 @@
         input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
         button { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 10px; }
         button:hover { background: #0056b3; }
-        #mensaje { color: #d93025; text-align: center; margin-top: 15px; font-size: 14px; min-height: 20px; }
+        .error-message { color: red; text-align: center; margin-top: 15px; font-size: 14px; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="login-card">
-    <h2>Iniciar Sesión</h2>
-    <input type="text" id="username" placeholder="Nombre de usuario" required>
-    <input type="password" id="password" placeholder="Contraseña" required>
-    <button onclick="login()">Entrar al Sistema</button>
-    <div id="mensaje"></div>
+    <h2>Isertel Docs</h2>
+    <form id="loginForm" onsubmit="login(event)">
+        <input type="text" id="username" placeholder="Usuario" required autocomplete="username">
+        <input type="password" id="password" placeholder="Contraseña" required autocomplete="current-password">
+        <button type="submit">Iniciar Sesión</button>
+    </form>
+    <div id="mensaje" class="error-message"></div>
 </div>
 
 <script>
-    async function login() {
-        const username = document.getElementById('username').value;
+    async function login(event) {
+        event.preventDefault();
+        
+        const username = document.getElementById('username').value.trim();
         const password = document.getElementById('password').value;
         const mensaje = document.getElementById('mensaje');
         mensaje.innerText = "Cargando...";
@@ -41,27 +45,21 @@
             const data = await response.json();
 
             if (response.ok) {
-                // Guardamos datos
+                // Guardamos los datos de sesión de forma segura en el navegador
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('rol', data.rol);
                 localStorage.setItem('nombre', data.nombre);
                 
-                // --- REDIRECCIÓN ADAPTADA ---
-                if (data.rol === 'admin') {
-                    window.location.href = 'admin.html';
-                } else if (data.rol === 'doc') {
-                    window.location.href = 'doctor.html';
-                } else if (data.rol === 'kelvin') {
-                    window.location.href = 'kelvin.html'; // Nueva redirección
-                } else {
-                    window.location.href = 'user.html';
-                }
+                // --- REDIRECCIÓN CENTRALIZADA MULTI-ROL ---
+                // Todos los roles autorizados (admin, doc, kelvin) van ahora al mismo archivo HTML
+                window.location.href = 'panel.html';
+                
             } else {
-                mensaje.innerText = data.error || "Error en los datos";
+                mensaje.innerText = data.error || "Error en los datos proporcionados";
             }
         } catch (error) {
             console.error(error);
-            mensaje.innerText = "No hay conexión con el servidor";
+            mensaje.innerText = "No hay conexión con el servidor de Isertel";
         }
     }
 </script>
