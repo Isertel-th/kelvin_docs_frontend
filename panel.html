@@ -65,6 +65,44 @@
 
         .btn-clear { background: #64748b; color: white; }
         .btn-clear:hover { background: #475569; }
+
+        /* Iconos SVG Animados y Dinámicos */
+        .animated-icon {
+            width: 20px;
+            height: 20px;
+            vertical-align: middle;
+            margin-right: 8px;
+            transition: transform 0.3s ease, fill 0.3s ease;
+        }
+        
+        /* Efecto de animación al pasar el cursor sobre la fila de la tabla */
+        tr:hover .icon-contrato {
+            transform: scale(1.15) rotate(-5deg);
+            fill: #007bff; /* Azul */
+        }
+        tr:hover .icon-vacaciones {
+            transform: translateY(-3px);
+            fill: #f59e0b; /* Ámbar/Sol */
+        }
+        tr:hover .icon-medico {
+            transform: scale(1.1) heartbeat 1.5s infinite; /* Simula latido */
+            fill: #ef4444; /* Rojo médico */
+        }
+        tr:hover .icon-competencia {
+            transform: rotate(15deg);
+            fill: #10b981; /* Verde esmeralda */
+        }
+        tr:hover .icon-general {
+            transform: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            fill: #64748b;
+        }
+
+        /* Contenedor alineado para la celda de Categoría */
+        .categoria-cell {
+            display: inline-flex;
+            align-items: center;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
@@ -641,7 +679,7 @@ async function abrirExpediente(id, nombre, cedula, esPasivo) {
             dibujarTablaAgrupada(gruposPorPeriodo, periodosOrdenados);
         }
 
-        function dibujarTablaAgrupada(grupos, periodos) {
+function dibujarTablaAgrupada(grupos, periodos) {
             const tbody = document.getElementById('tbody-docs-empleado');
             tbody.innerHTML = '';
 
@@ -670,9 +708,32 @@ async function abrirExpediente(id, nombre, cedula, esPasivo) {
                     // Inyección Visual del Subtipo al lado del Tipo Principal
                     const subTag = doc.subtipo_documento ? ` ➡️ <small style="color:#0284c7; font-weight:600; background:#e0f2fe; padding:2px 6px; border-radius:4px;">${doc.subtipo_documento}</small>` : '';
 
+                    // --- SELECCIÓN DE VECTORES SVG DINÁMICOS SEGÚN CATEGORÍA ---
+                    let svgIcon = '';
+                    const tipoNormalizado = doc.tipo_documento.toLowerCase();
+
+                    if (tipoNormalizado.includes('contrat') || tipoNormalizado.includes('desvincul')) {
+                        // Icono de Contrato / Documento Firmado (Pluma y papel)
+                        svgIcon = `<svg class="animated-icon icon-contrato" viewBox="0 0 24 24" fill="#475569" xmlns="http://www.w3.org/2000/svg"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>`;
+                    } else if (tipoNormalizado.includes('vacaci')) {
+                        // Icono de Vacaciones / Descanso (Sombrilla de playa o Sol)
+                        svgIcon = `<svg class="animated-icon icon-vacaciones" viewBox="0 0 24 24" fill="#475569" xmlns="http://www.w3.org/2000/svg"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0-5c.55 0 1 .45 1 1v2c0 .55-.45 1-1 1s-1-.45-1-1V3c0-.55.45-1 1-1zm0 14c.55 0 1 .45 1 1v2c0 .55-.45 1-1 1s-1-.45-1-1v-2c0-.55.45-1 1-1zM5.22 6.64c.39-.39 1.02-.39 1.41 0l1.41 1.41c.39.39.39 1.02 0 1.41s-1.02.39-1.41 0L5.22 8.05c-.39-.39-.39-1.02 0-1.41zm10.61 10.61c.39-.39 1.02-.39 1.41 0l1.41 1.41c.39.39.39 1.02 0 1.41s-1.02.39-1.41 0l-1.41-1.41c-.39-.39-.39-1.02 0-1.41zM2 12c0-.55.45-1 1-1h2c0 .55-.45 1-1 1H3c-.55 0-1-.45-1-1zm14 0c0-.55.45-1 1-1h2c.55 0 1 .45 1 1s-.45 1-1 1h-2c-.55 0-1-.45-1-1zM6.64 18.78c-.39-.39-.39-1.02 0-1.41l1.41-1.41c.39-.39 1.02-.39 1.41 0s.39 1.02 0 1.41l-1.41 1.41c-.39.38-1.03.38-1.41 0zm10.61-10.61c-.39-.39-.39-1.02 0-1.41l1.41-1.41c.39-.39 1.02-.39 1.41 0s.39 1.02 0 1.41l-1.41 1.41c-.39.39-1.02.39-1.41 0z"/></svg>`;
+                    } else if (tipoNormalizado.includes('médic') || tipoNormalizado.includes('repos') || tipoNormalizado.includes('aptitud')) {
+                        // Icono de Salud / Certificado Médico (Cruz en escudo o Corazón)
+                        svgIcon = `<svg class="animated-icon icon-medico" viewBox="0 0 24 24" fill="#475569" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-3H8v-2h3V8h2v3h3v2h-3v3z"/></svg>`;
+                    } else if (tipoNormalizado.includes('competenc') || tipoNormalizado.includes('técnic') || tipoNormalizado.includes('epp')) {
+                        // Icono Técnico / Competencias (Medalla / Check / Engranaje)
+                        svgIcon = `<svg class="animated-icon icon-competencia" viewBox="0 0 24 24" fill="#475569" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>`;
+                    } else {
+                        // Icono de Carpeta Estándar para otros documentos generales
+                        svgIcon = `<svg class="animated-icon icon-general" viewBox="0 0 24 24" fill="#475569" xmlns="http://www.w3.org/2000/svg"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>`;
+                    }
+
                     tbody.innerHTML += `
                         <tr>
-                            <td>📁 <span>${doc.tipo_documento}${subTag}</span></td>
+                            <td>
+                                <span class="categoria-cell">${svgIcon} <span>${doc.tipo_documento}${subTag}</span></span>
+                            </td>
                             <td style="font-size:14px; color:#1e293b; font-weight: 500; max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${nombreArchivoMostrar}">
                                 ${nombreArchivoMostrar}
                             </td>
