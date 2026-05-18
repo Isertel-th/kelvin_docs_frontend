@@ -276,52 +276,11 @@
                         </button>
                         <h3 id="detalle-categoria-titulo" style="margin: 0; color: #1e293b; font-size: 18px;">Carpeta</h3>
                     </div>
-                </div>
-
-                <div class="card" style="background: #f1f5f9; padding: 1.25rem; margin-bottom: 1.5rem; border: 1px solid #cbd5e1;">
-                    <h4 style="margin: 0 0 0.75rem 0; color: #334155; font-size: 14px;">🔍 Filtros Integrados:</h4>
-                    <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.5rem; margin-bottom: 0; align-items: flex-end;">
-                        <div style="display: none;">
-                            <label style="margin-bottom:2px;">Categoría:</label>
-                            <select id="filter-doc-tipo" onchange="actualizarSubtipos('filter'); filtrarDocumentos();"></select>
-                        </div>
-                        <div>
-                            <label style="margin-bottom:2px;">Subcategoría:</label>
-                            <select id="filter-doc-subtipo" onchange="filtrarDocumentos()">
-                                <option value="TODOS">-- Todos --</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label style="margin-bottom:2px;">Filtrar por Periodo (Mes/Año):</label>
-                            <input type="month" id="filter-doc-period" onchange="filtrarDocumentos()">
-                        </div>
-                        <div>
-                            <button type="button" class="btn-action btn-clear" style="width: 100%; padding: 10px; margin: 0; border-radius: 6px; font-weight: 600;" onclick="limpiarFiltros()">🧹 Limpiar</button>
-                        </div>
+                    <div>
+                        <button type="button" class="btn-action btn-upload" onclick="toggleUploadForm()" style="padding: 10px 20px; font-size: 14px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 0;">
+                            ➕ Subir Nuevo Documento
+                        </button>
                     </div>
-                </div>
-
-                <h3 style="color: #1e293b; font-size: 18px; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">📁 Documentos Clasificados por Periodo</h3>
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Categoría</th>
-                                <th>Nombre de Archivo</th>
-                                <th>Subido Por</th>
-                                <th>Fecha Doc.</th>
-                                <th>Ver</th>
-                                <th class="role-admin">Eliminar</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbody-docs-empleado"></tbody>
-                    </table>
-                </div>
-
-                <div style="margin-top: 1.5rem; margin-bottom: 1rem;">
-                    <button type="button" class="btn-action btn-upload" onclick="toggleUploadForm()" style="padding: 10px 20px; font-size: 14px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                        ➕ Subir Nuevo Documento
-                    </button>
                 </div>
 
                 <form id="form-upload-doc" onsubmit="procesarSubidaDocumento(event)" style="display: none; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; margin-top: 0.5rem; margin-bottom: 2rem;">
@@ -349,6 +308,44 @@
                         <button type="submit" class="btn-submit" style="padding:10px 24px; font-size:14px; border-radius: 8px;">🚀 Indexar y Subir Archivo</button>
                     </div>
                 </form>
+
+                <h3 style="color: #1e293b; font-size: 18px; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">📁 Documentos Clasificados por Periodo</h3>
+                <div class="table-responsive" style="max-height: 400px; overflow-y: auto; border: 1px solid #cbd5e1; border-radius: 8px;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th style="position: sticky; top: 0; background: #f1f5f9; z-index: 10;">Nombre de Archivo</th>
+                                <th style="position: sticky; top: 0; background: #f1f5f9; z-index: 10;">Fecha Doc.</th>
+                                <th style="position: sticky; top: 0; background: #f1f5f9; z-index: 10;">Ver</th>
+                                <th class="role-admin" style="position: sticky; top: 0; background: #f1f5f9; z-index: 10;">Eliminar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-docs-empleado"></tbody>
+                    </table>
+                </div>
+
+                <div class="card" style="background: #f1f5f9; padding: 1.25rem; margin-top: 1.5rem; margin-bottom: 1.5rem; border: 1px solid #cbd5e1;">
+                    <h4 style="margin: 0 0 0.75rem 0; color: #334155; font-size: 14px;">🔍 Filtros Integrados:</h4>
+                    <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.5rem; margin-bottom: 0; align-items: flex-end;">
+                        <div style="display: none;">
+                            <label style="margin-bottom:2px;">Categoría:</label>
+                            <select id="filter-doc-tipo" onchange="actualizarSubtipos('filter'); filtrarDocumentos();"></select>
+                        </div>
+                        <div>
+                            <label style="margin-bottom:2px;">Subcategoría:</label>
+                            <select id="filter-doc-subtipo" onchange="filtrarDocumentos()">
+                                <option value="TODOS">-- Todos --</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="margin-bottom:2px;">Filtrar por Periodo (Mes/Año):</label>
+                            <input type="month" id="filter-doc-period" onchange="filtrarDocumentos()">
+                        </div>
+                        <div>
+                            <button type="button" class="btn-action btn-clear" style="width: 100%; padding: 10px; margin: 0; border-radius: 6px; font-weight: 600;" onclick="limpiarFiltros()">🧹 Limpiar</button>
+                        </div>
+                    </div>
+                </div>
 
             </div> 
         </div>
@@ -729,7 +726,7 @@
                 if (!Array.isArray(documentosActuales)) documentosActuales = [];
                 filtrarDocumentos(); 
             } catch (err) { 
-                document.getElementById('tbody-docs-empleado').innerHTML = '<tr><td colspan="6" style="color:red;">Error al enlazar datos de almacenamiento remoto.</td></tr>'; 
+                document.getElementById('tbody-docs-empleado').innerHTML = '<tr><td colspan="4" style="color:red;">Error al enlazar datos de almacenamiento remoto.</td></tr>'; 
             }
         }
 
@@ -748,60 +745,35 @@
                 return matchTipo && matchSubtipo && matchPeriodo;
             });
 
-            const gruposPorPeriodo = {};
-            docsFiltrados.forEach(doc => {
-                const periodo = doc.periodo || (doc.fecha_documento || doc.created_at || '').substring(0, 7) || 'Sin Periodo';
-                if (!gruposPorPeriodo[periodo]) {
-                    gruposPorPeriodo[periodo] = [];
-                }
-                gruposPorPeriodo[periodo].push(doc);
-            });
-
-            const periodosOrdenados = Object.keys(gruposPorPeriodo).sort((a, b) => b.localeCompare(a));
-
-            dibujarTablaAgrupada(gruposPorPeriodo, periodosOrdenados);
+            dibujarTablaAgrupada(docsFiltrados);
         }
 
-        function dibujarTablaAgrupada(grupos, periodos) {
+        function dibujarTablaAgrupada(docsFiltrados) {
             const tbody = document.getElementById('tbody-docs-empleado');
             tbody.innerHTML = '';
 
-            if (periodos.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#94a3b8; padding: 2rem;">No se registran archivos en esta categoría para los criterios buscados.</td></tr>';
+            if (docsFiltrados.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#94a3b8; padding: 2rem;">No se registran archivos en esta categoría para los criterios buscados.</td></tr>';
                 return;
             }
 
-            periodos.forEach(periodo => {
-                const nombreMesCabecera = obtenerNombreMesEspanol(periodo);
+            docsFiltrados.forEach(doc => {
+                const fechaRaw = doc.fecha_documento || doc.created_at;
+                const fechaFormateada = fechaRaw ? new Date(fechaRaw).toLocaleDateString('es-EC', {day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC'}) : 'S/F';
+                
+                const puedeEliminar = (rol === 'admin' || rol === 'doc');
+                const nombreArchivoMostrar = doc.nombre_archivo || `${doc.tipo_documento}.pdf`;
+
                 tbody.innerHTML += `
-                    <tr class="row-periodo-header">
-                        <td colspan="6" style="padding: 8px 16px; font-weight: 700; font-size:14px; letter-spacing: 0.5px;">
-                            ${nombreMesCabecera}
+                    <tr>
+                        <td style="max-width: 450px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${nombreArchivoMostrar}">
+                            <span style="font-size: 16px; margin-right: 6px; vertical-align: middle;">📕</span>
+                            <span style="font-size: 14px; color: #1e293b; font-weight: 500; vertical-align: middle;">${nombreArchivoMostrar}</span>
                         </td>
-                    </tr>
-                `;
-
-                grupos[periodo].forEach(doc => {
-                    const fechaRaw = doc.fecha_documento || doc.created_at;
-                    const fechaFormateada = fechaRaw ? new Date(fechaRaw).toLocaleDateString('es-EC', {day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC'}) : 'S/F';
-                    
-                    const puedeEliminar = (rol === 'admin' || rol === 'doc');
-                    const nombreArchivoMostrar = doc.nombre_archivo || `${doc.tipo_documento}.pdf`;
-                    
-                    const subTag = doc.subtipo_documento ? ` ➡️ <small style="color:#0284c7; font-weight:600; background:#e0f2fe; padding:2px 6px; border-radius:4px;">${doc.subtipo_documento}</small>` : '';
-
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>📁 <span>${doc.tipo_documento}${subTag}</span></td>
-                            <td style="font-size:14px; color:#1e293b; font-weight: 500; max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${nombreArchivoMostrar}">
-                                ${nombreArchivoMostrar}
-                            </td>
-                            <td><span style="font-size:13px;" class="user-badge">${doc.nombre_user || 'Sistema'}</span></td>
-                            <td><strong>${fechaFormateada}</strong></td>
-                            <td><a href="${doc.url_cloudinary}" target="_blank" class="btn-action btn-view">👁️ Descargar</a></td>
-                            ${puedeEliminar ? `<td><button class="btn-action btn-delete" onclick="eliminarDocumento('${doc.id}')">❌</button></td>` : '<td>-</td>'}
-                        </tr>`;
-                });
+                        <td><strong>${fechaFormateada}</strong></td>
+                        <td><a href="${doc.url_cloudinary}" target="_blank" class="btn-action btn-view">👁️ Descargar</a></td>
+                        ${puedeEliminar ? `<td><button class="btn-action btn-delete" onclick="eliminarDocumento('${doc.id}')">❌</button></td>` : '<td>-</td>'}
+                    </tr>`;
             });
         }
 
