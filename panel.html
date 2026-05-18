@@ -292,12 +292,8 @@
                             </select>
                         </div>
                         <div>
-                            <label style="margin-bottom:2px;">Buscar por nombre:</label>
-                            <input type="text" id="filter-doc-name" placeholder="Palabra clave..." oninput="filtrarDocumentos()">
-                        </div>
-                        <div>
-                            <label style="margin-bottom:2px;">Filtrar por Fecha:</label>
-                            <input type="date" id="filter-doc-date" onchange="filtrarDocumentos()">
+                            <label style="margin-bottom:2px;">Filtrar por Periodo (Mes/Año):</label>
+                            <input type="month" id="filter-doc-period" onchange="filtrarDocumentos()">
                         </div>
                         <div>
                             <button type="button" class="btn-action btn-clear" style="width: 100%; padding: 10px; margin: 0; border-radius: 6px; font-weight: 600;" onclick="limpiarFiltros()">🧹 Limpiar</button>
@@ -342,10 +338,6 @@
                         <div>
                             <label>Fecha Documento:</label>
                             <input type="date" id="upload-doc-date" required>
-                        </div>
-                        <div>
-                            <label>Periodo (Mes/Año):</label>
-                            <input type="month" id="upload-doc-period" required>
                         </div>
                         <div style="grid-column: span 1;">
                             <label>Archivo (Solo PDF):</label>
@@ -677,8 +669,9 @@
 
             actualizarSubtipos('filter');
 
-            document.getElementById('filter-doc-name').value = '';
-            document.getElementById('filter-doc-date').value = '';
+            if (document.getElementById('filter-doc-period')) {
+                document.getElementById('filter-doc-period').value = '';
+            }
 
             await obtenerDocumentosServidor();
             document.getElementById('modal-expediente').style.display = 'flex';
@@ -743,21 +736,16 @@
         function filtrarDocumentos() {
             const tipoSeleccionado = document.getElementById('filter-doc-tipo').value;
             const subtipoSeleccionado = document.getElementById('filter-doc-subtipo') ? document.getElementById('filter-doc-subtipo').value : 'TODOS';
-            const valNombre = document.getElementById('filter-doc-name').value.toLowerCase().trim();
-            const valFecha = document.getElementById('filter-doc-date').value; 
+            const valPeriodo = document.getElementById('filter-doc-period') ? document.getElementById('filter-doc-period').value : '';
 
             const docsFiltrados = documentosActuales.filter(doc => {
                 const matchTipo = (doc.tipo_documento === tipoSeleccionado);
                 const matchSubtipo = (subtipoSeleccionado === 'TODOS' || doc.subtipo_documento === subtipoSeleccionado);
                 
-                const nombreArchivo = (doc.nombre_archivo || '').toLowerCase();
-                const matchNombre = valNombre === '' || nombreArchivo.includes(valNombre);
-                
-                const fechaRaw = doc.fecha_documento || doc.created_at || '';
-                const fechaDocFormato = fechaRaw.substring(0, 10); 
-                const matchFecha = valFecha === '' || (fechaDocFormato === valFecha);
+                const docPeriodo = doc.periodo || (doc.fecha_documento || doc.created_at || '').substring(0, 7) || '';
+                const matchPeriodo = valPeriodo === '' || docPeriodo === valPeriodo;
 
-                return matchTipo && matchSubtipo && matchNombre && matchFecha;
+                return matchTipo && matchSubtipo && matchPeriodo;
             });
 
             const gruposPorPeriodo = {};
@@ -821,8 +809,9 @@
             const selectSubtipo = document.getElementById('filter-doc-subtipo');
             if (selectSubtipo) selectSubtipo.value = 'TODOS';
             
-            document.getElementById('filter-doc-name').value = '';
-            document.getElementById('filter-doc-date').value = '';
+            if (document.getElementById('filter-doc-period')) {
+                document.getElementById('filter-doc-period').value = '';
+            }
             
             filtrarDocumentos();
         }
@@ -838,7 +827,6 @@
 
             const subtipoDoc = document.getElementById('upload-subtipo-doc') ? document.getElementById('upload-subtipo-doc').value : 'General / Único';
             const fechaDoc = document.getElementById('upload-doc-date').value;
-            const periodoDoc = document.getElementById('upload-doc-period').value; 
             const archivoInput = document.getElementById('upload-file').files[0];
 
             if (!archivoInput) return;
@@ -848,12 +836,31 @@
                 return;
             }
 
+            // 1. Extraer automáticamente el periodo (YYYY-MM) de la fecha seleccionada
+            const periodoDoc = fechaDoc ? fechaDoc.substring(0, 7) : null;
+
+            // 2. Formatear y sanear el subtipo (ej. "Aviso de entrada" -> "aviso_de_entrada")
+            const subtipoSaneado = subtipoDoc.toLowerCase().trim()
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remueve acentos tildes de forma segura
+                .replace(/\s+/g, '_')
+                .replace(/[^a-z0-9_]/g, '');
+
+            // 3. Formatear la fecha del calendario (YYYY-MM-DD) a DD_MM_YYYY
+            const [anio, mes, dia] = fechaDoc.split('-');
+            const fechaFormateadaNombre = `${dia}_${mes}_${anio}`;
+
+            // 4. Crear el nuevo nombre del archivo estructurado
+            const nuevoNombreArchivo = `${subtipoSaneado}_${fechaFormateadaNombre}.pdf`;
+
+            // 5. Instanciar un nuevo objeto File con el nombre personalizado para enviarlo a Cloudinary
+            const archivoRenombrado = new File([archivoInput], nuevoNombreArchivo, { type: archivoInput.type });
+
             const formData = new FormData();
             formData.append('tipo_documento', tipoDoc);
             formData.append('subtipo_documento', subtipoDoc); 
             formData.append('usuario_id', currentSelectedUserId);
-            formData.append('archivo', archivoInput);
-            formData.append('nombre_archivo', archivoInput.name); 
+            formData.append('archivo', archivoRenombrado);
+            formData.append('nombre_archivo', nuevoNombreArchivo); 
             formData.append('fecha_documento', fechaDoc);
             formData.append('periodo', periodoDoc);
             formData.append('nombre_user', nombreUsuario || 'Gestor Unificado');
