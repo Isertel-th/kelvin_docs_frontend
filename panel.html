@@ -65,7 +65,7 @@
         /* Grid de Categorías con Vectores */
         .vector-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
         .vector-card { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 1rem; text-align: center; cursor: pointer; transition: all 0.25s ease; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem; }
-        .vector-card svg { width: 45px; height: 45px; transition: all 0.25s ease; } /* Se eliminó el fill forzado gris para permitir colores */
+        .vector-card svg { width: 45px; height: 45px; transition: all 0.25s ease; }
         .vector-card span { font-size: 13px; font-weight: 600; color: #475569; line-height: 1.2; }
         .vector-card:hover { border-color: var(--primary-color); background: #f0f7ff; transform: translateY(-3px); }
         .vector-card:hover svg { fill: var(--primary-color); transform: scale(1.05); }
@@ -281,36 +281,6 @@
                     </button>
                 </div>
 
-                <form id="form-upload-doc" onsubmit="procesarSubidaDocumento(event)" style="display: none; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
-                    <input type="hidden" id="upload-tipo-doc" required>
-                    <h4 style="margin: 0 0 1rem 0; color: #475569; font-size: 14px;">📋 Paso 2: Completa los detalles del archivo</h4>
-                    
-                    <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
-                        <div>
-                            <label>Subtipo Documento:</label>
-                            <select id="upload-subtipo-doc" required>
-                                <option value="General / Único">General / Único</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label>Fecha Documento:</label>
-                            <input type="date" id="upload-doc-date" required>
-                        </div>
-                        <div>
-                            <label>Periodo (Mes/Año):</label>
-                            <input type="month" id="upload-doc-period" required>
-                        </div>
-                        <div style="grid-column: span 1;">
-                            <label>Archivo (Solo PDF):</label>
-                            <input type="file" id="upload-file" accept=".pdf" required style="padding: 7px;">
-                        </div>
-                    </div>
-                    
-                    <div style="margin-top: 1.25rem; text-align: right;">
-                        <button type="submit" class="btn-submit" style="padding:10px 24px; font-size:14px; border-radius: 8px;">🚀 Indexar y Subir Archivo</button>
-                    </div>
-                </form>
-
                 <div class="card" style="background: #f1f5f9; padding: 1.25rem; margin-bottom: 1.5rem; border: 1px solid #cbd5e1;">
                     <h4 style="margin: 0 0 0.75rem 0; color: #334155; font-size: 14px;">🔍 Clasificación y Filtros Integrados:</h4>
                     <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.5rem; margin-bottom: 0; align-items: flex-end;">
@@ -354,7 +324,39 @@
                         <tbody id="tbody-docs-empleado"></tbody>
                     </table>
                 </div>
-            </div> </div>
+
+                <form id="form-upload-doc" onsubmit="procesarSubidaDocumento(event)" style="display: none; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; margin-top: 2rem; margin-bottom: 2rem;">
+                    <input type="hidden" id="upload-tipo-doc" required>
+                    <h4 style="margin: 0 0 1rem 0; color: #475569; font-size: 14px;">📋 Paso 2: Completa los detalles del archivo</h4>
+                    
+                    <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
+                        <div>
+                            <label>Subtipo Documento:</label>
+                            <select id="upload-subtipo-doc" required>
+                                <option value="General / Único">General / Único</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Fecha Documento:</label>
+                            <input type="date" id="upload-doc-date" required>
+                        </div>
+                        <div>
+                            <label>Periodo (Mes/Año):</label>
+                            <input type="month" id="upload-doc-period" required>
+                        </div>
+                        <div style="grid-column: span 1;">
+                            <label>Archivo (Solo PDF):</label>
+                            <input type="file" id="upload-file" accept=".pdf" required style="padding: 7px;">
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 1.25rem; text-align: right;">
+                        <button type="submit" class="btn-submit" style="padding:10px 24px; font-size:14px; border-radius: 8px;">🚀 Indexar y Subir Archivo</button>
+                    </div>
+                </form>
+
+            </div> 
+        </div>
     </div>
 
 <script>
@@ -390,7 +392,7 @@
             "Memorándum": ["General / Único"]
         };
 
-        // Diccionario de Vectores Ilustrativos AHORA CON COLORES EN LA ETIQUETA FILL
+        // Diccionario de Vectores Ilustrativos
         const vectoresIconos = {
             "Contratación": `<svg viewBox="0 0 24 24" fill="#3b82f6"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>`,
             "Vacaciones": `<svg viewBox="0 0 24 24" fill="#f59e0b"><path d="M14 6V4h-4v2h4zM4 8v11c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2H6c-1.1 0-2 .9-2 2zm11 5h-2v2h-2v-2H9v-2h2V9h2v2h2v2z"/></svg>`,
@@ -413,7 +415,6 @@
             "Acta de Entrega EPP": `<svg viewBox="0 0 24 24" fill="#8b5cf6"><path d="M12 22c5.52 0 10-4.48 10-10S17.52 2 12 2 2 6.48 2 12s4.48 10 12 10zm1-15h2v6h-2V7zm0 8h2v2h-2v-2z"/></svg>`
         };
 
-        // Alternar la visualización del formulario de subida
         function toggleUploadForm() {
             const form = document.getElementById('form-upload-doc');
             if (form.style.display === 'none' || form.style.display === '') {
@@ -610,8 +611,6 @@
             } catch (err) { console.error(err); }
         }
 
-        // --- MANEJO DEL EXPEDIENTE DIGITAL DINÁMICO ---
-
         async function abrirExpediente(id, nombre, cedula, esPasivo) {
             currentSelectedUserId = id;
             currentSelectedUserPasivo = esPasivo;
@@ -622,12 +621,10 @@
 
             document.getElementById('form-upload-doc').reset();
             
-            // Asegurar que el Paso 1 se muestre y los detalles se oculten al abrir un expediente fresco
             document.getElementById('section-paso1').style.display = 'block';
             document.getElementById('expediente-detalles').style.display = 'none';
             document.getElementById('form-upload-doc').style.display = 'none';
 
-            // Forzar el vaciado del input oculto de tipo para evitar herencias erróneas
             document.getElementById('upload-tipo-doc').value = '';
 
             const selectFilter = document.getElementById('filter-doc-tipo');
@@ -702,20 +699,17 @@
                 });
             }
 
-            // MODIFICACIONES DE INTERFAZ SOLICITADAS: Ocultar Paso 1 completamente y habilitar detalles
             document.getElementById('section-paso1').style.display = 'none';
             document.getElementById('expediente-detalles').style.display = 'block';
             document.getElementById('form-upload-doc').style.display = 'none';
             document.getElementById('detalle-categoria-titulo').innerText = `📂 Carpeta: ${tipoSeleccionado}`;
 
-            // Sincronizar el filtro maestro y renderizar la tabla con la categoría específica
             const selectFilter = document.getElementById('filter-doc-tipo');
             if(selectFilter) selectFilter.value = tipoSeleccionado;
             actualizarSubtipos('filter');
             filtrarDocumentos();
         }
 
-        // NUEVA FUNCIÓN: Regresa la interfaz al Paso 1 limpiando selecciones de tarjetas
         function regresarAPaso1() {
             document.getElementById('section-paso1').style.display = 'block';
             document.getElementById('expediente-detalles').style.display = 'none';
@@ -737,14 +731,12 @@
                 const res = await fetch(endpoint, { headers: { 'Authorization': `Bearer ${token}` } });
                 documentosActuales = await res.json();
                 if (!Array.isArray(documentosActuales)) documentosActuales = [];
-                // Se filtra dinámicamente si ya hay una tarjeta seleccionada, si no, se queda a la espera
                 filtrarDocumentos(); 
             } catch (err) { 
                 document.getElementById('tbody-docs-empleado').innerHTML = '<tr><td colspan="6" style="color:red;">Error al enlazar datos de almacenamiento remoto.</td></tr>'; 
             }
         }
 
-        // CLASIFICACIÓN DINÁMICA POR TIPO, SUBTIPO Y AGRUPACIÓN POR PERIODO (MES)
         function filtrarDocumentos() {
             const tipoSeleccionado = document.getElementById('filter-doc-tipo').value;
             const subtipoSeleccionado = document.getElementById('filter-doc-subtipo') ? document.getElementById('filter-doc-subtipo').value : 'TODOS';
@@ -878,7 +870,6 @@
                 if (res.ok) {
                     alert("Archivo PDF indexado y guardado correctamente por periodo.");
                     document.getElementById('form-upload-doc').reset();
-                    // Al finalizar la subida, colapsamos el formulario para devolver limpieza a la interfaz
                     document.getElementById('form-upload-doc').style.display = 'none'; 
                     
                     document.getElementById('filter-doc-tipo').value = tipoDoc;
@@ -914,8 +905,6 @@
         function cerrarModal() {
             document.getElementById('modal-expediente').style.display = 'none';
         }
-
-        // --- MANEJO ADICIONAL CORPORATIVO / GLOBAL ---
 
         async function subirDocEmpresa(e) {
             e.preventDefault();
