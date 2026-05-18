@@ -339,7 +339,33 @@
                         </div>
                         <div>
                             <label style="margin-bottom:2px;">Filtrar por Periodo (Mes/Año):</label>
-                            <input type="month" id="filter-doc-period" onchange="filtrarDocumentos()">
+                            <div style="display: flex; gap: 5px;">
+                                <select id="filter-mes" onchange="filtrarDocumentos()" style="width: 100%;">
+                                    <option value="">- Mes -</option>
+                                    <option value="01">Enero</option>
+                                    <option value="02">Febrero</option>
+                                    <option value="03">Marzo</option>
+                                    <option value="04">Abril</option>
+                                    <option value="05">Mayo</option>
+                                    <option value="06">Junio</option>
+                                    <option value="07">Julio</option>
+                                    <option value="08">Agosto</option>
+                                    <option value="09">Septiembre</option>
+                                    <option value="10">Octubre</option>
+                                    <option value="11">Noviembre</option>
+                                    <option value="12">Diciembre</option>
+                                </select>
+                                <select id="filter-anio" onchange="filtrarDocumentos()" style="width: 100%;">
+                                    <option value="">- Año -</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2025">2025</option>
+                                    <option value="2026">2026</option>
+                                    <option value="2027">2027</option>
+                                    <option value="2028">2028</option>
+                                    <option value="2029">2029</option>
+                                    <option value="2030">2030</option>
+                                </select>
+                            </div>
                         </div>
                         <div>
                             <button type="button" class="btn-action btn-clear" style="width: 100%; padding: 10px; margin: 0; border-radius: 6px; font-weight: 600;" onclick="limpiarFiltros()">🧹 Limpiar</button>
@@ -529,7 +555,6 @@
                             <td>${emp.correo}</td>
                             <td>${emp.celular || 'S/N'}</td>
                             <td>
-                                <button class="btn-action btn-view" onclick="abrirExpediente('${emp.id}', '${emp.nombre_completo}', '${emp.cedula}', false)">📂 Ver Carpeta</button>
                                 ${rol === 'admin' ? `<button class="btn-action btn-passive" onclick="moverAPasivo('${emp.id}')">⚠️ Liquidar / Mover Pasivo</button>` : ''}
                             </td>
                         </tr>`;
@@ -552,9 +577,7 @@
                             <td>${emp.cedula}</td>
                             <td>${emp.correo}</td>
                             <td>${emp.celular || 'S/N'}</td>
-                            <td>
-                                <button class="btn-action btn-view" onclick="abrirExpediente('${emp.id}', '${emp.nombre_completo}', '${emp.cedula}', true)">📂 Ver Carpeta</button>
-                            </td>
+                            <td></td>
                         </tr>`;
                 });
             } catch (err) { console.error("Error cargando pasivos:", err); }
@@ -666,8 +689,9 @@
 
             actualizarSubtipos('filter');
 
-            if (document.getElementById('filter-doc-period')) {
-                document.getElementById('filter-doc-period').value = '';
+            if (document.getElementById('filter-mes')) {
+                document.getElementById('filter-mes').value = '';
+                document.getElementById('filter-anio').value = '';
             }
 
             await obtenerDocumentosServidor();
@@ -733,14 +757,24 @@
         function filtrarDocumentos() {
             const tipoSeleccionado = document.getElementById('filter-doc-tipo').value;
             const subtipoSeleccionado = document.getElementById('filter-doc-subtipo') ? document.getElementById('filter-doc-subtipo').value : 'TODOS';
-            const valPeriodo = document.getElementById('filter-doc-period') ? document.getElementById('filter-doc-period').value : '';
+            
+            const filterMes = document.getElementById('filter-mes') ? document.getElementById('filter-mes').value : '';
+            const filterAnio = document.getElementById('filter-anio') ? document.getElementById('filter-anio').value : '';
 
             const docsFiltrados = documentosActuales.filter(doc => {
                 const matchTipo = (doc.tipo_documento === tipoSeleccionado);
                 const matchSubtipo = (subtipoSeleccionado === 'TODOS' || doc.subtipo_documento === subtipoSeleccionado);
                 
                 const docPeriodo = doc.periodo || (doc.fecha_documento || doc.created_at || '').substring(0, 7) || '';
-                const matchPeriodo = valPeriodo === '' || docPeriodo === valPeriodo;
+                
+                let matchPeriodo = true;
+                if (filterAnio && filterMes) {
+                    matchPeriodo = (docPeriodo === `${filterAnio}-${filterMes}`);
+                } else if (filterAnio) {
+                    matchPeriodo = docPeriodo.startsWith(filterAnio);
+                } else if (filterMes) {
+                    matchPeriodo = docPeriodo.endsWith(`-${filterMes}`);
+                }
 
                 return matchTipo && matchSubtipo && matchPeriodo;
             });
@@ -781,9 +815,8 @@
             const selectSubtipo = document.getElementById('filter-doc-subtipo');
             if (selectSubtipo) selectSubtipo.value = 'TODOS';
             
-            if (document.getElementById('filter-doc-period')) {
-                document.getElementById('filter-doc-period').value = '';
-            }
+            if (document.getElementById('filter-mes')) document.getElementById('filter-mes').value = '';
+            if (document.getElementById('filter-anio')) document.getElementById('filter-anio').value = '';
             
             filtrarDocumentos();
         }
