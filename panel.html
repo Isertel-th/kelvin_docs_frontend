@@ -55,10 +55,30 @@
         .btn-passive { background: #f59e0b; color: white; }
         .btn-delete { background: #ef4444; color: white; }
 
-        /* Modales */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; padding: 2rem; border-radius: 10px; width: 90%; max-width: 850px; max-height: 85vh; overflow-y: auto; position: relative; }
-        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #94a3b8; }
+       /* Modales y Nueva Interfaz de Carga Profesional */
+.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 1000; }
+.modal-content { background: white; padding: 2.5rem; border-radius: 16px; width: 95%; max-width: 1000px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+.close-modal { position: absolute; top: 20px; right: 25px; font-size: 28px; cursor: pointer; color: #94a3b8; transition: color 0.2s; }
+.close-modal:hover { color: #475569; }
+
+/* Grid de Categorías con Vectores */
+.vector-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+.vector-card { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 1rem; text-align: center; cursor: pointer; transition: all 0.25s ease; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem; }
+.vector-card svg { width: 45px; height: 45px; fill: #64748b; transition: all 0.25s ease; }
+.vector-card span { font-size: 13px; font-weight: 600; color: #475569; line-height: 1.2; }
+.vector-card:hover { border-color: var(--primary-color); background: #f0f7ff; transform: translateY(-3px); }
+.vector-card:hover svg { fill: var(--primary-color); transform: scale(1.05); }
+.vector-card.selected { border-color: var(--primary-color); background: #e0f2fe; box-shadow: 0 0 0 1px var(--primary-color); }
+.vector-card.selected svg { fill: #0284c7; }
+.vector-card.selected span { color: #0369a1; }
+
+/* Bloque del Formulario Oculto/Desplegable */
+.upload-form-container { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; margin-top: 1rem; box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.02); }
+
+/* Separador de Secciones Históricas */
+.section-separator { border-top: 2px dashed #cbd5e1; margin: 2.5rem 0 2rem 0; position: relative; }
+.section-separator span { position: absolute; top: -12px; left: 20px; background: white; padding: 0 10px; font-weight: bold; color: #64748b; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
+        
         
         /* Restricciones de Roles Visuales */
         .role-admin, .role-doc, .role-kelvin { display: none; }
@@ -234,46 +254,56 @@
         </div>
     </div>
 
-    <div id="modal-expediente" class="modal">
+<div id="modal-expediente" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="cerrarModal()">&times;</span>
-            <h2 id="modal-emp-name">Expediente Digital</h2>
-            <p style="font-weight: bold; color:#64748b;">Cédula: <span id="modal-emp-cedula"></span></p>
+            <h2 id="modal-emp-name" style="margin-top: 0; color: #1e293b;">Expediente Digital</h2>
+            <p style="font-weight: bold; color:#64748b; margin-bottom: 2rem;">Cédula: <span id="modal-emp-cedula"></span></p>
             
-<div class="card" style="background: #f8fafc; border: 1px solid #e2e8f0;">
-                <h4 style="margin-top:0; color:#334155;">Cargar nuevo archivo a este expediente</h4>
+            <div class="card" style="border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+                <h3 style="margin-top:0; color:#0f172a; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.75rem; font-size: 16px;">
+                    📥 Paso 1: Selecciona el Tipo de Documento a Cargar
+                </h3>
+                
+                <div class="vector-grid" id="vector-container"></div>
+
                 <form id="form-upload-doc" onsubmit="procesarSubidaDocumento(event)">
-                    <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
-                        <div>
-                            <label>Tipo Documento:</label>
-                            <select id="upload-tipo-doc" required onchange="actualizarSubtipos('upload')"></select>
+                    <input type="hidden" id="upload-tipo-doc" required>
+
+                    <div class="upload-form-container">
+                        <h4 style="margin: 0 0 1rem 0; color: #475569; font-size: 14px;">📋 Paso 2: Completa los detalles del archivo</h4>
+                        <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
+                            <div>
+                                <label>Subtipo Documento:</label>
+                                <select id="upload-subtipo-doc" required>
+                                    <option value="General / Único">General / Único</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Fecha Documento:</label>
+                                <input type="date" id="upload-doc-date" required>
+                            </div>
+                            <div>
+                                <label>Periodo (Mes/Año):</label>
+                                <input type="month" id="upload-doc-period" required>
+                            </div>
+                            <div style="grid-column: span 1;">
+                                <label>Archivo (Solo PDF):</label>
+                                <input type="file" id="upload-file" accept=".pdf" required style="padding: 7px;">
+                            </div>
                         </div>
-                        <div>
-                            <label>Subtipo Documento:</label>
-                            <select id="upload-subtipo-doc" required>
-                                <option value="General / Único">General / Único</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label>Fecha Documento:</label>
-                            <input type="date" id="upload-doc-date" required>
-                        </div>
-                        <div>
-                            <label>Periodo (Mes/Año):</label>
-                            <input type="month" id="upload-doc-period" required>
-                        </div>
-                        <div>
-                            <label>Archivo (Solo PDF):</label>
-                            <input type="file" id="upload-file" accept=".pdf" required>
+                        <div style="margin-top: 1.25rem; text-align: right;">
+                            <button type="submit" class="btn-submit" style="padding:10px 24px; font-size:14px; border-radius: 8px;">🚀 Indexar y Subir Archivo</button>
                         </div>
                     </div>
-                    <button type="submit" class="btn-submit" style="padding:8px 16px; font-size:14px;">Subir Archivo</button>
                 </form>
             </div>
 
-<div class="card" style="background: #f1f5f9; padding: 1rem; margin-bottom: 1rem;">
-                <h4 style="margin: 0 0 0.5rem 0; color: #475569; font-size: 14px;">🔍 Clasificación y Filtros Integrados:</h4>
-                <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.5rem; margin-bottom: 0; align-items: flex-end;">
+            <div class="section-separator"><span>Repositorio de Consultas</span></div>
+
+            <div class="card" style="background: #f1f5f9; padding: 1.25rem; margin-bottom: 1.5rem; border: 1px solid #cbd5e1;">
+                <h4 style="margin: 0 0 0.75rem 0; color: #334155; font-size: 14px;">🔍 Clasificación y Filtros Integrados:</h4>
+                <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.5rem; margin-bottom: 0; align-items: flex-end;">
                     <div>
                         <label style="margin-bottom:2px;">Categoría:</label>
                         <select id="filter-doc-tipo" onchange="actualizarSubtipos('filter'); filtrarDocumentos();"></select>
@@ -286,20 +316,19 @@
                     </div>
                     <div>
                         <label style="margin-bottom:2px;">Buscar por nombre:</label>
-                        <input type="text" id="filter-doc-name" placeholder="Buscar palabra clave..." oninput="filtrarDocumentos()">
+                        <input type="text" id="filter-doc-name" placeholder="Palabra clave..." oninput="filtrarDocumentos()">
                     </div>
                     <div>
-                        <label style="margin-bottom:2px;">Filtrar por Fecha Doc.:</label>
+                        <label style="margin-bottom:2px;">Filtrar por Fecha:</label>
                         <input type="date" id="filter-doc-date" onchange="filtrarDocumentos()">
                     </div>
                     <div>
-                        <button type="button" class="btn-action btn-clear" style="width: 100%; padding: 10px; margin: 0;" onclick="limpiarFiltros()">🧹 Limpiar Filtros</button>
+                        <button type="button" class="btn-action btn-clear" style="width: 100%; padding: 10px; margin: 0; border-radius: 6px; font-weight: 600;" onclick="limpiarFiltros()">🧹 Limpiar</button>
                     </div>
                 </div>
             </div>
 
-            
-            <h3>Documentos Clasificados por Periodo</h3>
+            <h3 style="color: #1e293b; font-size: 18px; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">📁 Documentos Clasificados por Periodo</h3>
             <div class="table-responsive">
                 <table>
                     <thead>
@@ -349,6 +378,29 @@
             "Certificado de Competencia": ["General / Único"],
             "Acta de EPP's": ["General / Único"],
             "Memorándum": ["General / Único"]
+        };
+
+        // Diccionario de Vectores Ilustrativos (SVG) mapeados a cada Categoría
+        const vectoresIconos = {
+            "Contratación": `<svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>`,
+            "Vacaciones": `<svg viewBox="0 0 24 24"><path d="M14 6V4h-4v2h4zM4 8v11c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2H6c-1.1 0-2 .9-2 2zm11 5h-2v2h-2v-2H9v-2h2V9h2v2h2v2z"/></svg>`,
+            "Certificado de Competencia": `<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 12 10 10-4.48 10-12S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>`,
+            "Acta de EPP's": `<svg viewBox="0 0 24 24"><path d="M12 22c5.52 0 10-4.48 10-10S17.52 2 12 2 2 6.48 2 12s4.48 10 12 10zm1-15h2v6h-2V7zm0 8h2v2h-2v-2z"/></svg>`,
+            "Certificados Médicos": `<svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4 11h-2v2h-2v-2H9v-2h2V9h2v2h2v2z"/></svg>`,
+            "Certificados de Aptitud": `<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 12 10 10-4.48 10-12S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>`,
+            "Certificados": `<svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>`,
+            "Memorándum": `<svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-3 12H7v-2h10v2zm0-3H7V9h10v2zm0-3H7V6h10v2z"/></svg>`,
+            "Certificados y Cargas Familiares": `<svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 1.34 5 3s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>`,
+            "Desvinculación": `<svg viewBox="0 0 24 24"><path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>`,
+            
+            // Especiales Médicos
+            "Certificado médico": `<svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4 11h-2v2h-2v-2H9v-2h2V9h2v2h2v2z"/></svg>`,
+            "Aptitud Médica": `<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 12 10 10-4.48 10-12S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>`,
+            
+            // Especiales Kelvin
+            "Certificado de Competencia Laboral": `<svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>`,
+            "Certificado Técnico Operaciones": `<svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>`,
+            "Acta de Entrega EPP": `<svg viewBox="0 0 24 24"><path d="M12 22c5.52 0 10-4.48 10-10S17.52 2 12 2 2 6.48 2 12s4.48 10 12 10zm1-15h2v6h-2V7zm0 8h2v2h-2v-2z"/></svg>`
         };
 
         function actualizarSubtipos(contexto) {
@@ -519,68 +571,100 @@
         }
 
         // --- MANEJO DEL EXPEDIENTE DIGITAL DINÁMICO ---
-        
-// --- MANEJO DEL EXPEDIENTE DIGITAL DINÁMICO ---
 
-// --- MANEJO DEL EXPEDIENTE DIGITAL DINÁMICO ---
+        async function abrirExpediente(id, nombre, cedula, esPasivo) {
+            currentSelectedUserId = id;
+            currentSelectedUserPasivo = esPasivo;
+            currentSelectedUserName = nombre;
 
-async function abrirExpediente(id, nombre, cedula, esPasivo) {
-    currentSelectedUserId = id;
-    currentSelectedUserPasivo = esPasivo;
-    currentSelectedUserName = nombre;
+            document.getElementById('modal-emp-name').innerText = `Expediente: ${nombre}`;
+            document.getElementById('modal-emp-cedula').innerText = cedula;
 
-    document.getElementById('modal-emp-name').innerText = `Expediente: ${nombre}`;
-    document.getElementById('modal-emp-cedula').innerText = cedula;
+            document.getElementById('form-upload-doc').reset();
+            
+            // Forzar el vaciado del input oculto de tipo para evitar herencias erróneas de clics previos
+            document.getElementById('upload-tipo-doc').value = '';
 
-    document.getElementById('form-upload-doc').reset();
+            const selectFilter = document.getElementById('filter-doc-tipo');
+            
+            let opcionesArray = [];
 
-    const selectTipo = document.getElementById('upload-tipo-doc');
-    const selectFilter = document.getElementById('filter-doc-tipo');
-    
-    let opcionesHTML = "";
+            if (rol === 'admin') {
+                opcionesArray = [
+                    "Contratación", "Vacaciones", "Certificado de Competencia", 
+                    "Acta de EPP's", "Certificados Médicos", "Certificados de Aptitud", 
+                    "Certificados", "Memorándum", "Certificados y Cargas Familiares"
+                ];
+                if (esPasivo) {
+                    opcionesArray.push("Desvinculación");
+                }
+            } else if (rol === 'doc') {
+                opcionesArray = ["Certificado médico", "Aptitud Médica"];
+            } else if (rol === 'kelvin') {
+                opcionesArray = ["Certificado de Competencia Laboral", "Certificado Técnico Operaciones", "Acta de Entrega EPP"];
+            }
 
-    if (rol === 'admin') {
-        opcionesHTML = `
-            <option value="Contratación">Contratación</option>
-            <option value="Vacaciones">Vacaciones</option>
-            <option value="Certificado de Competencia">Certificado de Competencia</option>
-            <option value="Acta de EPP's">Acta de EPP's</option>
-            <option value="Certificados Médicos">Certificados Médicos</option>
-            <option value="Certificados de Aptitud">Certificados de Aptitud</option>
-            <option value="Certificados">Certificados (Laborales/Honorabilidad)</option>
-            <option value="Memorándum">Memorándum</option>
-            <option value="Certificados y Cargas Familiares">Certificados y Cargas Familiares</option>
-        `;
-        if (esPasivo) {
-            opcionesHTML += `<option value="Desvinculación">Desvinculación</option>`;
+            // 1. Inyectar dinámicamente las tarjetas vectoriales animadas en el contenedor superior
+            const vectorContainer = document.getElementById('vector-container');
+            if (vectorContainer) {
+                vectorContainer.innerHTML = '';
+                opcionesArray.forEach(tipo => {
+                    const SVGString = vectoresIconos[tipo] || `<svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>`;
+                    let labelMostrar = tipo;
+                    if(tipo === "Certificados") labelMostrar = "Certificados (Lab/Hon)";
+                    
+                    vectorContainer.innerHTML += `
+                        <div class="vector-card" id="card-vector-${tipo.replace(/\s+/g, '-')}" onclick="seleccionarCategoriaVector('${tipo}')">
+                            ${SVGString}
+                            <span>${labelMostrar}</span>
+                        </div>
+                    `;
+                });
+            }
+
+            // 2. Mantener la lógica idéntica para el select de filtros inferior
+            selectFilter.innerHTML = '';
+            opcionesArray.forEach(tipo => {
+                let labelMostrar = tipo;
+                if(tipo === "Certificados") labelMostrar = "Certificados (Laborales/Honorabilidad)";
+                if(tipo === "Certificado médico" && rol === 'doc') labelMostrar = "Certificados Médicos";
+                if(tipo === "Aptitud Médica" && rol === 'doc') labelMostrar = "Certificados de Aptitud";
+                selectFilter.innerHTML += `<option value="${tipo}">${labelMostrar}</option>`;
+            });
+
+            // Forzar actualización inicial de filtros abajo
+            actualizarSubtipos('filter');
+
+            document.getElementById('filter-doc-name').value = '';
+            document.getElementById('filter-doc-date').value = '';
+
+            await obtenerDocumentosServidor();
+            document.getElementById('modal-expediente').style.display = 'flex';
         }
-    } else if (rol === 'doc') {
-        // SOLUCIÓN: Ajustamos los 'value' exactos que el backend intercepta para docus_medicos y certificados_aptitud
-        opcionesHTML = `
-            <option value="Certificado médico">Certificados Médicos</option>
-            <option value="Aptitud Médica">Certificados de Aptitud</option>
-        `;
-    } else if (rol === 'kelvin') {
-        opcionesHTML = `
-            <option value="Certificado de Competencia Laboral">Certificado de Competencia Laboral</option>
-            <option value="Certificado Técnico Operaciones">Certificado Técnico Operaciones</option>
-            <option value="Acta de Entrega EPP">Acta de Entrega EPP</option>
-        `;
-    }
 
-    selectTipo.innerHTML = opcionesHTML;
-    selectFilter.innerHTML = opcionesHTML;
+        // Nueva función auxiliar para coordinar la selección mediante tarjetas vectoriales
+        function seleccionarCategoriaVector(tipoSeleccionado) {
+            // Limpiar la clase de selección previa de todas las tarjetas vectoriales
+            document.querySelectorAll('.vector-card').forEach(card => card.classList.remove('selected'));
+            
+            // Asignar clase activa a la tarjeta seleccionada
+            const idTarjeta = `card-vector-${tipoSeleccionado.replace(/\s+/g, '-')}`;
+            const tarjetaActiva = document.getElementById(idTarjeta);
+            if(tarjetaActiva) tarjetaActiva.classList.add('selected');
 
-    // Forzar la actualización inicial de los subtipos (Carga y Filtros)
-    actualizarSubtipos('upload');
-    actualizarSubtipos('filter');
+            // Sincronizar el input oculto que procesará el envío
+            document.getElementById('upload-tipo-doc').value = tipoSeleccionado;
 
-    document.getElementById('filter-doc-name').value = '';
-    document.getElementById('filter-doc-date').value = '';
-
-    await obtenerDocumentosServidor();
-    document.getElementById('modal-expediente').style.display = 'flex';
-}
+            // Actualizar dinámicamente el selector de subtipos del formulario superior
+            const selectSubtipoUpload = document.getElementById('upload-subtipo-doc');
+            if (selectSubtipoUpload) {
+                selectSubtipoUpload.innerHTML = '';
+                const listaSubtipos = mapaSubtipos[tipoSeleccionado] || ["General / Único"];
+                listaSubtipos.forEach(sub => {
+                    selectSubtipoUpload.innerHTML += `<option value="${sub}">${sub}</option>`;
+                });
+            }
+        }
 
         async function obtenerDocumentosServidor() {
             let endpoint = '';
@@ -685,9 +769,7 @@ async function abrirExpediente(id, nombre, cedula, esPasivo) {
             });
         }
 
-
-
-function limpiarFiltros() {
+        function limpiarFiltros() {
             // Restablecer subcategoría a TODOS
             const selectSubtipo = document.getElementById('filter-doc-subtipo');
             if (selectSubtipo) selectSubtipo.value = 'TODOS';
@@ -703,6 +785,13 @@ function limpiarFiltros() {
         async function procesarSubidaDocumento(e) {
             e.preventDefault();
             const tipoDoc = document.getElementById('upload-tipo-doc').value;
+            
+            // Validación estricta para asegurar que se ha seleccionado una de tus nuevas tarjetas vectoriales
+            if (!tipoDoc) {
+                alert("Por favor, elija primero un Tipo de Documento haciendo clic en los vectores ilustrados arriba.");
+                return;
+            }
+
             const subtipoDoc = document.getElementById('upload-subtipo-doc') ? document.getElementById('upload-subtipo-doc').value : 'General / Único';
             const fechaDoc = document.getElementById('upload-doc-date').value;
             const periodoDoc = document.getElementById('upload-doc-period').value; 
@@ -717,7 +806,7 @@ function limpiarFiltros() {
 
             const formData = new FormData();
             formData.append('tipo_documento', tipoDoc);
-            formData.append('subtipo_documento', subtipoDoc); // Inyección de la nueva variable
+            formData.append('subtipo_documento', subtipoDoc); 
             formData.append('usuario_id', currentSelectedUserId);
             formData.append('archivo', archivoInput);
             formData.append('nombre_archivo', archivoInput.name); 
@@ -741,6 +830,10 @@ function limpiarFiltros() {
                     alert("Archivo PDF indexado y guardado correctamente por periodo.");
                     document.getElementById('form-upload-doc').reset();
                     
+                    // Quitar iluminación de la tarjeta vectorial seleccionada tras una subida exitosa
+                    document.querySelectorAll('.vector-card').forEach(card => card.classList.remove('selected'));
+                    document.getElementById('upload-tipo-doc').value = '';
+
                     document.getElementById('filter-doc-tipo').value = tipoDoc;
                     actualizarSubtipos('filter');
                     
@@ -829,6 +922,6 @@ function limpiarFiltros() {
                 });
             } catch (err) { console.error(err); }
         }
-    </script>
+</script>
 </body>
 </html>
