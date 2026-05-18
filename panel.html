@@ -116,7 +116,6 @@
             <div id="view-activos" class="view-section active">
                 <div class="card">
                     <h3>Nómina General Activa</h3>
-                    <p style="color: #64748b; font-size: 13px; margin: 0 0 10px 0;">💡 <strong>Tip:</strong> Haz doble clic sobre cualquier fila de un empleado para abrir directamente su expediente digital.</p>
                     <div class="table-responsive">
                         <table>
                             <thead>
@@ -138,7 +137,6 @@
             <div id="view-pasivos" class="view-section">
                 <div class="card">
                     <h3>Historial de Personal Pasivo (Inactivos)</h3>
-                    <p style="color: #64748b; font-size: 13px; margin: 0 0 10px 0;">💡 <strong>Tip:</strong> Haz doble clic sobre cualquier fila de un empleado para abrir directamente su expediente digital.</p>
                     <div class="table-responsive">
                         <table>
                             <thead>
@@ -148,6 +146,7 @@
                                     <th>Cédula</th>
                                     <th>Correo</th>
                                     <th>Celular</th>
+                                    <th>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="tbody-pasivos"></tbody>
@@ -277,52 +276,11 @@
                         </button>
                         <h3 id="detalle-categoria-titulo" style="margin: 0; color: #1e293b; font-size: 18px;">Carpeta</h3>
                     </div>
-                </div>
-
-                <div class="card" style="background: #f1f5f9; padding: 1.25rem; margin-bottom: 1.5rem; border: 1px solid #cbd5e1;">
-                    <h4 style="margin: 0 0 0.75rem 0; color: #334155; font-size: 14px;">🔍 Filtros Integrados:</h4>
-                    <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.5rem; margin-bottom: 0; align-items: flex-end;">
-                        <div style="display: none;">
-                            <label style="margin-bottom:2px;">Categoría:</label>
-                            <select id="filter-doc-tipo" onchange="actualizarSubtipos('filter'); filtrarDocumentos();"></select>
-                        </div>
-                        <div>
-                            <label style="margin-bottom:2px;">Subcategoría:</label>
-                            <select id="filter-doc-subtipo" onchange="filtrarDocumentos()">
-                                <option value="TODOS">-- Todos --</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label style="margin-bottom:2px;">Filtrar por Periodo (AAAA o AAAA-MM):</label>
-                            <input type="text" id="filter-doc-period" placeholder="Ej: 2026 o 2026-05" oninput="filtrarDocumentos()">
-                        </div>
-                        <div>
-                            <button type="button" class="btn-action btn-clear" style="width: 100%; padding: 10px; margin: 0; border-radius: 6px; font-weight: 600;" onclick="limpiarFiltros()">🧹 Limpiar</button>
-                        </div>
+                    <div>
+                        <button type="button" class="btn-action btn-upload" onclick="toggleUploadForm()" style="padding: 10px 20px; font-size: 14px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 0;">
+                            ➕ Subir Nuevo Documento
+                        </button>
                     </div>
-                </div>
-
-                <h3 style="color: #1e293b; font-size: 18px; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">📁 Documentos Clasificados por Periodo</h3>
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Categoría</th>
-                                <th>Nombre de Archivo</th>
-                                <th>Subido Por</th>
-                                <th>Fecha Doc.</th>
-                                <th>Ver</th>
-                                <th class="role-admin">Eliminar</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbody-docs-empleado"></tbody>
-                    </table>
-                </div>
-
-                <div style="margin-top: 1.5rem; margin-bottom: 1rem;">
-                    <button type="button" class="btn-action btn-upload" onclick="toggleUploadForm()" style="padding: 10px 20px; font-size: 14px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                        ➕ Subir Nuevo Documento
-                    </button>
                 </div>
 
                 <form id="form-upload-doc" onsubmit="procesarSubidaDocumento(event)" style="display: none; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; margin-top: 0.5rem; margin-bottom: 2rem;">
@@ -350,6 +308,44 @@
                         <button type="submit" class="btn-submit" style="padding:10px 24px; font-size:14px; border-radius: 8px;">🚀 Indexar y Subir Archivo</button>
                     </div>
                 </form>
+
+                <h3 style="color: #1e293b; font-size: 18px; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">📁 Documentos Clasificados por Periodo</h3>
+                <div class="table-responsive" style="max-height: 400px; overflow-y: auto; border: 1px solid #cbd5e1; border-radius: 8px;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th style="position: sticky; top: 0; background: #f1f5f9; z-index: 10;">Nombre de Archivo</th>
+                                <th style="position: sticky; top: 0; background: #f1f5f9; z-index: 10;">Fecha Doc.</th>
+                                <th style="position: sticky; top: 0; background: #f1f5f9; z-index: 10;">Ver</th>
+                                <th class="role-admin" style="position: sticky; top: 0; background: #f1f5f9; z-index: 10;">Eliminar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-docs-empleado"></tbody>
+                    </table>
+                </div>
+
+                <div class="card" style="background: #f1f5f9; padding: 1.25rem; margin-top: 1.5rem; margin-bottom: 1.5rem; border: 1px solid #cbd5e1;">
+                    <h4 style="margin: 0 0 0.75rem 0; color: #334155; font-size: 14px;">🔍 Filtros Integrados:</h4>
+                    <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.5rem; margin-bottom: 0; align-items: flex-end;">
+                        <div style="display: none;">
+                            <label style="margin-bottom:2px;">Categoría:</label>
+                            <select id="filter-doc-tipo" onchange="actualizarSubtipos('filter'); filtrarDocumentos();"></select>
+                        </div>
+                        <div>
+                            <label style="margin-bottom:2px;">Subcategoría:</label>
+                            <select id="filter-doc-subtipo" onchange="filtrarDocumentos()">
+                                <option value="TODOS">-- Todos --</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="margin-bottom:2px;">Filtrar por Periodo (Mes/Año):</label>
+                            <input type="month" id="filter-doc-period" onchange="filtrarDocumentos()">
+                        </div>
+                        <div>
+                            <button type="button" class="btn-action btn-clear" style="width: 100%; padding: 10px; margin: 0; border-radius: 6px; font-weight: 600;" onclick="limpiarFiltros()">🧹 Limpiar</button>
+                        </div>
+                    </div>
+                </div>
 
             </div> 
         </div>
@@ -439,25 +435,19 @@
         }
 
         function formatearNombre(texto) {
-            return text
+            return texto
                 .toLowerCase()
                 .replace(/(^|\s)\S/g, (match) => match.toUpperCase());
         }
 
         function limpiarEspaciosNombre(texto) {
-            return text
+            return texto
                 .trim()
                 .replace(/\s+/g, ' ');
         }
 
         function obtenerNombreMesEspanol(periodoStr) {
-            if (!periodoStr) return "Periodo General / Antiguos";
-            
-            // Si solo es el año (ej. "2026")
-            if (!periodoStr.includes('-')) {
-                return `📅 Año Histórico: ${periodoStr}`;
-            }
-
+            if (!periodoStr || !periodoStr.includes('-')) return "Periodo General / Antiguos";
             const [anio, mes] = periodoStr.split('-');
             const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
             const index = parseInt(mes, 10) - 1;
@@ -539,7 +529,8 @@
                             <td>${emp.correo}</td>
                             <td>${emp.celular || 'S/N'}</td>
                             <td>
-                                ${rol === 'admin' ? `<button class="btn-action btn-passive" onclick="moverAPasivo('${emp.id}')">⚠️ Liquidar / Mover Pasivo</button>` : '<span style="color:#64748b; font-size:12px;">Doble clic para abrir</span>'}
+                                <button class="btn-action btn-view" onclick="abrirExpediente('${emp.id}', '${emp.nombre_completo}', '${emp.cedula}', false)">📂 Ver Carpeta</button>
+                                ${rol === 'admin' ? `<button class="btn-action btn-passive" onclick="moverAPasivo('${emp.id}')">⚠️ Liquidar / Mover Pasivo</button>` : ''}
                             </td>
                         </tr>`;
                 });
@@ -561,6 +552,9 @@
                             <td>${emp.cedula}</td>
                             <td>${emp.correo}</td>
                             <td>${emp.celular || 'S/N'}</td>
+                            <td>
+                                <button class="btn-action btn-view" onclick="abrirExpediente('${emp.id}', '${emp.nombre_completo}', '${emp.cedula}', true)">📂 Ver Carpeta</button>
+                            </td>
                         </tr>`;
                 });
             } catch (err) { console.error("Error cargando pasivos:", err); }
@@ -732,81 +726,54 @@
                 if (!Array.isArray(documentosActuales)) documentosActuales = [];
                 filtrarDocumentos(); 
             } catch (err) { 
-                document.getElementById('tbody-docs-empleado').innerHTML = '<tr><td colspan="6" style="color:red;">Error al enlazar datos de almacenamiento remoto.</td></tr>'; 
+                document.getElementById('tbody-docs-empleado').innerHTML = '<tr><td colspan="4" style="color:red;">Error al enlazar datos de almacenamiento remoto.</td></tr>'; 
             }
         }
 
         function filtrarDocumentos() {
             const tipoSeleccionado = document.getElementById('filter-doc-tipo').value;
             const subtipoSeleccionado = document.getElementById('filter-doc-subtipo') ? document.getElementById('filter-doc-subtipo').value : 'TODOS';
-            const valPeriodo = document.getElementById('filter-doc-period') ? document.getElementById('filter-doc-period').value.trim() : '';
+            const valPeriodo = document.getElementById('filter-doc-period') ? document.getElementById('filter-doc-period').value : '';
 
             const docsFiltrados = documentosActuales.filter(doc => {
                 const matchTipo = (doc.tipo_documento === tipoSeleccionado);
                 const matchSubtipo = (subtipoSeleccionado === 'TODOS' || doc.subtipo_documento === subtipoSeleccionado);
                 
                 const docPeriodo = doc.periodo || (doc.fecha_documento || doc.created_at || '').substring(0, 7) || '';
-                
-                // Lógica de filtrado inteligente: coincide si empieza con lo escrito (sirve para AAAA y para AAAA-MM)
-                const matchPeriodo = valPeriodo === '' || docPeriodo.startsWith(valPeriodo);
+                const matchPeriodo = valPeriodo === '' || docPeriodo === valPeriodo;
 
                 return matchTipo && matchSubtipo && matchPeriodo;
             });
 
-            const gruposPorPeriodo = {};
-            docsFiltrados.forEach(doc => {
-                const periodo = doc.periodo || (doc.fecha_documento || doc.created_at || '').substring(0, 7) || 'Sin Periodo';
-                if (!gruposPorPeriodo[periodo]) {
-                    gruposPorPeriodo[periodo] = [];
-                }
-                gruposPorPeriodo[periodo].push(doc);
-            });
-
-            const periodosOrdenados = Object.keys(gruposPorPeriodo).sort((a, b) => b.localeCompare(a));
-
-            dibujarTablaAgrupada(gruposPorPeriodo, periodosOrdenados);
+            dibujarTablaAgrupada(docsFiltrados);
         }
 
-        function dibujarTablaAgrupada(grupos, periodos) {
+        function dibujarTablaAgrupada(docsFiltrados) {
             const tbody = document.getElementById('tbody-docs-empleado');
             tbody.innerHTML = '';
 
-            if (periodos.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#94a3b8; padding: 2rem;">No se registran archivos en esta categoría para los criterios buscados.</td></tr>';
+            if (docsFiltrados.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#94a3b8; padding: 2rem;">No se registran archivos en esta categoría para los criterios buscados.</td></tr>';
                 return;
             }
 
-            periodos.forEach(periodo => {
-                const nombreMesCabecera = obtenerNombreMesEspanol(periodo);
+            docsFiltrados.forEach(doc => {
+                const fechaRaw = doc.fecha_documento || doc.created_at;
+                const fechaFormateada = fechaRaw ? new Date(fechaRaw).toLocaleDateString('es-EC', {day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC'}) : 'S/F';
+                
+                const puedeEliminar = (rol === 'admin' || rol === 'doc');
+                const nombreArchivoMostrar = doc.nombre_archivo || `${doc.tipo_documento}.pdf`;
+
                 tbody.innerHTML += `
-                    <tr class="row-periodo-header">
-                        <td colspan="6" style="padding: 8px 16px; font-weight: 700; font-size:14px; letter-spacing: 0.5px;">
-                            ${nombreMesCabecera}
+                    <tr>
+                        <td style="max-width: 450px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${nombreArchivoMostrar}">
+                            <span style="font-size: 16px; margin-right: 6px; vertical-align: middle;">📕</span>
+                            <span style="font-size: 14px; color: #1e293b; font-weight: 500; vertical-align: middle;">${nombreArchivoMostrar}</span>
                         </td>
-                    </tr>
-                `;
-
-                grupos[periodo].forEach(doc => {
-                    const fechaRaw = doc.fecha_documento || doc.created_at;
-                    const fechaFormateada = fechaRaw ? new Date(fechaRaw).toLocaleDateString('es-EC', {day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC'}) : 'S/F';
-                    
-                    const puedeEliminar = (rol === 'admin' || rol === 'doc');
-                    const nombreArchivoMostrar = doc.nombre_archivo || `${doc.tipo_documento}.pdf`;
-                    
-                    const subTag = doc.subtipo_documento ? ` ➡️ <small style="color:#0284c7; font-weight:600; background:#e0f2fe; padding:2px 6px; border-radius:4px;">${doc.subtipo_documento}</small>` : '';
-
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>📁 <span>${doc.tipo_documento}${subTag}</span></td>
-                            <td style="font-size:14px; color:#1e293b; font-weight: 500; max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${nombreArchivoMostrar}">
-                                ${nombreArchivoMostrar}
-                            </td>
-                            <td><span style="font-size:13px;" class="user-badge">${doc.nombre_user || 'Sistema'}</span></td>
-                            <td><strong>${fechaFormateada}</strong></td>
-                            <td><a href="${doc.url_cloudinary}" target="_blank" class="btn-action btn-view">👁️ Descargar</a></td>
-                            ${puedeEliminar ? `<td><button class="btn-action btn-delete" onclick="eliminarDocumento('${doc.id}')">❌</button></td>` : '<td>-</td>'}
-                        </tr>`;
-                });
+                        <td><strong>${fechaFormateada}</strong></td>
+                        <td><a href="${doc.url_cloudinary}" target="_blank" class="btn-action btn-view">👁️ Descargar</a></td>
+                        ${puedeEliminar ? `<td><button class="btn-action btn-delete" onclick="eliminarDocumento('${doc.id}')">❌</button></td>` : '<td>-</td>'}
+                    </tr>`;
             });
         }
 
@@ -841,18 +808,23 @@
                 return;
             }
 
+            // 1. Extraer automáticamente el periodo (YYYY-MM) de la fecha seleccionada
             const periodoDoc = fechaDoc ? fechaDoc.substring(0, 7) : null;
 
+            // 2. Formatear y sanear el subtipo (ej. "Aviso de entrada" -> "aviso_de_entrada")
             const subtipoSaneado = subtipoDoc.toLowerCase().trim()
-                .normalize("NFD").replace(/[\u0300-\u036f]/g, "") 
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remueve acentos tildes de forma segura
                 .replace(/\s+/g, '_')
                 .replace(/[^a-z0-9_]/g, '');
 
+            // 3. Formatear la fecha del calendario (YYYY-MM-DD) a DD_MM_YYYY
             const [anio, mes, dia] = fechaDoc.split('-');
             const fechaFormateadaNombre = `${dia}_${mes}_${anio}`;
 
+            // 4. Crear el nuevo nombre del archivo estructurado
             const nuevoNombreArchivo = `${subtipoSaneado}_${fechaFormateadaNombre}.pdf`;
 
+            // 5. Instanciar un nuevo objeto File con el nombre personalizado para enviarlo a Cloudinary
             const archivoRenombrado = new File([archivoInput], nuevoNombreArchivo, { type: archivoInput.type });
 
             const formData = new FormData();
