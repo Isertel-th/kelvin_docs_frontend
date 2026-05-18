@@ -229,7 +229,7 @@
     </div>
 
 <div id="modal-expediente" class="modal">
-        <div class="modal-content" style="max-width: 850px;">
+        <div class="modal-content">
             <span class="close-modal" onclick="cerrarModal()">&times;</span>
             <h2 id="modal-emp-name">Expediente Digital</h2>
             <p style="font-weight: bold; color:#64748b;">Cédula: <span id="modal-emp-cedula"></span></p>
@@ -237,50 +237,51 @@
             <div class="card" style="background: #f8fafc; border: 1px solid #e2e8f0;">
                 <h4 style="margin-top:0; color:#334155;">Cargar nuevo archivo a este expediente</h4>
                 <form id="form-upload-doc" onsubmit="procesarSubidaDocumento(event)">
-                    <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+                    <div class="grid-form">
                         <div>
-                            <label>Tipo Documento:</label>
-                            <select id="upload-tipo-doc" required onchange="actualizarPeriodoRequerido()"></select>
-                        </div>
-                        <div>
-                            <label>Fecha del Documento:</label>
-                            <input type="date" id="upload-fecha-doc" required>
-                        </div>
-                        <div>
-                            <label>Periodo / Mes:</label>
-                            <select id="upload-periodo-doc" required>
-                                <option value="">Seleccione Mes...</option>
-                                <option value="Enero">Enero</option>
-                                <option value="Febrero">Febrero</option>
-                                <option value="Marzo">Marzo</option>
-                                <option value="Abril">Abril</option>
-                                <option value="Mayo">Mayo</option>
-                                <option value="Junio">Junio</option>
-                                <option value="Julio">Julio</option>
-                                <option value="Agosto">Agosto</option>
-                                <option value="Septiembre">Septiembre</option>
-                                <option value="Octubre">Octubre</option>
-                                <option value="Noviembre">Noviembre</option>
-                                <option value="Diciembre">Diciembre</option>
-                            </select>
+                            <label>Seleccionar Tipo Documento:</label>
+                            <select id="upload-tipo-doc" required></select>
                         </div>
                         <div>
                             <label>Archivo (Solo PDF):</label>
                             <input type="file" id="upload-file" accept=".pdf" required>
                         </div>
                     </div>
-                    <button type="submit" class="btn-submit" style="padding:8px 16px; font-size:14px; margin-top: 10px;">Subir Archivo</button>
+                    <button type="submit" class="btn-submit" style="padding:8px 16px; font-size:14px;">Subir Archivo</button>
                 </form>
             </div>
 
-            <h4 style="margin-bottom: 0.5rem; color: #334155;">📁 Seleccione Tipo de Documento para visualizar:</h4>
-            <div id="tipo-doc-tabs" style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 1.5rem;">
+            <div class="card" style="background: #f1f5f9; padding: 1rem; margin-bottom: 1rem;">
+                <h4 style="margin: 0 0 0.5rem 0; color: #475569; font-size: 14px;">🔍 Filtrar documentos en esta carpeta:</h4>
+                <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.5rem; margin-bottom: 0;">
+                    <div>
+                        <input type="text" id="filter-doc-name" placeholder="Buscar por nombre de archivo..." oninput="filtrarDocumentos()">
+                    </div>
+                    <div>
+                        <input type="date" id="filter-doc-date" onchange="filtrarDocumentos()">
+                    </div>
+                    <div>
+                        <button type="button" class="btn-action" style="background:#94a3b8; color:white; padding:10px; width:100%;" onclick="limpiarFiltrosExpediente()">Limpiar Filtros</button>
+                    </div>
                 </div>
+            </div>
 
-            <h3>Documentos en Carpeta: <span id="txt-tipo-seleccionado" style="color: var(--primary-color);">Seleccione un tipo</span></h3>
-            <div id="contenedor-expediente-grupos">
-                </div>
-
+            <h3>Documentos en su Carpeta</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tipo de Documento</th>
+                            <th>Nombre de Archivo</th>
+                            <th>Subido Por</th>
+                            <th>Fecha</th>
+                            <th>Ver</th>
+                            <th class="role-admin">Eliminar</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-docs-empleado"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -294,8 +295,7 @@
         let currentSelectedUserId = null;
         let currentSelectedUserPasivo = false;
         let currentSelectedUserName = "";
-        let documentosActuales = []; // Todos los documentos del servidor
-        let tipoDocumentoActivo = ""; // Almacena qué pestaña está seleccionada
+        let documentosActuales = [];
 
 // ========================================================
         // AQUÍ PUEDES COLOCAR LAS NUEVAS FUNCIONES UTILITARIAS:
@@ -460,70 +460,51 @@ async function abrirExpediente(id, nombre, cedula, esPasivo) {
 
             document.getElementById('modal-emp-name').innerText = `Expediente: ${nombre}`;
             document.getElementById('modal-emp-cedula').innerText = cedula;
-            document.getElementById('form-upload-doc').reset();
-            document.getElementById('upload-fecha-doc').value = new Date().toISOString().split('T')[0];
+
             // Limpiar los inputs de filtros al abrir un nuevo expediente
             limpiarFiltrosExpediente();
 
             // Configurar Selector de tipos de documento permitido según ROL logeado
             const selectTipo = document.getElementById('upload-tipo-doc');
-            selectTipo.innerHTML = '<option value="">Seleccione tipo...</option>';
+            selectTipo.innerHTML = '';
 
-let opciones = [];
             if (rol === 'admin') {
-                opciones = ["Contratación", "Vacaciones", "Certificado de Competencia", "Acta de EPP's", "Certificados Médicos", "Certificados de Aptitud", "Memorándum", "Certificados y Cargas Familiares"];
-                if (esPasivo) opciones.push("Desvinculación");
+                let opcionesAdmin = `
+                    <option value="Contratación">Contratación</option>
+                    <option value="Vacaciones">Vacaciones</option>
+                    <option value="Certificado de Competencia">Certificado de Competencia</option>
+                    <option value="Acta de EPP's">Acta de EPP's</option>
+                    <option value="Certificados Médicos">Certificados Médicos</option>
+                    <option value="Certificados de Aptitud">Certificados de Aptitud</option>
+                    <option value="Memorándum">Memorándum</option>
+                    <option value="Certificados y Cargas Familiares">Certificados y Cargas Familiares</option>
+                `;
+
+                if (esPasivo) {
+                    opcionesAdmin += `<option value="Desvinculación">Desvinculación</option>`;
+                }
+                selectTipo.innerHTML = opcionesAdmin;
+
             } else if (rol === 'doc') {
-                opciones = ["Ficha Médica Ocupacional", "Aptitud Médica Ingreso", "Aptitud Médica Periódico", "Certificado médico", "Reposo médico"];
+                selectTipo.innerHTML = `
+                    <option value="Ficha Médica Ocupacional">Ficha Médica Ocupacional</option>
+                    <option value="Aptitud Médica Ingreso">Aptitud Médica Ingreso</option>
+                    <option value="Aptitud Médica Periódico">Aptitud Médica Periódico</option>
+                    <option value="Certificado médico">Certificado médico / Atención</option>
+                    <option value="Reposo médico">Reposo médico validado</option>
+                `;
             } else if (rol === 'kelvin') {
-                opciones = ["Certificado de Competencia Laboral", "Certificado Técnico Operaciones", "Acta de Entrega EPP"];
+                selectTipo.innerHTML = `
+                    <option value="Certificado de Competencia Laboral">Certificado de Competencia Laboral</option>
+                    <option value="Certificado Técnico Operaciones">Certificado Técnico Operaciones</option>
+                    <option value="Acta de Entrega EPP">Acta de Entrega EPP</option>
+                `;
             }
 
-            opciones.forEach(opt => {
-                selectTipo.innerHTML += `<option value="${opt}">${opt}</option>`;
-            });
-
-            // Generar los botones/pestañas de filtrado dinámico en el modal
-            const tabsContenedor = document.getElementById('tipo-doc-tabs');
-            tabsContenedor.innerHTML = '';
-            opciones.forEach((opt, index) => {
-                tabsContenedor.innerHTML += `
-                    <button class="btn-action" id="tab-${index}" style="background: #e2e8f0; color: #475569; border: 1px solid #cbd5e1;" onclick="seleccionarPestañaTipo('${opt}', 'tab-${index}')">
-                        ${opt}
-                    </button>`;
-            });
-
-            // Resetear vistas de filtros
-            tipoDocumentoActivo = opciones[0] || ""; 
-            document.getElementById('txt-tipo-seleccionado').innerText = tipoDocumentoActivo;
-
-            // Consultar documentos al servidor
+            // Consultar y guardar los documentos desde el servidor
             await obtenerDocumentosServidor();
-            
-            // Activar visualmente la primera pestaña por defecto
-            if(opciones.length > 0) seleccionarPestañaTipo(opciones[0], 'tab-0');
 
             document.getElementById('modal-expediente').style.display = 'flex';
-        }
-
-        function seleccionarPestañaTipo(tipo, tabId) {
-            tipoDocumentoActivo = tipo;
-            document.getElementById('txt-tipo-seleccionado').innerText = tipo;
-
-            // Estilos visuales de pestañas inactivas
-            document.querySelectorAll('#tipo-doc-tabs button').forEach(btn => {
-                btn.style.background = '#e2e8f0';
-                btn.style.color = '#475569';
-            });
-            // Estilo de pestaña activa
-            const botonActivo = document.getElementById(tabId);
-            if(botonActivo) {
-                botonActivo.style.background = 'var(--primary-color)';
-                botonActivo.style.color = 'white';
-            }
-
-            // Filtrar y renderizar agrupando por mes
-            renderizarDocumentosAgrupados();
         }
 
         async function obtenerDocumentosServidor() {
@@ -538,102 +519,79 @@ let opciones = [];
 
             try {
                 const res = await fetch(endpoint, { headers: { 'Authorization': `Bearer ${token}` } });
-                documentosActuales = await res.json();
+                documentosActuales = await res.json(); // Guardamos en la variable global
                 if (!Array.isArray(documentosActuales)) documentosActuales = [];
+                dibujarTablaDocumentos(documentosActuales);
             } catch (err) { 
-                console.error("Error al obtener archivos:", err);
-                documentosActuales = [];
+                document.getElementById('tbody-docs-empleado').innerHTML = '<tr><td colspan="6" style="color:red;">Error al enlazar datos de almacenamiento remoto.</td></tr>'; 
             }
         }
 
-        // FUNCIÓN CRUCIAL: Filtra por el tipo activo y construye tablas separadas por cada Mes (Periodo)
-        function renderizarDocumentosAgrupados() {
-            const contenedor = document.getElementById('contenedor-expediente-grupos');
-            contenedor.innerHTML = '';
+        function dibujarTablaDocumentos(listaDocs) {
+            const tbody = document.getElementById('tbody-docs-empleado');
+            tbody.innerHTML = '';
 
-            // 1. Filtrar solo los documentos que pertenecen al tipo seleccionado (ej: Vacaciones)
-            const docsFiltrados = documentosActuales.filter(d => d.tipo_documento === tipoDocumentoActivo);
-
-            if(docsFiltrados.length === 0) {
-                contenedor.innerHTML = `<div style="text-align:center; padding: 2rem; color:#94a3b8;">No hay documentos registrados en la categoría: <strong>${tipoDocumentoActivo}</strong></div>`;
+            if(!listaDocs || listaDocs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#94a3b8;">No se registran archivos con los criterios buscados.</td></tr>';
                 return;
             }
 
-            // 2. Agrupar los documentos filtrados por su campo "periodo" (Mes)
-            const gruposPorMes = {};
-            docsFiltrados.forEach(doc => {
-                // Si el documento antiguo no tiene periodo asignado, lo mandamos a "Sin Periodo"
-                const mes = doc.periodo || "Sin Periodo Especificado";
-                if (!gruposPorMes[mes]) {
-                    gruposPorMes[mes] = [];
+            listaDocs.forEach(doc => {
+                const fechaFormateada = new Date(doc.created_at).toLocaleDateString('es-EC', {day: '2-digit', month: '2-digit', year: 'numeric'});
+                const puedeEliminar = (rol === 'admin' || rol === 'doc');
+                
+                // Si tu backend no devuelve un campo 'nombre_archivo', usamos el 'tipo_documento' + '.pdf' por seguridad visual
+                const nombreArchivoMostrar = doc.nombre_archivo || `${doc.tipo_documento}.pdf`;
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td>📁 <strong>${doc.tipo_documento}</strong></td>
+                        <td style="font-size:13px; color:#475569; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${nombreArchivoMostrar}">${nombreArchivoMostrar}</td>
+                        <td><span style="font-size:13px;" class="user-badge">${doc.nombre_user || 'Sistema'}</span></td>
+                        <td>${fechaFormateada}</td>
+                        <td><a href="${doc.url_cloudinary}" target="_blank" class="btn-action btn-view">👁️ Descargar</a></td>
+                        ${puedeEliminar ? `<td><button class="btn-action btn-delete" onclick="eliminarDocumento('${doc.id}')">❌</button></td>` : '<td>-</td>'}
+                    </tr>`;
+            });
+        }
+
+        // FUNCIONES DE FILTRADO EN TIEMPO REAL
+        function filtrarDocumentos() {
+            const valNombre = document.getElementById('filter-doc-name').value.toLowerCase().trim();
+            const valFecha = document.getElementById('filter-doc-date').value; // Formato YYYY-MM-DD
+
+            const documentosFiltrados = documentosActuales.filter(doc => {
+                // Validación por Nombre de Archivo o Tipo de Documento
+                const matchNombre = (doc.nombre_archivo && doc.nombre_archivo.toLowerCase().includes(valNombre)) || 
+                                     doc.tipo_documento.toLowerCase().includes(valNombre);
+                
+                // Validación por Fecha de Registro
+                let matchFecha = true;
+                if (valFecha) {
+                    const fechaDoc = new Date(doc.created_at).toISOString().split('T')[0]; // Extrae YYYY-MM-DD
+                    matchFecha = (fechaDoc === valFecha);
                 }
-                gruposPorMes[mes].push(doc);
+
+                return matchNombre && matchFecha;
             });
 
-            // Orden de meses ideal para mostrarlos con criterio cronológico si existen
-            const ordenMeses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre", "Sin Periodo Especificado"];
+            dibujarTablaDocumentos(documentosFiltrados);
+        }
 
-            // 3. Dibujar una tabla independiente por cada mes que contenga archivos
-            ordenMeses.forEach(mes => {
-                if (gruposPorMes[mes] && gruposPorMes[mes].length > 0) {
-                    
-                    let tablaHTML = `
-                        <div class="card" style="border-left: 4px solid var(--primary-color); margin-bottom: 1.5rem; padding: 1rem;">
-                            <h4 style="margin-top:0; color:#1e293b; background:#f1f5f9; padding: 6px 12px; border-radius:4px;">📅 Periodo: ${mes}</h4>
-                            <div class="table-responsive">
-                                <table style="width:100%">
-                                    <thead>
-                                        <tr>
-                                            <th>Nombre Original del Archivo</th>
-                                            <th>Subido Por</th>
-                                            <th>Fecha Doc.</th>
-                                            <th>Acción</th>
-                                            ${(rol === 'admin' || rol === 'doc') ? '<th class="role-admin">Eliminar</th>' : ''}
-                                        </tr>
-                                    </thead>
-                                    <tbody>`;
-
-                    gruposPorMes[mes].forEach(doc => {
-                        // REPARACIÓN DEL NOMBRE DEL ARCHIVO: Prioriza el nombre original capturado desde la subida
-                        let nombreReal = doc.nombre_archivo || doc.nombre_original || `${doc.tipo_documento}.pdf`;
-                        
-                        // Si por algún motivo quedó guardada la ruta completa, extraemos solo el final
-                        if (nombreReal.includes('\\')) nombreReal = nombreReal.split('\\').pop();
-                        if (nombreReal.includes('/')) nombreReal = nombreReal.split('/').pop();
-
-                        // Formatear la fecha elegida por el usuario (venía del calendario) o la de creación
-                        const fechaMostrar = doc.fecha_documento 
-                            ? new Date(doc.fecha_documento + 'T00:00:00').toLocaleDateString('es-EC')
-                            : new Date(doc.created_at).toLocaleDateString('es-EC');
-
-                        const puedeEliminar = (rol === 'admin' || rol === 'doc');
-
-                        tablaHTML += `
-                            <tr>
-                                <td style="font-size:14px; color:#1e293b; font-weight:500;" title="${nombreReal}">📄 ${nombreReal}</td>
-                                <td><span style="font-size:12px;" class="user-badge">${doc.nombre_user || 'Sistema'}</span></td>
-                                <td>${fechaMostrar}</td>
-                                <td><a href="${doc.url_cloudinary}" target="_blank" class="btn-action btn-view">👁️ Ver PDF</a></td>
-                                ${puedeEliminar ? `<td><button class="btn-action btn-delete" onclick="eliminarDocumento('${doc.id}')">❌</button></td>` : ''}
-                            </tr>`;
-                    });
-
-                    tablaHTML += `</tbody></table></div></div>`;
-                    contenedor.innerHTML += tablaHTML;
-                }
-            });
+        function limpiarFiltrosExpediente() {
+            document.getElementById('filter-doc-name').value = '';
+            document.getElementById('filter-doc-date').value = '';
+            dibujarTablaDocumentos(documentosActuales);
         }
 
         async function procesarSubidaDocumento(e) {
             e.preventDefault();
             const tipoDoc = document.getElementById('upload-tipo-doc').value;
-            const fechaDoc = document.getElementById('upload-fecha-doc').value;
-            const periodoDoc = document.getElementById('upload-periodo-doc').value;
             const archivoInput = document.getElementById('upload-file').files[0];
 
-            if (!tipoDoc) { alert("Por favor, elija un tipo de documento."); return; }
             if (!archivoInput) return;
 
+            // VALIDACIÓN EXTRA DE SEGURIDAD EN CLIENTE: SOLO PDF
             if (archivoInput.type !== "application/pdf" && !archivoInput.name.endsWith('.pdf')) {
                 alert("Error: Solo se permite subir archivos en formato PDF.");
                 return;
@@ -641,12 +599,9 @@ let opciones = [];
 
             const formData = new FormData();
             formData.append('tipo_documento', tipoDoc);
-            formData.append('fecha_documento', fechaDoc); // Enviamos la fecha del calendario
-            formData.append('periodo', periodoDoc);         // Enviamos el mes elegido
+            formData.append('usuario_id', currentSelectedUserId);
             formData.append('archivo', archivoInput);
-            
-            // ARREGLO DE NOMBRE: Enviamos explícitamente el nombre real del archivo adjuntado
-            formData.append('nombre_archivo', archivoInput.name); 
+            formData.append('nombre_archivo', archivoInput.name); // Enviamos el nombre original al backend
             formData.append('nombre_user', nombreUsuario || 'Gestor Unificado');
             formData.append('es_pasivo', currentSelectedUserPasivo);
 
@@ -662,20 +617,13 @@ let opciones = [];
                     body: formData
                 });
                 if (res.ok) {
-                    alert("Archivo PDF indexado y guardado con su nombre original y periodo con éxito.");
+                    alert("Archivo PDF procesado e indexado correctamente.");
                     document.getElementById('form-upload-doc').reset();
-                    
-                    // Volver a poner la fecha de hoy por comodidad
-                    document.getElementById('upload-fecha-doc').value = new Date().toISOString().split('T')[0];
-                    
-                    // Recargar datos y forzar que la vista se mantenga en el tipo de documento recién subido
-                    await obtenerDocumentosServidor();
-                    seleccionarPestañaTipo(tipoDoc, Array.from(document.querySelectorAll('#tipo-doc-tabs button')).find(b => b.innerText.trim() === tipoDoc)?.id);
-                    
+                    await obtenerDocumentosServidor(); // Recargar datos locales
                     if(rol === 'admin' || rol === 'doc') cargarCertificadosGlobales();
                 } else {
                     const errData = await res.json();
-                    alert("Error en el servidor: " + errData.error);
+                    alert("Error crítico del servidor: " + errData.error);
                 }
             } catch(err) { alert("Fallo de red al intentar subir."); }
         }
@@ -692,13 +640,12 @@ let opciones = [];
                 });
                 if(res.ok) {
                     alert("Registro eliminado.");
-                    await obtenerDocumentosServidor();
-                    renderizarDocumentosAgrupados(); // Refrescar la vista actual segmentada
+                    await obtenerDocumentosServidor(); // Volver a consultar
                     if(rol === 'admin' || rol === 'doc') cargarCertificadosGlobales();
                 } else { alert("Denegado o error de procesamiento."); }
             } catch (err) { console.error(err); }
         }
-        
+
         function cerrarModal() {
             document.getElementById('modal-expediente').style.display = 'none';
         }
