@@ -123,7 +123,7 @@
                 <button class="nav-btn" onclick="switchView('pasivos')">📁 Personal Pasivo</button>
                 <button class="nav-btn role-admin" id="menu-crear" onclick="switchView('crear')">➕ Registrar Empleado</button>
                 <button class="nav-btn role-admin" id="menu-empresa" onclick="switchView('empresa')">🏢 Docs Empresa</button>
-                <button class="nav-btn role-doc" id="menu-global-med" onclick="switchView('global-medicos')">🩺 Certificados Globales</button>
+                <button class="nav-btn role-admin" id="menu-global-med" onclick="switchView('global-medicos')">🩺 Certificados Globales</button>
             </div>
         </div>
         <div>
@@ -525,7 +525,7 @@
             cargarEmpleadosActivos();
             cargarEmpleadosPasivos();
             if (rol === 'admin') cargarDocumentosEmpresa();
-            if (rol === 'admin' || rol === 'doc') cargarCertificadosGlobales();
+            if (rol === 'admin') cargarCertificadosGlobales();
 
             const mapearDobleClic = (tbodyId) => {
                 const tbody = document.getElementById(tbodyId);
@@ -695,12 +695,12 @@
                     let labelMostrar = tipo;
                     if(tipo === "Certificados") labelMostrar = "Certificados (Lab/Hon)";
                     
-vectorContainer.innerHTML += `
-    <div class="vector-card" id="card-vector-${tipo.replace(/\s+/g, '-').replace(/'/g, '')}" onclick="seleccionarCategoriaVector('${tipo.replace(/'/g, "\\'")}')">
-        ${SVGString}
-        <span>${labelMostrar}</span>
-    </div>
-`;
+                    vectorContainer.innerHTML += `
+                        <div class="vector-card" id="card-vector-${tipo.replace(/\s+/g, '-').replace(/'/g, '')}" onclick="seleccionarCategoriaVector('${tipo.replace(/'/g, "\\'")}')">
+                            ${SVGString}
+                            <span>${labelMostrar}</span>
+                        </div>
+                    `;
                 });
             }
 
@@ -725,32 +725,32 @@ vectorContainer.innerHTML += `
         }
 
         function seleccionarCategoriaVector(tipoSeleccionado) {
-const idTarjeta = `card-vector-${tipoSeleccionado.replace(/\s+/g, '-').replace(/'/g, '')}`;
-    
-    const tarjetaActiva = document.getElementById(idTarjeta); 
-    if(tarjetaActiva) tarjetaActiva.classList.add('selected'); 
+            const idTarjeta = `card-vector-${tipoSeleccionado.replace(/\s+/g, '-').replace(/'/g, '')}`;
+            
+            const tarjetaActiva = document.getElementById(idTarjeta); 
+            if(tarjetaActiva) tarjetaActiva.classList.add('selected'); 
 
-    document.getElementById('upload-tipo-doc').value = tipoSeleccionado;
+            document.getElementById('upload-tipo-doc').value = tipoSeleccionado;
 
-    const selectSubtipoUpload = document.getElementById('upload-subtipo-doc');
-    if (selectSubtipoUpload) {
-        selectSubtipoUpload.innerHTML = '';
-        const listaSubtipos = mapaSubtipos[tipoSeleccionado] || ["General / Único"]; 
-        listaSubtipos.forEach(sub => { // [cite: 86]
-            selectSubtipoUpload.innerHTML += `<option value="${sub}">${sub}</option>`;
-        });
+            const selectSubtipoUpload = document.getElementById('upload-subtipo-doc');
+            if (selectSubtipoUpload) {
+                selectSubtipoUpload.innerHTML = '';
+                const listaSubtipos = mapaSubtipos[tipoSeleccionado] || ["General / Único"]; 
+                listaSubtipos.forEach(sub => { 
+                    selectSubtipoUpload.innerHTML += `<option value="${sub}">${sub}</option>`;
+                });
             }
 
-document.getElementById('section-paso1').style.display = 'none'; 
-    document.getElementById('expediente-detalles').style.display = 'flex'; 
-    document.getElementById('form-upload-doc').style.display = 'none'; 
-    document.getElementById('detalle-categoria-titulo').innerText = `📂 Carpeta: ${tipoSeleccionado}`; 
+            document.getElementById('section-paso1').style.display = 'none'; 
+            document.getElementById('expediente-detalles').style.display = 'flex'; 
+            document.getElementById('form-upload-doc').style.display = 'none'; 
+            document.getElementById('detalle-categoria-titulo').innerText = `📂 Carpeta: ${tipoSeleccionado}`; 
 
-    const selectFilter = document.getElementById('filter-doc-tipo');
-    if(selectFilter) selectFilter.value = tipoSeleccionado;
-    actualizarSubtipos('filter');
-    filtrarDocumentos(); 
-}
+            const selectFilter = document.getElementById('filter-doc-tipo');
+            if(selectFilter) selectFilter.value = tipoSeleccionado;
+            actualizarSubtipos('filter');
+            filtrarDocumentos(); 
+        }
 
         function regresarAPaso1() {
             document.getElementById('section-paso1').style.display = 'block';
@@ -916,7 +916,7 @@ document.getElementById('section-paso1').style.display = 'none';
                     actualizarSubtipos('filter');
                     
                     await obtenerDocumentosServidor(); 
-                    if(rol === 'admin' || rol === 'doc') cargarCertificadosGlobales();
+                    if(rol === 'admin') cargarCertificadosGlobales();
                 } else {
                     const errData = await res.json();
                     alert("Error del servidor: " + errData.error);
@@ -937,7 +937,7 @@ document.getElementById('section-paso1').style.display = 'none';
                 if(res.ok) {
                     alert("Registro eliminado.");
                     await obtenerDocumentosServidor(); 
-                    if(rol === 'admin' || rol === 'doc') cargarCertificadosGlobales();
+                    if(rol === 'admin') cargarCertificadosGlobales();
                 } else { alert("Denegado o error de procesamiento."); }
             } catch (err) { console.error(err); }
         }
