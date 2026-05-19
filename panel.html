@@ -695,12 +695,12 @@
                     let labelMostrar = tipo;
                     if(tipo === "Certificados") labelMostrar = "Certificados (Lab/Hon)";
                     
-                    vectorContainer.innerHTML += `
-                        <div class="vector-card" id="card-vector-${tipo.replace(/\s+/g, '-')}" onclick="seleccionarCategoriaVector('${tipo}')">
-                            ${SVGString}
-                            <span>${labelMostrar}</span>
-                        </div>
-                    `;
+vectorContainer.innerHTML += `
+    <div class="vector-card" id="card-vector-${tipo.replace(/\s+/g, '-').replace(/'/g, '')}" onclick="seleccionarCategoriaVector('${tipo.replace(/'/g, "\\'")}')">
+        ${SVGString}
+        <span>${labelMostrar}</span>
+    </div>
+`;
                 });
             }
 
@@ -725,33 +725,32 @@
         }
 
         function seleccionarCategoriaVector(tipoSeleccionado) {
-            document.querySelectorAll('.vector-card').forEach(card => card.classList.remove('selected'));
-            
-            const idTarjeta = `card-vector-${tipoSeleccionado.replace(/\s+/g, '-')}`;
-            const tarjetaActiva = document.getElementById(idTarjeta);
-            if(tarjetaActiva) tarjetaActiva.classList.add('selected');
+const idTarjeta = `card-vector-${tipoSeleccionado.replace(/\s+/g, '-').replace(/'/g, '')}`;
+    
+    const tarjetaActiva = document.getElementById(idTarjeta); 
+    if(tarjetaActiva) tarjetaActiva.classList.add('selected'); 
 
-            document.getElementById('upload-tipo-doc').value = tipoSeleccionado;
+    document.getElementById('upload-tipo-doc').value = tipoSeleccionado;
 
-            const selectSubtipoUpload = document.getElementById('upload-subtipo-doc');
-            if (selectSubtipoUpload) {
-                selectSubtipoUpload.innerHTML = '';
-                const listaSubtipos = mapaSubtipos[tipoSeleccionado] || ["General / Único"];
-                listaSubtipos.forEach(sub => {
-                    selectSubtipoUpload.innerHTML += `<option value="${sub}">${sub}</option>`;
-                });
+    const selectSubtipoUpload = document.getElementById('upload-subtipo-doc');
+    if (selectSubtipoUpload) {
+        selectSubtipoUpload.innerHTML = '';
+        const listaSubtipos = mapaSubtipos[tipoSeleccionado] || ["General / Único"]; 
+        listaSubtipos.forEach(sub => { // [cite: 86]
+            selectSubtipoUpload.innerHTML += `<option value="${sub}">${sub}</option>`;
+        });
             }
 
-            document.getElementById('section-paso1').style.display = 'none';
-            document.getElementById('expediente-detalles').style.display = 'flex';
-            document.getElementById('form-upload-doc').style.display = 'none';
-            document.getElementById('detalle-categoria-titulo').innerText = `📂 Carpeta: ${tipoSeleccionado}`;
+document.getElementById('section-paso1').style.display = 'none'; 
+    document.getElementById('expediente-detalles').style.display = 'flex'; 
+    document.getElementById('form-upload-doc').style.display = 'none'; 
+    document.getElementById('detalle-categoria-titulo').innerText = `📂 Carpeta: ${tipoSeleccionado}`; 
 
-            const selectFilter = document.getElementById('filter-doc-tipo');
-            if(selectFilter) selectFilter.value = tipoSeleccionado;
-            actualizarSubtipos('filter');
-            filtrarDocumentos();
-        }
+    const selectFilter = document.getElementById('filter-doc-tipo');
+    if(selectFilter) selectFilter.value = tipoSeleccionado;
+    actualizarSubtipos('filter');
+    filtrarDocumentos(); 
+}
 
         function regresarAPaso1() {
             document.getElementById('section-paso1').style.display = 'block';
