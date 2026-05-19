@@ -1133,31 +1133,26 @@ async function actualizarUsuario(event) {
 
 
 // 1. Cargar y renderizar los documentos institucionales controlando los permisos visuales
+// Ejemplo de cómo debe renderizarse la función que llena la tabla de Docs Empresa
 async function cargarDocsEmpresa() {
     try {
         const res = await fetch(`${API_URL}/empresa/documentos`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        const docs = await res.json();
-        
+        const data = await res.json();
+
         const tbody = document.getElementById('tbody-empresa');
         tbody.innerHTML = '';
 
-        docs.forEach(doc => {
+        data.forEach(doc => {
             const tr = document.createElement('tr');
-            
-            // Formatear la fecha si viene con formato de base de datos completo (ej: 2026-05-19T00:00:00.000Z)
-            const fechaFormateada = doc.nombre_archivo ? doc.nombre_archivo.split('T')[0] : 'Sin fecha';
-
             tr.innerHTML = `
                 <td>${doc.id}</td>
-                <td><strong>${doc.tipo_documento}</strong></td>
-                <td><span class="user-badge" style="background:#e0f2fe; color:#0369a1;">📅 ${fechaFormateada}</span></td>
-                <td>
-                    <a href="${doc.url_archivo}" target="_blank" class="btn-action btn-view">👁️ Ver PDF</a>
-                </td>
+                <td>${doc.tipo_documento}</td>
+                <td>${doc.nombre_archivo}</td> 
+                <td><a href="${doc.url_archivo}" target="_blank" class="btn-action btn-view">👁️ Ver PDF</a></td>
                 <td class="columna-accion-admin" style="${rol === 'admin' ? '' : 'display:none;'}">
-                    <button onclick="eliminarDocEmpresa(${doc.id})" class="btn-action btn-delete">🗑️</button>
+                    <button class="btn-action btn-delete" onclick="eliminarDocEmpresa(${doc.id})">🗑️ Eliminar</button>
                 </td>
             `;
             tbody.appendChild(tr);
