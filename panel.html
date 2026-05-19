@@ -703,33 +703,38 @@
             document.querySelectorAll('.vector-card').forEach(card => card.classList.remove('selected'));
         }
 
-        async function obtenerDocumentosServidor() {
-            let endpoint = '';
-            const tipoSeleccionado = document.getElementById('filter-doc-tipo').value;
+async function obtenerDocumentosServidor() {
+    let endpoint = '';
+    const tipoSeleccionado = document.getElementById('filter-doc-tipo').value;
 
-            // 1. Prioridad Absoluta: Si la carpeta es médica o de aptitud, va a las tablas médicas directas
-            if (tipoSeleccionado === "Certificados Médicos" || tipoSeleccionado === "Certificados de Aptitud") {
-                endpoint = `${API_URL}/doctor/aptitud/${currentSelectedUserId}`;
-            } 
-            // 2. Si no es de salud, ruteamos según rol
-            else if (rol === 'admin') {
-                endpoint = `${API_URL}/admin/documentos/${currentSelectedUserId}?pasivo=${currentSelectedUserPasivo}`;
-            } else if (rol === 'doc') {
-                endpoint = `${API_URL}/doctor/aptitud/${currentSelectedUserId}`;
-            } else if (rol === 'kelvin') {
-                endpoint = `${API_URL}/kelvin/documentos/${currentSelectedUserId}`;
-            }
+    // 1. Prioridad Absoluta: Si la carpeta es médica o de aptitud, va a las tablas médicas directas
+    if (tipoSeleccionado === "Certificados Médicos" || tipoSeleccionado === "Certificados de Aptitud") {
+        endpoint = `${API_URL}/doctor/aptitud/${currentSelectedUserId}`;
+    } 
+    // 2. NUEVA PRIORIDAD: Si la carpeta es técnica (de Kelvin), usamos el endpoint de Kelvin
+    // Esto permite que tanto Kelvin como el Admin lean de las tablas certifi_competencia y acta_epps
+    else if (tipoSeleccionado === "Certificado de Competencia" || tipoSeleccionado === "Acta de EPP's") {
+        endpoint = `${API_URL}/kelvin/documentos/${currentSelectedUserId}`;
+    }
+    // 3. Si no es ninguna de las anteriores, ruteamos según el rol para los documentos administrativos generales
+    else if (rol === 'admin') {
+        endpoint = `${API_URL}/admin/documentos/${currentSelectedUserId}?pasivo=${currentSelectedUserPasivo}`;
+    } else if (rol === 'doc') {
+        endpoint = `${API_URL}/doctor/aptitud/${currentSelectedUserId}`;
+    } else if (rol === 'kelvin') {
+        endpoint = `${API_URL}/kelvin/documentos/${currentSelectedUserId}`;
+    }
 
-            try {
-                const res = await fetch(endpoint, { headers: { 'Authorization': `Bearer ${token}` } });
-                documentosActuales = await res.json();
-                if (!Array.isArray(documentosActuales)) documentosActuales = [];
-                filtrarDocumentos();
-            } catch (err) { 
-                document.getElementById('tbody-docs-empleado').innerHTML = 
-                    '<tr><td colspan="4" style="color:red;">Error al enlazar datos de almacenamiento remoto.</td></tr>';
-            }
-        }
+    try {
+        const res = await fetch(endpoint, { headers: { 'Authorization': `Bearer ${token}` } });
+        documentosActuales = await res.json();
+        if (!Array.isArray(documentosActuales)) documentosActuales = [];
+        filtrarDocumentos();
+    } catch (err) { 
+        document.getElementById('tbody-docs-empleado').innerHTML = 
+            '<tr><td colspan="4" style="color:red;">Error al enlazar datos de almacenamiento remoto.</td></tr>';
+    }
+}
 
         function filtrarDocumentos() {
             const tipoSeleccionado = document.getElementById('filter-doc-tipo').value;
@@ -759,34 +764,35 @@
             dibujarTablaAgrupada(docsFiltrados);
         }
 
-        function dibujarTablaAgrupada(docsFiltrados) {
-            const tbody = document.getElementById('tbody-docs-empleado');
-            tbody.innerHTML = '';
+function dibujarTablaAgrupada(docsFiltrados) {
+    const tbody = document.getElementById('tbody-docs-empleado');
+    tbody.innerHTML = '';
 
-            if (docsFiltrados.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#94a3b8; padding: 2rem;">No se registran archivos en esta categoría para los criterios buscados.</td></tr>';
-                return;
-            }
+    if (docsFiltrados.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#94a3b8; padding: 2rem;">No se registran archivos en esta categoría para los criterios buscados.</td></tr>';
+        return;
+    }
 
-            docsFiltrados.forEach(doc => {
-                const fechaRaw = doc.fecha_documento || doc.created_at;
-                const fechaFormateada = fechaRaw ? new Date(fechaRaw).toLocaleDateString('es-EC', {day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC'}) : 'S/F';
-                
-                const puedeEliminar = (rol === 'admin' || rol === 'doc');
-                const nombreArchivoMostrar = doc.nombre_archivo || `${doc.tipo_documento}.pdf`;
+    docsFiltrados.forEach(doc => {
+        const fechaRaw = doc.fecha_documento || doc.created_at;
+        const fechaFormateada = fechaRaw ? new Date(fechaRaw).toLocaleDateString('es-EC', {day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC'}) : 'S/F';
+        
+        // CORREGIDO: Ahora 'kelvin' también tiene permiso para visualizar el botón de eliminar en la tabla
+        const puedeEliminar = (rol === 'admin' || rol === 'doc' || rol === 'kelvin');
+        const nombreArchivoMostrar = doc.nombre_archivo || `${doc.tipo_documento}.pdf`;
 
-                tbody.innerHTML += `
-                    <tr>
-                        <td style="max-width: 450px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${nombreArchivoMostrar}">
-                            <span style="font-size: 16px; margin-right: 6px; vertical-align: middle;">📕</span>
-                            <span style="font-size: 14px; color: #1e293b; font-weight: 500; vertical-align: middle;">${nombreArchivoMostrar}</span>
-                        </td>
-                        <td><strong>${fechaFormateada}</strong></td>
-                        <td><a href="${doc.url_cloudinary}" target="_blank" class="btn-action btn-view">👁️ Descargar</a></td>
-                        ${puedeEliminar ? `<td><button class="btn-action btn-delete" onclick="eliminarDocumento('${doc.id}')">❌</button></td>` : '<td>-</td>'}
-                    </tr>`;
-            });
-        }
+        tbody.innerHTML += `
+            <tr>
+                <td style="max-width: 450px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${nombreArchivoMostrar}">
+                    <span style="font-size: 16px; margin-right: 6px; vertical-align: middle;">📕</span>
+                    <span style="font-size: 14px; color: #1e293b; font-weight: 500; vertical-align: middle;">${nombreArchivoMostrar}</span>
+                </td>
+                <td><strong>${fechaFormateada}</strong></td>
+                <td><a href="${doc.url_cloudinary}" target="_blank" class="btn-action btn-view">👁️ Descargar</a></td>
+                ${puedeEliminar ? `<td><button class="btn-action btn-delete" onclick="eliminarDocumento('${doc.id}')">❌</button></td>` : '<td>-</td>'}
+            </tr>`;
+    });
+}
 
         function limpiarFiltros() {
             const selectSubtipo = document.getElementById('filter-doc-subtipo');
@@ -874,13 +880,14 @@
             const tipoSeleccionado = document.getElementById('filter-doc-tipo').value;
             let deleteEndpoint = '';
             
-            if (tipoSeleccionado === "Certificados Médicos" || tipoSeleccionado === "Certificados de Aptitud") {
-                deleteEndpoint = `${API_URL}/doctor/aptitud/${id}`; // Endpoint médico (que acepta admin)
-            } else if (rol === 'kelvin') {
-                deleteEndpoint = `${API_URL}/kelvin/documentos/${id}`;
-            } else {
-                deleteEndpoint = `${API_URL}/admin/documentos/${id}`;
-            }
+// Si es una carpeta técnica, ambos (Admin y Kelvin) deberían apuntar al endpoint de Kelvin que limpia esas tablas específicas
+if (tipoSeleccionado === "Certificados Médicos" || tipoSeleccionado === "Certificados de Aptitud") {
+    deleteEndpoint = `${API_URL}/doctor/aptitud/${id}`;
+} else if (tipoSeleccionado === "Certificado de Competencia" || tipoSeleccionado === "Acta de EPP's") {
+    deleteEndpoint = `${API_URL}/kelvin/documentos/${id}`;
+} else {
+    deleteEndpoint = `${API_URL}/admin/documentos/${id}`;
+}
 
             try {
                 const res = await fetch(deleteEndpoint, {
