@@ -1357,12 +1357,12 @@ async function eliminarDocEmpresa(id) {
 
 //PERMISOOOOOOOOOOOOS
 // Control de visibilidad y carga dinámica según el Rol del administrador
+// Control de visibilidad
 function cargarSeccionEmpresa() {
     document.getElementById('menuPrincipal').classList.add('hidden');
     document.getElementById('seccionEmpresa').classList.remove('hidden');
     document.getElementById('btnVolver').classList.remove('hidden');
     
-    // Validamos en tiempo de ejecución si el rol guardado en localStorage es 'admin'
     const rolUsuario = localStorage.getItem('rol');
     const zonaAdmin = document.getElementById('zonaAdminEspecial');
     if (rolUsuario === 'admin') {
@@ -1375,7 +1375,6 @@ function cargarSeccionEmpresa() {
 }
 
 // Abrir e iniciar el modal cargando la tabla dinámica de departamentos
-// Abrir e iniciar el modal cargando la tabla dinámica de departamentos
 async function abrirModalPermisos() {
     document.getElementById('formPermisos').reset();
     
@@ -1387,29 +1386,27 @@ async function abrirModalPermisos() {
     modal.classList.remove('hidden');
     
     try {
-        const res = await fetch(`${API_BASE}/admin/departamentos`, {
+        // CORRECCIÓN AQUÍ: Agregamos /api a la ruta para que coincida con el backend
+        const res = await fetch(`${API_BASE}/api/admin/departamentos`, {
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
 
-        if (!res.ok) throw new Error('Error al obtener departamentos');
+        if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
 
         const departamentos = await res.json();
         
-        // Limpiamos el select
         selectDep.innerHTML = '<option value="">-- Seleccione un Departamento --</option>';
         
-        // Poblamos con los datos dinámicos (ajusta 'id' y 'nombre' según tu tabla)
         departamentos.forEach(d => {
             const option = document.createElement('option');
-            option.value = d.id; // Guardamos el ID para el INSERT
-            option.textContent = d.nombre; // Mostramos el nombre al usuario
+            option.value = d.id; 
+            option.textContent = d.nombre; 
             selectDep.appendChild(option);
         });
             
     } catch (err) {
         console.error("🚨 Error al cargar departamentos:", err);
-        // Silenciamos el alert para que no moleste al usuario
-        selectDep.innerHTML = '<option value="">Error al cargar departamentos</option>';
+        selectDep.innerHTML = '<option value="">Error de conexión. Reintente.</option>';
     }
 }
 
@@ -1419,7 +1416,7 @@ function cerrarModalPermisos() {
     modal.classList.add('hidden');
 }
 
-// Procesar el guardado con Multipart Form Data (Soporte de Imagen)
+// Procesar el guardado con Multipart Form Data
 async function guardarUsuarioEspecial(event) {
     event.preventDefault();
     
@@ -1430,12 +1427,12 @@ async function guardarUsuarioEspecial(event) {
     formData.append('rol', document.getElementById('esp_rol').value);
     formData.append('correo', document.getElementById('esp_correo').value);
     formData.append('celular', document.getElementById('esp_celular').value);
-    // IMPORTANTE: Cambiamos la key a 'departamento_id' para que el backend la reciba bien
     formData.append('departamento_id', document.getElementById('esp_departamento').value);
     formData.append('foto', document.getElementById('esp_foto').files[0]);
 
     try {
-        const res = await fetch(`${API_BASE}/admin/crear-permiso-especial`, {
+        // CORRECCIÓN AQUÍ: Agregamos /api a la ruta para que coincida con el backend
+        const res = await fetch(`${API_BASE}/api/admin/crear-permiso-especial`, {
             method: 'POST',
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
             body: formData
