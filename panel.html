@@ -117,6 +117,7 @@
                 <button class="nav-btn role-admin" id="menu-crear" onclick="switchView('crear')">➕ Registrar Empleado</button>
                 <button class="nav-btn role-admin" id="menu-modificar" onclick="switchView('modificar'); prepararModuloModificar();">✏️ Modificar Empleado</button>
                 <button class="nav-btn role-admin" id="menu-empresa" onclick="switchView('empresa')">🏢 Docs Empresa</button>
+                <button class="nav-btn" id="menu-empresa" onclick="switchView('empresa')">🏢 Docs Empresa</button>
             </div>
         </div>
         <div>
@@ -579,10 +580,19 @@
             document.getElementById('view-title').innerText = titles[viewId] || "Panel Isertel";
 
             // AGREGADO: Carga automáticamente los documentos de la empresa cuando entras a la sección
-            if (viewId === 'empresa') {
-                cargarDocsEmpresa();
+if (viewId === 'empresa') {
+        cargarDocsEmpresa(); // Llama a tu función que rellena la tabla
+        
+        const formSubidaEmpresa = document.getElementById('form-empresa');
+        if (formSubidaEmpresa) {
+            if (rol === 'admin') {
+                formSubidaEmpresa.style.display = 'block'; // Muestra el formulario si es admin
+            } else {
+                formSubidaEmpresa.style.display = 'none';  // Lo oculta completamente para 'doc', 'kelvin', etc.
             }
         }
+    }
+}
 
         function cerrarSesion() {
             localStorage.clear();
@@ -1148,7 +1158,7 @@ async function actualizarUsuario(event) {
 }
 
 // ==========================================
-//       LÓGICA: REPOSITORIO EMPRESA
+//        LÓGICA: REPOSITORIO EMPRESA
 // ==========================================
 
 // Función para subir el documento mediante AJAX/Fetch
@@ -1245,11 +1255,13 @@ async function cargarDocsEmpresa() {
                 <td><small style="color:#475569; font-weight:500;">📅 ${fechaFormateada}</small></td>
                 <td>
                     <a href="${doc.url_cloudinary}" target="_blank" class="btn-action btn-view" style="text-align:center;">👁️ Ver</a>
-                    
                     <a href="${doc.url_cloudinary}" download="${doc.nombre_archivo}" target="_blank" class="btn-action btn-upload" style="background:#0284c7; text-align:center;">📥 Descargar</a>
                 </td>
                 <td>
-                    ${rol === 'admin' ? `<button class="btn-action btn-delete" onclick="eliminarDocEmpresa(${doc.id})">🗑️ Eliminar</button>` : `<span style="color:#94a3b8; font-size:12px;">Sin permisos</span>`}
+                    ${rol === 'admin' 
+                        ? `<button class="btn-action btn-delete" onclick="eliminarDocEmpresa(${doc.id})">🗑️ Eliminar</button>` 
+                        : `<span style="color:#94a3b8; font-size:12px; font-style:italic;">Solo lectura</span>`
+                    }
                 </td>
             `;
             tbody.appendChild(tr);
