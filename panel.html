@@ -396,9 +396,6 @@
             "Certificados de Aptitud": ["Ingreso", "Periódico", "Salida"],
             "Certificados y Cargas Familiares": ["Certificados de nacimiento", "Acta de matrimonio", "Acta de unión de hecho", "Cédula de ciudadanía (porcentaje de discapacidad)"],
             "Ficha Médica Ocupacional": ["General / Único"],
-            "Aptitud Médica Ingreso": ["General / Único"],
-            "Aptitud Médica Periódico": ["General / Único"],
-            "Certificado médico": ["Certificado médico IESS", "Certificado médico privado", "Certificado médico MSP", "Reposo médico"],
             "Reposo médico": ["General / Único"],
             "Certificado de Competencia Laboral": ["General / Único"],
             "Certificado Técnico Operaciones": ["General / Único"],
@@ -643,8 +640,9 @@
                 if (esPasivo) {
                     opcionesArray.push("Desvinculación");
                 }
-            } else if (rol === 'doc') {
-                opcionesArray = ["Certificado médico", "Aptitud Médica"];
+} else if (rol === 'doc') {
+    // Usa exactamente los mismos nombres que tiene el admin
+    opcionesArray = ["Certificados Médicos", "Certificados de Aptitud"]; 
             } else if (rol === 'kelvin') {
                 opcionesArray = ["Certificado de Competencia Laboral", "Certificado Técnico Operaciones", "Acta de Entrega EPP"];
             }
