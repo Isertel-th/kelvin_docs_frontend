@@ -1376,7 +1376,6 @@ function cargarSeccionEmpresa() {
 
 // Abrir e iniciar el modal cargando la tabla dinámica de departamentos
 // Abrir e iniciar el modal cargando la tabla dinámica de departamentos
-// Abrir e iniciar el modal cargando la tabla dinámica de departamentos
 async function abrirModalPermisos() {
     document.getElementById('formPermisos').reset();
     
@@ -1392,32 +1391,25 @@ async function abrirModalPermisos() {
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
 
-        if (!res.ok) {
-            // Esto nos dirá si da un error 404, 500, etc.
-            const errorTexto = await res.text();
-            throw new Error(`Servidor respondió con código ${res.status}: ${errorTexto}`);
-        }
+        if (!res.ok) throw new Error('Error al obtener departamentos');
 
-        const deparamentos = await res.json();
+        const departamentos = await res.json();
         
-        if (!deparamentos || deparamentos.length === 0) {
-            throw new Error("El servidor devolvió una lista vacía.");
-        }
+        // Limpiamos el select
+        selectDep.innerHTML = '<option value="">-- Seleccione un Departamento --</option>';
         
-        selectDep.innerHTML = '<option value="">-- Seleccione un Departamento --</option>' + 
-            deparamentos.map(d => `<option value="${d.departamento}">${d.departamento}</option>`).join('');
+        // Poblamos con los datos dinámicos (ajusta 'id' y 'nombre' según tu tabla)
+        departamentos.forEach(d => {
+            const option = document.createElement('option');
+            option.value = d.id; // Guardamos el ID para el INSERT
+            option.textContent = d.nombre; // Mostramos el nombre al usuario
+            selectDep.appendChild(option);
+        });
             
     } catch (err) {
-        console.error("🚨 Error capturado en el frontend:", err);
-        
-        // Dejamos opciones por si el servidor falla por completo
-        selectDep.innerHTML = `
-            <option value="">-- Error al cargar (Opciones de respaldo) --</option>
-            <option value="TALENTO HUMANO">TALENTO HUMANO</option>
-            <option value="OPERACIONES">OPERACIONES</option>
-            <option value="TECNOLOGÍA">TECNOLOGÍA</option>
-        `;
-        alert('Nota: No se pudo sincronizar con la tabla departamentos. Cargando opciones de respaldo.');
+        console.error("🚨 Error al cargar departamentos:", err);
+        // Silenciamos el alert para que no moleste al usuario
+        selectDep.innerHTML = '<option value="">Error al cargar departamentos</option>';
     }
 }
 
@@ -1438,7 +1430,8 @@ async function guardarUsuarioEspecial(event) {
     formData.append('rol', document.getElementById('esp_rol').value);
     formData.append('correo', document.getElementById('esp_correo').value);
     formData.append('celular', document.getElementById('esp_celular').value);
-    formData.append('departamento', document.getElementById('esp_departamento').value);
+    // IMPORTANTE: Cambiamos la key a 'departamento_id' para que el backend la reciba bien
+    formData.append('departamento_id', document.getElementById('esp_departamento').value);
     formData.append('foto', document.getElementById('esp_foto').files[0]);
 
     try {
