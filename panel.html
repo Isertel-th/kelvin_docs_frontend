@@ -804,70 +804,86 @@ function dibujarTablaAgrupada(docsFiltrados) {
             filtrarDocumentos();
         }
 
-        async function procesarSubidaDocumento(e) {
-            e.preventDefault();
-            const tipoDoc = document.getElementById('upload-tipo-doc').value;
+async function procesarSubidaDocumento(e) {
+    e.preventDefault();
+    const tipoDoc = document.getElementById('upload-tipo-doc').value;
+    
+    if (!tipoDoc) {
+        alert("Por favor, elija primero un Tipo de Documento haciendo clic en los vectores ilustrados arriba.");
+        return;
+    }
+
+    const subtipoDoc = document.getElementById('upload-subtipo-doc') ?
+        document.getElementById('upload-subtipo-doc').value : 'General / Único';
+    const fechaDoc = document.getElementById('upload-doc-date').value;
+    const archivoInput = document.getElementById('upload-file').files[0];
+
+    if (!archivoInput) return;
+    if (archivoInput.type !== "application/pdf" && !archivoInput.name.endsWith('.pdf')) {
+        alert("Error: Solo se permite subir archivos en formato PDF.");
+        return;
+    }
+
+    const periodoDoc = fechaDoc ? fechaDoc.substring(0, 7) : null;
+
+    // --- CORRECCIÓN AQUÍ: Evaluar si es "General / Único" ---
+    // Si el subtipo es general, usamos el tipo de documento (la carpeta) para el nombre base.
+    let baseParaNombre = subtipoDoc;
+    if (subtipoDoc === "General / Único") {
+        baseParaNombre = tipoDoc;
+    }
+
+    // Saneamos la cadena elegida (ya sea el subtipo o el tipo de documento)
+    const subtipoSaneado = baseParaNombre.toLowerCase().trim()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") 
+        .replace(/\s+/g, '_')
+        .replace(/[^a-z0-9_]/g, '');
+
+    const [anio, mes, dia] = fechaDoc.split('-');
+    const fechaFormateadaNombre = `${dia}_${mes}_${anio}`;
+
+    const nuevoNombreArchivo = `${subtipoSaneado}_${fechaFormateadaNombre}.pdf`;
+    const archivoRenombrado = new File([archivoInput], nuevoNombreArchivo, { type: archivoInput.type });
+
+    const formData = new FormData();
+    formData.append('tipo_documento', tipoDoc);
+    formData.append('subtipo_documento', subtipoDoc);
+    formData.append('usuario_id', currentSelectedUserId);
+    formData.append('archivo', archivoRenombrado);
+    formData.append('nombre_archivo', nuevoNombreArchivo); 
+    formData.append('fecha_documento', fechaDoc);
+    formData.append('periodo', periodoDoc);
+    formData.append('nombre_user', nombreUsuario || 'Gestor Unificado');
+    formData.append('es_pasivo', currentSelectedUserPasivo);
+
+    let uploadEndpoint = '';
+    if (rol === 'admin') uploadEndpoint = `${API_URL}/admin/subir-a-usuario`;
+    else if (rol === 'doc') uploadEndpoint = `${API_URL}/doctor/subir-aptitud`;
+    else if (rol === 'kelvin') uploadEndpoint = `${API_URL}/kelvin/subir-certificados`;
+
+    try {
+        const res = await fetch(uploadEndpoint, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` },
+            body: formData
+        });
+        if (res.ok) {
+            alert("Archivo PDF indexado y guardado correctamente por periodo.");
+            document.getElementById('form-upload-doc').reset();
+            document.getElementById('form-upload-doc').style.display = 'none'; 
             
-            if (!tipoDoc) {
-                alert("Por favor, elija primero un Tipo de Documento haciendo clic en los vectores ilustrados arriba.");
-                return;
-            }
-
-const subtipoDoc = document.getElementById('upload-subtipo-doc') ?
-      document.getElementById('upload-subtipo-doc').value : 'General / Único';
-
-let baseParaNombre = (subtipoDoc === "General / Único") ? tipoDoc : subtipoDoc;
-
-const baseSaneada = baseParaNombre.toLowerCase().trim()
-    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Quita tildes
-    .replace(/\s+/g, '_')
-    .replace(/[^a-z0-9_]/g, '');
-
-const [anio, mes, dia] = fechaDoc.split('-');
-const fechaFormateadaNombre = `${dia}_${mes}_${anio}`;
-
-// El nuevo formato: nombre_carpeta_(fecha) o nombre_subtipo_(fecha)
-const nuevoNombreArchivo = `${baseSaneada}_(${fechaFormateadaNombre}).pdf`;
-
-const archivoRenombrado = new File([archivoInput], nuevoNombreArchivo, { type: archivoInput.type });
-
-            const formData = new FormData();
-            formData.append('tipo_documento', tipoDoc);
-            formData.append('subtipo_documento', subtipoDoc);
-            formData.append('usuario_id', currentSelectedUserId);
-            formData.append('archivo', archivoRenombrado);
-            formData.append('nombre_archivo', nuevoNombreArchivo); 
-            formData.append('fecha_documento', fechaDoc);
-            formData.append('periodo', periodoDoc);
-            formData.append('nombre_user', nombreUsuario || 'Gestor Unificado');
-            formData.append('es_pasivo', currentSelectedUserPasivo);
-
-            let uploadEndpoint = '';
-            if (rol === 'admin') uploadEndpoint = `${API_URL}/admin/subir-a-usuario`;
-            else if (rol === 'doc') uploadEndpoint = `${API_URL}/doctor/subir-aptitud`;
-            else if (rol === 'kelvin') uploadEndpoint = `${API_URL}/kelvin/subir-certificados`;
-
-            try {
-                const res = await fetch(uploadEndpoint, {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` },
-                    body: formData
-                });
-                if (res.ok) {
-                    alert("Archivo PDF indexado y guardado correctamente por periodo.");
-                    document.getElementById('form-upload-doc').reset();
-                    document.getElementById('form-upload-doc').style.display = 'none'; 
-                    
-                    document.getElementById('filter-doc-tipo').value = tipoDoc;
-                    actualizarSubtipos('filter');
-                    
-                    await obtenerDocumentosServidor();
-                } else {
-                    const errData = await res.json();
-                    alert("Error del servidor: " + errData.error);
-                }
-            } catch(err) { alert("Fallo de red al intentar subir."); }
+            document.getElementById('filter-doc-tipo').value = tipoDoc;
+            actualizarSubtipos('filter');
+            
+            await obtenerDocumentosServidor();
+        } else {
+            const errData = await res.json();
+            alert("Error del servidor: " + errData.error);
         }
+    } catch(err) { 
+        alert("Fallo de red al intentar subir.");
+    }
+}
 
         // CORREGIDO: Redirección inteligente de eliminación según tipo de documento (Para que el admin pueda borrar registros médicos)
         async function eliminarDocumento(id) {
