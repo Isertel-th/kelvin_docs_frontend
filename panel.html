@@ -1394,7 +1394,7 @@ async function abrirModalPermisos() {
         if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
 
         const departamentos = await res.json();
-        
+        console.log("Datos recibidos del servidor:", departamentos); // Agrega esto para depurar
         selectDep.innerHTML = '<option value="">-- Seleccione un Departamento --</option>';
         
         departamentos.forEach(d => {
