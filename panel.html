@@ -377,9 +377,9 @@
 
 <script>
         const API_URL = 'https://kelvin-th-docs-backend.onrender.com/api';
-        const token = localStorage.getItem('token');
-        const rol = localStorage.getItem('rol');
-        const nombreUsuario = localStorage.getItem('nombre');
+const token = sessionStorage.getItem('token');
+const rol = sessionStorage.getItem('rol');
+const nombreUsuario = sessionStorage.getItem('nombre');
 
         let currentSelectedUserId = null;
         let currentSelectedUserPasivo = false;
@@ -511,7 +511,7 @@
         }
 
         function cerrarSesion() {
-            localStorage.clear();
+            sessionStorage.clear();
             window.location.href = 'index.html';
         }
 
