@@ -719,25 +719,38 @@
             document.querySelectorAll('.vector-card').forEach(card => card.classList.remove('selected'));
         }
 
-        async function obtenerDocumentosServidor() {
-            let endpoint = '';
-            if (rol === 'admin') {
-                endpoint = `${API_URL}/admin/documentos/${currentSelectedUserId}?pasivo=${currentSelectedUserPasivo}`;
-            } else if (rol === 'doc') {
-                endpoint = `${API_URL}/doctor/aptitud/${currentSelectedUserId}`;
-            } else if (rol === 'kelvin') {
-                endpoint = `${API_URL}/kelvin/documentos/${currentSelectedUserId}`;
-            }
+async function obtenerDocumentosServidor() {
+    let endpoint = '';
+    const tipoSeleccionado = document.getElementById('filter-doc-tipo').value;
 
-            try {
-                const res = await fetch(endpoint, { headers: { 'Authorization': `Bearer ${token}` } });
-                documentosActuales = await res.json();
-                if (!Array.isArray(documentosActuales)) documentosActuales = [];
-                filtrarDocumentos(); 
-            } catch (err) { 
-                document.getElementById('tbody-docs-empleado').innerHTML = '<tr><td colspan="4" style="color:red;">Error al enlazar datos de almacenamiento remoto.</td></tr>'; 
-            }
-        }
+    // 1. Prioridad: Si es tipo médico/aptitud, siempre vamos al endpoint de doctor
+    if (tipoSeleccionado === "Certificados Médicos" || tipoSeleccionado === "Certificados de Aptitud") {
+        endpoint = `${API_URL}/doctor/aptitud/${currentSelectedUserId}`;
+    } 
+    // 2. Si no es médico, determinamos el endpoint según el rol
+    else if (rol === 'admin') {
+        endpoint = `${API_URL}/admin/documentos/${currentSelectedUserId}?pasivo=${currentSelectedUserPasivo}`;
+    } else if (rol === 'doc') {
+        // En caso de que el médico busque algo que no sea médico, 
+        // puedes decidir si enviarlo a aptitud o bloquearlo
+        endpoint = `${API_URL}/doctor/aptitud/${currentSelectedUserId}`;
+    } else if (rol === 'kelvin') {
+        endpoint = `${API_URL}/kelvin/documentos/${currentSelectedUserId}`;
+    }
+
+    // 3. Ejecución de la consulta
+    try {
+        const res = await fetch(endpoint, { 
+            headers: { 'Authorization': `Bearer ${token}` } 
+        });
+        documentosActuales = await res.json();
+        if (!Array.isArray(documentosActuales)) documentosActuales = [];
+        filtrarDocumentos(); 
+    } catch (err) { 
+        document.getElementById('tbody-docs-empleado').innerHTML = 
+            '<tr><td colspan="4" style="color:red;">Error al enlazar datos de almacenamiento remoto.</td></tr>'; 
+    }
+}
 
         function filtrarDocumentos() {
             const tipoSeleccionado = document.getElementById('filter-doc-tipo').value;
