@@ -1377,35 +1377,46 @@ function cargarSeccionEmpresa() {
 // Abrir e iniciar el modal cargando la tabla dinámica de departamentos
 // Abrir e iniciar el modal cargando la tabla dinámica de departamentos
 // Abrir e iniciar el modal cargando la tabla dinámica de departamentos
+// Abrir e iniciar el modal cargando la tabla dinámica de departamentos
 async function abrirModalPermisos() {
+    // 1. Limpiamos el formulario antes de mostrarlo
     document.getElementById('formPermisos').reset();
+    
+    // 2. Colocamos el estado de carga en el select
     const selectDep = document.getElementById('esp_departamento');
-    selectDep.innerHTML = '<option value="">Cargando...</option>';
+    selectDep.innerHTML = '<option value="">Cargando departamentos...</option>';
+    
+    // 3. MOSTRAMOS EL MODAL DE INMEDIATO (Mejora la experiencia visual)
+    const modal = document.getElementById('modalPermisos');
+    modal.style.display = 'flex';
+    modal.classList.remove('hidden');
     
     try {
+        // 4. Solicitamos los datos al backend de Render
         const res = await fetch(`${API_BASE}/admin/departamentos`, {
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
 
-        // Si el backend responde con error (ej. 404 o 500), lanzamos el fallo de inmediato
         if (!res.ok) {
-            throw new Error(`Error en el servidor: ${res.status}`);
+            throw new Error(`Código de estado de error: ${res.status}`);
         }
 
         const deparamentos = await res.json();
         
-        // Mapeamos los departamentos recibidos
+        // 5. Renderizamos las opciones reales mapeadas
         selectDep.innerHTML = '<option value="">-- Seleccione un Departamento --</option>' + 
             deparamentos.map(d => `<option value="${d.departamento}">${d.departamento}</option>`).join('');
             
-        // SOLO SI TODO ESTÁ BIEN: Mostramos el modal al usuario
-        const modal = document.getElementById('modalPermisos');
-        modal.style.display = 'flex';
-        modal.classList.remove('hidden');
-
     } catch (err) {
-        alert('Error al conectar con el servidor para mapear los departamentos. Verifique que el endpoint exista en el backend.');
-        console.error("Error detallado:", err);
+        console.error("Error detallado al mapear:", err);
+        // Si falla, dejamos una opción manual para que no se quede vacío e inutilizable
+        selectDep.innerHTML = `
+            <option value="">-- Error al cargar del servidor --</option>
+            <option value="TALENTO HUMANO">TALENTO HUMANO</option>
+            <option value="OPERACIONES">OPERACIONES</option>
+            <option value="TECNOLOGÍA">TECNOLOGÍA</option>
+        `;
+        alert('Nota: No se pudo sincronizar la lista desde el servidor. Se cargaron opciones de respaldo.');
     }
 }
 
