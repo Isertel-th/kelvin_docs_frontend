@@ -281,44 +281,41 @@
 </div>
 
 
-            <div id="view-empresa" class="view-section">
-                <div class="card">
-                    <h3>Subir Documento Institucional / Empresa</h3>
-                    <form id="form-empresa" onsubmit="subirDocEmpresa(event)">
-                        <div class="grid-form">
-                            <div>
-                                <label>Tipo de Documento:</label>
-                                <input type="text" id="emp_tipo" placeholder="Ej. Reglamento Interno, Políticas" required>
-                            </div>
-                            <div>
-                                <label>Archivo (PDF/Imagen):</label>
-                                <input type="file" id="emp_archivo" accept=".pdf" class="form-control" />
-                            </div>
-                        </div>
-                        <button type="submit" class="btn-submit">Subir Archivo General</button>
-                    </form>
+<div id="view-empresa" class="view-section">
+    <div class="card">
+        <h3>Subir Documento Institucional / Empresa</h3>
+        <form id="form-empresa" onsubmit="subirDocEmpresa(event)">
+            <div class="grid-form">
+                <div>
+                    <label>Tipo de Documento:</label>
+                    <input type="text" id="emp_tipo" placeholder="Ej. Reglamento Interno, Políticas" required>
                 </div>
-<div class="card">
-    <h3>Repositorio Corporativo</h3>
-    <div class="table-responsive">
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Tipo de Documento / Metadata</th>
-                    <th>Fecha de Subida</th>
-                    <th>Enlaces de Acceso</th>
-                    <th>Acción</th>
-                </tr>
-            </thead>
-            <tbody id="tbody-empresa"></tbody>
-        </table>
-    </div>
-</div>
+                <div>
+                    <label>Archivo (PDF/Imagen):</label>
+                    <input type="file" id="emp_archivo" accept=".pdf" class="form-control" />
+                </div>
             </div>
+            <button type="submit" class="btn-submit">Subir Archivo General</button>
+        </form>
+    </div>
 
+    <div class="card">
+        <h3>Repositorio Corporativo</h3>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tipo de Documento / Metadata</th>
+                        <th>Fecha de Subida</th>
+                        <th>Acciones</th> 
+                    </tr>
+                </thead>
+                <tbody id="tbody-empresa"></tbody>
+            </table>
         </div>
     </div>
+</div>
 
 
 
@@ -1208,6 +1205,7 @@ async function subirDocEmpresa(event) {
 }
 
 // Función para listar todos los documentos guardados
+// Función para listar todos los documentos guardados (Corregida para unificar botones)
 async function cargarDocsEmpresa() {
     const tbody = document.getElementById('tbody-empresa');
     if (!tbody) return;
@@ -1254,14 +1252,16 @@ async function cargarDocsEmpresa() {
                 </td>
                 <td><small style="color:#475569; font-weight:500;">📅 ${fechaFormateada}</small></td>
                 <td>
-                    <a href="${doc.url_cloudinary}" target="_blank" class="btn-action btn-view" style="text-align:center;">👁️ Ver</a>
-                    <a href="${doc.url_cloudinary}" download="${doc.nombre_archivo}" target="_blank" class="btn-action btn-upload" style="background:#0284c7; text-align:center;">📥 Descargar</a>
-                </td>
-                <td>
-                    ${rol === 'admin' 
-                        ? `<button class="btn-action btn-delete" onclick="eliminarDocEmpresa(${doc.id})">🗑️ Eliminar</button>` 
-                        : `<span style="color:#94a3b8; font-size:12px; font-style:italic;">Solo lectura</span>`
-                    }
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
+                        <a href="${doc.url_cloudinary}" target="_blank" class="btn-action btn-view" style="text-align:center; margin:0;">👁️ Ver</a>
+                        
+                        <a href="${doc.url_cloudinary}" download="${doc.nombre_archivo}" target="_blank" class="btn-action btn-upload" style="background:#0284c7; text-align:center; margin:0;">📥 Descargar</a>
+                        
+                        ${rol === 'admin' 
+                            ? `<button class="btn-action btn-delete" onclick="eliminarDocEmpresa(${doc.id})" style="margin:0;">🗑️ Eliminar</button>` 
+                            : `<span style="color:#94a3b8; font-size:12px; font-style:italic; margin-left: 5px;">Solo lectura</span>`
+                        }
+                    </div>
                 </td>
             `;
             tbody.appendChild(tr);
