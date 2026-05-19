@@ -111,13 +111,13 @@
     <div class="sidebar">
         <div>
             <h3 id="panel-title">Isertel Gestión</h3>
-<div class="nav-menu">
-    <button class="nav-btn active" onclick="switchView('activos')">👥 Personal Activo</button>
-    <button class="nav-btn" onclick="switchView('pasivos')">📁 Personal Pasivo</button>
-    <button class="nav-btn role-admin" id="menu-crear" onclick="switchView('crear')">➕ Registrar Empleado</button>
-    <button class="nav-btn role-admin" id="menu-modificar" onclick="switchView('modificar'); prepararModuloModificar();">✏️ Modificar Empleado</button>
-    <button class="nav-btn role-admin" id="menu-empresa" onclick="switchView('empresa')">🏢 Docs Empresa</button>
-</div>
+            <div class="nav-menu">
+                <button class="nav-btn active" onclick="switchView('activos')">👥 Personal Activo</button>
+                <button class="nav-btn" onclick="switchView('pasivos')">📁 Personal Pasivo</button>
+                <button class="nav-btn role-admin" id="menu-crear" onclick="switchView('crear')">➕ Registrar Empleado</button>
+                <button class="nav-btn role-admin" id="menu-modificar" onclick="switchView('modificar'); prepararModuloModificar();">✏️ Modificar Empleado</button>
+                <button class="nav-btn role-admin" id="menu-empresa" onclick="switchView('empresa')">🏢 Docs Empresa</button>
+            </div>
         </div>
         <div>
             <button class="logout-btn" onclick="cerrarSesion()">Cerrar Sesión</button>
@@ -217,14 +217,23 @@
 
 <div id="view-modificar" class="view-section">
     <div class="card">
-        <h3>Modificar Colaborador en Nómina</h3>
-        <p style="color: #64748b; font-size: 14px; margin-bottom: 1rem;">Selecciona un empleado de la nómina para cargar sus datos y corregir cualquier información errónea.</p>
+        <h3>Modificar Colaborador (Nómina / Pasivos)</h3>
+        <p style="color: #64748b; font-size: 14px; margin-bottom: 1rem;">Corrige de forma directa los detalles o errores de registro de cualquier colaborador activo o pasivo.</p>
         
-        <div style="margin-bottom: 1.5rem;">
-            <label style="font-weight: bold;">1. Seleccionar Colaborador:</label>
-            <select id="m_select_empleado" onchange="cargarDatosEmpleadoEnFormulario()" style="border: 2px solid var(--primary-color);">
-                <option value="">-- Seleccione un empleado de la lista --</option>
-            </select>
+        <div class="grid-form" style="margin-bottom: 1.5rem; background: #f1f5f9; padding: 1rem; border-radius: 8px;">
+            <div>
+                <label style="font-weight: bold;">1. Tipo de Estado:</label>
+                <select id="m_tipo_tabla" onchange="prepararModuloModificar()" style="border: 2px solid var(--admin-color);">
+                    <option value="nomina">👥 Personal Activo (Nómina)</option>
+                    <option value="pasivos">📁 Personal Pasivo (Histórico)</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-weight: bold;">2. Seleccionar Colaborador:</label>
+                <select id="m_select_empleado" onchange="cargarDatosEmpleadoEnFormulario()" style="border: 2px solid var(--primary-color);">
+                    <option value="">-- Seleccione un empleado --</option>
+                </select>
+            </div>
         </div>
 
         <form id="form-modificar-usuario" onsubmit="actualizarUsuario(event)" style="display: none; border-top: 1px solid #e2e8f0; padding-top: 1.5rem;">
@@ -270,42 +279,41 @@
     </div>
 </div>
 
-<div id="view-empresa" class="view-section">
-    <div class="card" id="contenedor-subida-empresa" style="display: none;">
-        <h3>Subir Documento Institucional / Empresa</h3>
-        <form id="form-empresa" onsubmit="subirDocEmpresa(event)">
-            <div class="grid-form">
-                <div>
-                    <label>Tipo de Documento:</label>
-                    <input type="text" id="emp_tipo" placeholder="Ej. Reglamento Interno, Políticas Corporativas" required>
+
+            <div id="view-empresa" class="view-section">
+                <div class="card">
+                    <h3>Subir Documento Institucional / Empresa</h3>
+                    <form id="form-empresa" onsubmit="subirDocEmpresa(event)">
+                        <div class="grid-form">
+                            <div>
+                                <label>Tipo de Documento:</label>
+                                <input type="text" id="emp_tipo" placeholder="Ej. Reglamento Interno, Políticas" required>
+                            </div>
+                            <div>
+                                <label>Archivo (PDF/Imagen):</label>
+                                <input type="file" id="emp_archivo" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-submit">Subir Archivo General</button>
+                    </form>
                 </div>
-                <div>
-                    <label>Archivo (Exclusivo PDF):</label>
-                    <input type="file" id="emp_archivo" accept=".pdf" required style="padding: 7px;">
+                <div class="card">
+                    <h3>Repositorio Corporativo</h3>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Tipo de Documento</th>
+                                    <th>Enlace</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-empresa"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-            <button type="submit" class="btn-submit">Subir Archivo General</button>
-        </form>
-    </div>
-
-    <div class="card">
-        <h3>Repositorio Corporativo - Documentos de la Empresa</h3>
-        <div class="table-responsive">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Tipo de Documento</th>
-                        <th>Fecha de subida</th>
-                        <th>Enlace</th>
-                        <th class="columna-accion-admin" style="display: none;">Acción</th>
-                    </tr>
-                </thead>
-                <tbody id="tbody-empresa"></tbody>
-            </table>
-        </div>
-    </div>
-</div>
 
         </div>
     </div>
@@ -558,7 +566,7 @@
             mapearDobleClic('tbody-pasivos');
         };
 
-            function switchView(viewId) {
+        function switchView(viewId) {
             document.querySelectorAll('.view-section').forEach(section => section.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById(`view-${viewId}`).classList.add('active');
@@ -568,11 +576,6 @@
 
             const titles = { 'activos': 'Personal Activo', 'pasivos': 'Personal Pasivo', 'crear': 'Registrar Empleado', 'empresa': 'Documentos Institucionales' };
             document.getElementById('view-title').innerText = titles[viewId] || "Panel Isertel";
-
-            // AQUÍ SE ADAPTA: Si el usuario entra a la vista de empresa, carga los documentos automáticamente
-            if (viewId === 'empresa') {
-                cargarDocsEmpresa();
-            }
         }
 
         function cerrarSesion() {
@@ -1022,37 +1025,46 @@ if (tipoSeleccionado === "Certificados Médicos" || tipoSeleccionado === "Certif
             } catch (err) { console.error(err); }
         }
         // Variable global para almacenar el listado de empleados cargados para modificar
-// Variable global para almacenar el listado de empleados cargados para modificar
+// Variable global para almacenar temporalmente los colaboradores cargados
 let empleadosModificarList = [];
 
-// Función para inicializar el módulo cargando los empleados activos en el select
+// Carga la lista correspondiente (activos o pasivos) en el select dependiente
 async function prepararModuloModificar() {
+    const tablaSeleccionada = document.getElementById('m_tipo_tabla').value;
     const select = document.getElementById('m_select_empleado');
     const form = document.getElementById('form-modificar-usuario');
     
-    // Resetear vistas iniciales
-    select.innerHTML = '<option value="">-- Seleccione un empleado de la lista --</option>';
+    // Limpiar estados previos
+    select.innerHTML = '<option value="">-- Seleccione un empleado --</option>';
     form.style.display = 'none';
     form.reset();
 
+    // Determinar endpoint de consulta según la selección
+    const rutaEndpoint = tablaSeleccionada === 'nomina' ? '/admin/empleados' : '/admin/pasivos';
+
     try {
-        const res = await fetch(`${API_URL}/admin/empleados`, {
+        const res = await fetch(`${API_URL}${rutaEndpoint}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        if (!res.ok) throw new Error("No se pudo obtener la nómina");
+        if (!res.ok) throw new Error("No se pudo obtener el listado del servidor");
         
         empleadosModificarList = await res.json();
         
+        if(empleadosModificarList.length === 0) {
+            select.innerHTML = '<option value="">No hay registros en esta categoría</option>';
+            return;
+        }
+
         empleadosModificarList.forEach(emp => {
             select.innerHTML += `<option value="${emp.id}">${emp.nombre_completo} (C.I. ${emp.cedula})</option>`;
         });
     } catch (err) {
         console.error(err);
-        alert("Error al cargar la nómina de empleados.");
+        alert("Error al cargar la lista de colaboradores desde el servidor.");
     }
 }
 
-// Función que lee el empleado seleccionado y rellena los campos del formulario
+// Rellena los inputs cuando seleccionas un empleado del dropdown
 function cargarDatosEmpleadoEnFormulario() {
     const idSeleccionado = document.getElementById('m_select_empleado').value;
     const form = document.getElementById('form-modificar-usuario');
@@ -1062,11 +1074,9 @@ function cargarDatosEmpleadoEnFormulario() {
         return;
     }
 
-    // Buscar el objeto en nuestra lista local
     const emp = empleadosModificarList.find(e => e.id == idSeleccionado);
     if (!emp) return;
 
-    // Rellenar cada input del formulario
     document.getElementById('m_id').value = emp.id;
     document.getElementById('m_cedula').value = emp.cedula;
     document.getElementById('m_nombre').value = emp.nombre_completo;
@@ -1075,7 +1085,6 @@ function cargarDatosEmpleadoEnFormulario() {
     document.getElementById('m_direccion').value = emp.direccion;
     document.getElementById('m_vista_foto').src = emp.foto_url || '';
 
-    // Formatear la fecha adecuadamente (YYYY-MM-DD) para el input date
     if (emp.fecha_ingreso) {
         const fechaIso = new Date(emp.fecha_ingreso).toISOString().split('T')[0];
         document.getElementById('m_fecha').value = fechaIso;
@@ -1083,15 +1092,15 @@ function cargarDatosEmpleadoEnFormulario() {
         document.getElementById('m_fecha').value = '';
     }
 
-    // Mostrar el formulario dinámicamente
     form.style.display = 'block';
 }
 
-// Función encargada de empaquetar los datos del formulario y enviarlos al Backend
+// Envía la petición PUT incluyendo la tabla correspondiente como parámetro de ruta
 async function actualizarUsuario(event) {
     event.preventDefault();
     
     const id = document.getElementById('m_id').value;
+    const tablaTarget = document.getElementById('m_tipo_tabla').value; // 'nomina' o 'pasivos'
     const formData = new FormData();
     
     formData.append('cedula', document.getElementById('m_cedula').value);
@@ -1107,7 +1116,8 @@ async function actualizarUsuario(event) {
     }
 
     try {
-        const res = await fetch(`${API_URL}/admin/modificar-usuario/${id}`, {
+        // Se envía a /api/admin/modificar-usuario/nomina/:id  O  /api/admin/modificar-usuario/pasivos/:id
+        const res = await fetch(`${API_URL}/admin/modificar-usuario/${tablaTarget}/${id}`, {
             method: 'PUT',
             headers: { 'Authorization': `Bearer ${token}` },
             body: formData
@@ -1116,129 +1126,18 @@ async function actualizarUsuario(event) {
         const data = await res.json();
 
         if (res.ok) {
-            alert("¡Información del colaborador actualizada exitosamente!");
-            // Recargar el selector y ocultar el formulario
-            prepararModuloModificar();
-            // Si tienes una función global para refrescar las tablas principales, puedes llamarla aquí:
-            if(typeof cargarEmpleados === 'function') cargarEmpleados(); 
+            alert("¡Registro actualizado con éxito en la base de datos!");
+            prepararModuloModificar(); // Recargar la lista actual
+            
+            // Refrescar vistas generales si las funciones existen en tu panel
+            if (typeof cargarEmpleados === 'function') cargarEmpleados();
+            if (typeof cargarPasivos === 'function') cargarPasivos();
         } else {
             alert("Error: " + data.error);
         }
     } catch (err) {
         console.error(err);
-        alert("Ocurrió un error de red o de servidor al procesar la actualización.");
-    }
-}
-
-
-
-// 1. Cargar y renderizar los documentos institucionales controlando los permisos visuales
-async function cargarDocsEmpresa() {
-    try {
-        const res = await fetch(`${API_URL}/empresa/documentos`, {
-            method: 'GET',
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const docs = await res.json();
-
-        const tbody = document.getElementById('tbody-empresa'); // Asegúrate de que este ID coincida con tu HTML
-        tbody.innerHTML = '';
-
-        docs.forEach(doc => {
-            // Formatear la fecha para que sea legible (DD/MM/YYYY)
-            const fecha = doc.fecha_subida ? new Date(doc.fecha_subida).toLocaleDateString() : 'N/A';
-
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td class="p-2 border">${doc.tipo_documento}</td>
-                <td class="p-2 border">${fecha}</td>
-                <td class="p-2 border text-center">
-                    <a href="${doc.enlace_url}" target="_blank" download="${doc.nombre_archivo}" class="text-blue-600 hover:underline font-medium">
-                        Ver / Descargar
-                    </a>
-                </td>
-                <td class="p-2 border text-center">
-                    ${rol === 'admin' ? `
-                        <button onclick="eliminarDocEmpresa(${doc.id})" class="bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600 transition">
-                            Eliminar
-                        </button>
-                    ` : '<span class="text-gray-400">Sin permisos</span>'}
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
-    } catch (err) {
-        console.error("Error al cargar documentos institucionales:", err);
-    }
-}
-
-// 2. Procesar el envío del formulario (Exclusivo Admin)
-async function subirDocEmpresa(event) {
-    event.preventDefault();
-    if (rol !== 'admin') {
-        alert("No posees los privilegios requeridos para subir información corporativa.");
-        return;
-    }
-
-    const tipoDoc = document.getElementById('emp_tipo').value;
-    const inputArchivo = document.getElementById('emp_archivo');
-
-    if (!inputArchivo.files[0]) {
-        alert("Selecciona un documento PDF.");
-        return;
-    }
-
-    // Doble verificación del archivo en Frontend
-    if (inputArchivo.files[0].type !== "application/pdf") {
-        alert("Error crítico: El sistema institucional solo admite archivos con extensión .pdf");
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append('tipo_documento', tipoDoc);
-    formData.append('archivo', inputArchivo.files[0]);
-
-    try {
-        const res = await fetch(`${API_URL}/empresa/documentos`, {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}` },
-            body: formData
-        });
-        const data = await res.json();
-
-        if (res.ok) {
-            alert("¡Documento corporativo indexado y renombrado exitosamente!");
-            document.getElementById('form-empresa').reset();
-            cargarDocsEmpresa(); // Refrescar tabla automáticamente
-        } else {
-            alert("Error: " + data.error);
-        }
-    } catch (err) {
-        console.error("Error en subida:", err);
-        alert("Ocurrió un error de red al intentar procesar el archivo.");
-    }
-}
-
-// 3. Eliminar documento institucional (Exclusivo Admin)
-async function eliminarDocEmpresa(id) {
-    if (rol !== 'admin') return;
-    if (!confirm("¿Está seguro de eliminar este documento del repositorio oficial de la empresa?")) return;
-
-    try {
-        const res = await fetch(`${API_URL}/empresa/documentos/${id}`, {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await res.json();
-
-        if (res.ok) {
-            alert("Documento eliminado del repositorio general.");
-            cargarDocsEmpresa();
-        } else {
-            alert("Error: " + data.error);
-        }
-    } catch (err) {
-        console.error("Error al eliminar:", err);
+        alert("Error de red o servidor al intentar guardar los cambios.");
     }
 }
 </script>
