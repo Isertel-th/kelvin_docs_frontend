@@ -288,23 +288,23 @@
         </form>
     </div>
 
-    <div class="card">
-        <h3>Repositorio Corporativo - Documentos de la Empresa</h3>
-        <div class="table-responsive">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Tipo de Documento</th>
-                        <th>Nombre Real Generado</th>
-                        <th>Enlace</th>
-                        <th class="columna-accion-admin" style="display: none;">Acción</th>
-                    </tr>
-                </thead>
-                <tbody id="tbody-empresa"></tbody>
-            </table>
-        </div>
+<div class="card">
+    <h3>Repositorio Corporativo - Documentos de la Empresa</h3>
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tipo de Documento</th>
+                    <th>Fecha de Subida</th> 
+                    <th>Enlace</th>
+                    <th class="columna-accion-admin" style="display: none;">Acción</th>
+                </tr>
+            </thead>
+            <tbody id="tbody-empresa"></tbody>
+        </table>
     </div>
+</div>
 </div>
 
         </div>
@@ -1136,63 +1136,34 @@ async function actualizarUsuario(event) {
 async function cargarDocsEmpresa() {
     try {
         const res = await fetch(`${API_URL}/empresa/documentos`, {
-            method: 'GET',
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        const data = await res.json();
-
-        // Control dinámico de roles en la vista
-        if (rol === 'admin') {
-            document.getElementById('contenedor-subida-empresa').style.display = 'block';
-            document.querySelectorAll('.columna-accion-admin').forEach(el => el.style.display = 'table-cell');
-        } else {
-            document.getElementById('contenedor-subida-empresa').style.display = 'none';
-            document.querySelectorAll('.columna-accion-admin').forEach(el => el.style.display = 'none');
-        }
-
+        const docs = await res.json();
+        
         const tbody = document.getElementById('tbody-empresa');
         tbody.innerHTML = '';
 
-        if (data.error) {
-            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red;">${data.error}</td></tr>`;
-            return;
-        }
-
-        if (data.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No hay documentos institucionales registrados.</td></tr>`;
-            return;
-        }
-
-        data.forEach(doc => {
+        docs.forEach(doc => {
             const tr = document.createElement('tr');
             
-            // Renderizamos las celdas comunes (Ver/Descargar)
-            let celdasHTML = `
+            // Formatear la fecha si viene con formato de base de datos completo (ej: 2026-05-19T00:00:00.000Z)
+            const fechaFormateada = doc.nombre_archivo ? doc.nombre_archivo.split('T')[0] : 'Sin fecha';
+
+            tr.innerHTML = `
                 <td>${doc.id}</td>
-                <td style="font-weight: 600;">${doc.tipo_documento}</td>
-                <td style="color: #475569; font-family: monospace;">${doc.nombre_archivo}</td>
+                <td><strong>${doc.tipo_documento}</strong></td>
+                <td><span class="user-badge" style="background:#e0f2fe; color:#0369a1;">📅 ${fechaFormateada}</span></td>
                 <td>
-                    <a href="${doc.url_cloudinary}" target="_blank" class="btn-action btn-view">👁️ Ver / Descargar</a>
+                    <a href="${doc.url_archivo}" target="_blank" class="btn-action btn-view">👁️ Ver PDF</a>
+                </td>
+                <td class="columna-accion-admin" style="${rol === 'admin' ? '' : 'display:none;'}">
+                    <button onclick="eliminarDocEmpresa(${doc.id})" class="btn-action btn-delete">🗑️</button>
                 </td>
             `;
-
-            // Si es admin añadimos el botón interactivo de borrar
-            if (rol === 'admin') {
-                celdasHTML += `
-                    <td class="columna-accion-admin">
-                        <button onclick="eliminarDocEmpresa(${doc.id})" class="btn-action btn-delete">🗑️ Eliminar</button>
-                    </td>
-                `;
-            } else {
-                celdasHTML += `<td class="columna-accion-admin" style="display:none;"></td>`;
-            }
-
-            tr.innerHTML = celdasHTML;
             tbody.appendChild(tr);
         });
-
     } catch (err) {
-        console.error("Error al cargar repositorio:", err);
+        console.error("Error cargando documentos de empresa:", err);
     }
 }
 
