@@ -217,14 +217,23 @@
 
 <div id="view-modificar" class="view-section">
     <div class="card">
-        <h3>Modificar Colaborador en Nómina</h3>
-        <p style="color: #64748b; font-size: 14px; margin-bottom: 1rem;">Selecciona un empleado de la nómina para cargar sus datos y corregir cualquier información errónea.</p>
+        <h3>Modificar Colaborador (Nómina / Pasivos)</h3>
+        <p style="color: #64748b; font-size: 14px; margin-bottom: 1rem;">Corrige de forma directa los detalles o errores de registro de cualquier colaborador activo o pasivo.</p>
         
-        <div style="margin-bottom: 1.5rem;">
-            <label style="font-weight: bold;">1. Seleccionar Colaborador:</label>
-            <select id="m_select_empleado" onchange="cargarDatosEmpleadoEnFormulario()" style="border: 2px solid var(--primary-color);">
-                <option value="">-- Seleccione un empleado de la lista --</option>
-            </select>
+        <div class="grid-form" style="margin-bottom: 1.5rem; background: #f1f5f9; padding: 1rem; border-radius: 8px;">
+            <div>
+                <label style="font-weight: bold;">1. Tipo de Estado:</label>
+                <select id="m_tipo_tabla" onchange="prepararModuloModificar()" style="border: 2px solid var(--admin-color);">
+                    <option value="nomina">👥 Personal Activo (Nómina)</option>
+                    <option value="pasivos">📁 Personal Pasivo (Histórico)</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-weight: bold;">2. Seleccionar Colaborador:</label>
+                <select id="m_select_empleado" onchange="cargarDatosEmpleadoEnFormulario()" style="border: 2px solid var(--primary-color);">
+                    <option value="">-- Seleccione un empleado --</option>
+                </select>
+            </div>
         </div>
 
         <form id="form-modificar-usuario" onsubmit="actualizarUsuario(event)" style="display: none; border-top: 1px solid #e2e8f0; padding-top: 1.5rem;">
@@ -308,6 +317,8 @@
 
         </div>
     </div>
+
+
 
     <div id="modal-expediente" class="modal">
         <div class="modal-content">
@@ -1014,36 +1025,46 @@ if (tipoSeleccionado === "Certificados Médicos" || tipoSeleccionado === "Certif
             } catch (err) { console.error(err); }
         }
         // Variable global para almacenar el listado de empleados cargados para modificar
+// Variable global para almacenar temporalmente los colaboradores cargados
 let empleadosModificarList = [];
 
-// Función para inicializar el módulo cargando los empleados activos en el select
+// Carga la lista correspondiente (activos o pasivos) en el select dependiente
 async function prepararModuloModificar() {
+    const tablaSeleccionada = document.getElementById('m_tipo_tabla').value;
     const select = document.getElementById('m_select_empleado');
     const form = document.getElementById('form-modificar-usuario');
     
-    // Resetear vistas iniciales
-    select.innerHTML = '<option value="">-- Seleccione un empleado de la lista --</option>';
+    // Limpiar estados previos
+    select.innerHTML = '<option value="">-- Seleccione un empleado --</option>';
     form.style.display = 'none';
     form.reset();
 
+    // Determinar endpoint de consulta según la selección
+    const rutaEndpoint = tablaSeleccionada === 'nomina' ? '/admin/empleados' : '/admin/pasivos';
+
     try {
-        const res = await fetch(`${API_URL}/admin/empleados`, {
+        const res = await fetch(`${API_URL}${rutaEndpoint}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        if (!res.ok) throw new Error("No se pudo obtener la nómina");
+        if (!res.ok) throw new Error("No se pudo obtener el listado del servidor");
         
         empleadosModificarList = await res.json();
         
+        if(empleadosModificarList.length === 0) {
+            select.innerHTML = '<option value="">No hay registros en esta categoría</option>';
+            return;
+        }
+
         empleadosModificarList.forEach(emp => {
             select.innerHTML += `<option value="${emp.id}">${emp.nombre_completo} (C.I. ${emp.cedula})</option>`;
         });
     } catch (err) {
         console.error(err);
-        alert("Error al cargar la nómina de empleados.");
+        alert("Error al cargar la lista de colaboradores desde el servidor.");
     }
 }
 
-// Función que lee el empleado seleccionado y rellena los campos del formulario
+// Rellena los inputs cuando seleccionas un empleado del dropdown
 function cargarDatosEmpleadoEnFormulario() {
     const idSeleccionado = document.getElementById('m_select_empleado').value;
     const form = document.getElementById('form-modificar-usuario');
@@ -1053,11 +1074,9 @@ function cargarDatosEmpleadoEnFormulario() {
         return;
     }
 
-    // Buscar el objeto en nuestra lista local
     const emp = empleadosModificarList.find(e => e.id == idSeleccionado);
     if (!emp) return;
 
-    // Rellenar cada input del formulario
     document.getElementById('m_id').value = emp.id;
     document.getElementById('m_cedula').value = emp.cedula;
     document.getElementById('m_nombre').value = emp.nombre_completo;
@@ -1066,7 +1085,6 @@ function cargarDatosEmpleadoEnFormulario() {
     document.getElementById('m_direccion').value = emp.direccion;
     document.getElementById('m_vista_foto').src = emp.foto_url || '';
 
-    // Formatear la fecha adecuadamente (YYYY-MM-DD) para el input date
     if (emp.fecha_ingreso) {
         const fechaIso = new Date(emp.fecha_ingreso).toISOString().split('T')[0];
         document.getElementById('m_fecha').value = fechaIso;
@@ -1074,15 +1092,15 @@ function cargarDatosEmpleadoEnFormulario() {
         document.getElementById('m_fecha').value = '';
     }
 
-    // Mostrar el formulario dinámicamente
     form.style.display = 'block';
 }
 
-// Función encargada de empaquetar los datos del formulario y enviarlos al Backend
+// Envía la petición PUT incluyendo la tabla correspondiente como parámetro de ruta
 async function actualizarUsuario(event) {
     event.preventDefault();
     
     const id = document.getElementById('m_id').value;
+    const tablaTarget = document.getElementById('m_tipo_tabla').value; // 'nomina' o 'pasivos'
     const formData = new FormData();
     
     formData.append('cedula', document.getElementById('m_cedula').value);
@@ -1098,7 +1116,8 @@ async function actualizarUsuario(event) {
     }
 
     try {
-        const res = await fetch(`${API_URL}/admin/modificar-usuario/${id}`, {
+        // Se envía a /api/admin/modificar-usuario/nomina/:id  O  /api/admin/modificar-usuario/pasivos/:id
+        const res = await fetch(`${API_URL}/admin/modificar-usuario/${tablaTarget}/${id}`, {
             method: 'PUT',
             headers: { 'Authorization': `Bearer ${token}` },
             body: formData
@@ -1107,17 +1126,18 @@ async function actualizarUsuario(event) {
         const data = await res.json();
 
         if (res.ok) {
-            alert("¡Información del colaborador actualizada exitosamente!");
-            // Recargar el selector y ocultar el formulario
-            prepararModuloModificar();
-            // Si tienes una función global para refrescar las tablas principales, puedes llamarla aquí:
-            if(typeof cargarEmpleados === 'function') cargarEmpleados(); 
+            alert("¡Registro actualizado con éxito en la base de datos!");
+            prepararModuloModificar(); // Recargar la lista actual
+            
+            // Refrescar vistas generales si las funciones existen en tu panel
+            if (typeof cargarEmpleados === 'function') cargarEmpleados();
+            if (typeof cargarPasivos === 'function') cargarPasivos();
         } else {
             alert("Error: " + data.error);
         }
     } catch (err) {
         console.error(err);
-        alert("Ocurrió un error de red o de servidor al procesar la actualización.");
+        alert("Error de red o servidor al intentar guardar los cambios.");
     }
 }
 </script>
