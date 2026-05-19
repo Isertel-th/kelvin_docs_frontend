@@ -1377,46 +1377,47 @@ function cargarSeccionEmpresa() {
 // Abrir e iniciar el modal cargando la tabla dinámica de departamentos
 // Abrir e iniciar el modal cargando la tabla dinámica de departamentos
 // Abrir e iniciar el modal cargando la tabla dinámica de departamentos
-// Abrir e iniciar el modal cargando la tabla dinámica de departamentos
 async function abrirModalPermisos() {
-    // 1. Limpiamos el formulario antes de mostrarlo
     document.getElementById('formPermisos').reset();
     
-    // 2. Colocamos el estado de carga en el select
     const selectDep = document.getElementById('esp_departamento');
     selectDep.innerHTML = '<option value="">Cargando departamentos...</option>';
     
-    // 3. MOSTRAMOS EL MODAL DE INMEDIATO (Mejora la experiencia visual)
     const modal = document.getElementById('modalPermisos');
     modal.style.display = 'flex';
     modal.classList.remove('hidden');
     
     try {
-        // 4. Solicitamos los datos al backend de Render
         const res = await fetch(`${API_BASE}/admin/departamentos`, {
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
 
         if (!res.ok) {
-            throw new Error(`Código de estado de error: ${res.status}`);
+            // Esto nos dirá si da un error 404, 500, etc.
+            const errorTexto = await res.text();
+            throw new Error(`Servidor respondió con código ${res.status}: ${errorTexto}`);
         }
 
         const deparamentos = await res.json();
         
-        // 5. Renderizamos las opciones reales mapeadas
+        if (!deparamentos || deparamentos.length === 0) {
+            throw new Error("El servidor devolvió una lista vacía.");
+        }
+        
         selectDep.innerHTML = '<option value="">-- Seleccione un Departamento --</option>' + 
             deparamentos.map(d => `<option value="${d.departamento}">${d.departamento}</option>`).join('');
             
     } catch (err) {
-        console.error("Error detallado al mapear:", err);
-        // Si falla, dejamos una opción manual para que no se quede vacío e inutilizable
+        console.error("🚨 Error capturado en el frontend:", err);
+        
+        // Dejamos opciones por si el servidor falla por completo
         selectDep.innerHTML = `
-            <option value="">-- Error al cargar del servidor --</option>
+            <option value="">-- Error al cargar (Opciones de respaldo) --</option>
             <option value="TALENTO HUMANO">TALENTO HUMANO</option>
             <option value="OPERACIONES">OPERACIONES</option>
             <option value="TECNOLOGÍA">TECNOLOGÍA</option>
         `;
-        alert('Nota: No se pudo sincronizar la lista desde el servidor. Se cargaron opciones de respaldo.');
+        alert('Nota: No se pudo sincronizar con la tabla departamentos. Cargando opciones de respaldo.');
     }
 }
 
