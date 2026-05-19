@@ -813,27 +813,23 @@ function dibujarTablaAgrupada(docsFiltrados) {
                 return;
             }
 
-            const subtipoDoc = document.getElementById('upload-subtipo-doc') ? document.getElementById('upload-subtipo-doc').value : 'General / Único';
-            const fechaDoc = document.getElementById('upload-doc-date').value;
-            const archivoInput = document.getElementById('upload-file').files[0];
+const subtipoDoc = document.getElementById('upload-subtipo-doc') ?
+      document.getElementById('upload-subtipo-doc').value : 'General / Único';
 
-            if (!archivoInput) return;
-            if (archivoInput.type !== "application/pdf" && !archivoInput.name.endsWith('.pdf')) {
-                alert("Error: Solo se permite subir archivos en formato PDF.");
-                return;
-            }
+let baseParaNombre = (subtipoDoc === "General / Único") ? tipoDoc : subtipoDoc;
 
-            const periodoDoc = fechaDoc ? fechaDoc.substring(0, 7) : null;
+const baseSaneada = baseParaNombre.toLowerCase().trim()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Quita tildes
+    .replace(/\s+/g, '_')
+    .replace(/[^a-z0-9_]/g, '');
 
-            const subtipoSaneado = subtipoDoc.toLowerCase().trim()
-                .normalize("NFD").replace(/[\u0300-\u036f]/g, "") 
-                .replace(/\s+/g, '_')
-                .replace(/[^a-z0-9_]/g, '');
-            const [anio, mes, dia] = fechaDoc.split('-');
-            const fechaFormateadaNombre = `${dia}_${mes}_${anio}`;
+const [anio, mes, dia] = fechaDoc.split('-');
+const fechaFormateadaNombre = `${dia}_${mes}_${anio}`;
 
-            const nuevoNombreArchivo = `${subtipoSaneado}_${fechaFormateadaNombre}.pdf`;
-            const archivoRenombrado = new File([archivoInput], nuevoNombreArchivo, { type: archivoInput.type });
+// El nuevo formato: nombre_carpeta_(fecha) o nombre_subtipo_(fecha)
+const nuevoNombreArchivo = `${baseSaneada}_(${fechaFormateadaNombre}).pdf`;
+
+const archivoRenombrado = new File([archivoInput], nuevoNombreArchivo, { type: archivoInput.type });
 
             const formData = new FormData();
             formData.append('tipo_documento', tipoDoc);
