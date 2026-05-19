@@ -1139,60 +1139,36 @@ async function cargarDocsEmpresa() {
             method: 'GET',
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        const data = await res.json();
+        const docs = await res.json();
 
-        // Control dinámico de roles en la vista
-        if (rol === 'admin') {
-            document.getElementById('contenedor-subida-empresa').style.display = 'block';
-            document.querySelectorAll('.columna-accion-admin').forEach(el => el.style.display = 'table-cell');
-        } else {
-            document.getElementById('contenedor-subida-empresa').style.display = 'none';
-            document.querySelectorAll('.columna-accion-admin').forEach(el => el.style.display = 'none');
-        }
-
-        const tbody = document.getElementById('tbody-empresa');
+        const tbody = document.getElementById('tbody-empresa'); // Asegúrate de que este ID coincida con tu HTML
         tbody.innerHTML = '';
 
-        if (data.error) {
-            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red;">${data.error}</td></tr>`;
-            return;
-        }
+        docs.forEach(doc => {
+            // Formatear la fecha para que sea legible (DD/MM/YYYY)
+            const fecha = doc.fecha_subida ? new Date(doc.fecha_subida).toLocaleDateString() : 'N/A';
 
-        if (data.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No hay documentos institucionales registrados.</td></tr>`;
-            return;
-        }
-
-        data.forEach(doc => {
             const tr = document.createElement('tr');
-            
-            // Renderizamos las celdas comunes (Ver/Descargar)
-            let celdasHTML = `
-                <td>${doc.id}</td>
-                <td style="font-weight: 600;">${doc.tipo_documento}</td>
-                <td style="color: #475569; font-family: monospace;">${doc.nombre_archivo}</td>
-                <td>
-                    <a href="${doc.url_cloudinary}" target="_blank" class="btn-action btn-view">👁️ Ver / Descargar</a>
+            tr.innerHTML = `
+                <td class="p-2 border">${doc.tipo_documento}</td>
+                <td class="p-2 border">${fecha}</td>
+                <td class="p-2 border text-center">
+                    <a href="${doc.enlace_url}" target="_blank" download="${doc.nombre_archivo}" class="text-blue-600 hover:underline font-medium">
+                        Ver / Descargar
+                    </a>
+                </td>
+                <td class="p-2 border text-center">
+                    ${rol === 'admin' ? `
+                        <button onclick="eliminarDocEmpresa(${doc.id})" class="bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600 transition">
+                            Eliminar
+                        </button>
+                    ` : '<span class="text-gray-400">Sin permisos</span>'}
                 </td>
             `;
-
-            // Si es admin añadimos el botón interactivo de borrar
-            if (rol === 'admin') {
-                celdasHTML += `
-                    <td class="columna-accion-admin">
-                        <button onclick="eliminarDocEmpresa(${doc.id})" class="btn-action btn-delete">🗑️ Eliminar</button>
-                    </td>
-                `;
-            } else {
-                celdasHTML += `<td class="columna-accion-admin" style="display:none;"></td>`;
-            }
-
-            tr.innerHTML = celdasHTML;
             tbody.appendChild(tr);
         });
-
     } catch (err) {
-        console.error("Error al cargar repositorio:", err);
+        console.error("Error al cargar documentos institucionales:", err);
     }
 }
 
