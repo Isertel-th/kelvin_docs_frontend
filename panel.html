@@ -111,13 +111,13 @@
     <div class="sidebar">
         <div>
             <h3 id="panel-title">Isertel Gestión</h3>
-            <div class="nav-menu">
-                <button class="nav-btn active" onclick="switchView('activos')">👥 Personal Activo</button>
-                <button class="nav-btn" onclick="switchView('pasivos')">📁 Personal Pasivo</button>
-                <button class="nav-btn role-admin" id="menu-crear" onclick="switchView('crear')">➕ Registrar Empleado</button>
-                <button class="nav-btn role-admin" id="menu-modificar" onclick="switchView('modificar'); prepararModuloModificar();">✏️ Modificar Empleado</button>
-                <button class="nav-btn" id="menu-empresa" onclick="switchView('empresa'); cargarDocsEmpresa();">🏢 Docs Empresa</button>
-            </div>
+<div class="nav-menu">
+    <button class="nav-btn active" onclick="switchView('activos')">👥 Personal Activo</button>
+    <button class="nav-btn" onclick="switchView('pasivos')">📁 Personal Pasivo</button>
+    <button class="nav-btn role-admin" id="menu-crear" onclick="switchView('crear')">➕ Registrar Empleado</button>
+    <button class="nav-btn role-admin" id="menu-modificar" onclick="switchView('modificar'); prepararModuloModificar();">✏️ Modificar Empleado</button>
+    <button class="nav-btn role-admin" id="menu-empresa" onclick="switchView('empresa')">🏢 Docs Empresa</button>
+</div>
         </div>
         <div>
             <button class="logout-btn" onclick="cerrarSesion()">Cerrar Sesión</button>
@@ -217,22 +217,14 @@
 
 <div id="view-modificar" class="view-section">
     <div class="card">
-        <h3>Modificar Colaborador (Nómina Activa)</h3>
-        <p style="color: #64748b; font-size: 14px; margin-bottom: 1rem;">Corrige de forma directa los detalles o errores de registro de cualquier colaborador activo.</p>
+        <h3>Modificar Colaborador en Nómina</h3>
+        <p style="color: #64748b; font-size: 14px; margin-bottom: 1rem;">Selecciona un empleado de la nómina para cargar sus datos y corregir cualquier información errónea.</p>
         
-        <div class="grid-form" style="margin-bottom: 1.5rem; background: #f1f5f9; padding: 1rem; border-radius: 8px;">
-            <div style="grid-column: span 2;">
-                <label style="font-weight: bold;">Seleccionar Colaborador de Nómina:</label>
-                <select id="m_select_empleado" onchange="cargarDatosEmpleadoEnFormulario()" style="border: 2px solid var(--primary-color);">
-                    <option value="">-- Seleccione un empleado --</option>
-                </select>
-            </div>
-        </div>
-                <label style="font-weight: bold;">2. Seleccionar Colaborador:</label>
-                <select id="m_select_empleado" onchange="cargarDatosEmpleadoEnFormulario()" style="border: 2px solid var(--primary-color);">
-                    <option value="">-- Seleccione un empleado --</option>
-                </select>
-            </div>
+        <div style="margin-bottom: 1.5rem;">
+            <label style="font-weight: bold;">1. Seleccionar Colaborador:</label>
+            <select id="m_select_empleado" onchange="cargarDatosEmpleadoEnFormulario()" style="border: 2px solid var(--primary-color);">
+                <option value="">-- Seleccione un empleado de la lista --</option>
+            </select>
         </div>
 
         <form id="form-modificar-usuario" onsubmit="actualizarUsuario(event)" style="display: none; border-top: 1px solid #e2e8f0; padding-top: 1.5rem;">
@@ -277,7 +269,6 @@
         </form>
     </div>
 </div>
-
 
 <div id="view-empresa" class="view-section">
     <div class="card" id="contenedor-subida-empresa" style="display: none;">
@@ -1031,39 +1022,37 @@ if (tipoSeleccionado === "Certificados Médicos" || tipoSeleccionado === "Certif
             } catch (err) { console.error(err); }
         }
         // Variable global para almacenar el listado de empleados cargados para modificar
-// Variable global para almacenar temporalmente los colaboradores cargados
+// Variable global para almacenar el listado de empleados cargados para modificar
 let empleadosModificarList = [];
 
-// Carga la lista correspondiente (activos o pasivos) en el select dependiente
+// Función para inicializar el módulo cargando los empleados activos en el select
 async function prepararModuloModificar() {
     const select = document.getElementById('m_select_empleado');
-    select.innerHTML = '<option value="">-- Seleccione un empleado --</option>';
-    document.getElementById('form-modificar-usuario').style.display = 'none';
+    const form = document.getElementById('form-modificar-usuario');
+    
+    // Resetear vistas iniciales
+    select.innerHTML = '<option value="">-- Seleccione un empleado de la lista --</option>';
+    form.style.display = 'none';
+    form.reset();
 
     try {
-        // Apunta directamente al endpoint de empleados activos (nomina)
         const res = await fetch(`${API_URL}/admin/empleados`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        const empleados = await res.json();
-
-        if (res.ok) {
-            empleados.forEach(emp => {
-                const opt = document.createElement('option');
-                opt.value = emp.id;
-                opt.textContent = `${emp.nombre_completo} (${emp.cedula})`;
-                // Almacenamos los datos en la propiedad de dataset para cargarlos al formulario convenientemente
-                opt.dataset.info = JSON.stringify(emp);
-                select.appendChild(opt);
-            });
-        } else {
-            alert("Error al cargar nómina: " + empleados.error);
-        }
+        if (!res.ok) throw new Error("No se pudo obtener la nómina");
+        
+        empleadosModificarList = await res.json();
+        
+        empleadosModificarList.forEach(emp => {
+            select.innerHTML += `<option value="${emp.id}">${emp.nombre_completo} (C.I. ${emp.cedula})</option>`;
+        });
     } catch (err) {
-        console.error("Error:", err);
+        console.error(err);
+        alert("Error al cargar la nómina de empleados.");
     }
 }
-// Rellena los inputs cuando seleccionas un empleado del dropdown
+
+// Función que lee el empleado seleccionado y rellena los campos del formulario
 function cargarDatosEmpleadoEnFormulario() {
     const idSeleccionado = document.getElementById('m_select_empleado').value;
     const form = document.getElementById('form-modificar-usuario');
@@ -1073,9 +1062,11 @@ function cargarDatosEmpleadoEnFormulario() {
         return;
     }
 
+    // Buscar el objeto en nuestra lista local
     const emp = empleadosModificarList.find(e => e.id == idSeleccionado);
     if (!emp) return;
 
+    // Rellenar cada input del formulario
     document.getElementById('m_id').value = emp.id;
     document.getElementById('m_cedula').value = emp.cedula;
     document.getElementById('m_nombre').value = emp.nombre_completo;
@@ -1084,6 +1075,7 @@ function cargarDatosEmpleadoEnFormulario() {
     document.getElementById('m_direccion').value = emp.direccion;
     document.getElementById('m_vista_foto').src = emp.foto_url || '';
 
+    // Formatear la fecha adecuadamente (YYYY-MM-DD) para el input date
     if (emp.fecha_ingreso) {
         const fechaIso = new Date(emp.fecha_ingreso).toISOString().split('T')[0];
         document.getElementById('m_fecha').value = fechaIso;
@@ -1091,45 +1083,50 @@ function cargarDatosEmpleadoEnFormulario() {
         document.getElementById('m_fecha').value = '';
     }
 
+    // Mostrar el formulario dinámicamente
     form.style.display = 'block';
 }
 
-// Envía la petición PUT incluyendo la tabla correspondiente como parámetro de ruta
+// Función encargada de empaquetar los datos del formulario y enviarlos al Backend
 async function actualizarUsuario(event) {
     event.preventDefault();
+    
     const id = document.getElementById('m_id').value;
-
     const formData = new FormData();
+    
     formData.append('cedula', document.getElementById('m_cedula').value);
     formData.append('nombre_completo', document.getElementById('m_nombre').value);
     formData.append('fecha_ingreso', document.getElementById('m_fecha').value);
     formData.append('correo', document.getElementById('m_correo').value);
     formData.append('celular', document.getElementById('m_celular').value);
     formData.append('direccion', document.getElementById('m_direccion').value);
-
-    const fotoFile = document.getElementById('m_foto').files[0];
-    if (fotoFile) {
-        formData.append('foto', fotoFile);
+    
+    const inputFoto = document.getElementById('m_foto');
+    if (inputFoto.files[0]) {
+        formData.append('foto', inputFoto.files[0]);
     }
 
     try {
-        // Petición limpia sin el parámetro ":tabla"
         const res = await fetch(`${API_URL}/admin/modificar-usuario/${id}`, {
             method: 'PUT',
             headers: { 'Authorization': `Bearer ${token}` },
             body: formData
         });
+
         const data = await res.json();
 
         if (res.ok) {
-            alert("¡Datos del colaborador actualizados exitosamente en Nómina!");
-            prepararModuloModificar(); // Recargar lista
+            alert("¡Información del colaborador actualizada exitosamente!");
+            // Recargar el selector y ocultar el formulario
+            prepararModuloModificar();
+            // Si tienes una función global para refrescar las tablas principales, puedes llamarla aquí:
+            if(typeof cargarEmpleados === 'function') cargarEmpleados(); 
         } else {
             alert("Error: " + data.error);
         }
     } catch (err) {
-        console.error("Error en actualización:", err);
-        alert("Ocurrió un error de red al guardar los cambios.");
+        console.error(err);
+        alert("Ocurrió un error de red o de servidor al procesar la actualización.");
     }
 }
 
