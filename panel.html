@@ -67,24 +67,17 @@
             border-radius: 16px; 
             width: 95%; 
             max-width: 1000px; 
-            height: 85vh; /* Altura fija respecto a la pantalla */
+            height: 85vh; 
             max-height: 85vh; 
             display: flex; 
             flex-direction: column; 
-            overflow: hidden; /* Evita el scroll de la ventana general */
+            overflow: hidden; 
             position: relative; 
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); 
         }
 
-        #section-paso1 { 
-            overflow-y: auto; 
-            flex-grow: 1; 
-        }
-        #expediente-detalles { 
-            flex-grow: 1; 
-            overflow: hidden; 
-            flex-direction: column; 
-        }
+        #section-paso1 { overflow-y: auto; flex-grow: 1; }
+        #expediente-detalles { flex-grow: 1; overflow: hidden; flex-direction: column; }
         .close-modal { position: absolute; top: 20px; right: 25px; font-size: 28px; cursor: pointer; color: #94a3b8; transition: color 0.2s; }
         .close-modal:hover { color: #475569; }
 
@@ -123,7 +116,6 @@
                 <button class="nav-btn" onclick="switchView('pasivos')">📁 Personal Pasivo</button>
                 <button class="nav-btn role-admin" id="menu-crear" onclick="switchView('crear')">➕ Registrar Empleado</button>
                 <button class="nav-btn role-admin" id="menu-empresa" onclick="switchView('empresa')">🏢 Docs Empresa</button>
-                <button class="nav-btn role-admin" id="menu-global-med" onclick="switchView('global-medicos')">🩺 Certificados Globales</button>
             </div>
         </div>
         <div>
@@ -252,26 +244,6 @@
                                 </tr>
                             </thead>
                             <tbody id="tbody-empresa"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div id="view-global-medicos" class="view-section">
-                <div class="card">
-                    <h3>Historial Global de Descansos y Certificados Médicos</h3>
-                    <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Empleado</th>
-                                    <th>Estado</th>
-                                    <th>Tipo Documento</th>
-                                    <th>Fecha de Registro</th>
-                                    <th>Archivo</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-global-medicos"></tbody>
                         </table>
                     </div>
                 </div>
@@ -498,14 +470,6 @@
                 .replace(/\s+/g, ' ');
         }
 
-        function obtenerNombreMesEspanol(periodoStr) {
-            if (!periodoStr || !periodoStr.includes('-')) return "Periodo General / Antiguos";
-            const [anio, mes] = periodoStr.split('-');
-            const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-            const index = parseInt(mes, 10) - 1;
-            return (index >= 0 && index < 12) ? `📅 ${meses[index]} de ${anio}` : `Periodo: ${periodoStr}`;
-        }
-
         if (!token || !rol) {
             cerrarSesion();
         }
@@ -525,7 +489,6 @@
             cargarEmpleadosActivos();
             cargarEmpleadosPasivos();
             if (rol === 'admin') cargarDocumentosEmpresa();
-            if (rol === 'admin') cargarCertificadosGlobales();
 
             const mapearDobleClic = (tbodyId) => {
                 const tbody = document.getElementById(tbodyId);
@@ -556,7 +519,7 @@
             const eventTarget = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.getAttribute('onclick').includes(viewId));
             if(eventTarget) eventTarget.classList.add('active');
 
-            const titles = { 'activos': 'Personal Activo', 'pasivos': 'Personal Pasivo', 'crear': 'Registrar Empleado', 'empresa': 'Documentos Institucionales', 'global-medicos': 'Certificados Médicos Globales' };
+            const titles = { 'activos': 'Personal Activo', 'pasivos': 'Personal Pasivo', 'crear': 'Registrar Empleado', 'empresa': 'Documentos Institucionales' };
             document.getElementById('view-title').innerText = titles[viewId] || "Panel Isertel";
         }
 
@@ -608,7 +571,6 @@
                 });
             } catch (err) { console.error("Error cargando pasivos:", err); }
         }
-
 
         async function crearUsuario(e) {
             e.preventDefault();
@@ -736,7 +698,7 @@
             if (selectSubtipoUpload) {
                 selectSubtipoUpload.innerHTML = '';
                 const listaSubtipos = mapaSubtipos[tipoSeleccionado] || ["General / Único"]; 
-                listaSubtipos.forEach(sub => { 
+                listaSubtipos.forEach(sub => {
                     selectSubtipoUpload.innerHTML += `<option value="${sub}">${sub}</option>`;
                 });
             }
@@ -866,23 +828,18 @@
                 return;
             }
 
-            // 1. Extraer automáticamente el periodo (YYYY-MM) de la fecha seleccionada
             const periodoDoc = fechaDoc ? fechaDoc.substring(0, 7) : null;
 
-            // 2. Formatear y sanear el subtipo (ej. "Aviso de entrada" -> "aviso_de_entrada")
             const subtipoSaneado = subtipoDoc.toLowerCase().trim()
-                .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remueve acentos tildes de forma segura
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "") 
                 .replace(/\s+/g, '_')
                 .replace(/[^a-z0-9_]/g, '');
 
-            // 3. Formatear la fecha del calendario (YYYY-MM-DD) a DD_MM_YYYY
             const [anio, mes, dia] = fechaDoc.split('-');
             const fechaFormateadaNombre = `${dia}_${mes}_${anio}`;
 
-            // 4. Crear el nuevo nombre del archivo estructurado
             const nuevoNombreArchivo = `${subtipoSaneado}_${fechaFormateadaNombre}.pdf`;
 
-            // 5. Instanciar un nuevo objeto File con el nombre personalizado para enviarlo a Cloudinary
             const archivoRenombrado = new File([archivoInput], nuevoNombreArchivo, { type: archivoInput.type });
 
             const formData = new FormData();
@@ -916,7 +873,6 @@
                     actualizarSubtipos('filter');
                     
                     await obtenerDocumentosServidor(); 
-                    if(rol === 'admin') cargarCertificadosGlobales();
                 } else {
                     const errData = await res.json();
                     alert("Error del servidor: " + errData.error);
@@ -937,7 +893,6 @@
                 if(res.ok) {
                     alert("Registro eliminado.");
                     await obtenerDocumentosServidor(); 
-                    if(rol === 'admin') cargarCertificadosGlobales();
                 } else { alert("Denegado o error de procesamiento."); }
             } catch (err) { console.error(err); }
         }
@@ -983,19 +938,6 @@
             try {
                 const res = await fetch(`${API_URL}/admin/documentos-empresa/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
                 if(res.ok) { cargarDocumentosEmpresa(); }
-            } catch (err) { console.error(err); }
-        }
-
-        async function cargarCertificadosGlobales() {
-            try {
-                const res = await fetch(`${API_URL}/doctor/certificados-globales`, { headers: { 'Authorization': `Bearer ${token}` } });
-                const data = await res.json();
-                const tbody = document.getElementById('tbody-global-medicos');
-                tbody.innerHTML = '';
-                data.forEach(c => {
-                    const f = new Date(c.created_at).toLocaleDateString('es-EC');
-                    tbody.innerHTML += `<tr><td><strong>${c.empleado_nombre}</strong></td><td>${c.estado_empleado}</td><td>${c.tipo_documento}</td><td>${f}</td><td><a href="${c.url_cloudinary}" target="_blank" class="btn-action btn-view">Ver Documento</a></td></tr>`;
-                });
             } catch (err) { console.error(err); }
         }
 </script>
