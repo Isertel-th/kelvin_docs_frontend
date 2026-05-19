@@ -1376,12 +1376,8 @@ function cargarSeccionEmpresa() {
 
 // Abrir e iniciar el modal cargando la tabla dinámica de departamentos
 // Abrir e iniciar el modal cargando la tabla dinámica de departamentos
+// Abrir e iniciar el modal cargando la tabla dinámica de departamentos
 async function abrirModalPermisos() {
-    // Si usas clases de Tailwind para ocultar/mostrar (como .hidden), asegúrate de usar style para limpiar el modal antiguo
-    const modal = document.getElementById('modalPermisos');
-    modal.style.display = 'flex'; // Fuerza a que se muestre el contenedor flexible
-    modal.classList.remove('hidden');
-
     document.getElementById('formPermisos').reset();
     const selectDep = document.getElementById('esp_departamento');
     selectDep.innerHTML = '<option value="">Cargando...</option>';
@@ -1390,15 +1386,26 @@ async function abrirModalPermisos() {
         const res = await fetch(`${API_BASE}/admin/departamentos`, {
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
+
+        // Si el backend responde con error (ej. 404 o 500), lanzamos el fallo de inmediato
+        if (!res.ok) {
+            throw new Error(`Error en el servidor: ${res.status}`);
+        }
+
         const deparamentos = await res.json();
         
-        // CORRECCIÓN: Usamos d.departamento que es lo que realmente envía el backend
+        // Mapeamos los departamentos recibidos
         selectDep.innerHTML = '<option value="">-- Seleccione un Departamento --</option>' + 
             deparamentos.map(d => `<option value="${d.departamento}">${d.departamento}</option>`).join('');
             
+        // SOLO SI TODO ESTÁ BIEN: Mostramos el modal al usuario
+        const modal = document.getElementById('modalPermisos');
+        modal.style.display = 'flex';
+        modal.classList.remove('hidden');
+
     } catch (err) {
-        alert('Error al conectar con el servidor para mapear los departamentos.');
-        console.error(err);
+        alert('Error al conectar con el servidor para mapear los departamentos. Verifique que el endpoint exista en el backend.');
+        console.error("Error detallado:", err);
     }
 }
 
