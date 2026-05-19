@@ -115,6 +115,7 @@
                 <button class="nav-btn active" onclick="switchView('activos')">👥 Personal Activo</button>
                 <button class="nav-btn" onclick="switchView('pasivos')">📁 Personal Pasivo</button>
                 <button class="nav-btn role-admin" id="menu-crear" onclick="switchView('crear')">➕ Registrar Empleado</button>
+                <button class="nav-btn role-admin" id="menu-modificar" onclick="switchView('modificar'); prepararModuloModificar();">✏️ Modificar Empleado</button>
                 <button class="nav-btn role-admin" id="menu-empresa" onclick="switchView('empresa')">🏢 Docs Empresa</button>
             </div>
         </div>
@@ -213,6 +214,62 @@
                     </form>
                 </div>
             </div>
+
+<div id="view-modificar" class="view-section">
+    <div class="card">
+        <h3>Modificar Colaborador en Nómina</h3>
+        <p style="color: #64748b; font-size: 14px; margin-bottom: 1rem;">Selecciona un empleado de la nómina para cargar sus datos y corregir cualquier información errónea.</p>
+        
+        <div style="margin-bottom: 1.5rem;">
+            <label style="font-weight: bold;">1. Seleccionar Colaborador:</label>
+            <select id="m_select_empleado" onchange="cargarDatosEmpleadoEnFormulario()" style="border: 2px solid var(--primary-color);">
+                <option value="">-- Seleccione un empleado de la lista --</option>
+            </select>
+        </div>
+
+        <form id="form-modificar-usuario" onsubmit="actualizarUsuario(event)" style="display: none; border-top: 1px solid #e2e8f0; padding-top: 1.5rem;">
+            <input type="hidden" id="m_id">
+            <div class="grid-form">
+                <div>
+                    <label>Cédula (10 dígitos enteros):</label>
+                    <input type="text" id="m_cedula" required pattern="[0-9]{10}" maxlength="10" oninput="this.value = this.value.replace(/\D/g, '')">
+                </div>
+                <div>
+                    <label>Nombre Completo:</label>
+                    <input type="text" id="m_nombre" required oninput="this.value = formatearNombre(this.value)" onblur="this.value = limpiarEspaciosNombre(this.value)">
+                </div>
+                <div>
+                    <label>Fecha de Ingreso:</label>
+                    <input type="date" id="m_fecha" required>
+                </div>
+            </div>
+            <div class="grid-form">
+                <div>
+                    <label>Correo Electrónico:</label>
+                    <input type="email" id="m_correo" required>
+                </div>
+                <div>
+                    <label>Celular (10 dígitos enteros):</label>
+                    <input type="text" id="m_celular" required pattern="[0-9]{10}" maxlength="10" oninput="this.value = this.value.replace(/\D/g, '')">
+                </div>
+                <div>
+                    <label>Dirección domiciliaria:</label>
+                    <input type="text" id="m_direccion" required>
+                </div>
+            </div>
+            <div style="margin-bottom: 1.5rem; background: #f8fafc; padding: 1rem; border-radius: 6px; border: 1px dashed #cbd5e1;">
+                <label style="margin-bottom: 8px;">Foto de Perfil actual / Cambiar Foto:</label>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <img id="m_vista_foto" src="" alt="Perfil" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 1px solid #cbd5e1;">
+                    <input type="file" id="m_foto" accept="image/*">
+                </div>
+                <small style="color: #64748b; display: block; margin-top: 6px;">* Dejar vacío si no se desea cambiar la imagen actual.</small>
+            </div>
+            <button type="submit" class="btn-submit" style="background: #e67e22;">💾 Guardar Cambios Realizados</button>
+        </form>
+    </div>
+</div>
+
 
             <div id="view-empresa" class="view-section">
                 <div class="card">
@@ -956,6 +1013,113 @@ if (tipoSeleccionado === "Certificados Médicos" || tipoSeleccionado === "Certif
                 if(res.ok) { cargarDocumentosEmpresa(); }
             } catch (err) { console.error(err); }
         }
+        // Variable global para almacenar el listado de empleados cargados para modificar
+let empleadosModificarList = [];
+
+// Función para inicializar el módulo cargando los empleados activos en el select
+async function prepararModuloModificar() {
+    const select = document.getElementById('m_select_empleado');
+    const form = document.getElementById('form-modificar-usuario');
+    
+    // Resetear vistas iniciales
+    select.innerHTML = '<option value="">-- Seleccione un empleado de la lista --</option>';
+    form.style.display = 'none';
+    form.reset();
+
+    try {
+        const res = await fetch(`${API_URL}/admin/empleados`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error("No se pudo obtener la nómina");
+        
+        empleadosModificarList = await res.json();
+        
+        empleadosModificarList.forEach(emp => {
+            select.innerHTML += `<option value="${emp.id}">${emp.nombre_completo} (C.I. ${emp.cedula})</option>`;
+        });
+    } catch (err) {
+        console.error(err);
+        alert("Error al cargar la nómina de empleados.");
+    }
+}
+
+// Función que lee el empleado seleccionado y rellena los campos del formulario
+function cargarDatosEmpleadoEnFormulario() {
+    const idSeleccionado = document.getElementById('m_select_empleado').value;
+    const form = document.getElementById('form-modificar-usuario');
+
+    if (!idSeleccionado) {
+        form.style.display = 'none';
+        return;
+    }
+
+    // Buscar el objeto en nuestra lista local
+    const emp = empleadosModificarList.find(e => e.id == idSeleccionado);
+    if (!emp) return;
+
+    // Rellenar cada input del formulario
+    document.getElementById('m_id').value = emp.id;
+    document.getElementById('m_cedula').value = emp.cedula;
+    document.getElementById('m_nombre').value = emp.nombre_completo;
+    document.getElementById('m_correo').value = emp.correo;
+    document.getElementById('m_celular').value = emp.celular;
+    document.getElementById('m_direccion').value = emp.direccion;
+    document.getElementById('m_vista_foto').src = emp.foto_url || '';
+
+    // Formatear la fecha adecuadamente (YYYY-MM-DD) para el input date
+    if (emp.fecha_ingreso) {
+        const fechaIso = new Date(emp.fecha_ingreso).toISOString().split('T')[0];
+        document.getElementById('m_fecha').value = fechaIso;
+    } else {
+        document.getElementById('m_fecha').value = '';
+    }
+
+    // Mostrar el formulario dinámicamente
+    form.style.display = 'block';
+}
+
+// Función encargada de empaquetar los datos del formulario y enviarlos al Backend
+async function actualizarUsuario(event) {
+    event.preventDefault();
+    
+    const id = document.getElementById('m_id').value;
+    const formData = new FormData();
+    
+    formData.append('cedula', document.getElementById('m_cedula').value);
+    formData.append('nombre_completo', document.getElementById('m_nombre').value);
+    formData.append('fecha_ingreso', document.getElementById('m_fecha').value);
+    formData.append('correo', document.getElementById('m_correo').value);
+    formData.append('celular', document.getElementById('m_celular').value);
+    formData.append('direccion', document.getElementById('m_direccion').value);
+    
+    const inputFoto = document.getElementById('m_foto');
+    if (inputFoto.files[0]) {
+        formData.append('foto', inputFoto.files[0]);
+    }
+
+    try {
+        const res = await fetch(`${API_URL}/admin/modificar-usuario/${id}`, {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${token}` },
+            body: formData
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            alert("¡Información del colaborador actualizada exitosamente!");
+            // Recargar el selector y ocultar el formulario
+            prepararModuloModificar();
+            // Si tienes una función global para refrescar las tablas principales, puedes llamarla aquí:
+            if(typeof cargarEmpleados === 'function') cargarEmpleados(); 
+        } else {
+            alert("Error: " + data.error);
+        }
+    } catch (err) {
+        console.error(err);
+        alert("Ocurrió un error de red o de servidor al procesar la actualización.");
+    }
+}
 </script>
 </body>
 </html>
