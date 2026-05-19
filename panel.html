@@ -291,7 +291,7 @@
                             </div>
                             <div>
                                 <label>Archivo (PDF/Imagen):</label>
-                                <input type="file" id="emp_archivo" required>
+                                <input type="file" id="emp_archivo" accept=".pdf" class="form-control" />
                             </div>
                         </div>
                         <button type="submit" class="btn-submit">Subir Archivo General</button>
@@ -1157,15 +1157,22 @@ async function subirDocEmpresa(event) {
 
     const tipoInput = document.getElementById('emp_tipo');
     const archivoInput = document.getElementById('emp_archivo');
+    const file = archivoInput.files[0];
 
-    if (!archivoInput.files[0]) {
+    if (!file) {
         alert("Por favor seleccione un archivo.");
+        return;
+    }
+
+    // VALIDACIÓN: Verificar que el archivo seleccionado sea estrictamente un PDF
+    if (file.type !== "application/pdf" && !file.name.endsWith('.pdf')) {
+        alert("Error: Solo se permiten archivos en formato PDF (.pdf)");
         return;
     }
 
     const formData = new FormData();
     formData.append('tipo_documento', tipoInput.value);
-    formData.append('archivo', archivoInput.files[0]);
+    formData.append('archivo', file);
 
     try {
         const res = await fetch(`${API_URL}/empresa/documentos`, {
@@ -1178,10 +1185,8 @@ async function subirDocEmpresa(event) {
 
         if (res.ok) {
             alert("¡Documento corporativo subido e indexado con éxito!");
-            // Limpiamos campos del formulario
             tipoInput.value = "";
             archivoInput.value = "";
-            // Recargamos el Repositorio Corporativo para visualizar los cambios
             cargarDocsEmpresa();
         } else {
             alert("Error al subir: " + data.error);
