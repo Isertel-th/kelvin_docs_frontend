@@ -1375,7 +1375,13 @@ function cargarSeccionEmpresa() {
 }
 
 // Abrir e iniciar el modal cargando la tabla dinámica de departamentos
+// Abrir e iniciar el modal cargando la tabla dinámica de departamentos
 async function abrirModalPermisos() {
+    // Si usas clases de Tailwind para ocultar/mostrar (como .hidden), asegúrate de usar style para limpiar el modal antiguo
+    const modal = document.getElementById('modalPermisos');
+    modal.style.display = 'flex'; // Fuerza a que se muestre el contenedor flexible
+    modal.classList.remove('hidden');
+
     document.getElementById('formPermisos').reset();
     const selectDep = document.getElementById('esp_departamento');
     selectDep.innerHTML = '<option value="">Cargando...</option>';
@@ -1386,10 +1392,10 @@ async function abrirModalPermisos() {
         });
         const deparamentos = await res.json();
         
+        // CORRECCIÓN: Usamos d.departamento que es lo que realmente envía el backend
         selectDep.innerHTML = '<option value="">-- Seleccione un Departamento --</option>' + 
-            deparamentos.map(d => `<option value="${d.id}">${d.nombre}</option>`).join('');
+            deparamentos.map(d => `<option value="${d.departamento}">${d.departamento}</option>`).join('');
             
-        document.getElementById('modalPermisos').classList.remove('hidden');
     } catch (err) {
         alert('Error al conectar con el servidor para mapear los departamentos.');
         console.error(err);
@@ -1397,7 +1403,9 @@ async function abrirModalPermisos() {
 }
 
 function cerrarModalPermisos() {
-    document.getElementById('modalPermisos').classList.add('hidden');
+    const modal = document.getElementById('modalPermisos');
+    modal.style.display = 'none';
+    modal.classList.add('hidden');
 }
 
 // Procesar el guardado con Multipart Form Data (Soporte de Imagen)
@@ -1411,7 +1419,7 @@ async function guardarUsuarioEspecial(event) {
     formData.append('rol', document.getElementById('esp_rol').value);
     formData.append('correo', document.getElementById('esp_correo').value);
     formData.append('celular', document.getElementById('esp_celular').value);
-    formData.append('departamento_id', document.getElementById('esp_departamento').value);
+    formData.append('departamento', document.getElementById('esp_departamento').value);
     formData.append('foto', document.getElementById('esp_foto').files[0]);
 
     try {
