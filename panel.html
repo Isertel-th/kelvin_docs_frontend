@@ -116,7 +116,7 @@
                 <button class="nav-btn" onclick="switchView('pasivos')">📁 Personal Pasivo</button>
                 <button class="nav-btn role-admin" id="menu-crear" onclick="switchView('crear')">➕ Registrar Empleado</button>
                 <button class="nav-btn role-admin" id="menu-modificar" onclick="switchView('modificar'); prepararModuloModificar();">✏️ Modificar Empleado</button>
-                <button class="nav-btn role-admin" id="menu-empresa" onclick="switchView('empresa')">🏢 Docs Empresa</button>
+                <button class="nav-btn" id="menu-empresa" onclick="switchView('empresa'); cargarDocsEmpresa();">🏢 Docs Empresa</button>
             </div>
         </div>
         <div>
@@ -280,40 +280,42 @@
 </div>
 
 
-            <div id="view-empresa" class="view-section">
-                <div class="card">
-                    <h3>Subir Documento Institucional / Empresa</h3>
-                    <form id="form-empresa" onsubmit="subirDocEmpresa(event)">
-                        <div class="grid-form">
-                            <div>
-                                <label>Tipo de Documento:</label>
-                                <input type="text" id="emp_tipo" placeholder="Ej. Reglamento Interno, Políticas" required>
-                            </div>
-                            <div>
-                                <label>Archivo (PDF/Imagen):</label>
-                                <input type="file" id="emp_archivo" required>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn-submit">Subir Archivo General</button>
-                    </form>
+<div id="view-empresa" class="view-section">
+    <div class="card" id="contenedor-subida-empresa" style="display: none;">
+        <h3>Subir Documento Institucional / Empresa</h3>
+        <form id="form-empresa" onsubmit="subirDocEmpresa(event)">
+            <div class="grid-form">
+                <div>
+                    <label>Tipo de Documento:</label>
+                    <input type="text" id="emp_tipo" placeholder="Ej. Reglamento Interno, Políticas Corporativas" required>
                 </div>
-                <div class="card">
-                    <h3>Repositorio Corporativo</h3>
-                    <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Tipo de Documento</th>
-                                    <th>Enlace</th>
-                                    <th>Acción</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-empresa"></tbody>
-                        </table>
-                    </div>
+                <div>
+                    <label>Archivo (Exclusivo PDF):</label>
+                    <input type="file" id="emp_archivo" accept=".pdf" required style="padding: 7px;">
                 </div>
             </div>
+            <button type="submit" class="btn-submit">Subir Archivo General</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h3>Repositorio Corporativo - Documentos de la Empresa</h3>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tipo de Documento</th>
+                        <th>Nombre Real Generado</th>
+                        <th>Enlace</th>
+                        <th class="columna-accion-admin" style="display: none;">Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-empresa"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
         </div>
     </div>
@@ -566,7 +568,7 @@
             mapearDobleClic('tbody-pasivos');
         };
 
-        function switchView(viewId) {
+            function switchView(viewId) {
             document.querySelectorAll('.view-section').forEach(section => section.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById(`view-${viewId}`).classList.add('active');
@@ -576,6 +578,11 @@
 
             const titles = { 'activos': 'Personal Activo', 'pasivos': 'Personal Pasivo', 'crear': 'Registrar Empleado', 'empresa': 'Documentos Institucionales' };
             document.getElementById('view-title').innerText = titles[viewId] || "Panel Isertel";
+
+            // AQUÍ SE ADAPTA: Si el usuario entra a la vista de empresa, carga los documentos automáticamente
+            if (viewId === 'empresa') {
+                cargarDocsEmpresa();
+            }
         }
 
         function cerrarSesion() {
@@ -1138,6 +1145,142 @@ async function actualizarUsuario(event) {
     } catch (err) {
         console.error(err);
         alert("Error de red o servidor al intentar guardar los cambios.");
+    }
+}
+
+
+
+// 1. Cargar y renderizar los documentos institucionales controlando los permisos visuales
+async function cargarDocsEmpresa() {
+    try {
+        const res = await fetch(`${API_URL}/empresa/documentos`, {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+
+        // Control dinámico de roles en la vista
+        if (rol === 'admin') {
+            document.getElementById('contenedor-subida-empresa').style.display = 'block';
+            document.querySelectorAll('.columna-accion-admin').forEach(el => el.style.display = 'table-cell');
+        } else {
+            document.getElementById('contenedor-subida-empresa').style.display = 'none';
+            document.querySelectorAll('.columna-accion-admin').forEach(el => el.style.display = 'none');
+        }
+
+        const tbody = document.getElementById('tbody-empresa');
+        tbody.innerHTML = '';
+
+        if (data.error) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red;">${data.error}</td></tr>`;
+            return;
+        }
+
+        if (data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No hay documentos institucionales registrados.</td></tr>`;
+            return;
+        }
+
+        data.forEach(doc => {
+            const tr = document.createElement('tr');
+            
+            // Renderizamos las celdas comunes (Ver/Descargar)
+            let celdasHTML = `
+                <td>${doc.id}</td>
+                <td style="font-weight: 600;">${doc.tipo_documento}</td>
+                <td style="color: #475569; font-family: monospace;">${doc.nombre_archivo}</td>
+                <td>
+                    <a href="${doc.url_cloudinary}" target="_blank" class="btn-action btn-view">👁️ Ver / Descargar</a>
+                </td>
+            `;
+
+            // Si es admin añadimos el botón interactivo de borrar
+            if (rol === 'admin') {
+                celdasHTML += `
+                    <td class="columna-accion-admin">
+                        <button onclick="eliminarDocEmpresa(${doc.id})" class="btn-action btn-delete">🗑️ Eliminar</button>
+                    </td>
+                `;
+            } else {
+                celdasHTML += `<td class="columna-accion-admin" style="display:none;"></td>`;
+            }
+
+            tr.innerHTML = celdasHTML;
+            tbody.appendChild(tr);
+        });
+
+    } catch (err) {
+        console.error("Error al cargar repositorio:", err);
+    }
+}
+
+// 2. Procesar el envío del formulario (Exclusivo Admin)
+async function subirDocEmpresa(event) {
+    event.preventDefault();
+    if (rol !== 'admin') {
+        alert("No posees los privilegios requeridos para subir información corporativa.");
+        return;
+    }
+
+    const tipoDoc = document.getElementById('emp_tipo').value;
+    const inputArchivo = document.getElementById('emp_archivo');
+
+    if (!inputArchivo.files[0]) {
+        alert("Selecciona un documento PDF.");
+        return;
+    }
+
+    // Doble verificación del archivo en Frontend
+    if (inputArchivo.files[0].type !== "application/pdf") {
+        alert("Error crítico: El sistema institucional solo admite archivos con extensión .pdf");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('tipo_documento', tipoDoc);
+    formData.append('archivo', inputArchivo.files[0]);
+
+    try {
+        const res = await fetch(`${API_URL}/empresa/documentos`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` },
+            body: formData
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+            alert("¡Documento corporativo indexado y renombrado exitosamente!");
+            document.getElementById('form-empresa').reset();
+            cargarDocsEmpresa(); // Refrescar tabla automáticamente
+        } else {
+            alert("Error: " + data.error);
+        }
+    } catch (err) {
+        console.error("Error en subida:", err);
+        alert("Ocurrió un error de red al intentar procesar el archivo.");
+    }
+}
+
+// 3. Eliminar documento institucional (Exclusivo Admin)
+async function eliminarDocEmpresa(id) {
+    if (rol !== 'admin') return;
+    if (!confirm("¿Está seguro de eliminar este documento del repositorio oficial de la empresa?")) return;
+
+    try {
+        const res = await fetch(`${API_URL}/empresa/documentos/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+            alert("Documento eliminado del repositorio general.");
+            cargarDocsEmpresa();
+        } else {
+            alert("Error: " + data.error);
+        }
+    } catch (err) {
+        console.error("Error al eliminar:", err);
     }
 }
 </script>
