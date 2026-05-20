@@ -330,54 +330,58 @@
                         </table>
                     </div>
                 </div> 
-            </div> <div id="view-registrar-usuarios" class="view-section" style="padding: 25px; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 650px; width: 100%; margin: 20px auto; display: none; box-sizing: border-box;">
+            </div> 
+            
+            
+            
+            
+            
+            <div id="view-registrar-usuarios" class="view-section" style="padding: 25px; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 650px; width: 100%; margin: 20px auto; display: none; box-sizing: border-box;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.75rem;">
                     <h2 style="color: #1e293b; margin: 0; font-size: 1.5rem; font-weight: 700;">👤 Registrar Nuevo Colaborador</h2>
 
                 </div>
                 
-                <form id="form-registro-usuario" onsubmit="registrarUsuario(event)" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1.25rem;">
-                    <div style="display: flex; flex-direction: column; gap: 0.4rem;">
-                        <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Foto de Perfil:</label>
-                        <input type="file" id="reg-foto" accept="image/*" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; background: #f8fafc;">
-                    </div>
-
-                    <div style="display: flex; flex-direction: column; gap: 0.4rem;">
-                        <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Nombre Completo:</label>
-                        <input type="text" id="reg-nombre" required placeholder="Ej. Juan Carlos Pérez" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
-                    </div>
-
-                    <div style="display: flex; gap: 1rem;">
-                        <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
-                            <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Cédula de Identidad:</label>
-                            <input type="text" id="reg-cedula" required placeholder="Ej. 172XXXXXX" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
-                        </div>
-                        <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
-                            <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Celular:</label>
-                            <input type="tel" id="reg-celular" placeholder="Ej. 099XXXXXXX" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
-                        </div>
-                    </div>
-
-                    <div style="display: flex; flex-direction: column; gap: 0.4rem;">
-                        <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Correo Electrónico:</label>
-                        <input type="email" id="reg-correo" required placeholder="usuario@isertel.com" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
-                    </div>
-
-
-
-<div style="display: flex; gap: 1rem;">
-    <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
-        <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Departamento:</label>
-        <select id="reg-departamento" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; height: 42px; background: white;">
-            <option value="">Cargando departamentos...</option>
-        </select>
+<form id="form-registro-usuario" onsubmit="registrarUsuario(event)" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1.25rem;">
+    <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+        <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Foto de Perfil:</label>
+        <input type="file" id="reg-foto" accept="image/*" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; background: #f8fafc;">
     </div>
 
-    <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
-        <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Rol de Sistema:</label>
-        <input type="text" id="reg-rol" placeholder="Ej: empleado, admin, doc, etc." required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; height: 42px; background: white; box-sizing: border-box;">
+    <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+        <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Nombre Completo:</label>
+        <input type="text" id="reg-nombre" required placeholder="Ej. Juan Carlos Pérez" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
     </div>
-</div>
+
+    <div style="display: flex; gap: 1rem;">
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
+            <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Cédula de Identidad:</label>
+            <input type="text" id="reg-cedula" required minlength="10" maxlength="10" placeholder="Ej. 172XXXXXX" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+        </div>
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
+            <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Celular:</label>
+            <input type="tel" id="reg-celular" required minlength="10" maxlength="10" placeholder="Ej. 099XXXXXXX" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+        </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+        <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Correo Electrónico:</label>
+        <input type="email" id="reg-correo" required placeholder="usuario@gmail.com" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+    </div>
+
+    <div style="display: flex; gap: 1rem;">
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
+            <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Departamento:</label>
+            <select id="reg-departamento" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; height: 42px; background: white;">
+                <option value="">Cargando departamentos...</option>
+            </select>
+        </div>
+
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
+            <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Rol de Sistema:</label>
+            <input type="text" id="reg-rol" placeholder="Ej: empleado, admin, doc, etc." required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; height: 42px; background: white; box-sizing: border-box;">
+        </div>
+    </div>
 
 
 
@@ -1420,49 +1424,92 @@ function mostrarSeccion(seccionId) {
 
 // Función encargada de recopilar los datos y enviarlos al Backend por AJAX
 async function registrarUsuario(event) {
-    event.preventDefault();
+    event.preventDefault(); // Evita que la página se recargue solo
 
-    // Como enviamos una imagen (archivo binario), debemos usar FormData
-    const formData = new FormData();
-    
-    const fotoFile = document.getElementById('reg-foto').files[0];
-    if (fotoFile) {
-        formData.append('foto', fotoFile);
+    // Capturar los valores de los elementos del formulario
+    const nombreInput = document.getElementById('reg-nombre').value.trim();
+    const cedulaInput = document.getElementById('reg-cedula').value.trim();
+    const celularInput = document.getElementById('reg-celular').value.trim();
+    const correoInput = document.getElementById('reg-correo').value.trim().toLowerCase();
+    const departamentoInput = document.getElementById('reg-departamento').value;
+    const rolInput = document.getElementById('reg-rol').value.trim();
+    const fotoInput = document.getElementById('reg-foto').files[0];
+
+    // 1. VALIDACIÓN: Comprobar que todos los campos requeridos tengan valor
+    if (!nombreInput || !cedulaInput || !celularInput || !correoInput || !departamentoInput || !rolInput) {
+        alert("Por favor, complete todos los campos obligatorios del formulario.");
+        return;
     }
+
+    // 2. CORRECCIÓN: Primera letra de cada palabra en Mayúscula (juan perez -> Juan Perez)
+    const nombreFormateado = nombreInput
+        .split(/\s+/) // Divide por espacios múltiples
+        .map(palabra => palabra.charAt(0).toUpperCase() + palabra.slice(1).toLowerCase())
+        .join(' ');
+
+    // 3. VALIDACIÓN: Cédula y celular (Solo números enteros y exactamente 10 caracteres)
+    const regexSoloNumeros = /^\d{10}$/; // Evalúa exactamente 10 números seguidos del 0 al 9
+
+    if (!regexSoloNumeros.test(cedulaInput)) {
+        alert("La Cédula de Identidad no es válida. Debe contener exactamente 10 dígitos numéricos enteros (sin letras ni decimales).");
+        return;
+    }
+
+    if (!regexSoloNumeros.test(celularInput)) {
+        alert("El número de Celular no es válido. Debe contener exactamente 10 dígitos numéricos enteros (sin letras ni decimales).");
+        return;
+    }
+
+    // 4. VALIDACIÓN: Dominios de correo permitidos estrictamente
+    const dominiosPermitidos = ['gmail.com', 'hotmail.com', 'outlook.com', 'outlook.es'];
+    const correoDominio = correoInput.split('@')[1];
+
+    if (!correoInput.includes('@') || !dominiosPermitidos.includes(correoDominio)) {
+        alert("Correo electrónico inválido. Dominios autorizados: gmail.com, hotmail.com, outlook.com, outlook.es");
+        return;
+    }
+
+    // 5. CONSTRUCCIÓN DE DATOS: Preparamos el FormData (porque envías un archivo físico/foto)
+    const formData = new FormData();
+    formData.append('nombre_completo', nombreFormateado); // Enviamos el nombre ya corregido
+    formData.append('cedula', cedulaInput);
+    formData.append('celular', celularInput);
+    formData.append('correo', correoInput);
+    formData.append('departamento', departamentoInput); // Enviará el depto.nombre configurado anteriormente
+    formData.append('rol_asignado', rolInput);
     
-    formData.append('nombre_completo', document.getElementById('reg-nombre').value);
-    formData.append('cedula', document.getElementById('reg-cedula').value);
-    formData.append('celular', document.getElementById('reg-celular').value);
-    formData.append('correo', document.getElementById('reg-correo').value);
-    formData.append('departamento', document.getElementById('reg-departamento').value);
-    formData.append('rol_asignado', document.getElementById('reg-rol').value);
+    if (fotoInput) {
+        formData.append('foto', fotoInput);
+    }
 
     try {
+        // Suponiendo que usas variables de configuración o la ruta relativa /api/usuarios
         const respuesta = await fetch(`${API_URL}/usuarios`, {
             method: 'POST',
             headers: {
-                // IMPORTANTE: Al enviar FormData NO debes definir 'Content-Type': 'application/json'
-                // El navegador añadirá el boundary automáticamente.
-                'Authorization': `Bearer ${token}` 
+                // Si requieres token de administrador, lo tomas del localStorage/sessionStorage
+                'Authorization': `Bearer ${localStorage.getItem('token')}` 
             },
-            body: formData
+            body: formData // Pasamos el formulario estructurado
         });
 
         const resultado = await respuesta.json();
 
-        if (respuesta.ok) {
-            alert("✅ ¡Usuario registrado exitosamente!");
-            document.getElementById('form-registro-usuario').reset(); // Limpia el formulario
-            switchView('activos'); // Te regresa limpiamente a la lista principal sin superposiciones
-        } else {
-            alert("❌ Error: " + resultado.error);
+        if (!respuesta.ok) {
+            throw new Error(resultado.error || 'Error desconocido al registrar usuario');
         }
 
+        alert("¡Usuario registrado con éxito!");
+        document.getElementById('form-registro-usuario').reset(); // Limpia el formulario
+        
+        // Aquí puedes recargar tu tabla de usuarios si tienes una función para ello, ej: listarUsuarios();
+
     } catch (error) {
-        console.error("Error en la petición de registro:", error);
-        alert("Ocurrió un error de red al intentar registrar al usuario.");
+        console.error("Error en registro:", error);
+        alert("No se pudo completar el registro: " + error.message);
     }
 }
+
 
 // Función para cargar los departamentos desde la base de datos
 async function cargarDepartamentos() {
