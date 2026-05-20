@@ -320,7 +320,7 @@
 
 
 <div id="view-registrar-usuarios" class="view-section">
-    <div style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); max-width: 600px; margin: 0 auto;">
+    <div class="form-container" style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); max-width: 600px; margin: 20px auto;">
         
         <form id="form-registrar-usuario-sistema" onsubmit="registrarUsuarioSistema(event)" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 15px;">
             
@@ -368,12 +368,11 @@
             </div>
 
             <button type="submit" class="btn-action btn-upload" style="background: #10b981; padding: 12px; font-size: 16px; font-weight: bold; width: 100%; margin-top: 10px; border: none; color: white; border-radius: 6px; cursor: pointer;">
-                💾 Registrar en Base de Datos
+                💾 Guardar en Usuarios
             </button>
         </form>
     </div>
 </div>
-
 
 
 
@@ -630,38 +629,47 @@
         };
 
 function switchView(viewId) {
-    document.querySelectorAll('.view-section').forEach(section => section.classList.remove('active'));
+    // 1. Ocultamos todas las secciones quitando la clase active
+    document.querySelectorAll('.view-section').forEach(section => {
+        section.classList.remove('active');
+        // Aseguramos por fuerza bruta que las que no son se oculten
+        section.style.display = 'none'; 
+    });
+    
     document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
     
+    // 2. Mostramos la sección activa
     const targetView = document.getElementById(`view-${viewId}`);
     if (targetView) {
         targetView.classList.add('active');
+        targetView.style.display = 'block'; // Forzamos el renderizado en pantalla
     } else {
         console.error(`No existe el contenedor con ID: view-${viewId}`);
     }
     
+    // 3. Iluminamos el botón correspondiente del menú lateral
     const eventTarget = Array.from(document.querySelectorAll('.nav-btn')).find(b => {
         const onClickAttr = b.getAttribute('onclick');
         return onClickAttr && onClickAttr.includes(viewId);
     });
     if(eventTarget) eventTarget.classList.add('active');
 
-    // Mapeo de títulos corregido incluyendo tu nueva sección
+    // 4. Cambiamos el título del header de tu panel
     const titles = { 
         'activos': 'Personal Activo', 
         'pasivos': 'Personal Pasivo', 
         'crear': 'Registrar Empleado', 
+        'modificar': 'Modificar Empleado',
         'empresa': 'Documentos Institucionales',
         'registrar-usuarios': 'Registrar Nuevo Usuario (Sistema)' 
     };
     document.getElementById('view-title').innerText = titles[viewId] || "Panel Isertel";
 
-    // AGREGADO: Carga automáticamente los documentos de la empresa cuando entras a la sección
+    // Carga de datos según la sección
     if (viewId === 'empresa') {
         cargarDocsEmpresa();
     }
 
-    // DISPARADOR: Carga los departamentos para tu formulario en caliente
     if (viewId === 'registrar-usuarios') {
         cargarDepartamentosDesplegable();
     }
