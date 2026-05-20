@@ -117,7 +117,10 @@
                 <button class="nav-btn role-admin" id="menu-crear" onclick="switchView('crear')">➕ Registrar Empleado</button>
                 <button class="nav-btn role-admin" id="menu-modificar" onclick="switchView('modificar'); prepararModuloModificar();">✏️ Modificar Empleado</button>
                 <button class="nav-btn role-admin" id="menu-empresa" onclick="switchView('empresa')">🏢 Docs Empresa</button>
-                <button class="nav-btn" onclick="switchView('registrar')">👤 Registrar Usuario</button>
+<button id="btn-registrar-usuarios" class="nav-btn" onclick="mostrarSeccion('registrar-usuarios')" style="display: none;">
+    👤 Registrar Usuarios
+</button>
+
 
             </div>
         </div>
@@ -317,72 +320,69 @@
                         </table>
                     </div>
                 </div>
-
-            </div>
-            
-
-
-<div id="view-registrar" style="display: none; width: 100%;">
-    <section id="sec-registrar-usuarios" style="padding: 25px; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 650px; margin: 20px auto; color: #334155;">
-
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.75rem;">
-            <h2 style="color: #1e293b; margin: 0; font-size: 1.5rem; font-weight: 700;">👤 Registrar Nuevo Colaborador</h2>
-<button type="button" onclick="switchView('modificar')" style="background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s;">❌ Cerrar</button>        
-        <form id="form-registro-usuario" onsubmit="registrarUsuario(event)" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1.25rem;">
-            
-            <div style="display: flex; flex-direction: column; gap: 0.4rem;">
-                <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Foto de Perfil:</label>
-                <input type="file" id="reg-foto" accept="image/*" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; background: #f8fafc;">
-            </div>
-
-            <div style="display: flex; flex-direction: column; gap: 0.4rem;">
-                <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Nombre Completo:</label>
-                <input type="text" id="reg-nombre" required placeholder="Ej. Juan Carlos Pérez" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
-            </div>
-
-            <div style="display: flex; gap: 1rem;">
-                <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
-                    <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Cédula de Identidad:</label>
-                    <input type="text" id="reg-cedula" required placeholder="Ej. 172XXXXXX" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+            </div> <section id="sec-registrar-usuarios" class="content-section" style="display: none; padding: 25px; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 650px; margin: 20px auto; color: #334155;">
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.75rem;">
+                    <h2 style="color: #1e293b; margin: 0; font-size: 1.5rem; font-weight: 700;">👤 Registrar Nuevo Colaborador</h2>
+                    <button type="button" onclick="mostrarSeccion('documentos')" style="background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s;">❌ Cerrar</button>
                 </div>
-                <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
-                    <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Celular:</label>
-                    <input type="tel" id="reg-celular" placeholder="Ej. 099XXXXXXX" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
-                </div>
-            </div>
+                
+                <form id="form-registro-usuario" onsubmit="registrarUsuario(event)" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1.25rem;">
+                    
+                    <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+                        <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Foto de Perfil:</label>
+                        <input type="file" id="reg-foto" accept="image/*" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; background: #f8fafc;">
+                    </div>
 
-            <div style="display: flex; flex-direction: column; gap: 0.4rem;">
-                <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Correo Electrónico:</label>
-                <input type="email" id="reg-correo" required placeholder="usuario@isertel.com" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
-            </div>
+                    <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+                        <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Nombre Completo:</label>
+                        <input type="text" id="reg-nombre" required placeholder="Ej. Juan Carlos Pérez" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+                    </div>
 
-            <div style="display: flex; gap: 1rem;">
-                <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
-                    <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Departamento:</label>
-                    <select id="reg-departamento" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; height: 42px; background: white;">
-                        <option value="Talento Humano">Talento Humano</option>
-                        <option value="Operaciones">Operaciones</option>
-                        <option value="Tecnología / Sistemas">Tecnología / Sistemas</option>
-                        <option value="Médico">Médico / Salud</option>
-                    </select>
-                </div>
-                <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
-                    <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Rol de Sistema:</label>
-                    <select id="reg-rol" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; height: 42px; background: white;">
-                        <option value="empleado">Empleado</option>
-                        <option value="admin">Administrador</option>
-                        <option value="doc">Médico (Doc)</option>
-                        <option value="kelvin">Kelvin</option>
-                    </select>
-                </div>
-            </div>
+                    <div style="display: flex; gap: 1rem;">
+                        <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
+                            <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Cédula de Identidad:</label>
+                            <input type="text" id="reg-cedula" required placeholder="Ej. 172XXXXXX" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+                        </div>
+                        <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
+                            <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Celular:</label>
+                            <input type="tel" id="reg-celular" placeholder="Ej. 099XXXXXXX" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+                        </div>
+                    </div>
 
-            <button type="submit" style="background: #22c55e; color: white; border: none; padding: 14px; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 0.5rem; transition: background 0.2s; display: flex; justify-content: center; align-items: center; gap: 0.5rem;">
-                💾 Guardar Colaborador en Sistema
-            </button>
-        </form>
-    </section>
-</div>
+                    <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+                        <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Correo Electrónico:</label>
+                        <input type="email" id="reg-correo" required placeholder="usuario@isertel.com" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+                    </div>
+
+                    <div style="display: flex; gap: 1rem;">
+                        <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
+                            <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Departamento:</label>
+                            <select id="reg-departamento" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; height: 42px; background: white;">
+                                <option value="Talento Humano">Talento Humano</option>
+                                <option value="Operaciones">Operaciones</option>
+                                <option value="Tecnología / Sistemas">Tecnología / Sistemas</option>
+                                <option value="Médico">Médico / Salud</option>
+                            </select>
+                        </div>
+                        <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
+                            <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Rol de Sistema:</label>
+                            <select id="reg-rol" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; height: 42px; background: white;">
+                                <option value="empleado">Empleado</option>
+                                <option value="admin">Administrador</option>
+                                <option value="doc">Médico (Doc)</option>
+                                <option value="kelvin">Kelvin</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" style="background: #22c55e; color: white; border: none; padding: 14px; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 0.5rem; transition: background 0.2s; display: flex; justify-content: center; align-items: center; gap: 0.5rem;">
+                        💾 Guardar Colaborador en Sistema
+                    </button>
+                </form>
+            </section>
+
+        </div> </div>
 
 
     <div id="modal-expediente" class="modal">
@@ -632,51 +632,22 @@
             mapearDobleClic('tbody-pasivos');
         };
 
-// Forzamos que la nueva sección se agregue al ciclo original de tu sistema
-function switchView(viewId) {
-    console.log("Cambiando de vista nativa a:", viewId);
+        function switchView(viewId) {
+            document.querySelectorAll('.view-section').forEach(section => section.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`view-${viewId}`).classList.add('active');
+            
+            const eventTarget = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.getAttribute('onclick').includes(viewId));
+            if(eventTarget) eventTarget.classList.add('active');
 
-    // 1. Quitamos la clase 'active' de todas las secciones para ocultarlas de forma segura
-    const secciones = document.querySelectorAll('.view-section');
-    secciones.forEach(sec => {
-        sec.classList.remove('active');
-        sec.style.display = 'none'; // Asegura compatibilidad de ocultación total
-    });
+            const titles = { 'activos': 'Personal Activo', 'pasivos': 'Personal Pasivo', 'crear': 'Registrar Empleado', 'empresa': 'Documentos Institucionales' };
+            document.getElementById('view-title').innerText = titles[viewId] || "Panel Isertel";
 
-    // 2. Quitamos la clase activa de los botones de la barra lateral
-    const botones = document.querySelectorAll('.nav-btn');
-    botones.forEach(btn => btn.classList.remove('active'));
-
-    // 3. Resolvemos cuál es la sección real que se debe encender
-    let vistaDestinoId = `view-${viewId}`;
-    let vistaDestino = document.getElementById(vistaDestinoId);
-
-    if (vistaDestino) {
-        // Activamos la sección usando la lógica CSS de clases de tu panel
-        vistaDestino.classList.add('active');
-        vistaDestino.style.display = 'block';
-        
-        // Actualizamos dinámicamente el título del encabezado superior
-        const tituloHeader = document.getElementById('view-title');
-        if (tituloHeader) {
-            if (viewId === 'activos') tituloHeader.innerText = "Personal Activo";
-            if (viewId === 'pasivos') tituloHeader.innerText = "Personal Pasivo";
-            if (viewId === 'crear') tituloHeader.innerText = "Registrar Colaborador";
-            if (viewId === 'modificar') tituloHeader.innerText = "Modificar Colaborador";
-            if (viewId === 'empresa') tituloHeader.innerText = "Documentos de la Empresa";
-            if (viewId === 'registrar') tituloHeader.innerText = "Registrar Nuevo Usuario del Sistema";
+            // AGREGADO: Carga automáticamente los documentos de la empresa cuando entras a la sección
+            if (viewId === 'empresa') {
+                cargarDocsEmpresa();
+            }
         }
-    } else {
-        console.error(`❌ Error de renderizado: No se encontró la sección HTML '${vistaDestinoId}'`);
-    }
-}
-
-// Mantenemos este alias por si acaso otra parte interna de tu código de envío/submit llamaba al nombre viejo
-function mostrarSeccion(id) {
-    if (id === 'view-modificar' || id === 'modificar') switchView('modificar');
-    else if (id === 'documentos' || id === 'activos') switchView('activos');
-    else switchView('registrar');
-}
 
         function cerrarSesion() {
             localStorage.clear();
@@ -1381,39 +1352,21 @@ async function eliminarDocEmpresa(id) {
 function mostrarSeccion(seccionId) {
     console.log("Cambiando a la sección:", seccionId);
 
-    // 1. Ocultamos las secciones principales, pero evitamos tocar la sidebar o el header
-    // Buscamos contenedores de contenido principales o que empiecen con sec- o view-
-    const contenedores = document.querySelectorAll('main section, .content-section, [id^="sec-"], [id^="view-"]');
+    // 1. Ocultamos explícitamente todas las secciones principales usando selectores comunes
+    const contenedores = document.querySelectorAll('section, .content-section, [id^="sec-"]');
     contenedores.forEach(contenedor => {
-        // No ocultamos el contenedor si es parte de la navegación
-        if (!contenedor.classList.contains('sidebar') && !contenedor.closest('.sidebar')) {
-            contenedor.style.display = 'none';
-        }
+        contenedor.style.display = 'none';
     });
 
-    // 2. Resolvemos cuál es el elemento a mostrar
-    let seccionActiva = null;
-
-    // Caso especial para el registro
-    if (seccionId === 'registrar' || seccionId === 'registrar-usuarios' || seccionId === 'view-registrar') {
-        seccionActiva = document.getElementById('view-registrar') || document.getElementById('sec-registrar-usuarios');
-    } else {
-        // Para las secciones originales, probamos con el ID directo, con 'sec-' o con 'view-'
-        seccionActiva = document.getElementById(seccionId) || 
-                        document.getElementById(`sec-${seccionId}`) || 
-                        document.getElementById(`view-${seccionId}`);
-    }
-
-    // 3. Mostramos la sección encontrada
+    // 2. Buscamos la sección específica que queremos activar
+    const seccionActiva = document.getElementById(`sec-${seccionId}`);
+    
     if (seccionActiva) {
+        // Forzamos el display correcto. Si tu plantilla usa flexbox para centrar contenido, puedes usar 'flex'
         seccionActiva.style.display = 'block'; 
-        console.log(`✅ Vista '${seccionActiva.id}' mostrada con éxito.`);
+        console.log(`✅ Vista 'sec-${seccionId}' mostrada con éxito.`);
     } else {
-        console.error(`❌ Error: No existe ningún elemento HTML con el id '${seccionId}'`);
-        
-        // Respaldo automático: Si algo falla, muestra la sección principal (Modificar) para no quedar en blanco
-        const respaldo = document.getElementById('sec-view-modificar') || document.getElementById('view-modificar');
-        if (respaldo) respaldo.style.display = 'block';
+        console.error(`❌ Error crítico: No existe ningún elemento HTML con el id 'sec-${seccionId}'`);
     }
 }
 
