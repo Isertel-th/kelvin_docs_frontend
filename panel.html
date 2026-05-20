@@ -117,9 +117,7 @@
                 <button class="nav-btn role-admin" id="menu-crear" onclick="switchView('crear')">➕ Registrar Empleado</button>
                 <button class="nav-btn role-admin" id="menu-modificar" onclick="switchView('modificar'); prepararModuloModificar();">✏️ Modificar Empleado</button>
                 <button class="nav-btn role-admin" id="menu-empresa" onclick="switchView('empresa')">🏢 Docs Empresa</button>
-<button id="btn-registrar-usuarios" class="nav-btn" onclick="mostrarSeccion('registrar-usuarios')" style="display: none;">
-    👤 Registrar Usuarios
-</button>
+                <button class="nav-btn" onclick="mostrarSeccion('registrar')">👤 Registrar Usuario</button>
 
 
             </div>
@@ -325,7 +323,7 @@
             
 
 
-<div id="view-registrar" class="view-section">
+<div id="view-registrar" class="view-section" style="display: none;">
     <section id="sec-registrar-usuarios" style="padding: 25px; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 650px; margin: 20px auto; color: #334155;">
         
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.75rem;">
@@ -1355,39 +1353,40 @@ async function eliminarDocEmpresa(id) {
 
 // Función para alternar entre las diferentes secciones de tu panel
 function mostrarSeccion(seccionId) {
-    console.log("Intentando cambiar a la sección:", seccionId);
+    console.log("Cambiando a la vista:", seccionId);
 
-    // 1. Ocultamos TODAS las vistas posibles para limpiar la pantalla por completo
-    const contenedores = document.querySelectorAll('.view-section, section, .content-section, [id^="view-"], [id^="sec-"]');
-    contenedores.forEach(contenedor => {
-        contenedor.style.display = 'none';
+    // 1. Ocultamos ÚNICAMENTE los contenedores que forman parte de las vistas del panel central
+    const vistas = document.querySelectorAll('.view-section');
+    vistas.forEach(vista => {
+        vista.style.display = 'none';
     });
 
-    // 2. Buscamos el elemento probando todas las combinaciones que tienes en tu proyecto
-    let seccionActiva = document.getElementById(seccionId) || 
-                        document.getElementById(`view-${seccionId}`) || 
-                        document.getElementById(`sec-${seccionId}`);
-
-    // CASO ESPECIAL: Si lo que buscas es el registro de usuarios
-    if (seccionId === 'registrar' || seccionId === 'registrar-usuarios') {
-        seccionActiva = document.getElementById('view-registrar') || document.getElementById('sec-registrar-usuarios');
-    }
-
-    // 3. Si encontramos la sección, la mostramos individualmente
-    if (seccionActiva) {
-        seccionActiva.style.display = 'block'; 
-        console.log(`✅ Vista '${seccionActiva.id}' mostrada con éxito.`);
-    } else {
-        // En lugar de romper el código con un error que congele la pantalla, dejamos una alerta controlada
-        console.warn(`⚠️ No se encontró la vista para el ID enviado: "${seccionId}". Mostrando vista por defecto.`);
-        
-        // Intenta abrir una sección segura por defecto para que nunca se quede en blanco
-        const vistaPorDefecto = document.getElementById('view-modificar') || document.getElementById('view-empresa');
-        if (vistaPorDefecto) {
-            vistaPorDefecto.style.display = 'block';
+    // 2. Resolvemos cuál es el elemento correcto a mostrar según lo que envíe el botón
+    let objetivoId = seccionId;
+    if (seccionId === 'registrar' || seccionId === 'registrar-usuarios' || seccionId === 'registrar-usuario') {
+        objetivoId = 'view-registrar';
+    } else if (!seccionId.startsWith('view-')) {
+        // Si mandan 'empresa' o 'modificar', buscamos 'view-empresa' o 'view-modificar'
+        if (document.getElementById(`view-${seccionId}`)) {
+            objetivoId = `view-${seccionId}`;
         }
     }
+
+    const seccionActiva = document.getElementById(objetivoId);
+
+    // 3. Mostramos la vista correspondiente si existe
+    if (seccionActiva) {
+        seccionActiva.style.display = 'block';
+        console.log(`✅ Cambiado con éxito a la sección: ${objetivoId}`);
+    } else {
+        console.error(`❌ No se encontró ningún contenedor con el ID: "${objetivoId}"`);
+        
+        // Respaldo por si acaso para evitar que quede vacío
+        const respaldo = document.getElementById('view-modificar') || document.getElementById('view-empresa');
+        if (respaldo) respaldo.style.display = 'block';
+    }
 }
+
 
 // Función encargada de recopilar los datos y enviarlos al Backend por AJAX
 async function registrarUsuario(event) {
