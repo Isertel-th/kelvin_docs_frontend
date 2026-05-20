@@ -323,13 +323,12 @@
             
 
 
-<div id="view-registrar" class="view-section" style="display: none;">
+<div id="view-registrar" style="display: none; width: 100%;">
     <section id="sec-registrar-usuarios" style="padding: 25px; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 650px; margin: 20px auto; color: #334155;">
         
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.75rem;">
             <h2 style="color: #1e293b; margin: 0; font-size: 1.5rem; font-weight: 700;">👤 Registrar Nuevo Colaborador</h2>
-            <button type="button" onclick="mostrarSeccion('documentos')" style="background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s;">❌ Cerrar</button>
-        </div>
+<button type="button" onclick="mostrarSeccion('view-modificar')" style="background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s;">❌ Cerrar</button>        </div>
         
         <form id="form-registro-usuario" onsubmit="registrarUsuario(event)" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1.25rem;">
             
@@ -1353,40 +1352,43 @@ async function eliminarDocEmpresa(id) {
 
 // Función para alternar entre las diferentes secciones de tu panel
 function mostrarSeccion(seccionId) {
-    console.log("Cambiando a la vista:", seccionId);
+    console.log("Cambiando a la sección:", seccionId);
 
-    // 1. Ocultamos ÚNICAMENTE los contenedores que forman parte de las vistas del panel central
-    const vistas = document.querySelectorAll('.view-section');
-    vistas.forEach(vista => {
-        vista.style.display = 'none';
+    // 1. Ocultamos las secciones principales, pero evitamos tocar la sidebar o el header
+    // Buscamos contenedores de contenido principales o que empiecen con sec- o view-
+    const contenedores = document.querySelectorAll('main section, .content-section, [id^="sec-"], [id^="view-"]');
+    contenedores.forEach(contenedor => {
+        // No ocultamos el contenedor si es parte de la navegación
+        if (!contenedor.classList.contains('sidebar') && !contenedor.closest('.sidebar')) {
+            contenedor.style.display = 'none';
+        }
     });
 
-    // 2. Resolvemos cuál es el elemento correcto a mostrar según lo que envíe el botón
-    let objetivoId = seccionId;
-    if (seccionId === 'registrar' || seccionId === 'registrar-usuarios' || seccionId === 'registrar-usuario') {
-        objetivoId = 'view-registrar';
-    } else if (!seccionId.startsWith('view-')) {
-        // Si mandan 'empresa' o 'modificar', buscamos 'view-empresa' o 'view-modificar'
-        if (document.getElementById(`view-${seccionId}`)) {
-            objetivoId = `view-${seccionId}`;
-        }
+    // 2. Resolvemos cuál es el elemento a mostrar
+    let seccionActiva = null;
+
+    // Caso especial para el registro
+    if (seccionId === 'registrar' || seccionId === 'registrar-usuarios' || seccionId === 'view-registrar') {
+        seccionActiva = document.getElementById('view-registrar') || document.getElementById('sec-registrar-usuarios');
+    } else {
+        // Para las secciones originales, probamos con el ID directo, con 'sec-' o con 'view-'
+        seccionActiva = document.getElementById(seccionId) || 
+                        document.getElementById(`sec-${seccionId}`) || 
+                        document.getElementById(`view-${seccionId}`);
     }
 
-    const seccionActiva = document.getElementById(objetivoId);
-
-    // 3. Mostramos la vista correspondiente si existe
+    // 3. Mostramos la sección encontrada
     if (seccionActiva) {
-        seccionActiva.style.display = 'block';
-        console.log(`✅ Cambiado con éxito a la sección: ${objetivoId}`);
+        seccionActiva.style.display = 'block'; 
+        console.log(`✅ Vista '${seccionActiva.id}' mostrada con éxito.`);
     } else {
-        console.error(`❌ No se encontró ningún contenedor con el ID: "${objetivoId}"`);
+        console.error(`❌ Error: No existe ningún elemento HTML con el id '${seccionId}'`);
         
-        // Respaldo por si acaso para evitar que quede vacío
-        const respaldo = document.getElementById('view-modificar') || document.getElementById('view-empresa');
+        // Respaldo automático: Si algo falla, muestra la sección principal (Modificar) para no quedar en blanco
+        const respaldo = document.getElementById('sec-view-modificar') || document.getElementById('view-modificar');
         if (respaldo) respaldo.style.display = 'block';
     }
 }
-
 
 // Función encargada de recopilar los datos y enviarlos al Backend por AJAX
 async function registrarUsuario(event) {
