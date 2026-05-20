@@ -369,6 +369,11 @@
         <input type="email" id="reg-correo" required placeholder="usuario@gmail.com" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
     </div>
 
+    <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+    <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Dirección de Domicilio:</label>
+    <input type="text" id="reg-direccion" required placeholder="Ej. Av. Amazonas y República" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+    </div>
+
     <div style="display: flex; gap: 1rem;">
         <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
             <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Departamento:</label>
@@ -1431,13 +1436,14 @@ async function registrarUsuario(event) {
     const cedulaInput = document.getElementById('reg-cedula').value.trim();
     const celularInput = document.getElementById('reg-celular').value.trim();
     const correoInput = document.getElementById('reg-correo').value.trim().toLowerCase();
+    const direccionInput = document.getElementById('reg-direccion').value.trim(); // <-- CAPTURAR DIRECCIÓN
     const departamentoInput = document.getElementById('reg-departamento').value;
     const rolInput = document.getElementById('reg-rol').value.trim();
     const fotoInput = document.getElementById('reg-foto').files[0];
 
     // 1. VALIDACIÓN: Comprobar que todos los campos requeridos tengan valor
-if (!nombreInput || !cedulaInput || !celularInput || !correoInput || !departamentoInput || !rolInput || !fotoInput) {
-    alert("Por favor, complete todos los campos obligatorios del formulario (incluyendo la foto de perfil).");
+if (!nombreInput || !cedulaInput || !celularInput || !correoInput || !direccionInput || !departamentoInput || !rolInput || !fotoInput) {
+    alert("Por favor, complete todos los campos obligatorios del formulario (incluyendo la foto y dirección).");
     return;
 }
 
@@ -1475,6 +1481,7 @@ if (!nombreInput || !cedulaInput || !celularInput || !correoInput || !departamen
     formData.append('cedula', cedulaInput);
     formData.append('celular', celularInput);
     formData.append('correo', correoInput);
+    formData.append('direccion', direccionInput); // <-- ENVIAR AL BACKEND
     formData.append('departamento', departamentoInput); // Enviará el depto.nombre configurado anteriormente
     formData.append('rol_asignado', rolInput);
     
