@@ -100,7 +100,7 @@
         .section-separator span { position: absolute; top: -12px; left: 20px; background: white; padding: 0 10px; font-weight: bold; color: #64748b; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
         
         /* Restricciones de Roles Visuales */
-        .role-admin, .role-doc, .role-kelvin { display: none; }
+        .role-admin, .role-doc, .role-kelvin { display: none !important; }
 
         .btn-clear { background: #64748b; color: white; }
         .btn-clear:hover { background: #475569; }
@@ -602,42 +602,56 @@
             cerrarSesion();
         }
 
-        window.onload = function() {
-            document.getElementById('user-role').innerText = rol.toUpperCase();
-            document.getElementById('user-display-name').innerText = nombreUsuario || "Usuario Isertel";
+window.onload = function() {
+    // 1. Configurar la información de identidad en el header
+    document.getElementById('user-role').innerText = rol.toUpperCase();
+    document.getElementById('user-display-name').innerText = nombreUsuario || "Usuario Isertel";
 
-            if (rol === 'admin') {
-                document.getElementById('btn-registrar-usuarios').style.display = 'block';
-                document.querySelectorAll('.role-admin').forEach(el => el.style.display = 'block');
-            } else if (rol === 'doc') {
-                document.querySelectorAll('.role-doc').forEach(el => el.style.display = 'block');
-            } else if (rol === 'kelvin') {
-                document.querySelectorAll('.role-kelvin').forEach(el => el.style.display = 'block');
-            }
+    // 2. Control de accesos por roles (Vistas de menú)
+    if (rol === 'admin') {
+        // Mostramos el botón específico de registro de usuarios
+        document.getElementById('btn-registrar-usuarios').style.display = 'block';
+        
+        // Forzamos la aparición de todos los botones de administración ignorando el !important del CSS
+        document.querySelectorAll('.role-admin').forEach(el => {
+            el.style.setProperty('display', 'block', 'important');
+        });
+    } else if (rol === 'doc') {
+        document.querySelectorAll('.role-doc').forEach(el => el.style.display = 'block');
+    } else if (rol === 'kelvin') {
+        document.querySelectorAll('.role-kelvin').forEach(el => el.style.display = 'block');
+    }
 
-            cargarEmpleadosActivos();
-            cargarEmpleadosPasivos();
-            if (rol === 'admin') cargarDocumentosEmpresa();
+    // 3. Cargar los datos iniciales desde el servidor
+    cargarEmpleadosActivos();
+    cargarEmpleadosPasivos();
+    if (rol === 'admin') cargarDocumentosEmpresa();
 
-            const mapearDobleClic = (tbodyId) => {
-                const tbody = document.getElementById(tbodyId);
-                if (tbody) {
-                    tbody.ondblclick = function(e) {
-                        const fila = e.target.closest('tr');
-                        if (fila && fila.dataset.id) {
-                            const id = fila.dataset.id;
-                            const nombre = fila.dataset.nombre;
-                            const cedula = fila.dataset.cedula;
-                            const esPasivo = fila.dataset.pasivo === 'true';
-                            abrirExpediente(id, nombre, cedula, esPasivo);
-                        }
-                    };
+    // 4. Mapeo inteligente de doble clic para abrir expedientes digitales
+    const mapearDobleClic = (tbodyId) => {
+        const tbody = document.getElementById(tbodyId);
+        if (tbody) {
+            tbody.ondblclick = function(e) {
+                // Ignorar el doble clic si el usuario interactúa con botones o enlaces dentro de la fila
+                if (e.target.closest('button') || e.target.closest('a')) return;
+
+                const fila = e.target.closest('tr');
+                if (fila && fila.dataset.id) {
+                    const id = fila.dataset.id;
+                    const nombre = fila.dataset.nombre;
+                    const cedula = fila.dataset.cedula;
+                    const esPasivo = fila.dataset.pasivo === 'true';
+                    
+                    abrirExpediente(id, nombre, cedula, esPasivo);
                 }
             };
+        }
+    };
 
-            mapearDobleClic('tbody-activos');
-            mapearDobleClic('tbody-pasivos');
-        };
+    // Activar los escuchadores en ambas tablas
+    mapearDobleClic('tbody-activos');
+    mapearDobleClic('tbody-pasivos');
+};
 
 function switchView(viewId) {
     console.log("Cambiando a la vista:", viewId);
