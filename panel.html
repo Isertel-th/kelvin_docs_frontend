@@ -1482,10 +1482,10 @@ async function cargarDepartamentos() {
         // Limpiamos el indicador de carga
         selectDepto.innerHTML = '<option value="">Seleccione un departamento</option>';
         
-        // Llenamos las opciones mapeando tus columnas id y nombre
+        // Llenamos las opciones usando el nombre del departamento como valor
         departamentos.forEach(depto => {
             const option = document.createElement('option');
-            option.value = depto.id;       // Envía el ID numérico a la BD al registrar
+            option.value = depto.nombre;       // <-- CAMBIO: Ahora envía el texto (ej: "Sistemas", "Contabilidad")
             option.textContent = depto.nombre; // Muestra el nombre visible al usuario
             selectDepto.appendChild(option);
         });
