@@ -1355,27 +1355,37 @@ async function eliminarDocEmpresa(id) {
 
 // Función para alternar entre las diferentes secciones de tu panel
 function mostrarSeccion(seccionId) {
-    console.log("Cambiando a la sección:", seccionId);
+    console.log("Intentando cambiar a la sección:", seccionId);
 
-    // 1. Ocultamos absolutamente todas las secciones y vistas del panel
-    const contenedores = document.querySelectorAll('.view-section, section, .content-section');
+    // 1. Ocultamos TODAS las vistas posibles para limpiar la pantalla por completo
+    const contenedores = document.querySelectorAll('.view-section, section, .content-section, [id^="view-"], [id^="sec-"]');
     contenedores.forEach(contenedor => {
         contenedor.style.display = 'none';
     });
 
-    // 2. Buscamos la sección intentando con el ID directo o con el prefijo 'sec-'
-    let seccionActiva = document.getElementById(seccionId);
-    
-    if (!seccionActiva) {
-        seccionActiva = document.getElementById(`sec-${seccionId}`);
+    // 2. Buscamos el elemento probando todas las combinaciones que tienes en tu proyecto
+    let seccionActiva = document.getElementById(seccionId) || 
+                        document.getElementById(`view-${seccionId}`) || 
+                        document.getElementById(`sec-${seccionId}`);
+
+    // CASO ESPECIAL: Si lo que buscas es el registro de usuarios
+    if (seccionId === 'registrar' || seccionId === 'registrar-usuarios') {
+        seccionActiva = document.getElementById('view-registrar') || document.getElementById('sec-registrar-usuarios');
     }
-    
-    // 3. Si se encuentra, la mostramos de forma individual
+
+    // 3. Si encontramos la sección, la mostramos individualmente
     if (seccionActiva) {
         seccionActiva.style.display = 'block'; 
-        console.log(`✅ Vista mostrada con éxito.`);
+        console.log(`✅ Vista '${seccionActiva.id}' mostrada con éxito.`);
     } else {
-        console.error(`❌ Error crítico: No existe ningún elemento HTML con el id '${seccionId}' o 'sec-${seccionId}'`);
+        // En lugar de romper el código con un error que congele la pantalla, dejamos una alerta controlada
+        console.warn(`⚠️ No se encontró la vista para el ID enviado: "${seccionId}". Mostrando vista por defecto.`);
+        
+        // Intenta abrir una sección segura por defecto para que nunca se quede en blanco
+        const vistaPorDefecto = document.getElementById('view-modificar') || document.getElementById('view-empresa');
+        if (vistaPorDefecto) {
+            vistaPorDefecto.style.display = 'block';
+        }
     }
 }
 
