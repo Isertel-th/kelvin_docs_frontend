@@ -104,16 +104,7 @@
 
         .btn-clear { background: #64748b; color: white; }
         .btn-clear:hover { background: #475569; }
-
-
-        /* Fuerza a la sección de registro a mostrarse dinámicamente con la lógica del panel */
-.view-section#view-registrar-usuarios {
-    display: none;
-}
-.view-section#view-registrar-usuarios.active {
-    display: block !important;
-}
-
+        
     </style>
 </head>
 <body>
@@ -640,16 +631,20 @@
         };
 
 function switchView(viewId) {
-    // 1. Ocultamos todas las secciones quitando la clase active (incluyendo el registro)
-    document.querySelectorAll('.view-section').forEach(section => section.classList.remove('active'));
+    // 1. Ocultamos TODAS las secciones quitando la clase active y forzando display 'none'
+    document.querySelectorAll('.view-section').forEach(section => {
+        section.classList.remove('active');
+        section.style.display = 'none'; 
+    });
     
     // 2. Quitamos el estado activo de todos los botones del menú
     document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
     
-    // 3. Activamos la sección correspondiente
+    // 3. Activamos la sección correspondiente y la FORZAMOS a mostrarse en pantalla
     const seccionActiva = document.getElementById(`view-${viewId}`);
     if (seccionActiva) {
         seccionActiva.classList.add('active');
+        seccionActiva.style.display = 'block'; // Fuerza al navegador a renderizarla aquí mismo
     } else {
         console.error(`❌ No se encontró la sección con ID: view-${viewId}`);
     }
@@ -667,7 +662,7 @@ function switchView(viewId) {
         'pasivos': 'Personal Pasivo', 
         'crear': 'Registrar Empleado', 
         'empresa': 'Documentos Institucionales',
-        'registrar-usuarios': 'Registrar Colaborador' // Añadido el título para esta sección
+        'registrar-usuarios': 'Registrar Colaborador'
     };
     const mainTitle = document.getElementById('view-title');
     if (mainTitle) {
