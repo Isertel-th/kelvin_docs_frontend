@@ -117,8 +117,7 @@
                 <button class="nav-btn role-admin" id="menu-crear" onclick="switchView('crear')">➕ Registrar Empleado</button>
                 <button class="nav-btn role-admin" id="menu-modificar" onclick="switchView('modificar'); prepararModuloModificar();">✏️ Modificar Empleado</button>
                 <button class="nav-btn role-admin" id="menu-empresa" onclick="switchView('empresa')">🏢 Docs Empresa</button>
-                <button class="nav-btn" onclick="mostrarSeccion('registrar')">👤 Registrar Usuario</button>
-
+                <button class="nav-btn" onclick="switchView('registrar')">👤 Registrar Usuario</button>
 
             </div>
         </div>
@@ -325,11 +324,10 @@
 
 <div id="view-registrar" style="display: none; width: 100%;">
     <section id="sec-registrar-usuarios" style="padding: 25px; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 650px; margin: 20px auto; color: #334155;">
-        
+
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.75rem;">
             <h2 style="color: #1e293b; margin: 0; font-size: 1.5rem; font-weight: 700;">👤 Registrar Nuevo Colaborador</h2>
-<button type="button" onclick="mostrarSeccion('view-modificar')" style="background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s;">❌ Cerrar</button>        </div>
-        
+<button type="button" onclick="switchView('modificar')" style="background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s;">❌ Cerrar</button>        
         <form id="form-registro-usuario" onsubmit="registrarUsuario(event)" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1.25rem;">
             
             <div style="display: flex; flex-direction: column; gap: 0.4rem;">
@@ -634,22 +632,51 @@
             mapearDobleClic('tbody-pasivos');
         };
 
-        function switchView(viewId) {
-            document.querySelectorAll('.view-section').forEach(section => section.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(`view-${viewId}`).classList.add('active');
-            
-            const eventTarget = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.getAttribute('onclick').includes(viewId));
-            if(eventTarget) eventTarget.classList.add('active');
+// Forzamos que la nueva sección se agregue al ciclo original de tu sistema
+function switchView(viewId) {
+    console.log("Cambiando de vista nativa a:", viewId);
 
-            const titles = { 'activos': 'Personal Activo', 'pasivos': 'Personal Pasivo', 'crear': 'Registrar Empleado', 'empresa': 'Documentos Institucionales' };
-            document.getElementById('view-title').innerText = titles[viewId] || "Panel Isertel";
+    // 1. Quitamos la clase 'active' de todas las secciones para ocultarlas de forma segura
+    const secciones = document.querySelectorAll('.view-section');
+    secciones.forEach(sec => {
+        sec.classList.remove('active');
+        sec.style.display = 'none'; // Asegura compatibilidad de ocultación total
+    });
 
-            // AGREGADO: Carga automáticamente los documentos de la empresa cuando entras a la sección
-            if (viewId === 'empresa') {
-                cargarDocsEmpresa();
-            }
+    // 2. Quitamos la clase activa de los botones de la barra lateral
+    const botones = document.querySelectorAll('.nav-btn');
+    botones.forEach(btn => btn.classList.remove('active'));
+
+    // 3. Resolvemos cuál es la sección real que se debe encender
+    let vistaDestinoId = `view-${viewId}`;
+    let vistaDestino = document.getElementById(vistaDestinoId);
+
+    if (vistaDestino) {
+        // Activamos la sección usando la lógica CSS de clases de tu panel
+        vistaDestino.classList.add('active');
+        vistaDestino.style.display = 'block';
+        
+        // Actualizamos dinámicamente el título del encabezado superior
+        const tituloHeader = document.getElementById('view-title');
+        if (tituloHeader) {
+            if (viewId === 'activos') tituloHeader.innerText = "Personal Activo";
+            if (viewId === 'pasivos') tituloHeader.innerText = "Personal Pasivo";
+            if (viewId === 'crear') tituloHeader.innerText = "Registrar Colaborador";
+            if (viewId === 'modificar') tituloHeader.innerText = "Modificar Colaborador";
+            if (viewId === 'empresa') tituloHeader.innerText = "Documentos de la Empresa";
+            if (viewId === 'registrar') tituloHeader.innerText = "Registrar Nuevo Usuario del Sistema";
         }
+    } else {
+        console.error(`❌ Error de renderizado: No se encontró la sección HTML '${vistaDestinoId}'`);
+    }
+}
+
+// Mantenemos este alias por si acaso otra parte interna de tu código de envío/submit llamaba al nombre viejo
+function mostrarSeccion(id) {
+    if (id === 'view-modificar' || id === 'modificar') switchView('modificar');
+    else if (id === 'documentos' || id === 'activos') switchView('activos');
+    else switchView('registrar');
+}
 
         function cerrarSesion() {
             localStorage.clear();
