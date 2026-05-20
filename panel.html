@@ -317,14 +317,10 @@
     </div>
 </div>
 
-//cambio permisos inicio
 
 
-<div id="view-registrar-usuarios" class="view-section" style="display: none; padding: 20px;">
+<div id="view-registrar-usuarios" class="view-section">
     <div style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); max-width: 600px; margin: 0 auto;">
-        <h2 style="color: var(--admin-color); margin-top: 0; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
-            👤 Registrar Nuevo Usuario (Sistema)
-        </h2>
         
         <form id="form-registrar-usuario-sistema" onsubmit="registrarUsuarioSistema(event)" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 15px;">
             
@@ -333,12 +329,12 @@
                 <input type="text" id="reg-sys-nombre" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
             </div>
 
-            <div style="display: flex; gap: 15px;">
-                <div style="flex: 1;">
+            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 200px;">
                     <label style="display: block; font-weight: 600; margin-bottom: 5px; color: #475569;">Cédula:</label>
                     <input type="text" id="reg-sys-cedula" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
                 </div>
-                <div style="flex: 1;">
+                <div style="flex: 1; min-width: 200px;">
                     <label style="display: block; font-weight: 600; margin-bottom: 5px; color: #475569;">Rol de Sistema:</label>
                     <select id="reg-sys-rol" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; background: white; box-sizing: border-box;">
                         <option value="kelvin">Kelvin</option>
@@ -348,13 +344,12 @@
                 </div>
             </div>
 
-
-            <div style="display: flex; gap: 15px;">
-                <div style="flex: 1;">
+            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 200px;">
                     <label style="display: block; font-weight: 600; margin-bottom: 5px; color: #475569;">Correo Electrónico:</label>
                     <input type="email" id="reg-sys-correo" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
                 </div>
-                <div style="flex: 1;">
+                <div style="flex: 1; min-width: 200px;">
                     <label style="display: block; font-weight: 600; margin-bottom: 5px; color: #475569;">Celular:</label>
                     <input type="text" id="reg-sys-celular" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
                 </div>
@@ -373,15 +368,11 @@
             </div>
 
             <button type="submit" class="btn-action btn-upload" style="background: #10b981; padding: 12px; font-size: 16px; font-weight: bold; width: 100%; margin-top: 10px; border: none; color: white; border-radius: 6px; cursor: pointer;">
-                💾 Guardar en Usuarios
+                💾 Registrar en Base de Datos
             </button>
         </form>
     </div>
 </div>
-
-
-//cambio permisos fin
-
 
 
 
@@ -638,29 +629,43 @@
             mapearDobleClic('tbody-pasivos');
         };
 
-        function switchView(viewId) {
-            document.querySelectorAll('.view-section').forEach(section => section.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(`view-${viewId}`).classList.add('active');
-            
-            const eventTarget = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.getAttribute('onclick').includes(viewId));
-            if(eventTarget) eventTarget.classList.add('active');
+function switchView(viewId) {
+    document.querySelectorAll('.view-section').forEach(section => section.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+    
+    const targetView = document.getElementById(`view-${viewId}`);
+    if (targetView) {
+        targetView.classList.add('active');
+    } else {
+        console.error(`No existe el contenedor con ID: view-${viewId}`);
+    }
+    
+    const eventTarget = Array.from(document.querySelectorAll('.nav-btn')).find(b => {
+        const onClickAttr = b.getAttribute('onclick');
+        return onClickAttr && onClickAttr.includes(viewId);
+    });
+    if(eventTarget) eventTarget.classList.add('active');
 
-            const titles = { 'activos': 'Personal Activo', 'pasivos': 'Personal Pasivo', 'crear': 'Registrar Empleado', 'empresa': 'Documentos Institucionales' };
-            document.getElementById('view-title').innerText = titles[viewId] || "Panel Isertel";
+    // Mapeo de títulos corregido incluyendo tu nueva sección
+    const titles = { 
+        'activos': 'Personal Activo', 
+        'pasivos': 'Personal Pasivo', 
+        'crear': 'Registrar Empleado', 
+        'empresa': 'Documentos Institucionales',
+        'registrar-usuarios': 'Registrar Nuevo Usuario (Sistema)' 
+    };
+    document.getElementById('view-title').innerText = titles[viewId] || "Panel Isertel";
 
-            // AGREGADO: Carga automáticamente los documentos de la empresa cuando entras a la sección
-            if (viewId === 'empresa') {
-                cargarDocsEmpresa();
+    // AGREGADO: Carga automáticamente los documentos de la empresa cuando entras a la sección
+    if (viewId === 'empresa') {
+        cargarDocsEmpresa();
+    }
 
-            }
-
-            //cambio permisos
-
-            if (viewId === 'registrar-usuarios') {
+    // DISPARADOR: Carga los departamentos para tu formulario en caliente
+    if (viewId === 'registrar-usuarios') {
         cargarDepartamentosDesplegable();
     }
-        }
+}
         
 
 
@@ -1368,7 +1373,6 @@ async function eliminarDocEmpresa(id) {
 
 //cambio permisos
 
-// Obtiene los departamentos de la DB y llena el select dinámico
 async function cargarDepartamentosDesplegable() {
     const selectDep = document.getElementById('reg-sys-departamento');
     try {
@@ -1376,15 +1380,15 @@ async function cargarDepartamentosDesplegable() {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         
-        if (!res.ok) throw new Error("Error en la respuesta");
+        if (!res.ok) throw new Error("Error en respuesta de la API");
         
         const departamentos = await res.json();
         
         selectDep.innerHTML = '<option value="">-- Seleccione un Departamento --</option>';
         departamentos.forEach(dep => {
             const option = document.createElement('option');
-            option.value = dep.id; // Guarda el id numérico
-            option.textContent = dep.nombre; // Nombre legible
+            option.value = dep.id;
+            option.textContent = dep.nombre;
             selectDep.appendChild(option);
         });
     } catch (err) {
@@ -1393,7 +1397,6 @@ async function cargarDepartamentosDesplegable() {
     }
 }
 
-// Procesa el envío del formulario hacia el nuevo endpoint de la tabla usuarios
 async function registrarUsuarioSistema(event) {
     event.preventDefault();
 
@@ -1422,12 +1425,12 @@ async function registrarUsuarioSistema(event) {
         if (res.ok) {
             alert("✅ Usuario registrado exitosamente en la tabla 'usuarios'.");
             document.getElementById('form-registrar-usuario-sistema').reset();
-            switchView('activos'); // Redirige a la vista principal por defecto de tu sistema
+            switchView('activos');
         } else {
             alert("❌ Error: " + data.error);
         }
     } catch (err) {
-        console.error("Error en la solicitud:", err);
+        console.error("Error en la solicitud de registro:", err);
         alert("Error de conexión con el servidor.");
     }
 }
