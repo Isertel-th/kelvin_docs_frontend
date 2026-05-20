@@ -336,9 +336,35 @@
             
             
             
-<div id="view-registrar-usuarios" class="view-section" style="padding: 25px; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 650px; width: 100%; margin: 20px auto; display: none; box-sizing: border-box;">
+<div id="view-registrar-usuarios" class="view-section" style="padding: 25px; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 900px; width: 100%; margin: 20px auto; display: none; box-sizing: border-box;">
+    
+    <div style="margin-bottom: 2.5rem;">
+        <h3 style="color: #1e293b; margin-top: 0; margin-bottom: 1rem; font-size: 1.3rem; font-weight: 700; border-bottom: 2px solid #3b82f6; padding-bottom: 0.5rem;">
+            📋 Usuarios Registrados en el Sistema
+        </h3>
+        <div class="table-responsive" style="max-height: 300px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 6px;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                <thead style="background: #f8fafc; position: sticky; top: 0; z-index: 10;">
+                    <tr style="border-bottom: 2px solid #e2e8f0; text-align: left;">
+                        <th style="padding: 10px;">Foto</th>
+                        <th style="padding: 10px;">Nombre Completo</th>
+                        <th style="padding: 10px;">Cédula</th>
+                        <th style="padding: 10px;">Correo</th>
+                        <th style="padding: 10px;">Departamento</th>
+                        <th style="padding: 10px;">Rol</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-usuarios-sistema">
+                    <tr>
+                        <td colspan="6" style="padding: 15px; text-align: center; color: #64748b;">Cargando usuarios...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.75rem;">
-        <h2 style="color: #1e293b; margin: 0; font-size: 1.5rem; font-weight: 700;">👤 Registrar Nuevo Colaborador</h2>
+        <h2 style="color: #1e293b; margin: 0; font-size: 1.3rem; font-weight: 700;">👤 Registrar Nuevo Colaborador</h2>
     </div>
     
     <form id="form-registro-usuario" onsubmit="registrarUsuario(event)" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1.25rem;">
@@ -712,6 +738,10 @@ function switchView(viewId) {
     // 6. Carga automática de documentos institucionales (si aplica)
     if (viewId === 'empresa' && typeof cargarDocsEmpresa === 'function') {
         cargarDocsEmpresa();
+    }
+    // NUEVO: Carga automática de la lista de usuarios al entrar a la vista
+    if (viewId === 'registrar-usuarios') {
+        cargarUsuariosSistema();
     }
 }
 
@@ -1414,6 +1444,13 @@ async function eliminarDocEmpresa(id) {
     }
 }
 
+
+
+
+
+
+//ADMINS MENUUUUU
+
 // Función para alternar entre las diferentes secciones de tu panel
 function mostrarSeccion(seccionId) {
     console.log("Cambiando a la sección:", seccionId);
@@ -1519,7 +1556,8 @@ async function registrarUsuario(event) {
 
         alert("¡Usuario registrado con éxito!");
         document.getElementById('form-registro-usuario').reset(); // Limpia el formulario
-        
+        cargarUsuariosSistema();
+
     } catch (error) {
         console.error("Error en registro:", error);
         alert("No se pudo completar el registro: " + error.message);
@@ -1578,6 +1616,58 @@ function toggleVisibilidadPassword() {
         inputPass.type = 'text';
     } else {
         inputPass.type = 'password';
+    }
+}
+
+
+
+
+
+async function cargarUsuariosSistema() {
+    const tbody = document.getElementById('tbody-usuarios-sistema');
+    if (!tbody) return;
+
+    try {
+        const respuesta = await fetch(`${API_URL}/usuarios`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        });
+
+        if (!respuesta.ok) {
+            throw new Error('No se pudo obtener la nómina de usuarios.');
+        }
+
+        const usuarios = await respuesta.json();
+        
+        if (usuarios.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="padding: 15px; text-align: center; color: #64748b;">No hay usuarios registrados aún.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = ''; // Limpiar mensaje de carga
+        usuarios.forEach(user => {
+            const tr = document.createElement('tr');
+            tr.style.borderBottom = '1px solid #e2e8f0';
+            
+            // Reemplazar URL de foto por defecto si falla o viene vacía
+            const fotoUrl = user.foto_url ? user.foto_url : 'https://via.placeholder.com/40';
+
+            tr.innerHTML = `
+                <td style="padding: 8px;"><img src="${fotoUrl}" alt="Foto" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"></td>
+                <td style="padding: 8px; font-weight: 500; color: #1e293b;">${user.nombre_completo}</td>
+                <td style="padding: 8px; color: #475569;">${user.cedula}</td>
+                <td style="padding: 8px; color: #475569;">${user.correo}</td>
+                <td style="padding: 8px;"><span style="background: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">${user.departamento || 'N/A'}</span></td>
+                <td style="padding: 8px;"><span style="background: #f1f5f9; color: #475569; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold;">${user.rol}</span></td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+    } catch (error) {
+        console.error("❌ Error al cargar usuarios:", error);
+        tbody.innerHTML = `<tr><td colspan="6" style="padding: 15px; text-align: center; color: #ef4444; font-weight: bold;">Error al cargar el listado.</td></tr>`;
     }
 }
 
