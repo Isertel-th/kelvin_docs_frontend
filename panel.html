@@ -117,6 +117,9 @@
                 <button class="nav-btn role-admin" id="menu-crear" onclick="switchView('crear')">➕ Registrar Empleado</button>
                 <button class="nav-btn role-admin" id="menu-modificar" onclick="switchView('modificar'); prepararModuloModificar();">✏️ Modificar Empleado</button>
                 <button class="nav-btn role-admin" id="menu-empresa" onclick="switchView('empresa')">🏢 Docs Empresa</button>
+                <button id="btn-registro-usuarios" class="nav-btn" onclick="mostrarSeccion('registro-usuarios')" style="display: none;">
+                    👥 Registrar Usuarios
+                </button>            
             </div>
         </div>
         <div>
@@ -314,6 +317,63 @@
         </table>
     </div>
 </div>
+
+
+
+<section id="registro-usuarios" class="content-section" style="display: none;">
+    <h2>Registro de Nuevo Personal</h2>
+    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); max-width: 600px;">
+        <form id="form-registro" onsubmit="registrarUsuario(event)">
+            
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Foto del Empleado:</label>
+                <input type="file" id="reg-foto" accept="image/*" style="width: 100%;">
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Nombre Completo:</label>
+                <input type="text" id="reg-nombre" required style="width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;">
+            </div>
+
+            <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                <div style="flex: 1;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 5px;">Cédula:</label>
+                    <input type="text" id="reg-cedula" required style="width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;">
+                </div>
+                <div style="flex: 1;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 5px;">Celular:</label>
+                    <input type="text" id="reg-celular" required style="width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;">
+                </div>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Correo Electrónico:</label>
+                <input type="email" id="reg-correo" required style="width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;">
+            </div>
+
+            <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                <div style="flex: 1;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 5px;">Departamento:</label>
+                    <select id="reg-departamento" required style="width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;">
+                        <option value="">Seleccione un departamento...</option>
+                        </select>
+                </div>
+                <div style="flex: 1;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 5px;">Rol de Sistema:</label>
+                    <select id="reg-rol" required style="width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;">
+                        <option value="kelvin">Técnico / Operaciones</option>
+                        <option value="doc">Doctor</option>
+                        <option value="admin">Administrador</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit" style="background: #2c3e50; color: white; padding: 12px 15px; border: none; border-radius: 4px; cursor: pointer; width: 100%; font-size: 16px; font-weight: bold;">
+                💾 Registrar Empleado
+            </button>
+        </form>
+    </div>
+</section>
             </div>
 
         </div>
@@ -531,17 +591,29 @@
             cerrarSesion();
         }
 
-        window.onload = function() {
-            document.getElementById('user-role').innerText = rol.toUpperCase();
-            document.getElementById('user-display-name').innerText = nombreUsuario || "Usuario Isertel";
+window.onload = function() {
+    // Mostrar datos básicos del usuario en el header
+    document.getElementById('user-role').innerText = rol.toUpperCase();
+    document.getElementById('user-display-name').innerText = nombreUsuario || "Usuario Isertel";
 
-            if (rol === 'admin') {
-                document.querySelectorAll('.role-admin').forEach(el => el.style.display = 'block');
-            } else if (rol === 'doc') {
-                document.querySelectorAll('.role-doc').forEach(el => el.style.display = 'block');
-            } else if (rol === 'kelvin') {
-                document.querySelectorAll('.role-kelvin').forEach(el => el.style.display = 'block');
-            }
+    // Control de vistas y funciones según el Rol asignado
+    if (rol === 'admin') {
+        document.querySelectorAll('.role-admin').forEach(el => el.style.display = 'block');
+        
+        // Habilitar el botón de registro e inicializar departamentos SOLO para el admin
+        const btnRegistro = document.getElementById('btn-registro-usuarios');
+        if (btnRegistro) btnRegistro.style.display = 'block';
+        
+        if (typeof cargarDepartamentos === 'function') {
+            cargarDepartamentos(); // Llena el select de departamentos
+        }
+        
+    } else if (rol === 'doc') {
+        document.querySelectorAll('.role-doc').forEach(el => el.style.display = 'block');
+        
+    } else if (rol === 'kelvin') {
+        document.querySelectorAll('.role-kelvin').forEach(el => el.style.display = 'block');
+    }
 
             cargarEmpleadosActivos();
             cargarEmpleadosPasivos();
