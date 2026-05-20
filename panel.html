@@ -117,6 +117,9 @@
                 <button class="nav-btn role-admin" id="menu-crear" onclick="switchView('crear')">➕ Registrar Empleado</button>
                 <button class="nav-btn role-admin" id="menu-modificar" onclick="switchView('modificar'); prepararModuloModificar();">✏️ Modificar Empleado</button>
                 <button class="nav-btn role-admin" id="menu-empresa" onclick="switchView('empresa')">🏢 Docs Empresa</button>
+                <button id="btn-registrar-usuarios" class="nav-btn" onclick="mostrarSeccion('registrar-usuarios')" style="display: none;">
+        👤 Registrar Usuarios
+                </button>
             </div>
         </div>
         <div>
@@ -314,6 +317,73 @@
         </table>
     </div>
 </div>
+
+
+
+
+<section id="sec-registrar-usuarios" class="content-section" style="display: none; padding: 2rem; background: #fff; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); max-width: 600px; margin: 2rem auto;">
+    <h2 style="color: var(--admin-color); margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem;">Registrar Nuevo Empleado / Usuario</h2>
+    
+    <form id="form-registro-usuario" onsubmit="registrarUsuario(event)" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1rem;">
+        
+        <div>
+            <label style="display: block; font-weight: 600; margin-bottom: 0.3rem;">Foto de Perfil:</label>
+            <input type="file" id="reg-foto" accept="image/*" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;">
+        </div>
+
+        <div>
+            <label style="display: block; font-weight: 600; margin-bottom: 0.3rem;">Nombre Completo:</label>
+            <input type="text" id="reg-nombre" required placeholder="Ej. Juan Pérez" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px;">
+        </div>
+
+        <div style="display: flex; gap: 1rem;">
+            <div style="flex: 1;">
+                <label style="display: block; font-weight: 600; margin-bottom: 0.3rem;">Cédula de Identidad:</label>
+                <input type="text" id="reg-cedula" required placeholder="Ej. 172XXXXXX" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px;">
+            </div>
+            <div style="flex: 1;">
+                <label style="display: block; font-weight: 600; margin-bottom: 0.3rem;">Celular:</label>
+                <input type="tel" id="reg-celular" placeholder="Ej. 099XXXXXXX" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px;">
+            </div>
+        </div>
+
+        <div>
+            <label style="display: block; font-weight: 600; margin-bottom: 0.3rem;">Correo Electrónico:</label>
+            <input type="email" id="reg-correo" required placeholder="correo@isertel.com" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px;">
+        </div>
+
+        <div style="display: flex; gap: 1rem;">
+            <div style="flex: 1;">
+                <label style="display: block; font-weight: 600; margin-bottom: 0.3rem;">Departamento:</label>
+                <select id="reg-departamento" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px;">
+                    <option value="Talento Humano">Talento Humano</option>
+                    <option value="Operaciones">Operaciones</option>
+                    <option value="Tecnología / Sistemas">Tecnología / Sistemas</option>
+                    <option value="Médico">Médico / Salud</option>
+                </select>
+            </div>
+            <div style="flex: 1;">
+                <label style="display: block; font-weight: 600; margin-bottom: 0.3rem;">Rol de Sistema:</label>
+                <select id="reg-rol" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px;">
+                    <option value="empleado">Empleado (Por defecto)</option>
+                    <option value="admin">Administrador</option>
+                    <option value="doc">Médico (Doc)</option>
+                    <option value="kelvin">Kelvin</option>
+                </select>
+            </div>
+        </div>
+
+        <button type="submit" style="background: #22c55e; color: white; border: none; padding: 12px; font-size: 1rem; font-weight: bold; border-radius: 4px; cursor: pointer; margin-top: 1rem; transition: background 0.2s;">
+            💾 Guardar Registro
+        </button>
+    </form>
+</section>
+
+
+
+
+
+
             </div>
 
         </div>
@@ -536,6 +606,7 @@
             document.getElementById('user-display-name').innerText = nombreUsuario || "Usuario Isertel";
 
             if (rol === 'admin') {
+                document.getElementById('btn-registrar-usuarios').style.display = 'block';
                 document.querySelectorAll('.role-admin').forEach(el => el.style.display = 'block');
             } else if (rol === 'doc') {
                 document.querySelectorAll('.role-doc').forEach(el => el.style.display = 'block');
@@ -1283,7 +1354,64 @@ async function eliminarDocEmpresa(id) {
     }
 }
 
+// Función para alternar entre las diferentes secciones de tu panel
+function mostrarSeccion(seccionId) {
+    // 1. Ocultar todas las secciones de contenido (asegúrate de que tus otras secciones compartan una clase común como 'content-section')
+    const secciones = document.querySelectorAll('.content-section');
+    secciones.forEach(sec => sec.style.display = 'none');
 
+    // 2. Mostrar únicamente la seleccionada
+    const seccionActiva = document.getElementById(`sec-${seccionId}`);
+    if (seccionActiva) {
+        seccionActiva.style.display = 'block';
+    }
+}
+
+// Función encargada de recopilar los datos y enviarlos al Backend por AJAX
+async function registrarUsuario(event) {
+    event.preventDefault();
+
+    // Como enviamos una imagen (archivo binario), debemos usar FormData
+    const formData = new FormData();
+    
+    const fotoFile = document.getElementById('reg-foto').files[0];
+    if (fotoFile) {
+        formData.append('foto', fotoFile);
+    }
+    
+    formData.append('nombre_completo', document.getElementById('reg-nombre').value);
+    formData.append('cedula', document.getElementById('reg-cedula').value);
+    formData.append('celular', document.getElementById('reg-celular').value);
+    formData.append('correo', document.getElementById('reg-correo').value);
+    formData.append('departamento', document.getElementById('reg-departamento').value);
+    formData.append('rol_asignado', document.getElementById('reg-rol').value);
+
+    try {
+        const respuesta = await fetch(`${API_URL}/usuarios`, {
+            method: 'POST',
+            headers: {
+                // IMPORTANTE: Al enviar FormData NO debes definir 'Content-Type': 'application/json'
+                // El navegador añadirá el boundary automáticamente.
+                'Authorization': `Bearer ${token}` 
+            },
+            body: formData
+        });
+
+        const resultado = await respuesta.json();
+
+        if (respuesta.ok) {
+            alert("✅ ¡Usuario registrado exitosamente!");
+            document.getElementById('form-registro-usuario').reset(); // Limpia el formulario
+            mostrarSeccion('documentos'); // Redirecciona a la sección que desees por defecto
+        } else {
+            alert("❌ Error: " + resultado.error);
+        }
+
+    } catch (error) {
+        console.error("Error en la petición de registro:", error);
+        alert("Ocurrió un error de red al intentar registrar al usuario.");
+    }
+}
 </script>
 </body>
 </html>
