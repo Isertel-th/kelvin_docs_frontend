@@ -336,65 +336,74 @@
             
             
             
-            <div id="view-registrar-usuarios" class="view-section" style="padding: 25px; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 650px; width: 100%; margin: 20px auto; display: none; box-sizing: border-box;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.75rem;">
-                    <h2 style="color: #1e293b; margin: 0; font-size: 1.5rem; font-weight: 700;">👤 Registrar Nuevo Colaborador</h2>
-
-                </div>
-                
-<form id="form-registro-usuario" onsubmit="registrarUsuario(event)" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1.25rem;">
-    <div style="display: flex; flex-direction: column; gap: 0.4rem;">
-        <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Foto de Perfil:</label>
-        <input type="file" id="reg-foto" accept="image/*" required style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; background: #f8fafc;">
+<div id="view-registrar-usuarios" class="view-section" style="padding: 25px; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 650px; width: 100%; margin: 20px auto; display: none; box-sizing: border-box;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.75rem;">
+        <h2 style="color: #1e293b; margin: 0; font-size: 1.5rem; font-weight: 700;">👤 Registrar Nuevo Colaborador</h2>
     </div>
-
-    <div style="display: flex; flex-direction: column; gap: 0.4rem;">
-        <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Nombre Completo:</label>
-        <input type="text" id="reg-nombre" required placeholder="Ej. Juan Carlos Pérez" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
-    </div>
-
-    <div style="display: flex; gap: 1rem;">
-        <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
-            <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Cédula de Identidad:</label>
-            <input type="text" id="reg-cedula" required minlength="10" maxlength="10" placeholder="Ej. 172XXXXXX" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
-        </div>
-        <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
-            <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Celular:</label>
-            <input type="tel" id="reg-celular" required minlength="10" maxlength="10" placeholder="Ej. 099XXXXXXX" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
-        </div>
-    </div>
-
-    <div style="display: flex; flex-direction: column; gap: 0.4rem;">
-        <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Correo Electrónico:</label>
-        <input type="email" id="reg-correo" required placeholder="usuario@gmail.com" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
-    </div>
-
-    <div style="display: flex; flex-direction: column; gap: 0.4rem;">
-    <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Dirección de Domicilio:</label>
-    <input type="text" id="reg-direccion" required placeholder="Ej. Av. Amazonas y República" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
-    </div>
-
-    <div style="display: flex; gap: 1rem;">
-        <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
-            <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Departamento:</label>
-            <select id="reg-departamento" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; height: 42px; background: white;">
-                <option value="">Cargando departamentos...</option>
-            </select>
+    
+    <form id="form-registro-usuario" onsubmit="registrarUsuario(event)" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1.25rem;">
+        <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+            <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Foto de Perfil:</label>
+            <input type="file" id="reg-foto" accept="image/*" required style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; background: #f8fafc;">
         </div>
 
-        <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
-            <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Rol de Sistema:</label>
-            <input type="text" id="reg-rol" placeholder="Ej: empleado, admin, doc, etc." required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; height: 42px; background: white; box-sizing: border-box;">
+        <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+            <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Nombre Completo:</label>
+            <input type="text" id="reg-nombre" required placeholder="Ej. Juan Carlos Pérez" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
         </div>
-    </div>
 
-
-
-                    <button type="submit" style="background: #22c55e; color: white; border: none; padding: 14px; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 0.5rem; transition: background 0.2s; display: flex; justify-content: center; align-items: center; gap: 0.5rem;">
-                        💾 Guardar Colaborador en Sistema
-                    </button>
-                </form>
+        <div style="display: flex; gap: 1rem;">
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
+                <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Cédula de Identidad:</label>
+                <input type="text" id="reg-cedula" required minlength="10" maxlength="10" placeholder="Ej. 172XXXXXX" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
             </div>
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
+                <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Celular:</label>
+                <input type="tel" id="reg-celular" required minlength="10" maxlength="10" placeholder="Ej. 099XXXXXXX" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+            </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+            <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Correo Electrónico:</label>
+            <input type="email" id="reg-correo" required placeholder="usuario@gmail.com" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+            <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Dirección de Domicilio:</label>
+            <input type="text" id="reg-direccion" required placeholder="Ej. Av. Amazonas y República" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+            <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Contraseña de Ingreso:</label>
+            <div style="position: relative; display: flex; align-items: center;">
+                <input type="password" id="reg-contrasenia" required placeholder="Escriba la contraseña" style="width: 100%; padding: 10px; padding-right: 45px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+                <button type="button" onclick="toggleVisibilidadPassword()" style="position: absolute; right: 5px; background: none; border: none; cursor: pointer; padding: 8px; color: #64748b; font-size: 1.1rem; display: flex; align-items: center; justify-content: center;">
+                    👁️
+                </button>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 1rem;">
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
+                <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Departamento:</label>
+                <select id="reg-departamento" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; height: 42px; background: white;">
+                    <option value="">Cargando departamentos...</option>
+                </select>
+            </div>
+
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
+                <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Rol de Sistema:</label>
+                <input type="text" id="reg-rol" placeholder="Ej: empleado, admin, doc, etc." required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; height: 42px; background: white; box-sizing: border-box;">
+            </div>
+        </div>
+
+        <button type="submit" style="background: #22c55e; color: white; border: none; padding: 14px; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 0.5rem; transition: background 0.2s; display: flex; justify-content: center; align-items: center; gap: 0.5rem;">
+            💾 Guardar Colaborador en Sistema
+        </button>
+    </form>
+</div>
+
+
 
     <div id="modal-expediente" class="modal">
         <div class="modal-content">
@@ -1436,16 +1445,17 @@ async function registrarUsuario(event) {
     const cedulaInput = document.getElementById('reg-cedula').value.trim();
     const celularInput = document.getElementById('reg-celular').value.trim();
     const correoInput = document.getElementById('reg-correo').value.trim().toLowerCase();
-    const direccionInput = document.getElementById('reg-direccion').value.trim(); // <-- CAPTURAR DIRECCIÓN
+    const direccionInput = document.getElementById('reg-direccion').value.trim(); 
+    const contraseniaInput = document.getElementById('reg-contrasenia').value; // <-- NUEVO: CAPTURAR CONTRASEÑA
     const departamentoInput = document.getElementById('reg-departamento').value;
     const rolInput = document.getElementById('reg-rol').value.trim();
     const fotoInput = document.getElementById('reg-foto').files[0];
 
-    // 1. VALIDACIÓN: Comprobar que todos los campos requeridos tengan valor
-if (!nombreInput || !cedulaInput || !celularInput || !correoInput || !direccionInput || !departamentoInput || !rolInput || !fotoInput) {
-    alert("Por favor, complete todos los campos obligatorios del formulario (incluyendo la foto y dirección).");
-    return;
-}
+    // 1. VALIDACIÓN: Comprobar que todos los campos requeridos tengan valor (incluyendo la contraseña)
+    if (!nombreInput || !cedulaInput || !celularInput || !correoInput || !direccionInput || !contraseniaInput || !departamentoInput || !rolInput || !fotoInput) {
+        alert("Por favor, complete todos los campos obligatorios del formulario (incluyendo la foto, dirección y contraseña).");
+        return;
+    }
 
     // 2. CORRECCIÓN: Primera letra de cada palabra en Mayúscula (juan perez -> Juan Perez)
     const nombreFormateado = nombreInput
@@ -1481,7 +1491,8 @@ if (!nombreInput || !cedulaInput || !celularInput || !correoInput || !direccionI
     formData.append('cedula', cedulaInput);
     formData.append('celular', celularInput);
     formData.append('correo', correoInput);
-    formData.append('direccion', direccionInput); // <-- ENVIAR AL BACKEND
+    formData.append('direccion', direccionInput); 
+    formData.append('contrasenia', contraseniaInput); // <-- NUEVO: ENVIAR CONTRASEÑA AL BACKEND
     formData.append('departamento', departamentoInput); // Enviará el depto.nombre configurado anteriormente
     formData.append('rol_asignado', rolInput);
     
@@ -1490,11 +1501,11 @@ if (!nombreInput || !cedulaInput || !celularInput || !correoInput || !direccionI
     }
 
     try {
-        // Suponiendo que usas variables de configuración o la ruta relativa /api/usuarios
+        // Petición usando la variable global API_URL
         const respuesta = await fetch(`${API_URL}/usuarios`, {
             method: 'POST',
             headers: {
-                // Si requieres token de administrador, lo tomas del localStorage/sessionStorage
+                // Tomamos el token del administrador del localStorage
                 'Authorization': `Bearer ${localStorage.getItem('token')}` 
             },
             body: formData // Pasamos el formulario estructurado
@@ -1509,8 +1520,6 @@ if (!nombreInput || !cedulaInput || !celularInput || !correoInput || !direccionI
         alert("¡Usuario registrado con éxito!");
         document.getElementById('form-registro-usuario').reset(); // Limpia el formulario
         
-        // Aquí puedes recargar tu tabla de usuarios si tienes una función para ello, ej: listarUsuarios();
-
     } catch (error) {
         console.error("Error en registro:", error);
         alert("No se pudo completar el registro: " + error.message);
@@ -1559,6 +1568,18 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener('DOMContentLoaded', () => {
     cargarDepartamentos();
 });
+
+
+
+//ara activar el funcionamiento interactivo del botón del ojo (👁️):
+function toggleVisibilidadPassword() {
+    const inputPass = document.getElementById('reg-contrasenia');
+    if (inputPass.type === 'password') {
+        inputPass.type = 'text';
+    } else {
+        inputPass.type = 'password';
+    }
+}
 
 
 </script>
