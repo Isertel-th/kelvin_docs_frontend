@@ -1567,13 +1567,17 @@ async function registrarUsuario(event) {
         }
 
 alert("¡Usuario registrado con éxito!");
-        document.getElementById('form-registro-usuario').reset(); // Limpia el formulario
+        document.getElementById('form-registro-usuario').reset(); 
         
-        // NUEVO: Oculta el contenedor del formulario tras el éxito
+        // Oculta el contenedor del formulario tras el éxito
         const contenedorForm = document.getElementById('contenedor-formulario-registro');
         if (contenedorForm) contenedorForm.style.display = 'none';
 
-        cargarUsuariosSistema(); // Recarga la lista de arriba de inmediato
+        // NUEVO: Asegurar que el botón regrese a su texto original
+        const boton = document.getElementById('btn-mostrar-formulario-registro');
+        if (boton) boton.innerHTML = '👤 Registrar Nuevo Colaborador';
+
+        cargarUsuariosSistema();
         
     } catch (error) {
         console.error("Error en registro:", error);
@@ -1692,14 +1696,23 @@ async function cargarUsuariosSistema() {
 
 function mostrarFormularioRegistro() {
     const contenedorForm = document.getElementById('contenedor-formulario-registro');
+    const boton = document.getElementById('btn-mostrar-formulario-registro');
+    
     if (contenedorForm) {
-        contenedorForm.style.display = 'block'; // Muestra el formulario
-        
-        // Opcional: Hace un scroll suave hacia el formulario para mejorar la navegación
-        contenedorForm.scrollIntoView({ behavior: 'smooth' });
+        if (contenedorForm.style.display === 'none' || contenedorForm.style.display === '') {
+            contenedorForm.style.display = 'block';
+            contenedorForm.scrollIntoView({ behavior: 'smooth' });
+            
+            // Cambia el texto cuando está abierto
+            if (boton) boton.innerHTML = '❌ Cerrar Formulario de Registro';
+        } else {
+            contenedorForm.style.display = 'none';
+            
+            // Restaura el texto original cuando se cierra
+            if (boton) boton.innerHTML = '👤 Registrar Nuevo Colaborador';
+        }
     }
 }
-
 </script>
 </body>
 </html>
