@@ -318,15 +318,14 @@
                             <tbody id="tbody-empresa"></tbody>
                         </table>
                     </div>
-                </div>
-<section id="view-registrar-usuarios" class="view-section" style="padding: 25px; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 650px; margin: 20px auto; color: #334155;">                
+                 </div> 
+
+            <div id="view-registrar-usuarios" class="view-section" style="padding: 25px; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 650px; margin: 20px auto; color: #334155;">                
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.75rem;">
                     <h2 style="color: #1e293b; margin: 0; font-size: 1.5rem; font-weight: 700;">👤 Registrar Nuevo Colaborador</h2>
-<button type="button" 
-        onclick="document.getElementById('view-registrar-usuarios').style.display = 'none';" 
-        style="background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s;">
-    ❌ Cerrar
-</button>                
+                    <button type="button" onclick="document.getElementById('view-registrar-usuarios').classList.remove('active'); document.getElementById('view-title').innerText = 'Panel Isertel';" style="background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s;">❌ Cerrar</button>
+                </div>
+                
                 <form id="form-registro-usuario" onsubmit="registrarUsuario(event)" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1.25rem;">
                     
                     <div style="display: flex; flex-direction: column; gap: 0.4rem;">
@@ -380,9 +379,9 @@
                         💾 Guardar Colaborador en Sistema
                     </button>
                 </form>
-            </section>
-
-        </div> </div>
+            </div>
+        
+        </div>
 
 
     <div id="modal-expediente" class="modal">
@@ -633,48 +632,46 @@
         };
 
 function switchView(viewId) {
-    // 1. Ocultamos todas las secciones quitando la clase active y limpiando estilos directos
-    document.querySelectorAll('.view-section, .content-section, section').forEach(section => {
+    // 1. Ocultamos todas las secciones principales quitando la clase active
+    document.querySelectorAll('.view-section').forEach(section => {
         section.classList.remove('active');
-        section.style.display = ''; // <--- ESTO ES CLAVE: Limpia bloqueos de display en línea
+        section.style.display = ''; // Limpiamos cualquier rastro de display inline conflictivo
     });
     
-    // 2. Quitamos el estado activo de todos los botones del menú
-    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+    // 2. Quitamos el estado activo de todos los botones del menú lateral
+    document.querySelectorAll('.nav-menu .nav-btn').forEach(btn => btn.classList.remove('active'));
     
-    // 3. Activamos la sección correspondiente
+    // 3. Activamos EXCLUSIVAMENTE la sección que llamamos
     const seccionActiva = document.getElementById(`view-${viewId}`);
     if (seccionActiva) {
         seccionActiva.classList.add('active');
-        // Aseguramos que si por alguna razón tenía display none en línea, se anule:
-        seccionActiva.style.setProperty('display', 'block', 'important'); 
     } else {
         console.error(`❌ No se encontró la sección con ID: view-${viewId}`);
     }
     
-    // 4. Marcamos el botón del menú actual como activo
+    // 4. Buscamos si existe un botón específico para esta vista en el menú lateral para iluminarlo
     const eventTarget = Array.from(document.querySelectorAll('.nav-btn')).find(b => {
         const onclickAttr = b.getAttribute('onclick') || '';
         return onclickAttr.includes(viewId);
     });
     if (eventTarget) eventTarget.classList.add('active');
 
-    // 5. Actualizamos el título dinámico del panel superior
+    // 5. Actualizamos el título de arriba de forma independiente
     const titles = { 
         'activos': 'Personal Activo', 
         'pasivos': 'Personal Pasivo', 
         'crear': 'Registrar Empleado', 
         'empresa': 'Documentos Institucionales',
-        'registrar-usuarios': 'Registrar Colaborador' 
+        'registrar-usuarios': 'Registrar Colaborador'
     };
     const mainTitle = document.getElementById('view-title');
     if (mainTitle) {
         mainTitle.innerText = titles[viewId] || "Panel Isertel";
     }
 
-    // 6. Carga automática de documentos institucionales
-    if (viewId === 'empresa') {
-        typeof cargarDocsEmpresa === 'function' && cargarDocsEmpresa();
+    // 6. Carga automática de documentos institucionales (solo si aplica)
+    if (viewId === 'empresa' && typeof cargarDocsEmpresa === 'function') {
+        cargarDocsEmpresa();
     }
 }
 
