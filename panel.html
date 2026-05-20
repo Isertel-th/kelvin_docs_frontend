@@ -643,31 +643,36 @@
         };
 
 function switchView(viewId) {
-    // 1. Ocultamos todas las secciones principales quitando la clase active
+    console.log("Cambiando a la vista:", viewId);
+
+    // 1. Ocultamos absolutamente todas las secciones usando display: none
     document.querySelectorAll('.view-section').forEach(section => {
         section.classList.remove('active');
-        section.style.display = ''; // Limpiamos cualquier rastro de display inline conflictivo
+        section.style.setProperty('display', 'none', 'important'); 
     });
     
     // 2. Quitamos el estado activo de todos los botones del menú lateral
     document.querySelectorAll('.nav-menu .nav-btn').forEach(btn => btn.classList.remove('active'));
     
-    // 3. Activamos EXCLUSIVAMENTE la sección que llamamos
+    // 3. Buscamos la sección actual
     const seccionActiva = document.getElementById(`view-${viewId}`);
     if (seccionActiva) {
         seccionActiva.classList.add('active');
+        // Forzamos el display block directamente en el elemento para ganarle a cualquier CSS corporativo
+        seccionActiva.style.setProperty('display', 'block', 'important');
+        console.log(`✅ Vista view-${viewId} mostrada correctamente.`);
     } else {
-        console.error(`❌ No se encontró la sección con ID: view-${viewId}`);
+        console.error(`❌ Error crítico: No se encontró la sección con ID: view-${viewId}`);
     }
     
-    // 4. Buscamos si existe un botón específico para esta vista en el menú lateral para iluminarlo
+    // 4. Iluminar el botón correspondiente en el menú lateral
     const eventTarget = Array.from(document.querySelectorAll('.nav-btn')).find(b => {
         const onclickAttr = b.getAttribute('onclick') || '';
         return onclickAttr.includes(viewId);
     });
     if (eventTarget) eventTarget.classList.add('active');
 
-    // 5. Actualizamos el título de arriba de forma independiente
+    // 5. Actualizar el título principal
     const titles = { 
         'activos': 'Personal Activo', 
         'pasivos': 'Personal Pasivo', 
@@ -680,7 +685,7 @@ function switchView(viewId) {
         mainTitle.innerText = titles[viewId] || "Panel Isertel";
     }
 
-    // 6. Carga automática de documentos institucionales (solo si aplica)
+    // 6. Carga automática de documentos institucionales (si aplica)
     if (viewId === 'empresa' && typeof cargarDocsEmpresa === 'function') {
         cargarDocsEmpresa();
     }
