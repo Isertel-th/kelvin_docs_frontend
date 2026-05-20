@@ -1467,27 +1467,39 @@ async function registrarUsuario(event) {
 // Función para cargar los departamentos desde la base de datos
 async function cargarDepartamentos() {
     const selectDepto = document.getElementById('reg-departamento');
+    if (!selectDepto) return;
+
     try {
+        // Hacemos la petición usando la variable global API_URL de tu panel
         const respuesta = await fetch(`${API_URL}/departamentos`);
-        if (!respuesta.ok) throw new Error("No se pudieron obtener los departamentos");
+        
+        if (!respuesta.ok) {
+            throw new Error(`Código de estado: ${respuesta.status}`);
+        }
         
         const departamentos = await respuesta.json();
         
-        // Limpiamos el select y dejamos una opción por defecto limpia
+        // Limpiamos el indicador de carga
         selectDepto.innerHTML = '<option value="">Seleccione un departamento</option>';
         
-        // Iteramos el resultado y agregamos cada departamento al select
+        // Llenamos las opciones mapeando tus columnas id y nombre
         departamentos.forEach(depto => {
             const option = document.createElement('option');
-            option.value = depto.id; // Enviará el ID numérico al backend
-            option.textContent = depto.nombre; // Muestra el nombre al usuario
+            option.value = depto.id;       // Envía el ID numérico a la BD al registrar
+            option.textContent = depto.nombre; // Muestra el nombre visible al usuario
             selectDepto.appendChild(option);
         });
+
     } catch (error) {
-        console.error("Error cargando departamentos:", error);
-        selectDepto.innerHTML = '<option value="">Error al cargar departamentos</option>';
+        console.error("❌ Error al conectar con /departamentos:", error);
+        selectDepto.innerHTML = '<option value="">Error al cargar los datos</option>';
     }
 }
+
+// Ejecutar la función cuando el documento esté completamente listo
+document.addEventListener('DOMContentLoaded', () => {
+    cargarDepartamentos();
+});
 
 // Ejecutar la carga de departamentos automáticamente cuando el archivo cargue
 document.addEventListener('DOMContentLoaded', () => {
