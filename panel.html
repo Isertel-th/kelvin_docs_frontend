@@ -117,10 +117,9 @@
                 <button class="nav-btn role-admin" id="menu-crear" onclick="switchView('crear')">➕ Registrar Empleado</button>
                 <button class="nav-btn role-admin" id="menu-modificar" onclick="switchView('modificar'); prepararModuloModificar();">✏️ Modificar Empleado</button>
                 <button class="nav-btn role-admin" id="menu-empresa" onclick="switchView('empresa')">🏢 Docs Empresa</button>
-<button id="btn-registrar-usuarios" class="nav-btn" onclick="mostrarSeccion('registrar-usuarios')" style="display: none;">
+<button id="btn-registrar-usuarios" class="nav-btn" onclick="switchView('registrar-usuarios')" style="display: none;">
     👤 Registrar Usuarios
 </button>
-
 
             </div>
         </div>
@@ -320,12 +319,10 @@
                         </table>
                     </div>
                 </div>
-            </div> <section id="sec-registrar-usuarios" class="content-section" style="display: none; padding: 25px; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 650px; margin: 20px auto; color: #334155;">
-                
+<section id="view-registrar-usuarios" class="view-section" style="padding: 25px; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 650px; margin: 20px auto; color: #334155;">                
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.75rem;">
                     <h2 style="color: #1e293b; margin: 0; font-size: 1.5rem; font-weight: 700;">👤 Registrar Nuevo Colaborador</h2>
-                    <button type="button" onclick="mostrarSeccion('documentos')" style="background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s;">❌ Cerrar</button>
-                </div>
+<button type="button" onclick="switchView('activos')" style="background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s;">❌ Cerrar</button>                </div>
                 
                 <form id="form-registro-usuario" onsubmit="registrarUsuario(event)" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1.25rem;">
                     
@@ -632,22 +629,46 @@
             mapearDobleClic('tbody-pasivos');
         };
 
-        function switchView(viewId) {
-            document.querySelectorAll('.view-section').forEach(section => section.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(`view-${viewId}`).classList.add('active');
-            
-            const eventTarget = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.getAttribute('onclick').includes(viewId));
-            if(eventTarget) eventTarget.classList.add('active');
+function switchView(viewId) {
+    // 1. Ocultamos todas las secciones quitando la clase active (incluyendo el registro)
+    document.querySelectorAll('.view-section').forEach(section => section.classList.remove('active'));
+    
+    // 2. Quitamos el estado activo de todos los botones del menú
+    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+    
+    // 3. Activamos la sección correspondiente
+    const seccionActiva = document.getElementById(`view-${viewId}`);
+    if (seccionActiva) {
+        seccionActiva.classList.add('active');
+    } else {
+        console.error(`❌ No se encontró la sección con ID: view-${viewId}`);
+    }
+    
+    // 4. Marcamos el botón del menú actual como activo
+    const eventTarget = Array.from(document.querySelectorAll('.nav-btn')).find(b => {
+        const onclickAttr = b.getAttribute('onclick') || '';
+        return onclickAttr.includes(viewId);
+    });
+    if (eventTarget) eventTarget.classList.add('active');
 
-            const titles = { 'activos': 'Personal Activo', 'pasivos': 'Personal Pasivo', 'crear': 'Registrar Empleado', 'empresa': 'Documentos Institucionales' };
-            document.getElementById('view-title').innerText = titles[viewId] || "Panel Isertel";
+    // 5. Actualizamos el título dinámico del panel superior
+    const titles = { 
+        'activos': 'Personal Activo', 
+        'pasivos': 'Personal Pasivo', 
+        'crear': 'Registrar Empleado', 
+        'empresa': 'Documentos Institucionales',
+        'registrar-usuarios': 'Registrar Colaborador' // Añadido el título para esta sección
+    };
+    const mainTitle = document.getElementById('view-title');
+    if (mainTitle) {
+        mainTitle.innerText = titles[viewId] || "Panel Isertel";
+    }
 
-            // AGREGADO: Carga automáticamente los documentos de la empresa cuando entras a la sección
-            if (viewId === 'empresa') {
-                cargarDocsEmpresa();
-            }
-        }
+    // 6. Carga automática de documentos institucionales
+    if (viewId === 'empresa') {
+        cargarDocsEmpresa();
+    }
+}
 
         function cerrarSesion() {
             localStorage.clear();
@@ -1352,8 +1373,8 @@ async function eliminarDocEmpresa(id) {
 function mostrarSeccion(seccionId) {
     console.log("Cambiando a la sección:", seccionId);
 
-    // 1. Ocultamos explícitamente todas las secciones principales usando selectores comunes
-    const contenedores = document.querySelectorAll('section, .content-section, [id^="sec-"]');
+    // 1. Ocultamos TODAS las secciones principales y las vistas dinámicas (.view-section)
+    const contenedores = document.querySelectorAll('section, .content-section, .view-section, [id^="sec-"]');
     contenedores.forEach(contenedor => {
         contenedor.style.display = 'none';
     });
@@ -1362,7 +1383,7 @@ function mostrarSeccion(seccionId) {
     const seccionActiva = document.getElementById(`sec-${seccionId}`);
     
     if (seccionActiva) {
-        // Forzamos el display correcto. Si tu plantilla usa flexbox para centrar contenido, puedes usar 'flex'
+        // Forzamos el display correcto.
         seccionActiva.style.display = 'block'; 
         console.log(`✅ Vista 'sec-${seccionId}' mostrada con éxito.`);
     } else {
@@ -1405,7 +1426,7 @@ async function registrarUsuario(event) {
         if (respuesta.ok) {
             alert("✅ ¡Usuario registrado exitosamente!");
             document.getElementById('form-registro-usuario').reset(); // Limpia el formulario
-            mostrarSeccion('documentos'); // Redirecciona a la sección que desees por defecto
+            switchView('activos'); // Te regresa limpiamente a la lista principal sin superposiciones
         } else {
             alert("❌ Error: " + resultado.error);
         }
