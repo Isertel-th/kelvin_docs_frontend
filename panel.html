@@ -104,6 +104,17 @@
 
         .btn-clear { background: #64748b; color: white; }
         .btn-clear:hover { background: #475569; }
+
+
+        .view-section {
+    display: none; /* Por defecto todas ocultas */
+}
+
+.view-section.active {
+    display: block !important; /* Se muestra solo la activa */
+}
+
+
     </style>
 </head>
 <body>
@@ -117,8 +128,8 @@
                 <button class="nav-btn role-admin" id="menu-crear" onclick="switchView('crear')">➕ Registrar Empleado</button>
                 <button class="nav-btn role-admin" id="menu-modificar" onclick="switchView('modificar'); prepararModuloModificar();">✏️ Modificar Empleado</button>
                 <button class="nav-btn role-admin" id="menu-empresa" onclick="switchView('empresa')">🏢 Docs Empresa</button>
-<button id="btn-registrar-usuarios" class="nav-btn" onclick="switchView('registrar-usuarios')" style="display: none;">
-    👤 Registrar Usuarios
+<button class="nav-btn" onclick="switchView('registrar-usuarios')">
+    👤 Registrar Usuario
 </button>
 
             </div>
@@ -319,6 +330,9 @@
                         </table>
                     </div>
                 </div>
+
+
+
 <section id="view-registrar-usuarios" class="view-section" style="padding: 25px; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 650px; margin: 20px auto; color: #334155;">                
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.75rem;">
                     <h2 style="color: #1e293b; margin: 0; font-size: 1.5rem; font-weight: 700;">👤 Registrar Nuevo Colaborador</h2>
@@ -630,8 +644,11 @@
         };
 
 function switchView(viewId) {
-    // 1. Ocultamos todas las secciones quitando la clase active (incluyendo el registro)
-    document.querySelectorAll('.view-section').forEach(section => section.classList.remove('active'));
+    // 1. Ocultamos todas las secciones quitando la clase active y forzando el display a none
+    document.querySelectorAll('.view-section').forEach(section => {
+        section.classList.remove('active');
+        section.style.display = 'none'; // <-- Forzamos el ocultado de la sección
+    });
     
     // 2. Quitamos el estado activo de todos los botones del menú
     document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
@@ -640,6 +657,7 @@ function switchView(viewId) {
     const seccionActiva = document.getElementById(`view-${viewId}`);
     if (seccionActiva) {
         seccionActiva.classList.add('active');
+        seccionActiva.style.display = 'block'; // <-- Forzamos que se muestre en pantalla
     } else {
         console.error(`❌ No se encontró la sección con ID: view-${viewId}`);
     }
@@ -657,7 +675,7 @@ function switchView(viewId) {
         'pasivos': 'Personal Pasivo', 
         'crear': 'Registrar Empleado', 
         'empresa': 'Documentos Institucionales',
-        'registrar-usuarios': 'Registrar Colaborador' // Añadido el título para esta sección
+        'registrar-usuarios': 'Registrar Colaborador' 
     };
     const mainTitle = document.getElementById('view-title');
     if (mainTitle) {
