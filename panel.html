@@ -416,19 +416,14 @@
                 </div>
             </div>
 
-            <div style="display: flex; gap: 1rem;">
-                <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
-                    <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Departamento:</label>
-                    <select id="reg-departamento" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; height: 42px; background: white;">
-                        <option value="">Cargando departamentos...</option>
-                    </select>
-                </div>
-
-                <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
-                    <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Rol de Sistema:</label>
-                    <input type="text" id="reg-rol" placeholder="Ej: empleado, admin, doc, etc." required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; height: 42px; background: white; box-sizing: border-box;">
-                </div>
-            </div>
+<div style="display: flex; gap: 1rem;">
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
+        <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Departamento:</label>
+        <select id="reg-departamento" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; height: 42px; background: white;">
+            <option value="">Seleccione un departamento...</option>
+            </select>
+    </div>
+    </div>
 
             <button type="submit" style="background: #22c55e; color: white; border: none; padding: 14px; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 0.5rem; transition: background 0.2s; display: flex; justify-content: center; align-items: center; gap: 0.5rem;">
                 💾 Guardar Colaborador en Sistema
@@ -1487,67 +1482,46 @@ function mostrarSeccion(seccionId) {
 
 // Función encargada de recopilar los datos y enviarlos al Backend por AJAX
 async function registrarUsuario(event) {
-    event.preventDefault(); // Evita que la página se recargue solo
+    event.preventDefault();
 
-    // Capturar los valores de los elementos del formulario
+    // Capturar los valores del formulario
     const nombreInput = document.getElementById('reg-nombre').value.trim();
     const cedulaInput = document.getElementById('reg-cedula').value.trim();
     const celularInput = document.getElementById('reg-celular').value.trim();
-    const correoInput = document.getElementById('reg-correo').value.trim().toLowerCase();
-    const direccionInput = document.getElementById('reg-direccion').value.trim(); 
-    const contraseniaInput = document.getElementById('reg-contrasenia').value; // <-- NUEVO: CAPTURAR CONTRASEÑA
+    const correoInput = document.getElementById('reg-correo').value.trim();
+    const direccionInput = document.getElementById('reg-direccion').value.trim();
+    const contraseniaInput = document.getElementById('reg-contrasenia').value.trim();
+    
+    // Capturamos el ID o nombre del departamento seleccionado
     const departamentoInput = document.getElementById('reg-departamento').value;
-    const rolInput = document.getElementById('reg-rol').value.trim();
-    const fotoInput = document.getElementById('reg-foto').files[0];
 
-    // 1. VALIDACIÓN: Comprobar que todos los campos requeridos tengan valor (incluyendo la contraseña)
-    if (!nombreInput || !cedulaInput || !celularInput || !correoInput || !direccionInput || !contraseniaInput || !departamentoInput || !rolInput || !fotoInput) {
-        alert("Por favor, complete todos los campos obligatorios del formulario (incluyendo la foto, dirección y contraseña).");
-        return;
+    // --- NUEVA LÓGICA: Asignar el Rol automáticamente según el Departamento ---
+    let rolCalculado = "empleado"; // Rol por defecto si no coincide ninguno
+
+    // Aquí defines tus reglas. Por ejemplo:
+    if (departamentoInput === "Sistemas" || departamentoInput === "TI") {
+        rolCalculado = "admin";
+    } else if (departamentoInput === "Medicina" || departamentoInput === "Salud") {
+        rolCalculado = "doc";
+    } else if (departamentoInput === "Directiva") {
+        rolCalculado = "gerente";
     }
+    // Puedes seguir agregando los casos que necesites según tus departamentos reales
+    // ------------------------------------------------------------------------
 
-    // 2. CORRECCIÓN: Primera letra de cada palabra en Mayúscula (juan perez -> Juan Perez)
-    const nombreFormateado = nombreInput
-        .split(/\s+/) // Divide por espacios múltiples
-        .map(palabra => palabra.charAt(0).toUpperCase() + palabra.slice(1).toLowerCase())
-        .join(' ');
-
-    // 3. VALIDACIÓN: Cédula y celular (Solo números enteros y exactamente 10 caracteres)
-    const regexSoloNumeros = /^\d{10}$/; // Evalúa exactamente 10 números seguidos del 0 al 9
-
-    if (!regexSoloNumeros.test(cedulaInput)) {
-        alert("La Cédula de Identidad no es válida. Debe contener exactamente 10 dígitos numéricos enteros (sin letras ni decimales).");
-        return;
-    }
-
-    if (!regexSoloNumeros.test(celularInput)) {
-        alert("El número de Celular no es válido. Debe contener exactamente 10 dígitos numéricos enteros (sin letras ni decimales).");
-        return;
-    }
-
-    // 4. VALIDACIÓN: Dominios de correo permitidos estrictamente
-    const dominiosPermitidos = ['gmail.com', 'hotmail.com', 'outlook.com', 'outlook.es'];
-    const correoDominio = correoInput.split('@')[1];
-
-    if (!correoInput.includes('@') || !dominiosPermitidos.includes(correoDominio)) {
-        alert("Correo electrónico inválido. Dominios autorizados: gmail.com, hotmail.com, outlook.com, outlook.es");
-        return;
-    }
-
-    // 5. CONSTRUCCIÓN DE DATOS: Preparamos el FormData (porque envías un archivo físico/foto)
+    // Construir el FormData para enviar al Backend
     const formData = new FormData();
-    formData.append('nombre_completo', nombreFormateado); // Enviamos el nombre ya corregido
+    formData.append('foto', document.getElementById('reg-foto').files[0]);
+    formData.append('nombre', nombreInput);
     formData.append('cedula', cedulaInput);
     formData.append('celular', celularInput);
     formData.append('correo', correoInput);
-    formData.append('direccion', direccionInput); 
-    formData.append('contrasenia', contraseniaInput); // <-- NUEVO: ENVIAR CONTRASEÑA AL BACKEND
-    formData.append('departamento', departamentoInput); // Enviará el depto.nombre configurado anteriormente
-    formData.append('rol_asignado', rolInput);
+    formData.append('direccion', direccionInput);
+    formData.append('contrasenia', contraseniaInput);
+    formData.append('departamento', departamentoInput);
     
-    if (fotoInput) {
-        formData.append('foto', fotoInput);
-    }
+    // Enviamos el rol calculado automáticamente en lugar de leerlo del HTML
+    formData.append('rol', rolCalculado);
 
     try {
         // Petición usando la variable global API_URL
@@ -1569,15 +1543,13 @@ async function registrarUsuario(event) {
 alert("¡Usuario registrado con éxito!");
         document.getElementById('form-registro-usuario').reset(); 
         
-        // Oculta el contenedor del formulario tras el éxito
+        // Ocultar formulario y restablecer botón
         const contenedorForm = document.getElementById('contenedor-formulario-registro');
         if (contenedorForm) contenedorForm.style.display = 'none';
-
-        // NUEVO: Asegurar que el botón regrese a su texto original
         const boton = document.getElementById('btn-mostrar-formulario-registro');
         if (boton) boton.innerHTML = '👤 Registrar Nuevo Colaborador';
 
-        cargarUsuariosSistema();
+        cargarUsuariosSistema(); 
         
     } catch (error) {
         console.error("Error en registro:", error);
