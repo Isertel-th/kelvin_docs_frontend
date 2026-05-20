@@ -345,7 +345,7 @@
 <form id="form-registro-usuario" onsubmit="registrarUsuario(event)" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1.25rem;">
     <div style="display: flex; flex-direction: column; gap: 0.4rem;">
         <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Foto de Perfil:</label>
-        <input type="file" id="reg-foto" accept="image/*" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; background: #f8fafc;">
+        <input type="file" id="reg-foto" accept="image/*" required style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; background: #f8fafc;">
     </div>
 
     <div style="display: flex; flex-direction: column; gap: 0.4rem;">
@@ -1436,10 +1436,10 @@ async function registrarUsuario(event) {
     const fotoInput = document.getElementById('reg-foto').files[0];
 
     // 1. VALIDACIÓN: Comprobar que todos los campos requeridos tengan valor
-    if (!nombreInput || !cedulaInput || !celularInput || !correoInput || !departamentoInput || !rolInput) {
-        alert("Por favor, complete todos los campos obligatorios del formulario.");
-        return;
-    }
+if (!nombreInput || !cedulaInput || !celularInput || !correoInput || !departamentoInput || !rolInput || !fotoInput) {
+    alert("Por favor, complete todos los campos obligatorios del formulario (incluyendo la foto de perfil).");
+    return;
+}
 
     // 2. CORRECCIÓN: Primera letra de cada palabra en Mayúscula (juan perez -> Juan Perez)
     const nombreFormateado = nombreInput
