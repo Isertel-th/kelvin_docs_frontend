@@ -104,17 +104,6 @@
 
         .btn-clear { background: #64748b; color: white; }
         .btn-clear:hover { background: #475569; }
-
-
-        .view-section {
-    display: none; /* Por defecto todas ocultas */
-}
-
-.view-section.active {
-    display: block !important; /* Se muestra solo la activa */
-}
-
-
     </style>
 </head>
 <body>
@@ -128,8 +117,8 @@
                 <button class="nav-btn role-admin" id="menu-crear" onclick="switchView('crear')">➕ Registrar Empleado</button>
                 <button class="nav-btn role-admin" id="menu-modificar" onclick="switchView('modificar'); prepararModuloModificar();">✏️ Modificar Empleado</button>
                 <button class="nav-btn role-admin" id="menu-empresa" onclick="switchView('empresa')">🏢 Docs Empresa</button>
-<button class="nav-btn" onclick="switchView('registrar-usuarios')">
-    👤 Registrar Usuario
+<button id="btn-registrar-usuarios" class="nav-btn" onclick="switchView('registrar-usuarios')" style="display: none;">
+    👤 Registrar Usuarios
 </button>
 
             </div>
@@ -330,14 +319,14 @@
                         </table>
                     </div>
                 </div>
-
-
-
 <section id="view-registrar-usuarios" class="view-section" style="padding: 25px; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 650px; margin: 20px auto; color: #334155;">                
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.75rem;">
                     <h2 style="color: #1e293b; margin: 0; font-size: 1.5rem; font-weight: 700;">👤 Registrar Nuevo Colaborador</h2>
-<button type="button" onclick="switchView('activos')" style="background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s;">❌ Cerrar</button>                </div>
-                
+<button type="button" 
+        onclick="document.getElementById('view-registrar-usuarios').style.display = 'none';" 
+        style="background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s;">
+    ❌ Cerrar
+</button>                
                 <form id="form-registro-usuario" onsubmit="registrarUsuario(event)" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1.25rem;">
                     
                     <div style="display: flex; flex-direction: column; gap: 0.4rem;">
@@ -644,10 +633,10 @@
         };
 
 function switchView(viewId) {
-    // 1. Ocultamos todas las secciones quitando la clase active y forzando el display a none
-    document.querySelectorAll('.view-section').forEach(section => {
+    // 1. Ocultamos todas las secciones quitando la clase active y limpiando estilos directos
+    document.querySelectorAll('.view-section, .content-section, section').forEach(section => {
         section.classList.remove('active');
-        section.style.display = 'none'; // <-- Forzamos el ocultado de la sección
+        section.style.display = ''; // <--- ESTO ES CLAVE: Limpia bloqueos de display en línea
     });
     
     // 2. Quitamos el estado activo de todos los botones del menú
@@ -657,7 +646,8 @@ function switchView(viewId) {
     const seccionActiva = document.getElementById(`view-${viewId}`);
     if (seccionActiva) {
         seccionActiva.classList.add('active');
-        seccionActiva.style.display = 'block'; // <-- Forzamos que se muestre en pantalla
+        // Aseguramos que si por alguna razón tenía display none en línea, se anule:
+        seccionActiva.style.setProperty('display', 'block', 'important'); 
     } else {
         console.error(`❌ No se encontró la sección con ID: view-${viewId}`);
     }
@@ -684,7 +674,7 @@ function switchView(viewId) {
 
     // 6. Carga automática de documentos institucionales
     if (viewId === 'empresa') {
-        cargarDocsEmpresa();
+        typeof cargarDocsEmpresa === 'function' && cargarDocsEmpresa();
     }
 }
 
