@@ -363,26 +363,23 @@
                         <input type="email" id="reg-correo" required placeholder="usuario@isertel.com" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
                     </div>
 
-                    <div style="display: flex; gap: 1rem;">
-                        <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
-                            <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Departamento:</label>
-                            <select id="reg-departamento" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; height: 42px; background: white;">
-                                <option value="Talento Humano">Talento Humano</option>
-                                <option value="Operaciones">Operaciones</option>
-                                <option value="Tecnología / Sistemas">Tecnología / Sistemas</option>
-                                <option value="Médico">Médico / Salud</option>
-                            </select>
-                        </div>
-                        <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
-                            <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Rol de Sistema:</label>
-                            <select id="reg-rol" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; height: 42px; background: white;">
-                                <option value="empleado">Empleado</option>
-                                <option value="admin">Administrador</option>
-                                <option value="doc">Médico (Doc)</option>
-                                <option value="kelvin">Kelvin</option>
-                            </select>
-                        </div>
-                    </div>
+
+
+<div style="display: flex; gap: 1rem;">
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
+        <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Departamento:</label>
+        <select id="reg-departamento" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; height: 42px; background: white;">
+            <option value="">Cargando departamentos...</option>
+        </select>
+    </div>
+
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
+        <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Rol de Sistema:</label>
+        <input type="text" id="reg-rol" placeholder="Ej: empleado, admin, doc, etc." required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; height: 42px; background: white; box-sizing: border-box;">
+    </div>
+</div>
+
+
 
                     <button type="submit" style="background: #22c55e; color: white; border: none; padding: 14px; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 0.5rem; transition: background 0.2s; display: flex; justify-content: center; align-items: center; gap: 0.5rem;">
                         💾 Guardar Colaborador en Sistema
@@ -1466,6 +1463,38 @@ async function registrarUsuario(event) {
         alert("Ocurrió un error de red al intentar registrar al usuario.");
     }
 }
+
+// Función para cargar los departamentos desde la base de datos
+async function cargarDepartamentos() {
+    const selectDepto = document.getElementById('reg-departamento');
+    try {
+        const respuesta = await fetch(`${API_URL}/departamentos`);
+        if (!respuesta.ok) throw new Error("No se pudieron obtener los departamentos");
+        
+        const departamentos = await respuesta.json();
+        
+        // Limpiamos el select y dejamos una opción por defecto limpia
+        selectDepto.innerHTML = '<option value="">Seleccione un departamento</option>';
+        
+        // Iteramos el resultado y agregamos cada departamento al select
+        departamentos.forEach(depto => {
+            const option = document.createElement('option');
+            option.value = depto.id; // Enviará el ID numérico al backend
+            option.textContent = depto.nombre; // Muestra el nombre al usuario
+            selectDepto.appendChild(option);
+        });
+    } catch (error) {
+        console.error("Error cargando departamentos:", error);
+        selectDepto.innerHTML = '<option value="">Error al cargar departamentos</option>';
+    }
+}
+
+// Ejecutar la carga de departamentos automáticamente cuando el archivo cargue
+document.addEventListener('DOMContentLoaded', () => {
+    cargarDepartamentos();
+});
+
+
 </script>
 </body>
 </html>
