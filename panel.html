@@ -1663,12 +1663,13 @@ async function cargarUsuariosSistema() {
             // Reemplazar URL de foto por defecto si falla o viene vacía
             const fotoUrl = user.foto_url ? user.foto_url : 'https://via.placeholder.com/40';
 
+            // 🌟 CORRECCIÓN AQUÍ: Ambos campos leen 'user.rol' ya que se unificaron
             tr.innerHTML = `
                 <td style="padding: 8px;"><img src="${fotoUrl}" alt="Foto" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"></td>
                 <td style="padding: 8px; font-weight: 500; color: #1e293b;">${user.nombre_completo}</td>
                 <td style="padding: 8px; color: #475569;">${user.cedula}</td>
                 <td style="padding: 8px; color: #475569;">${user.correo}</td>
-                <td style="padding: 8px;"><span style="background: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">${user.departamento || 'N/A'}</span></td>
+                <td style="padding: 8px;"><span style="background: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">${user.rol}</span></td>
                 <td style="padding: 8px;"><span style="background: #f1f5f9; color: #475569; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold;">${user.rol}</span></td>
             `;
             tbody.appendChild(tr);
