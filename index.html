@@ -8,9 +8,9 @@
         body { 
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
             
-            /* Inmersión total con Circ.gif */
+            /* Cambiado de Circ.gif a tu nueva imagen rt.jpg cubriendo toda la pantalla */
             background-color: #05070f;
-            background-image: url('Circ.gif'); 
+            background-image: url('rt.jpg'); 
             background-repeat: no-repeat;
             background-position: center center;
             background-size: cover; 
@@ -135,7 +135,7 @@
             display: flex;
         }
 
-        /* Alineación simétrica y perfecta de logge.png */
+        /* Alineación simétrica de logge.png */
         .welcome-img {
             max-width: 320px; 
             width: 75%;
@@ -164,7 +164,7 @@
                  2px  2px 8px rgba(255, 255, 255, 0.95);
         }
 
-        /* Animación por palabras acelerada ligeramente para la nueva duración */
+        /* Animación por palabras */
         .animated-text .word {
             display: inline-block;
             opacity: 0;
@@ -247,7 +247,7 @@
         setTimeout(() => {
             loginCard.style.display = 'none';
             
-            // 2. Cambio inmersivo al entorno de tech.gif cubriendo toda la pantalla
+            // 2. Transición inmersiva: cambia la imagen rt.jpg por tech.gif ocupando toda la pantalla
             document.body.style.backgroundColor = '#000000';
             document.body.style.backgroundImage = "url('tech.gif')";
             document.body.style.backgroundSize = 'cover'; 
@@ -263,11 +263,11 @@
                 const span = document.createElement('span');
                 span.classList.add('word');
                 span.innerHTML = palabra + '&nbsp;'; 
-                span.style.animationDelay = `${index * 0.15}s`; // Reducido el retraso para ajustarse al nuevo tiempo
+                span.style.animationDelay = `${index * 0.15}s`; 
                 welcomeText.appendChild(span);
             });
 
-            // 5. Redirección automática corregida a 2 segundos (2000ms)
+            // 5. Redirección automática configurada a 2 segundos exactos
             setTimeout(() => {
                 window.location.href = 'panel.html';
             }, 2000);
