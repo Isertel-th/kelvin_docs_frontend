@@ -350,8 +350,7 @@
                         <th style="padding: 10px;">Nombre Completo</th>
                         <th style="padding: 10px;">Cédula</th>
                         <th style="padding: 10px;">Correo</th>
-                        <th style="padding: 10px;">Departamento</th>
-                        <th style="padding: 10px;">Rol</th>
+                        <th style="padding: 10px;">Departamento / Rol</th>
                     </tr>
                 </thead>
                 <tbody id="tbody-usuarios-sistema">
@@ -1482,33 +1481,32 @@ function mostrarSeccion(seccionId) {
 
 // Función encargada de recopilar los datos y enviarlos al Backend por AJAX
 async function registrarUsuario(event) {
-    event.preventDefault(); // Evita que la página se recargue sola
+    event.preventDefault(); 
 
     // Capturar los valores del formulario
     const nombreInput = document.getElementById('reg-nombre').value.trim();
     const cedulaInput = document.getElementById('reg-cedula').value.trim();
     const celularInput = document.getElementById('reg-celular').value.trim();
-    const correoInput = document.getElementById('reg-correo').value.trim().toLowerCase(); // Asegura minúsculas como tu original
+    const correoInput = document.getElementById('reg-correo').value.trim().toLowerCase(); 
     const direccionInput = document.getElementById('reg-direccion').value.trim();
-    const contraseniaInput = document.getElementById('reg-contrasenia').value; // Sin .trim() por si la contraseña tiene espacios al inicio/final
+    const contraseniaInput = document.getElementById('reg-contrasenia').value; 
     
-    // Capturamos el nombre del departamento seleccionado
     const departamentoInput = document.getElementById('reg-departamento').value;
-    const fotoInput = document.getElementById('reg-foto').files[0]; // Capturar archivo físico de foto
+    const fotoInput = document.getElementById('reg-foto').files[0]; 
 
-    // 1. CORRECCIÓN: Validación del Frontend para evitar enviar campos vacíos 
+    // 1. VALIDACIÓN
     if (!nombreInput || !cedulaInput || !celularInput || !correoInput || !direccionInput || !contraseniaInput || !departamentoInput || !fotoInput) {
         alert("Por favor, complete todos los campos obligatorios del formulario (incluyendo la foto, dirección y contraseña).");
-        return; // Detiene el envío 
+        return; 
     }
 
-    // 2. CORRECCIÓN: Mantener el formateo automático de nombres (juan perez -> Juan Perez) que tenías 
+    // 2. FORMATEO
     const nombreFormateado = nombreInput
         .split(/\s+/) 
         .map(palabra => palabra.charAt(0).toUpperCase() + palabra.slice(1).toLowerCase())
         .join(' ');
 
-    // 3. CORRECCIÓN: Validaciones de formato para Cédula y Celular (10 dígitos exactos)
+    // 3. VALIDACIONES NUMÉRICAS
     const regexSoloNumeros = /^\d{10}$/;
     if (!regexSoloNumeros.test(cedulaInput)) {
         alert("La Cédula de Identidad no es válida. Debe contener exactamente 10 dígitos numéricos enteros.");
@@ -1519,7 +1517,7 @@ async function registrarUsuario(event) {
         return;
     }
 
-    // 4. CORRECCIÓN: Validación de dominios de correo permitidos
+    // 4. VALIDACIÓN DE CORREO
     const dominiosPermitidos = ['gmail.com', 'hotmail.com', 'outlook.com', 'outlook.es'];
     const correoDominio = correoInput.split('@')[1];
     if (!correoInput.includes('@') || !dominiosPermitidos.includes(correoDominio)) {
@@ -1527,42 +1525,28 @@ async function registrarUsuario(event) {
         return;
     }
 
-    // --- NUEVA LÓGICA AUTOMÁTICA: Asignar el Rol según el Departamento ---
-    let rolCalculado = "empleado"; // Rol por defecto si no coincide ninguno
-
-    // Asegura "Jefatura de Operaciones" de tu caso real
-    if (departamentoInput === "Sistemas" || departamentoInput === "TI" || departamentoInput === "Jefatura de Operaciones") {
-        rolCalculado = "admin";
-    } else if (departamentoInput === "Medicina" || departamentoInput === "Salud") {
-        rolCalculado = "doc";
-    } else if (departamentoInput === "Directiva") {
-        rolCalculado = "gerente";
-    }
-
-    // Construir el FormData para enviar al Backend usando las llaves EXACTAS que tenías
+    // Construir el FormData para enviar al Backend
     const formData = new FormData();
-    formData.append('nombre_completo', nombreFormateado); // Llave corregida de tu backend
+    formData.append('nombre_completo', nombreFormateado); 
     formData.append('cedula', cedulaInput);
     formData.append('celular', celularInput);
     formData.append('correo', correoInput);
     formData.append('direccion', direccionInput);
-    formData.append('contrasenia', contraseniaInput); // Llave original
-    formData.append('departamento', departamentoInput);
-    formData.append('rol_asignado', rolCalculado); // Llave corregida de tu backend
+    formData.append('contrasenia', contraseniaInput); 
+    formData.append('departamento', departamentoInput); // Se sigue enviando bajo esta llave porque el backend la extrae de req.body para validarla e igualarla a rol
+    formData.append('rol_asignado', departamentoInput); 
     
     if (fotoInput) {
         formData.append('foto', fotoInput);
     }
 
     try {
-        // Petición usando la variable global API_URL
         const respuesta = await fetch(`${API_URL}/usuarios`, {
             method: 'POST',
             headers: {
-                // Tomamos el token del administrador del localStorage
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
             },
-            body: formData // Pasamos el formulario estructurado
+            body: formData 
         });
 
         const resultado = await respuesta.json();
@@ -1572,15 +1556,13 @@ async function registrarUsuario(event) {
         }
 
         alert("¡Usuario registrado con éxito!");
-        document.getElementById('form-registro-usuario').reset(); // Limpia el formulario
+        document.getElementById('form-registro-usuario').reset(); 
         
-        // Ocultar formulario y restablecer botón
         const contenedorForm = document.getElementById('contenedor-formulario-registro');
         if (contenedorForm) contenedorForm.style.display = 'none';
         const boton = document.getElementById('btn-mostrar-formulario-registro');
         if (boton) boton.innerHTML = '👤 Registrar Nuevo Colaborador';
 
-        // Ejecutar si la función existe en tu entorno global
         if (typeof cargarUsuariosSistema === 'function') {
             cargarUsuariosSistema();
         }
