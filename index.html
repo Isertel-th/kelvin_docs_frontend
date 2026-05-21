@@ -7,27 +7,36 @@
     <style>
         body { 
             font-family: 'Segoe UI', sans-serif; 
-            background: #f0f2f5; 
+            
+            /* Ajuste profesional para Circ.gif horizontal */
+            background-color: #000000; /* Fondo negro para rellenar el espacio sobrante horizontal */
+            background-image: url('Circ.gif'); 
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-size: contain; /* Ajusta el GIF horizontal a la pantalla sin cortarlo */
+            
             display: flex; 
             justify-content: center; 
             align-items: center; 
             height: 100vh; 
             margin: 0; 
             overflow: hidden;
+            transition: background 0.5s ease; 
         }
 
-        /* Tarjeta de Login */
+        /* Tarjeta de Login Refinada */
         .login-card { 
-            background: white; 
+            background: rgba(255, 255, 255, 0.95); 
             padding: 2.5rem; 
             border-radius: 12px; 
-            box-shadow: 0 8px 24px rgba(0,0,0,0.1); 
+            box-shadow: 0 12px 32px rgba(0,0,0,0.4); /* Sombra un poco más pronunciada para resaltar sobre el negro */
             width: 100%; 
             max-width: 380px; 
             transition: all 0.5s ease;
             opacity: 1;
             transform: scale(1);
             z-index: 10;
+            backdrop-filter: blur(4px); 
         }
 
         /* Clase para desvanecer el login */
@@ -38,13 +47,13 @@
             display: none;
         }
 
-        h2 { text-align: center; color: #333; margin-bottom: 1.5rem; }
-        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
-        button { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 10px; }
+        h2 { text-align: center; color: #1a1a1a; margin-bottom: 1.5rem; font-weight: 700; }
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; background: rgba(255,255,255,0.9); }
+        button { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 10px; transition: background 0.2s; }
         button:hover { background: #0056b3; }
-        #mensaje { color: #d93025; text-align: center; margin-top: 15px; font-size: 14px; min-height: 20px; }
+        #mensaje { color: #d93025; text-align: center; margin-top: 15px; font-size: 14px; min-height: 20px; font-weight: 600; }
 
-        /* --- PANTALLA DE BIENVENIDA CON FONDO TECH --- */
+        /* --- PANTALLA DE BIENVENIDA (SPLASH SCREEN) --- */
         .welcome-screen {
             display: none;
             flex-direction: column;
@@ -55,21 +64,15 @@
             height: 100vh;
             padding: 2rem;
             box-sizing: border-box;
-            
-            background-color: #000000; 
-            background-image: url('tech.gif'); 
-            background-repeat: no-repeat; 
-            background-position: center center; 
-            background-size: contain; 
         }
 
         .welcome-screen.active {
             display: flex;
         }
 
-        /* Imagen/Logo principal reducida para un mejor balance visual */
+        /* Imagen/Logo principal (logge.png) con tamaño balanceado */
         .welcome-img {
-            max-width: 320px; /* Reducido de 550px a 320px */
+            max-width: 320px; 
             width: 80%;
             height: auto;
             margin-bottom: 2.5rem;
@@ -168,16 +171,21 @@
         const welcomeScreen = document.getElementById('welcomeScreen');
         const welcomeText = document.getElementById('welcomeText');
 
-        // 1. Desvanecer login
+        // 1. Desvanecer la tarjeta de login
         loginCard.classList.add('fade-out');
 
         setTimeout(() => {
             loginCard.style.display = 'none';
             
-            // 2. Activar pantalla completa con el fondo tech.gif centrado
+            // 2. Cambio dinámico al entorno de tech.gif (también optimizado y centrado)
+            document.body.style.backgroundColor = '#000000';
+            document.body.style.backgroundImage = "url('tech.gif')";
+            document.body.style.backgroundSize = 'contain';
+            
+            // 3. Activar pantalla completa de bienvenida
             welcomeScreen.classList.add('active');
 
-            // 3. Animación por palabras de "Somos Isertel, Bienvenido"
+            // 4. Animación por palabras de "Somos Isertel, Bienvenido"
             const palabras = ["Somos", "Isertel,", "Bienvenido"];
             welcomeText.innerHTML = ''; 
 
@@ -189,7 +197,7 @@
                 welcomeText.appendChild(span);
             });
 
-            // 4. Redirección automática tras 4 segundos
+            // 5. Redirección automática tras 4 segundos al panel principal
             setTimeout(() => {
                 window.location.href = 'panel.html';
             }, 4000);
