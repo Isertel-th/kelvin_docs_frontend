@@ -326,7 +326,12 @@
             </table>
         </div>
     </div> 
-</div> <div id="view-registrar-usuarios" class="view-section" style="padding: 25px; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 900px; width: 100%; margin: 20px auto; display: none; box-sizing: border-box;">
+</div>
+
+
+
+
+<div id="view-registrar-usuarios" class="view-section" style="padding: 25px; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 900px; width: 100%; margin: 20px auto; display: none; box-sizing: border-box;">
     
     <div style="margin-bottom: 1.5rem;">
         <h3 style="color: #1e293b; margin-top: 0; margin-bottom: 1rem; font-size: 1.3rem; font-weight: 700; border-bottom: 2px solid #3b82f6; padding-bottom: 0.5rem;">
@@ -353,15 +358,14 @@
         </div>
     </div>
 
+    <!-- Contenedor de botones superiores simplificado (Se eliminó el botón de editar) -->
     <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.75rem; margin-bottom: 2rem;">
-        <button type="button" id="btn-mostrar-formulario-edicion" onclick="mostrarFormularioEdicion()" style="background: #f59e0b; color: white; border: none; padding: 12px 20px; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; transition: background 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-            ✏️ Editar Colaborador
-        </button>
         <button type="button" id="btn-mostrar-formulario-registro" onclick="mostrarFormularioRegistro()" style="background: #3b82f6; color: white; border: none; padding: 12px 20px; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; transition: background 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
             👤 Registrar Nuevo Colaborador
         </button>
     </div>
 
+    <!-- Formulario de Registro -->
     <div id="contenedor-formulario-registro" style="display: none; border-top: 2px dashed #cbd5e1; padding-top: 2rem; margin-bottom: 2rem;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.75rem;">
             <h2 style="color: #1e293b; margin: 0; font-size: 1.3rem; font-weight: 700;">👤 Registrar Nuevo Colaborador</h2>
@@ -424,18 +428,15 @@
         </form>
     </div>
 
+    <!-- Panel de Edición Modificado (Se eliminó el buscador interno y se agregó el botón de cerrar) -->
     <div id="contenedor-formulario-edicion" style="display: none; border-top: 2px dashed #cbd5e1; padding-top: 2rem;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.75rem;">
             <h2 style="color: #1e293b; margin: 0; font-size: 1.3rem; font-weight: 700;">✏️ Panel de Edición de Colaboradores</h2>
-        </div>
-        
-        <div style="background: #f1f5f9; padding: 15px; border-radius: 6px; border: 1px solid #cbd5e1; margin-bottom: 1.5rem;">
-            <label style="font-weight: 700; color: #1e293b; font-size: 0.95rem; display: block; margin-bottom: 0.5rem;">
-                🔍 Seleccione el usuario que desea modificar:
-            </label>
-            <select id="edit-selector-usuario" onchange="cargarDatosEnFormularioPorSelect(this.value)" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; height: 42px; background: white; font-weight: 500; color: #334155;">
-                <option value="">-- Elija un colaborador de la lista --</option>
-            </select>
+            
+            <!-- 🌟 NUEVO BOTÓN DE CERRAR EL EDITOR -->
+            <button type="button" onclick="cerrarFormularioEdicion()" style="background: #ef4444; color: white; border: none; padding: 8px 14px; font-size: 0.9rem; font-weight: bold; border-radius: 6px; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; gap: 0.3rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                ❌ Cerrar Editor
+            </button>
         </div>
 
         <form id="form-edicion-usuario" onsubmit="actualizarUsuario(event)" enctype="multipart/form-data" style="display: none; flex-direction: column; gap: 1.25rem;">
@@ -496,7 +497,8 @@
                 💾 Actualizar Cambios del Colaborador
             </button>
         </form>
-    </div> </div>
+    </div> 
+</div>
     
     
     
@@ -1526,17 +1528,14 @@ let listaUsuariosLocal = [];
 function mostrarSeccion(seccionId) {
     console.log("Cambiando a la sección:", seccionId);
 
-    // 1. Ocultamos TODAS las secciones principales y las vistas dinámicas (.view-section)
     const contenedores = document.querySelectorAll('section, .content-section, .view-section, [id^="sec-"]');
-    containers.forEach(contenedor => {
+    contenedores.forEach(contenedor => {
         contenedor.style.display = 'none';
     });
 
-    // 2. Buscamos la sección específica que queremos activar
     const seccionActiva = document.getElementById(`sec-${seccionId}`);
     
     if (seccionActiva) {
-        // Forzamos el display correcto.
         seccionActiva.style.display = 'block'; 
         console.log(`✅ Vista 'sec-${seccionId}' mostrada con éxito.`);
     } else {
@@ -1548,7 +1547,6 @@ function mostrarSeccion(seccionId) {
 async function registrarUsuario(event) {
     event.preventDefault(); 
 
-    // Capturar los valores del formulario
     const nombreInput = document.getElementById('reg-nombre').value.trim();
     const cedulaInput = document.getElementById('reg-cedula').value.trim();
     const celularInput = document.getElementById('reg-celular').value.trim();
@@ -1558,19 +1556,16 @@ async function registrarUsuario(event) {
     const departamentoInput = document.getElementById('reg-departamento').value;
     const fotoInput = document.getElementById('reg-foto').files[0]; 
 
-    // 1. VALIDACIÓN
     if (!nombreInput || !cedulaInput || !celularInput || !correoInput || !direccionInput || !contraseniaInput || !departamentoInput || !fotoInput) {
         alert("Por favor, complete todos los campos obligatorios del formulario (incluyendo la foto, dirección y contraseña).");
         return; 
     }
 
-    // 2. FORMATEO
     const nombreFormateado = nombreInput
         .split(/\s+/) 
         .map(palabra => palabra.charAt(0).toUpperCase() + palabra.slice(1).toLowerCase())
         .join(' ');
 
-    // 3. VALIDACIONES NUMÉRICAS
     const regexSoloNumeros = /^\d{10}$/;
     if (!regexSoloNumeros.test(cedulaInput)) {
         alert("La Cédula de Identidad no es válida. Debe contener exactamente 10 dígitos numéricos enteros.");
@@ -1581,7 +1576,6 @@ async function registrarUsuario(event) {
         return;
     }
 
-    // 4. VALIDACIÓN DE CORREO
     const dominiosPermitidos = ['gmail.com', 'hotmail.com', 'outlook.com', 'outlook.es'];
     const correoDominio = correoInput.split('@')[1];
     if (!correoInput.includes('@') || !dominiosPermitidos.includes(correoDominio)) {
@@ -1589,7 +1583,6 @@ async function registrarUsuario(event) {
         return;
     }
 
-    // Construir el FormData para enviar al Backend
     const formData = new FormData();
     formData.append('nombre_completo', nombreFormateado); 
     formData.append('cedula', cedulaInput);
@@ -1637,36 +1630,29 @@ async function registrarUsuario(event) {
     }
 }
 
-// Función para cargar los departamentos desde la base de datos
 async function cargarDepartamentos() {
     const selectDepto = document.getElementById('reg-departamento');
     if (!selectDepto) return;
 
     try {
         const respuesta = await fetch(`${API_URL}/departamentos`);
-        
-        if (!respuesta.ok) {
-            throw new Error(`Código de estado: ${respuesta.status}`);
-        }
+        if (!respuesta.ok) throw new Error(`Código de estado: ${respuesta.status}`);
         
         const departamentos = await respuesta.json();
-        
         selectDepto.innerHTML = '<option value="">Seleccione un departamento...</option>';
         
         departamentos.forEach(depto => {
             const option = document.createElement('option');
-            option.value = depto.nombre;       
+            option.value = depto.nombre;      
             option.textContent = depto.nombre; 
             selectDepto.appendChild(option);
         });
-
     } catch (error) {
         console.error("❌ Error al conectar con /departamentos:", error);
         selectDepto.innerHTML = '<option value="">Error al cargar los datos</option>';
     }
 }
 
-// Función polivalente para alternar el ojo de las contraseñas (Pasando el ID del Input como string)
 function toggleVisibilidadPassword(inputId) {
     const inputPass = document.getElementById(inputId);
     if (inputPass) {
@@ -1674,11 +1660,9 @@ function toggleVisibilidadPassword(inputId) {
     }
 }
 
-// Función para renderizar y actualizar el listado de usuarios con la columna Acciones
-// Función para renderizar y actualizar el listado de usuarios y rellenar el buscador/lista de edición
+// Carga usuarios y actualiza la lista local en memoria (Se eliminó la carga del select antiguo)
 async function cargarUsuariosSistema() {
     const tbody = document.getElementById('tbody-usuarios-sistema');
-    const selectorUsuarios = document.getElementById('edit-selector-usuario');
     if (!tbody) return;
 
     try {
@@ -1689,23 +1673,10 @@ async function cargarUsuariosSistema() {
             }
         });
 
-        if (!respuesta.ok) {
-            throw new Error('No se pudo obtener la nómina de usuarios.');
-        }
+        if (!respuesta.ok) throw new Error('No se pudo obtener la nómina de usuarios.');
 
         const usuarios = await respuesta.json();
-        listaUsuariosLocal = usuarios; // Guardamos en memoria local para agilizar la edición rápida
-        
-        // 🌟 NUEVO: Llenamos el selector de la lista de usuarios para modificar
-        if (selectorUsuarios) {
-            selectorUsuarios.innerHTML = '<option value="">-- Elija un colaborador de la lista --</option>';
-            usuarios.forEach(user => {
-                const opt = document.createElement('option');
-                opt.value = user.id;
-                opt.textContent = `${user.nombre_completo} (C.I: ${user.cedula} - ${user.rol})`;
-                selectorUsuarios.appendChild(opt);
-            });
-        }
+        listaUsuariosLocal = usuarios; 
 
         if (usuarios.length === 0) {
             tbody.innerHTML = `<tr><td colspan="6" style="padding: 15px; text-align: center; color: #64748b;">No hay usuarios registrados aún.</td></tr>`;
@@ -1716,7 +1687,6 @@ async function cargarUsuariosSistema() {
         usuarios.forEach(user => {
             const tr = document.createElement('tr');
             tr.style.borderBottom = '1px solid #e2e8f0';
-            
             const fotoUrl = user.foto_url ? user.foto_url : 'https://via.placeholder.com/40';
 
             tr.innerHTML = `
@@ -1731,27 +1701,23 @@ async function cargarUsuariosSistema() {
             `;
             tbody.appendChild(tr);
         });
-
     } catch (error) {
         console.error("❌ Error al cargar usuarios:", error);
         tbody.innerHTML = `<tr><td colspan="6" style="padding: 15px; text-align: center; color: #ef4444; font-weight: bold;">Error al cargar el listado.</td></tr>`;
     }
 }
 
-// Alternar visualización del formulario de registro
 function mostrarFormularioRegistro() {
     const contenedorForm = document.getElementById('contenedor-formulario-registro');
     const contenedorEdicion = document.getElementById('contenedor-formulario-edicion');
     const boton = document.getElementById('btn-mostrar-formulario-registro');
-    const botonEdicion = document.getElementById('btn-mostrar-formulario-edicion');
     
     if (contenedorForm) {
         if (contenedorForm.style.display === 'none' || contenedorForm.style.display === '') {
             contenedorForm.style.display = 'block';
-            if (contenedorEdicion) contenedorEdicion.style.display = 'none'; // Cerrar edición alternada
+            if (contenedorEdicion) contenedorEdicion.style.display = 'none'; 
             contenedorForm.scrollIntoView({ behavior: 'smooth' });
             if (boton) boton.innerHTML = '❌ Cerrar Formulario de Registro';
-            if (botonEdicion) botonEdicion.innerHTML = '✏️ Editar Colaborador';
         } else {
             contenedorForm.style.display = 'none';
             if (boton) boton.innerHTML = '👤 Registrar Nuevo Colaborador';
@@ -1759,74 +1725,44 @@ function mostrarFormularioRegistro() {
     }
 }
 
-// Alternar visualización del formulario de edición (Botón superior)
-function mostrarFormularioEdicion() {
+// 🌟 NUEVA FUNCIÓN: Cierra de forma limpia el menú/panel de edición
+function cerrarFormularioEdicion() {
     const contenedorEdicion = document.getElementById('contenedor-formulario-edicion');
-    const contenedorRegistro = document.getElementById('contenedor-formulario-registro');
     const formEdicion = document.getElementById('form-edicion-usuario');
-    const selectorUsuarios = document.getElementById('edit-selector-usuario');
-    const boton = document.getElementById('btn-mostrar-formulario-edicion');
-    const botonRegistro = document.getElementById('btn-mostrar-formulario-registro');
     
-    if (contenedorEdicion) {
-        if (contenedorEdicion.style.display === 'none' || contenedorEdicion.style.display === '') {
-            contenedorEdicion.style.display = 'block';
-            if (contenedorRegistro) contenedorRegistro.style.display = 'none'; // Cerrar registro alternado
-            
-            // Forzar a que primero seleccione un usuario de la lista limpia antes de ver los campos
-            if (formEdicion) formEdicion.style.display = 'none';
-            if (selectorUsuarios) selectorUsuarios.value = "";
-            
-            contenedorEdicion.scrollIntoView({ behavior: 'smooth' });
-            if (boton) boton.innerHTML = '❌ Cerrar Panel de Edición';
-            if (botonRegistro) botonRegistro.innerHTML = '👤 Registrar Nuevo Colaborador';
-        } else {
-            contenedorEdicion.style.display = 'none';
-            if (boton) boton.innerHTML = '✏️ Editar Colaborador';
-        }
+    if (contenedorEdicion) contenedorEdicion.style.display = 'none';
+    if (formEdicion) {
+        formEdicion.reset();
+        formEdicion.style.display = 'none';
     }
 }
 
-// 🌟 NUEVA FUNCIÓN INTERMEDIA: Se ejecuta al cambiar la selección en la lista desplegable de edición
-function cargarDatosEnFormularioPorSelect(usuarioId) {
-    const formEdicion = document.getElementById('form-edicion-usuario');
-    if (!usuarioId) {
-        if (formEdicion) formEdicion.style.display = 'none'; // Esconde los campos si elige la opción vacía
-        return;
-    }
-    prepararEdicion(usuarioId);
-}
-
-// Extraer datos del usuario y prepararlos en los campos de edición
+// Se ejecuta directamente al presionar el botón "Editar" en la fila del usuario
 function prepararEdicion(usuarioId) {
     const usuario = listaUsuariosLocal.find(u => String(u.id) === String(usuarioId));
     if (!usuario) {
         alert("No se pudieron encontrar los datos locales del colaborador.");
         return;
     }
-
-    // Forzar apertura exclusiva de los paneles correspondientes
-    document.getElementById('contenedor-formulario-edicion').style.display = 'block';
+    
+    // Ocultar registro si estuviera abierto
     document.getElementById('contenedor-formulario-registro').style.display = 'none';
-    document.getElementById('form-edicion-usuario').style.display = 'flex'; // Muestra el formulario interno
-    document.getElementById('btn-mostrar-formulario-edicion').innerHTML = '❌ Cerrar Panel de Edición';
     document.getElementById('btn-mostrar-formulario-registro').innerHTML = '👤 Registrar Nuevo Colaborador';
 
-    // Sincronizar el selector de la lista de usuarios por si se presionó directo el botón de la tabla
-    const selectorUsuarios = document.getElementById('edit-selector-usuario');
-    if (selectorUsuarios) selectorUsuarios.value = usuarioId;
+    // Mostrar contenedores de edición
+    document.getElementById('contenedor-formulario-edicion').style.display = 'block';
+    document.getElementById('form-edicion-usuario').style.display = 'flex'; 
 
-    // Rellenar inputs
+    // Rellenar campos
     document.getElementById('edit-id').value = usuario.id;
     document.getElementById('edit-nombre').value = usuario.nombre_completo;
     document.getElementById('edit-cedula').value = usuario.cedula;
     document.getElementById('edit-celular').value = usuario.celular || '';
     document.getElementById('edit-correo').value = usuario.correo;
     document.getElementById('edit-direccion').value = usuario.direccion || '';
-    document.getElementById('edit-contrasenia').value = ''; // Vacío por política de seguridad
+    document.getElementById('edit-contrasenia').value = ''; 
     document.getElementById('edit-preview-foto').src = usuario.foto_url || 'https://via.placeholder.com/60';
 
-    // Sincronizar el selector dinámico clonando opciones del de registro
     const selectReg = document.getElementById('reg-departamento');
     const selectEdit = document.getElementById('edit-departamento');
     if (selectReg && selectEdit) {
@@ -1834,10 +1770,9 @@ function prepararEdicion(usuarioId) {
         selectEdit.value = usuario.rol; 
     }
 
-    document.getElementById('form-edicion-usuario').scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('contenedor-formulario-edicion').scrollIntoView({ behavior: 'smooth' });
 }
 
-// Ejecutar el envío AJAX de la edición mediante método PUT
 async function actualizarUsuario(event) {
     event.preventDefault();
 
@@ -1888,18 +1823,14 @@ async function actualizarUsuario(event) {
         if (!respuesta.ok) throw new Error(resultado.error || 'Error en la actualización');
 
         alert("¡Colaborador actualizado con éxito!");
-        document.getElementById('form-edicion-usuario').reset();
-        document.getElementById('contenedor-formulario-edicion').style.display = 'none';
-        document.getElementById('btn-mostrar-formulario-edicion').innerHTML = '✏️ Editar Colaborador';
-
-        cargarUsuariosSistema(); // Actualiza la vista y la lista desplegable en tiempo real
+        cerrarFormularioEdicion(); // Cierra el menú automáticamente tras actualizar
+        cargarUsuariosSistema(); 
     } catch (error) {
         console.error("Error al actualizar usuario:", error);
         alert("No se pudo completar la edición: " + error.message);
     }
 }
 
-// Inicialización unificada de eventos al cargar el documento
 document.addEventListener('DOMContentLoaded', () => {
     cargarDepartamentos();
     cargarUsuariosSistema(); 
