@@ -437,64 +437,64 @@
             </button>
         </div>
 
-        <form id="form-edicion-usuario" onsubmit="actualizarUsuario(event)" enctype="multipart/form-data" style="display: none; flex-direction: column; gap: 1.25rem;">
-            <input type="hidden" id="edit-id">
+<form id="form-edicion-usuario" onsubmit="actualizarUsuarioSistema(event)" enctype="multipart/form-data" style="display: none; flex-direction: column; gap: 1.25rem;">
+    <input type="hidden" id="edit-id">
 
-            <div style="display: flex; align-items: center; gap: 1.5rem; background: #f8fafc; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
-                <img id="edit-preview-foto" src="https://via.placeholder.com/60" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #cbd5e1;">
-                <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
-                    <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Cambiar Foto de Perfil (Opcional):</label>
-                    <input type="file" id="edit-foto" accept="image/*" style="width: 100%; padding: 5px; border: 1px solid #cbd5e1; border-radius: 4px; background: white;">
-                </div>
-            </div>
+    <div style="display: flex; align-items: center; gap: 1.5rem; background: #f8fafc; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
+        <img id="edit-preview-foto" src="https://via.placeholder.com/60" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #cbd5e1;">
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
+            <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Cambiar Foto de Perfil (Opcional):</label>
+            <input type="file" id="edit-foto" accept="image/*" style="width: 100%; padding: 5px; border: 1px solid #cbd5e1; border-radius: 4px; background: white;">
+        </div>
+    </div>
 
-            <div style="display: flex; flex-direction: column; gap: 0.4rem;">
-                <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Nombre Completo:</label>
-                <input type="text" id="edit-nombre" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
-            </div>
+    <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+        <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Nombre Completo:</label>
+        <input type="text" id="edit-nombre" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+    </div>
 
-            <div style="display: flex; gap: 1rem;">
-                <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
-                    <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Cédula de Identidad:</label>
-                    <input type="text" id="edit-cedula" required minlength="10" maxlength="10" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
-                </div>
-                <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
-                    <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Celular:</label>
-                    <input type="tel" id="edit-celular" required minlength="10" maxlength="10" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
-                </div>
-            </div>
+    <div style="display: flex; gap: 1rem;">
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
+            <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Cédula de Identidad:</label>
+            <input type="text" id="edit-cedula" required minlength="10" maxlength="10" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+        </div>
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
+            <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Celular:</label>
+            <input type="tel" id="edit-celular" required minlength="10" maxlength="10" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+        </div>
+    </div>
 
-            <div style="display: flex; flex-direction: column; gap: 0.4rem;">
-                <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Correo Electrónico:</label>
-                <input type="email" id="edit-correo" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
-            </div>
+    <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+        <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Correo Electrónico:</label>
+        <input type="email" id="edit-correo" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+    </div>
 
-            <div style="display: flex; flex-direction: column; gap: 0.4rem;">
-                <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Dirección de Domicilio:</label>
-                <input type="text" id="edit-direccion" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
-            </div>
+    <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+        <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Dirección de Domicilio:</label>
+        <input type="text" id="edit-direccion" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+    </div>
 
-            <div style="display: flex; flex-direction: column; gap: 0.4rem;">
-                <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Contraseña (Dejar en blanco para mantener la actual):</label>
-                <div style="position: relative; display: flex; align-items: center;">
-                    <input type="password" id="edit-contrasenia" placeholder="Escriba una nueva contraseña si desea cambiarla" style="width: 100%; padding: 10px; padding-right: 45px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
-                    <button type="button" onclick="toggleVisibilidadPassword('edit-contrasenia')" style="position: absolute; right: 5px; background: none; border: none; cursor: pointer; padding: 8px; color: #64748b; font-size: 1.1rem; display: flex; align-items: center; justify-content: center;">
-                        👁️
-                    </button>
-                </div>
-            </div>
-
-            <div style="display: flex; gap: 1rem;">
-                <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
-                    <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Departamento / Rol Asignado:</label>
-                    <select id="edit-departamento" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; height: 42px; background: white;"></select>
-                </div>
-            </div>
-
-            <button type="submit" style="background: #f59e0b; color: white; border: none; padding: 14px; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 0.5rem; transition: background 0.2s; display: flex; justify-content: center; align-items: center; gap: 0.5rem;">
-                💾 Actualizar Cambios del Colaborador
+    <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+        <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Contraseña (Dejar en blanco para mantener la actual):</label>
+        <div style="position: relative; display: flex; align-items: center;">
+            <input type="password" id="edit-contrasenia" placeholder="Escriba una nueva contraseña si desea cambiarla" style="width: 100%; padding: 10px; padding-right: 45px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+            <button type="button" onclick="toggleVisibilidadPassword('edit-contrasenia')" style="position: absolute; right: 5px; background: none; border: none; cursor: pointer; padding: 8px; color: #64748b; font-size: 1.1rem; display: flex; align-items: center; justify-content: center;">
+                👁️
             </button>
-        </form>
+        </div>
+    </div>
+
+    <div style="display: flex; gap: 1rem;">
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
+            <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Departamento / Rol Asignado:</label>
+            <select id="edit-departamento" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; height: 42px; background: white;"></select>
+        </div>
+    </div>
+
+    <button type="submit" style="background: #f59e0b; color: white; border: none; padding: 14px; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 0.5rem; transition: background 0.2s; display: flex; justify-content: center; align-items: center; gap: 0.5rem;">
+        💾 Actualizar Cambios del Colaborador
+    </button>
+</form>
     </div> 
 </div>
     
@@ -1800,7 +1800,8 @@ function prepararEdicion(usuarioId) {
     document.getElementById('contenedor-formulario-edicion').scrollIntoView({ behavior: 'smooth' });
 }
 
-async function actualizarUsuario(event) {
+// NOMBRE CORREGIDO: Evita conflictos con el módulo de modificación de nómina ('m_')
+async function actualizarUsuarioSistema(event) {
     event.preventDefault();
 
     const id = document.getElementById('edit-id').value;
@@ -1862,7 +1863,6 @@ document.addEventListener('DOMContentLoaded', () => {
     cargarDepartamentos();
     cargarUsuariosSistema(); 
 });
-
 
 
 // 🌟 NUEVA FUNCIÓN: Envía la solicitud DELETE al Backend y refresca la tabla automáticamente
