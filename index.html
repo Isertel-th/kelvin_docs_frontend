@@ -8,7 +8,7 @@
         body { 
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
             
-            /* Inmersión total: El GIF se estira para cubrir toda la pantalla sin dejar espacios vacíos */
+            /* Inmersión total con Circ.gif */
             background-color: #05070f;
             background-image: url('Circ.gif'); 
             background-repeat: no-repeat;
@@ -27,22 +27,21 @@
         /* Tarjeta de Login Minimalista Premium (Glassmorphism) */
         .login-card { 
             background: rgba(255, 255, 255, 0.88); 
-            padding: 2rem 2.2rem; /* Más compacto y elegante */
+            padding: 2rem 2.2rem; 
             border-radius: 16px; 
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4); 
             width: 100%; 
-            max-width: 340px; /* Estructura más esbelta */
+            max-width: 340px; 
             transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
             opacity: 1;
             transform: scale(1);
             z-index: 10;
-            backdrop-filter: blur(10px); /* Desenfoque de cristal premium */
+            backdrop-filter: blur(10px); 
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
             box-sizing: border-box;
         }
 
-        /* Clase para desvanecer el login de manera fluida */
         .fade-out {
             opacity: 0;
             transform: scale(0.92);
@@ -60,7 +59,6 @@
             letter-spacing: -0.5px;
         }
 
-        /* Inputs estilizados modernos y más limpios */
         .input-group {
             position: relative;
             margin-bottom: 1.2rem;
@@ -71,7 +69,7 @@
             padding: 11px 8px; 
             margin: 0;
             border: none;
-            border-bottom: 2px solid #cbd5e1; /* Línea minimalista */
+            border-bottom: 2px solid #cbd5e1; 
             background: transparent;
             box-sizing: border-box; 
             font-size: 15px; 
@@ -81,7 +79,7 @@
         }
 
         input:focus {
-            border-bottom-color: #007bff; /* Color azul eléctrico al enfocar */
+            border-bottom-color: #007bff; 
         }
 
         input::placeholder {
@@ -137,12 +135,13 @@
             display: flex;
         }
 
-        /* Imagen/Logo principal (logge.png) */
+        /* Ajustes de márgenes para bajar la imagen y centrarla perfectamente */
         .welcome-img {
             max-width: 320px; 
             width: 75%;
             height: auto;
-            margin-bottom: 2.5rem;
+            margin-top: 2rem;       /* Empuja la imagen un poco hacia abajo */
+            margin-bottom: 1.2rem;   /* Reduce la separación exagerada con el texto */
             animation: popIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
             opacity: 0;
             z-index: 2;
