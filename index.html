@@ -27,6 +27,7 @@
             transition: all 0.5s ease;
             opacity: 1;
             transform: scale(1);
+            z-index: 10;
         }
 
         /* Clase para desvanecer el login */
@@ -43,7 +44,7 @@
         button:hover { background: #0056b3; }
         #mensaje { color: #d93025; text-align: center; margin-top: 15px; font-size: 14px; min-height: 20px; }
 
-        /* --- PANTALLA DE BIENVENIDA SUPER GRANDE --- */
+        /* --- PANTALLA DE BIENVENIDA CON FONDO TECH --- */
         .welcome-screen {
             display: none;
             flex-direction: column;
@@ -54,13 +55,20 @@
             height: 100vh;
             padding: 2rem;
             box-sizing: border-box;
+            
+            /* Configuración del fondo solicitado */
+            background-color: #000000; /* Rellena el sobrante con color negro */
+            background-image: url('tech.gif'); /* Tu archivo GIF */
+            background-repeat: no-repeat; /* Evita que el GIF se duplique */
+            background-position: center center; /* Lo mantiene perfectamente centrado */
+            background-size: contain; /* Ajusta el GIF al alto/ancho de la pantalla sin cortarse ni estirarse */
         }
 
         .welcome-screen.active {
             display: flex;
         }
 
-        /* Imagen MUCHO más grande (550px) */
+        /* Imagen/Logo principal (logge.png) */
         .welcome-img {
             max-width: 550px; 
             width: 90%;
@@ -68,20 +76,28 @@
             margin-bottom: 3rem;
             animation: popIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
             opacity: 0;
+            z-index: 2;
         }
 
-        /* Contenedor del texto animado en Negro */
+        /* Contenedor del texto animado en Negro con contraste */
         .animated-text {
-            font-size: 42px; /* Más grande y legible */
+            font-size: 42px; 
             font-weight: 800;
-            color: #000000; /* Negro absoluto pedido */
+            color: #000000; /* Negro absoluto solicitado */
             margin: 0;
             padding: 0;
             display: block;
             line-height: 1.4;
+            z-index: 2;
+            /* Sombra blanca sutil que actúa como borde para que se lea perfectamente sobre el GIF */
+            text-shadow: 
+                -2px -2px 8px rgba(255, 255, 255, 0.9),  
+                 2px -2px 8px rgba(255, 255, 255, 0.9),
+                -2px  2px 8px rgba(255, 255, 255, 0.9),
+                 2px  2px 8px rgba(255, 255, 255, 0.9);
         }
 
-        /* Animación suave por palabras para evitar fallos de renderizado */
+        /* Animación por palabras */
         .animated-text .word {
             display: inline-block;
             opacity: 0;
@@ -107,7 +123,7 @@
 
 <div class="login-card" id="loginCard">
     <h2>Iniciar Sesión</h2>
-    <input text" id="username" placeholder="Nombre de usuario" required>
+    <input type="text" id="username" placeholder="Nombre de usuario" required>
     <input type="password" id="password" placeholder="Contraseña" required>
     <button onclick="login()">Entrar al Sistema</button>
     <div id="mensaje"></div>
@@ -139,7 +155,7 @@
                 localStorage.setItem('rol', data.rol);
                 localStorage.setItem('nombre', data.nombre);
                 
-                // Ejecuta la animación
+                // Ejecuta la animación y el cambio de fondo
                 ejecutarTransicionBienvenida();
             } else {
                 mensaje.innerText = data.error || "Error en los datos";
@@ -161,25 +177,25 @@
         setTimeout(() => {
             loginCard.style.display = 'none';
             
-            // 2. Activar pantalla completa de bienvenida
+            // 2. Activar pantalla completa con el fondo tech.gif centrado
             welcomeScreen.classList.add('active');
 
-            // 3. Animación por palabras (Súper estable y segura para navegadores modernos)
+            // 3. Animación por palabras de "Somos Isertel, Bienvenido"
             const palabras = ["Somos", "Isertel,", "Bienvenido"];
             welcomeText.innerHTML = ''; 
 
             palabras.forEach((palabra, index) => {
                 const span = document.createElement('span');
                 span.classList.add('word');
-                span.innerHTML = palabra + '&nbsp;'; // Añade espacio entre palabras
-                span.style.animationDelay = `${index * 0.2}s`; // Efecto de aparición escalonada escalonado
+                span.innerHTML = palabra + '&nbsp;'; 
+                span.style.animationDelay = `${index * 0.25}s`; // Ligero ajuste para sincronizar mejor el ritmo
                 welcomeText.appendChild(span);
             });
 
-            // 4. Redirección automática tras 3.8 segundos
+            // 4. Redirección automática tras 4 segundos (tiempo ideal para apreciar el GIF y el texto)
             setTimeout(() => {
                 window.location.href = 'panel.html';
-            }, 3800);
+            }, 4000);
 
         }, 500);
     }
