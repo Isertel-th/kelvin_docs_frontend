@@ -6,14 +6,14 @@
     <title>Login - Gestión Documental Isertel</title>
     <style>
         body { 
-            font-family: 'Segoe UI', sans-serif; 
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
             
-            /* Ajuste profesional para Circ.gif horizontal */
-            background-color: #000000; /* Fondo negro para rellenar el espacio sobrante horizontal */
+            /* Inmersión total: El GIF se estira para cubrir toda la pantalla sin dejar espacios vacíos */
+            background-color: #05070f;
             background-image: url('Circ.gif'); 
             background-repeat: no-repeat;
             background-position: center center;
-            background-size: contain; /* Ajusta el GIF horizontal a la pantalla sin cortarlo */
+            background-size: cover; 
             
             display: flex; 
             justify-content: center; 
@@ -21,37 +21,104 @@
             height: 100vh; 
             margin: 0; 
             overflow: hidden;
-            transition: background 0.5s ease; 
+            transition: background 0.6s cubic-bezier(0.25, 1, 0.5, 1); 
         }
 
-        /* Tarjeta de Login Refinada */
+        /* Tarjeta de Login Minimalista Premium (Glassmorphism) */
         .login-card { 
-            background: rgba(255, 255, 255, 0.95); 
-            padding: 2.5rem; 
-            border-radius: 12px; 
-            box-shadow: 0 12px 32px rgba(0,0,0,0.4); /* Sombra un poco más pronunciada para resaltar sobre el negro */
+            background: rgba(255, 255, 255, 0.88); 
+            padding: 2rem 2.2rem; /* Más compacto y elegante */
+            border-radius: 16px; 
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4); 
             width: 100%; 
-            max-width: 380px; 
-            transition: all 0.5s ease;
+            max-width: 340px; /* Estructura más esbelta */
+            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
             opacity: 1;
             transform: scale(1);
             z-index: 10;
-            backdrop-filter: blur(4px); 
+            backdrop-filter: blur(10px); /* Desenfoque de cristal premium */
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-sizing: border-box;
         }
 
-        /* Clase para desvanecer el login */
+        /* Clase para desvanecer el login de manera fluida */
         .fade-out {
             opacity: 0;
-            transform: scale(0.9);
+            transform: scale(0.92);
             pointer-events: none;
             display: none;
         }
 
-        h2 { text-align: center; color: #1a1a1a; margin-bottom: 1.5rem; font-weight: 700; }
-        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; background: rgba(255,255,255,0.9); }
-        button { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 10px; transition: background 0.2s; }
-        button:hover { background: #0056b3; }
-        #mensaje { color: #d93025; text-align: center; margin-top: 15px; font-size: 14px; min-height: 20px; font-weight: 600; }
+        h2 { 
+            text-align: center; 
+            color: #0f172a; 
+            margin-top: 0;
+            margin-bottom: 1.8rem; 
+            font-size: 24px;
+            font-weight: 700; 
+            letter-spacing: -0.5px;
+        }
+
+        /* Inputs estilizados modernos y más limpios */
+        .input-group {
+            position: relative;
+            margin-bottom: 1.2rem;
+        }
+
+        input { 
+            width: 100%; 
+            padding: 11px 8px; 
+            margin: 0;
+            border: none;
+            border-bottom: 2px solid #cbd5e1; /* Línea minimalista */
+            background: transparent;
+            box-sizing: border-box; 
+            font-size: 15px; 
+            color: #1e293b;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus {
+            border-bottom-color: #007bff; /* Color azul eléctrico al enfocar */
+        }
+
+        input::placeholder {
+            color: #94a3b8;
+        }
+
+        button { 
+            width: 100%; 
+            padding: 12px; 
+            background: #007bff; 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 15px; 
+            font-weight: 600; 
+            margin-top: 0.8rem; 
+            transition: background 0.2s, transform 0.1s; 
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+        }
+
+        button:hover { 
+            background: #0056b3; 
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        #mensaje { 
+            color: #e11d48; 
+            text-align: center; 
+            margin-top: 1rem; 
+            font-size: 13px; 
+            min-height: 18px; 
+            font-weight: 600; 
+        }
 
         /* --- PANTALLA DE BIENVENIDA (SPLASH SCREEN) --- */
         .welcome-screen {
@@ -70,10 +137,10 @@
             display: flex;
         }
 
-        /* Imagen/Logo principal (logge.png) con tamaño balanceado */
+        /* Imagen/Logo principal (logge.png) */
         .welcome-img {
             max-width: 320px; 
-            width: 80%;
+            width: 75%;
             height: auto;
             margin-bottom: 2.5rem;
             animation: popIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
@@ -81,7 +148,7 @@
             z-index: 2;
         }
 
-        /* Contenedor del texto animado en Negro con contraste */
+        /* Contenedor del texto animado en Negro con contraste nítido */
         .animated-text {
             font-size: 42px; 
             font-weight: 800;
@@ -92,10 +159,10 @@
             line-height: 1.4;
             z-index: 2;
             text-shadow: 
-                -2px -2px 8px rgba(255, 255, 255, 0.9),  
-                 2px -2px 8px rgba(255, 255, 255, 0.9),
-                -2px  2px 8px rgba(255, 255, 255, 0.9),
-                 2px  2px 8px rgba(255, 255, 255, 0.9);
+                -2px -2px 8px rgba(255, 255, 255, 0.95),  
+                 2px -2px 8px rgba(255, 255, 255, 0.95),
+                -2px  2px 8px rgba(255, 255, 255, 0.95),
+                 2px  2px 8px rgba(255, 255, 255, 0.95);
         }
 
         /* Animación por palabras */
@@ -124,8 +191,12 @@
 
 <div class="login-card" id="loginCard">
     <h2>Iniciar Sesión</h2>
-    <input type="text" id="username" placeholder="Nombre de usuario" required>
-    <input type="password" id="password" placeholder="Contraseña" required>
+    <div class="input-group">
+        <input type="text" id="username" placeholder="Nombre de usuario" required>
+    </div>
+    <div class="input-group">
+        <input type="password" id="password" placeholder="Contraseña" required>
+    </div>
     <button onclick="login()">Entrar al Sistema</button>
     <div id="mensaje"></div>
 </div>
@@ -177,10 +248,10 @@
         setTimeout(() => {
             loginCard.style.display = 'none';
             
-            // 2. Cambio dinámico al entorno de tech.gif (también optimizado y centrado)
+            // 2. Cambio inmersivo al entorno de tech.gif cubriendo toda la pantalla
             document.body.style.backgroundColor = '#000000';
             document.body.style.backgroundImage = "url('tech.gif')";
-            document.body.style.backgroundSize = 'contain';
+            document.body.style.backgroundSize = 'cover'; 
             
             // 3. Activar pantalla completa de bienvenida
             welcomeScreen.classList.add('active');
