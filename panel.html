@@ -344,15 +344,16 @@
         </h3>
         <div class="table-responsive" style="max-height: 300px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 6px;">
             <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
-<thead style="background: #f8fafc; position: sticky; top: 0; z-index: 10;">
-    <tr style="border-bottom: 2px solid #e2e8f0; text-align: left;">
-        <th style="padding: 10px;">Foto</th>
-        <th style="padding: 10px;">Nombre Completo</th>
-        <th style="padding: 10px;">Cédula</th>
-        <th style="padding: 10px;">Correo</th>
-        <th style="padding: 10px;">Departamento / Rol</th> 
-    </tr>
-</thead>
+                <thead style="background: #f8fafc; position: sticky; top: 0; z-index: 10;">
+                    <tr style="border-bottom: 2px solid #e2e8f0; text-align: left;">
+                        <th style="padding: 10px;">Foto</th>
+                        <th style="padding: 10px;">Nombre Completo</th>
+                        <th style="padding: 10px;">Cédula</th>
+                        <th style="padding: 10px;">Correo</th>
+                        <th style="padding: 10px;">Departamento / Rol</th> 
+                        <th style="padding: 10px; text-align: center;">Acciones</th> 
+                    </tr>
+                </thead>
                 <tbody id="tbody-usuarios-sistema">
                     <tr>
                         <td colspan="6" style="padding: 15px; text-align: center; color: #64748b;">Cargando usuarios...</td>
@@ -362,13 +363,16 @@
         </div>
     </div>
 
-    <div style="text-align: right; margin-bottom: 2rem;">
+    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.75rem; margin-bottom: 2rem;">
+        <button type="button" id="btn-mostrar-formulario-edicion" onclick="mostrarFormularioEdicion()" style="background: #f59e0b; color: white; border: none; padding: 12px 20px; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; transition: background 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            ✏️ Editar Colaborador
+        </button>
         <button type="button" id="btn-mostrar-formulario-registro" onclick="mostrarFormularioRegistro()" style="background: #3b82f6; color: white; border: none; padding: 12px 20px; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; transition: background 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
             👤 Registrar Nuevo Colaborador
         </button>
     </div>
 
-    <div id="contenedor-formulario-registro" style="display: none; border-top: 2px dashed #cbd5e1; padding-top: 2rem;">
+    <div id="contenedor-formulario-registro" style="display: none; border-top: 2px dashed #cbd5e1; padding-top: 2rem; margin-bottom: 2rem;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.75rem;">
             <h2 style="color: #1e293b; margin: 0; font-size: 1.3rem; font-weight: 700;">👤 Registrar Nuevo Colaborador</h2>
         </div>
@@ -409,27 +413,94 @@
                 <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Contraseña de Ingreso:</label>
                 <div style="position: relative; display: flex; align-items: center;">
                     <input type="password" id="reg-contrasenia" required placeholder="Escriba la contraseña" style="width: 100%; padding: 10px; padding-right: 45px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
-                    <button type="button" onclick="toggleVisibilidadPassword()" style="position: absolute; right: 5px; background: none; border: none; cursor: pointer; padding: 8px; color: #64748b; font-size: 1.1rem; display: flex; align-items: center; justify-content: center;">
+                    <button type="button" onclick="toggleVisibilidadPassword('reg-contrasenia')" style="position: absolute; right: 5px; background: none; border: none; cursor: pointer; padding: 8px; color: #64748b; font-size: 1.1rem; display: flex; align-items: center; justify-content: center;">
                         👁️
                     </button>
                 </div>
             </div>
 
-<div style="display: flex; gap: 1rem;">
-    <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
-        <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Departamento:</label>
-        <select id="reg-departamento" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; height: 42px; background: white;">
-            <option value="">Seleccione un departamento...</option>
-            </select>
-    </div>
-    </div>
+            <div style="display: flex; gap: 1rem;">
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
+                    <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Departamento:</label>
+                    <select id="reg-departamento" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; height: 42px; background: white;">
+                        <option value="">Seleccione un departamento...</option>
+                    </select>
+                </div>
+            </div>
 
             <button type="submit" style="background: #22c55e; color: white; border: none; padding: 14px; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 0.5rem; transition: background 0.2s; display: flex; justify-content: center; align-items: center; gap: 0.5rem;">
                 💾 Guardar Colaborador en Sistema
             </button>
         </form>
     </div>
+
+    <div id="contenedor-formulario-edicion" style="display: none; border-top: 2px dashed #cbd5e1; padding-top: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.75rem;">
+            <h2 style="color: #1e293b; margin: 0; font-size: 1.3rem; font-weight: 700;">✏️ Editar Colaborador Seleccionado</h2>
+        </div>
+        
+        <form id="form-edicion-usuario" onsubmit="actualizarUsuario(event)" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1.25rem;">
+            <input type="hidden" id="edit-id">
+
+            <div style="display: flex; align-items: center; gap: 1.5rem; background: #f8fafc; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                <img id="edit-preview-foto" src="https://via.placeholder.com/60" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #cbd5e1;">
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
+                    <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Cambiar Foto de Perfil (Opcional):</label>
+                    <input type="file" id="edit-foto" accept="image/*" style="width: 100%; padding: 5px; border: 1px solid #cbd5e1; border-radius: 4px; background: white;">
+                </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+                <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Nombre Completo:</label>
+                <input type="text" id="edit-nombre" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+            </div>
+
+            <div style="display: flex; gap: 1rem;">
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
+                    <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Cédula de Identidad:</label>
+                    <input type="text" id="edit-cedula" required minlength="10" maxlength="10" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+                </div>
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
+                    <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Celular:</label>
+                    <input type="tel" id="edit-celular" required minlength="10" maxlength="10" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+                </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+                <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Correo Electrónico:</label>
+                <input type="email" id="edit-correo" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+                <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Dirección de Domicilio:</label>
+                <input type="text" id="edit-direccion" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+                <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Contraseña (Dejar en blanco para mantener la actual):</label>
+                <div style="position: relative; display: flex; align-items: center;">
+                    <input type="password" id="edit-contrasenia" placeholder="Escriba una nueva contraseña si desea cambiarla" style="width: 100%; padding: 10px; padding-right: 45px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+                    <button type="button" onclick="toggleVisibilidadPassword('edit-contrasenia')" style="position: absolute; right: 5px; background: none; border: none; cursor: pointer; padding: 8px; color: #64748b; font-size: 1.1rem; display: flex; align-items: center; justify-content: center;">
+                        👁️
+                    </button>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem;">
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
+                    <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Departamento / Rol Asignado:</label>
+                    <select id="edit-departamento" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; height: 42px; background: white;"></select>
+                </div>
+            </div>
+
+            <button type="submit" style="background: #f59e0b; color: white; border: none; padding: 14px; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 0.5rem; transition: background 0.2s; display: flex; justify-content: center; align-items: center; gap: 0.5rem;">
+                💾 Actualizar Cambios del Colaborador
+            </button>
+        </form>
+    </div>
 </div>
+
+
 
 
 
@@ -1451,11 +1522,10 @@ async function eliminarDocEmpresa(id) {
 }
 
 
-
-
-
-
 //ADMINS MENUUUUU
+
+// Variable global para almacenar temporalmente los usuarios y autocompletar la edición sin re-consultar la API
+let listaUsuariosLocal = [];
 
 // Función para alternar entre las diferentes secciones de tu panel
 function mostrarSeccion(seccionId) {
@@ -1463,7 +1533,7 @@ function mostrarSeccion(seccionId) {
 
     // 1. Ocultamos TODAS las secciones principales y las vistas dinámicas (.view-section)
     const contenedores = document.querySelectorAll('section, .content-section, .view-section, [id^="sec-"]');
-    contenedores.forEach(contenedor => {
+    containers.forEach(contenedor => {
         contenedor.style.display = 'none';
     });
 
@@ -1490,7 +1560,6 @@ async function registrarUsuario(event) {
     const correoInput = document.getElementById('reg-correo').value.trim().toLowerCase(); 
     const direccionInput = document.getElementById('reg-direccion').value.trim();
     const contraseniaInput = document.getElementById('reg-contrasenia').value; 
-    
     const departamentoInput = document.getElementById('reg-departamento').value;
     const fotoInput = document.getElementById('reg-foto').files[0]; 
 
@@ -1533,7 +1602,7 @@ async function registrarUsuario(event) {
     formData.append('correo', correoInput);
     formData.append('direccion', direccionInput);
     formData.append('contrasenia', contraseniaInput); 
-    formData.append('departamento', departamentoInput); // Se sigue enviando bajo esta llave porque el backend la extrae de req.body para validarla e igualarla a rol
+    formData.append('departamento', departamentoInput); 
     formData.append('rol_asignado', departamentoInput); 
     
     if (fotoInput) {
@@ -1573,14 +1642,12 @@ async function registrarUsuario(event) {
     }
 }
 
-
 // Función para cargar los departamentos desde la base de datos
 async function cargarDepartamentos() {
     const selectDepto = document.getElementById('reg-departamento');
     if (!selectDepto) return;
 
     try {
-        // Hacemos la petición usando la variable global API_URL de tu panel
         const respuesta = await fetch(`${API_URL}/departamentos`);
         
         if (!respuesta.ok) {
@@ -1589,14 +1656,12 @@ async function cargarDepartamentos() {
         
         const departamentos = await respuesta.json();
         
-        // Limpiamos el indicador de carga
-        selectDepto.innerHTML = '<option value="">Seleccione un departamento</option>';
+        selectDepto.innerHTML = '<option value="">Seleccione un departamento...</option>';
         
-        // Llenamos las opciones usando el nombre del departamento como valor
         departamentos.forEach(depto => {
             const option = document.createElement('option');
-            option.value = depto.nombre;       // <-- CAMBIO: Ahora envía el texto (ej: "Sistemas", "Contabilidad")
-            option.textContent = depto.nombre; // Muestra el nombre visible al usuario
+            option.value = depto.nombre;       
+            option.textContent = depto.nombre; 
             selectDepto.appendChild(option);
         });
 
@@ -1606,32 +1671,15 @@ async function cargarDepartamentos() {
     }
 }
 
-// Ejecutar la función cuando el documento esté completamente listo
-document.addEventListener('DOMContentLoaded', () => {
-    cargarDepartamentos();
-});
-
-// Ejecutar la carga de departamentos automáticamente cuando el archivo cargue
-document.addEventListener('DOMContentLoaded', () => {
-    cargarDepartamentos();
-});
-
-
-
-//ara activar el funcionamiento interactivo del botón del ojo (👁️):
-function toggleVisibilidadPassword() {
-    const inputPass = document.getElementById('reg-contrasenia');
-    if (inputPass.type === 'password') {
-        inputPass.type = 'text';
-    } else {
-        inputPass.type = 'password';
+// Función polivalente para alternar el ojo de las contraseñas (Pasando el ID del Input como string)
+function toggleVisibilidadPassword(inputId) {
+    const inputPass = document.getElementById(inputId);
+    if (inputPass) {
+        inputPass.type = inputPass.type === 'password' ? 'text' : 'password';
     }
 }
 
-
-
-
-
+// Función para renderizar y actualizar el listado de usuarios con la columna Acciones
 async function cargarUsuariosSistema() {
     const tbody = document.getElementById('tbody-usuarios-sistema');
     if (!tbody) return;
@@ -1649,57 +1697,184 @@ async function cargarUsuariosSistema() {
         }
 
         const usuarios = await respuesta.json();
+        listaUsuariosLocal = usuarios; // Guardamos en memoria local para agilizar la edición rápida
         
         if (usuarios.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" style="padding: 15px; text-align: center; color: #64748b;">No hay usuarios registrados aún.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="6" style="padding: 15px; text-align: center; color: #64748b;">No hay usuarios registrados aún.</td></tr>`;
             return;
         }
 
-        tbody.innerHTML = ''; // Limpiar mensaje de carga
+        tbody.innerHTML = ''; 
         usuarios.forEach(user => {
             const tr = document.createElement('tr');
             tr.style.borderBottom = '1px solid #e2e8f0';
             
-            // Reemplazar URL de foto por defecto si falla o viene vacía
             const fotoUrl = user.foto_url ? user.foto_url : 'https://via.placeholder.com/40';
 
-            // 🌟 CORRECCIÓN: Dejamos una sola celda para el Rol/Departamento (Total: 5 columnas)
+            // Renderizamos 6 columnas acopladas perfectamente al HTML adaptado
             tr.innerHTML = `
                 <td style="padding: 8px;"><img src="${fotoUrl}" alt="Foto" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"></td>
                 <td style="padding: 8px; font-weight: 500; color: #1e293b;">${user.nombre_completo}</td>
                 <td style="padding: 8px; color: #475569;">${user.cedula}</td>
                 <td style="padding: 8px; color: #475569;">${user.correo}</td>
                 <td style="padding: 8px;"><span style="background: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold;">${user.rol}</span></td>
+                <td style="padding: 8px; text-align: center;">
+                    <button onclick="prepararEdicion('${user.id}')" style="background: #f59e0b; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; transition: background 0.2s;">✏️ Editar</button>
+                </td>
             `;
             tbody.appendChild(tr);
         });
 
     } catch (error) {
         console.error("❌ Error al cargar usuarios:", error);
-        tbody.innerHTML = `<tr><td colspan="5" style="padding: 15px; text-align: center; color: #ef4444; font-weight: bold;">Error al cargar el listado.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="padding: 15px; text-align: center; color: #ef4444; font-weight: bold;">Error al cargar el listado.</td></tr>`;
     }
 }
 
-
+// Alternar visualización del formulario de registro
 function mostrarFormularioRegistro() {
     const contenedorForm = document.getElementById('contenedor-formulario-registro');
+    const contenedorEdicion = document.getElementById('contenedor-formulario-edicion');
     const boton = document.getElementById('btn-mostrar-formulario-registro');
+    const botonEdicion = document.getElementById('btn-mostrar-formulario-edicion');
     
     if (contenedorForm) {
         if (contenedorForm.style.display === 'none' || contenedorForm.style.display === '') {
             contenedorForm.style.display = 'block';
+            if (contenedorEdicion) contenedorEdicion.style.display = 'none'; // Cerrar edición alternada
             contenedorForm.scrollIntoView({ behavior: 'smooth' });
-            
-            // Cambia el texto cuando está abierto
             if (boton) boton.innerHTML = '❌ Cerrar Formulario de Registro';
+            if (botonEdicion) botonEdicion.innerHTML = '✏️ Editar Colaborador';
         } else {
             contenedorForm.style.display = 'none';
-            
-            // Restaura el texto original cuando se cierra
             if (boton) boton.innerHTML = '👤 Registrar Nuevo Colaborador';
         }
     }
 }
+
+// Alternar visualización del formulario de edición (Botón superior)
+function mostrarFormularioEdicion() {
+    const contenedorEdicion = document.getElementById('contenedor-formulario-edicion');
+    const contenedorRegistro = document.getElementById('contenedor-formulario-registro');
+    const boton = document.getElementById('btn-mostrar-formulario-edicion');
+    const botonRegistro = document.getElementById('btn-mostrar-formulario-registro');
+    
+    if (contenedorEdicion) {
+        if (contenedorEdicion.style.display === 'none' || contenedorEdicion.style.display === '') {
+            contenedorEdicion.style.display = 'block';
+            if (contenedorRegistro) contenedorRegistro.style.display = 'none'; // Cerrar registro alternado
+            contenedorEdicion.scrollIntoView({ behavior: 'smooth' });
+            if (boton) boton.innerHTML = '❌ Cerrar Panel de Edición';
+            if (botonRegistro) botonRegistro.innerHTML = '👤 Registrar Nuevo Colaborador';
+        } else {
+            contenedorEdicion.style.display = 'none';
+            if (boton) boton.innerHTML = '✏️ Editar Colaborador';
+        }
+    }
+}
+
+// Extraer datos del usuario y prepararlos en los campos de edición
+function prepararEdicion(usuarioId) {
+    const usuario = listaUsuariosLocal.find(u => String(u.id) === String(usuarioId));
+    if (!usuario) {
+        alert("No se pudieron encontrar los datos locales del colaborador.");
+        return;
+    }
+
+    // Forzar apertura exclusiva del panel de edición
+    document.getElementById('contenedor-formulario-edicion').style.display = 'block';
+    document.getElementById('contenedor-formulario-registro').style.display = 'none';
+    document.getElementById('btn-mostrar-formulario-edicion').innerHTML = '❌ Cerrar Panel de Edición';
+    document.getElementById('btn-mostrar-formulario-registro').innerHTML = '👤 Registrar Nuevo Colaborador';
+
+    // Rellenar inputs
+    document.getElementById('edit-id').value = usuario.id;
+    document.getElementById('edit-nombre').value = usuario.nombre_completo;
+    document.getElementById('edit-cedula').value = usuario.cedula;
+    document.getElementById('edit-celular').value = usuario.celular || '';
+    document.getElementById('edit-correo').value = usuario.correo;
+    document.getElementById('edit-direccion').value = usuario.direccion || '';
+    document.getElementById('edit-contrasenia').value = ''; // Vacío por política de seguridad
+    document.getElementById('edit-preview-foto').src = usuario.foto_url || 'https://via.placeholder.com/60';
+
+    // Sincronizar el selector dinámico clonando opciones del de registro
+    const selectReg = document.getElementById('reg-departamento');
+    const selectEdit = document.getElementById('edit-departamento');
+    if (selectReg && selectEdit) {
+        selectEdit.innerHTML = selectReg.innerHTML;
+        selectEdit.value = usuario.rol; 
+    }
+
+    document.getElementById('contenedor-formulario-edicion').scrollIntoView({ behavior: 'smooth' });
+}
+
+// Ejecutar el envío AJAX de la edición mediante método PUT
+async function actualizarUsuario(event) {
+    event.preventDefault();
+
+    const id = document.getElementById('edit-id').value;
+    const nombreInput = document.getElementById('edit-nombre').value.trim();
+    const cedulaInput = document.getElementById('edit-cedula').value.trim();
+    const celularInput = document.getElementById('edit-celular').value.trim();
+    const correoInput = document.getElementById('edit-correo').value.trim().toLowerCase();
+    const direccionInput = document.getElementById('edit-direccion').value.trim();
+    const contraseniaInput = document.getElementById('edit-contrasenia').value;
+    const departamentoInput = document.getElementById('edit-departamento').value;
+    const fotoInput = document.getElementById('edit-foto').files[0];
+
+    if (!id || !nombreInput || !cedulaInput || !celularInput || !correoInput || !direccionInput || !departamentoInput) {
+        alert("Por favor rellene todos los campos requeridos para procesar la actualización.");
+        return;
+    }
+
+    const nombreFormateado = nombreInput.split(/\s+/).map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase()).join(' ');
+
+    const regexSoloNumeros = /^\d{10}$/;
+    if (!regexSoloNumeros.test(cedulaInput) || !regexSoloNumeros.test(celularInput)) {
+        alert("La cédula y el celular deben tener exactamente 10 dígitos numéricos enteros.");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('nombre_completo', nombreFormateado);
+    formData.append('cedula', cedulaInput);
+    formData.append('celular', celularInput);
+    formData.append('correo', correoInput);
+    formData.append('direccion', direccionInput);
+    formData.append('rol', departamentoInput); 
+    
+    if (contraseniaInput) formData.append('contrasenia', contraseniaInput);
+    if (fotoInput) formData.append('foto', fotoInput);
+
+    try {
+        const respuesta = await fetch(`${API_URL}/usuarios/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: formData
+        });
+
+        const resultado = await respuesta.json();
+        if (!respuesta.ok) throw new Error(resultado.error || 'Error en la actualización');
+
+        alert("¡Colaborador actualizado con éxito!");
+        document.getElementById('form-edicion-usuario').reset();
+        document.getElementById('contenedor-formulario-edicion').style.display = 'none';
+        document.getElementById('btn-mostrar-formulario-edicion').innerHTML = '✏️ Editar Colaborador';
+
+        cargarUsuariosSistema(); // Actualiza la vista en tiempo real sin recargar la página
+    } catch (error) {
+        console.error("Error al actualizar usuario:", error);
+        alert("No se pudo completar la edición: " + error.message);
+    }
+}
+
+// Inicialización unificada de eventos al cargar el documento
+document.addEventListener('DOMContentLoaded', () => {
+    cargarDepartamentos();
+    cargarUsuariosSistema(); // Opcional: Carga la nómina directo al iniciar si la sección está por defecto
+});
 </script>
 </body>
 </html>
