@@ -326,7 +326,7 @@
             </table>
         </div>
     </div> 
-</div> <div id="view-registrar-usuarios" class="view-section" style="padding: 25px; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 900px; width: 100%; margin: 20px auto; display: none; box-sizing: border-box;">
+<div id="view-registrar-usuarios" class="view-section" style="padding: 25px; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 900px; width: 100%; margin: 20px auto; display: none; box-sizing: border-box;">
     
     <div style="margin-bottom: 1.5rem;">
         <h3 style="color: #1e293b; margin-top: 0; margin-bottom: 1rem; font-size: 1.3rem; font-weight: 700; border-bottom: 2px solid #3b82f6; padding-bottom: 0.5rem;">
@@ -334,7 +334,7 @@
         </h3>
         <div class="table-responsive" style="max-height: 300px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 6px;">
             <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
-                <thead style="background: #f8fafc; position: sticky; top: 0; z-index: 10;">
+                <head style="background: #f8fafc; position: sticky; top: 0; z-index: 10;">
                     <tr style="border-bottom: 2px solid #e2e8f0; text-align: left;">
                         <th style="padding: 10px;">Foto</th>
                         <th style="padding: 10px;">Nombre Completo</th>
@@ -354,9 +354,6 @@
     </div>
 
     <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.75rem; margin-bottom: 2rem;">
-        <button type="button" id="btn-mostrar-formulario-edicion" onclick="mostrarFormularioEdicion()" style="background: #f59e0b; color: white; border: none; padding: 12px 20px; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; transition: background 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-            ✏️ Editar Colaborador
-        </button>
         <button type="button" id="btn-mostrar-formulario-registro" onclick="mostrarFormularioRegistro()" style="background: #3b82f6; color: white; border: none; padding: 12px 20px; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; transition: background 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
             👤 Registrar Nuevo Colaborador
         </button>
@@ -427,6 +424,9 @@
     <div id="contenedor-formulario-edicion" style="display: none; border-top: 2px dashed #cbd5e1; padding-top: 2rem;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.75rem;">
             <h2 style="color: #1e293b; margin: 0; font-size: 1.3rem; font-weight: 700;">✏️ Panel de Edición de Colaboradores</h2>
+            <button type="button" onclick="document.getElementById('contenedor-formulario-edicion').style.display = 'none';" style="background: none; border: none; font-size: 1.5rem; color: #64748b; cursor: pointer; padding: 5px; transition: color 0.2s;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#64748b'">
+                ✖️
+            </button>
         </div>
         
         <div style="background: #f1f5f9; padding: 15px; border-radius: 6px; border: 1px solid #cbd5e1; margin-bottom: 1.5rem;">
@@ -496,7 +496,13 @@
                 💾 Actualizar Cambios del Colaborador
             </button>
         </form>
-    </div> </div> <div id="modal-expediente" class="modal">
+    </div> 
+</div>
+    
+    
+    
+    
+    <div id="modal-expediente" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="cerrarModal()">&times;</span>
         <h2 id="modal-emp-name" style="margin-top: 0; color: #1e293b; margin-bottom: 4px;">Expediente Digital</h2>
