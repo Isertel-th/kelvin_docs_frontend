@@ -56,24 +56,23 @@
             padding: 2rem;
             box-sizing: border-box;
             
-            /* Configuración del fondo solicitado */
-            background-color: #000000; /* Rellena el sobrante con color negro */
-            background-image: url('tech.gif'); /* Tu archivo GIF */
-            background-repeat: no-repeat; /* Evita que el GIF se duplique */
-            background-position: center center; /* Lo mantiene perfectamente centrado */
-            background-size: contain; /* Ajusta el GIF al alto/ancho de la pantalla sin cortarse ni estirarse */
+            background-color: #000000; 
+            background-image: url('tech.gif'); 
+            background-repeat: no-repeat; 
+            background-position: center center; 
+            background-size: contain; 
         }
 
         .welcome-screen.active {
             display: flex;
         }
 
-        /* Imagen/Logo principal (logge.png) */
+        /* Imagen/Logo principal reducida para un mejor balance visual */
         .welcome-img {
-            max-width: 550px; 
-            width: 90%;
+            max-width: 320px; /* Reducido de 550px a 320px */
+            width: 80%;
             height: auto;
-            margin-bottom: 3rem;
+            margin-bottom: 2.5rem;
             animation: popIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
             opacity: 0;
             z-index: 2;
@@ -83,13 +82,12 @@
         .animated-text {
             font-size: 42px; 
             font-weight: 800;
-            color: #000000; /* Negro absoluto solicitado */
+            color: #000000; 
             margin: 0;
             padding: 0;
             display: block;
             line-height: 1.4;
             z-index: 2;
-            /* Sombra blanca sutil que actúa como borde para que se lea perfectamente sobre el GIF */
             text-shadow: 
                 -2px -2px 8px rgba(255, 255, 255, 0.9),  
                  2px -2px 8px rgba(255, 255, 255, 0.9),
@@ -155,7 +153,6 @@
                 localStorage.setItem('rol', data.rol);
                 localStorage.setItem('nombre', data.nombre);
                 
-                // Ejecuta la animación y el cambio de fondo
                 ejecutarTransicionBienvenida();
             } else {
                 mensaje.innerText = data.error || "Error en los datos";
@@ -188,11 +185,11 @@
                 const span = document.createElement('span');
                 span.classList.add('word');
                 span.innerHTML = palabra + '&nbsp;'; 
-                span.style.animationDelay = `${index * 0.25}s`; // Ligero ajuste para sincronizar mejor el ritmo
+                span.style.animationDelay = `${index * 0.25}s`; 
                 welcomeText.appendChild(span);
             });
 
-            // 4. Redirección automática tras 4 segundos (tiempo ideal para apreciar el GIF y el texto)
+            // 4. Redirección automática tras 4 segundos
             setTimeout(() => {
                 window.location.href = 'panel.html';
             }, 4000);
