@@ -229,19 +229,15 @@
 
 <div id="view-modificar" class="view-section">
     <div class="card">
-        <h3>Modificar Colaborador (Nómina / Pasivos)</h3>
-        <p style="color: #64748b; font-size: 14px; margin-bottom: 1rem;">Corrige de forma directa los detalles o errores de registro de cualquier colaborador activo o pasivo.</p>
+        <h3>Modificar Colaborador Activo</h3>
+        <p style="color: #64748b; font-size: 14px; margin-bottom: 1rem;">Corrige de forma directa los detalles o errores de registro de cualquier colaborador en nómina activa.</p>
         
         <div class="grid-form" style="margin-bottom: 1.5rem; background: #f1f5f9; padding: 1rem; border-radius: 8px;">
-            <div>
-                <label style="font-weight: bold;">1. Tipo de Estado:</label>
-                <select id="m_tipo_tabla" onchange="prepararModuloModificar()" style="border: 2px solid var(--admin-color);">
-                    <option value="nomina">👥 Personal Activo (Nómina)</option>
-                    <option value="pasivos">📁 Personal Pasivo (Histórico)</option>
-                </select>
-            </div>
-            <div>
-                <label style="font-weight: bold;">2. Seleccionar Colaborador:</label>
+            <!-- Forzamos de forma oculta el valor 'nomina' para que tus funciones JS sigan operando correctamente sin romperse -->
+            <input type="hidden" id="m_tipo_tabla" value="nomina">
+            
+            <div style="grid-column: span 2;">
+                <label style="font-weight: bold;">Seleccionar Colaborador Activo:</label>
                 <select id="m_select_empleado" onchange="cargarDatosEmpleadoEnFormulario()" style="border: 2px solid var(--primary-color);">
                     <option value="">-- Seleccione un empleado --</option>
                 </select>
@@ -290,6 +286,8 @@
         </form>
     </div>
 </div>
+
+
 
 <div id="view-empresa" class="view-section">
     <div class="card">
@@ -1267,20 +1265,29 @@ if (tipoSeleccionado === "Certificados Médicos" || tipoSeleccionado === "Certif
         }
         // Variable global para almacenar el listado de empleados cargados para modificar
 // Variable global para almacenar temporalmente los colaboradores cargados
+// Variable global para almacenar el listado de empleados cargados para modificar
 let empleadosModificarList = [];
 
-// Carga la lista correspondiente (activos o pasivos) en el select dependiente
+// Carga la lista correspondiente (Solo activos autorizados para modificar)
 async function prepararModuloModificar() {
     const tablaSeleccionada = document.getElementById('m_tipo_tabla').value;
     const select = document.getElementById('m_select_empleado');
     const form = document.getElementById('form-modificar-usuario');
     
+    // RESTRICCIÓN FRONTEND: Bloquear la selección de pasivos de forma amigable
+    if (tablaSeleccionada === 'pasivos') {
+        alert("Los registros de personal pasivo son históricos y no se pueden modificar de forma directa.");
+        document.getElementById('m_tipo_tabla').value = 'nomina'; // Revertir selección
+        prepararModuloModificar(); // Recargar nómina activa
+        return;
+    }
+
     // Limpiar estados previos
     select.innerHTML = '<option value="">-- Seleccione un empleado --</option>';
     form.style.display = 'none';
     form.reset();
 
-    // Determinar endpoint de consulta según la selección
+    // Determinar endpoint de consulta según la selección (aquí siempre será /admin/empleados por el bloqueo)
     const rutaEndpoint = tablaSeleccionada === 'nomina' ? '/admin/empleados' : '/admin/pasivos';
 
     try {
@@ -1342,6 +1349,13 @@ async function actualizarUsuario(event) {
     
     const id = document.getElementById('m_id').value;
     const tablaTarget = document.getElementById('m_tipo_tabla').value; // 'nomina' o 'pasivos'
+    
+    // SEGUNDO CANDADO DE SEGURIDAD: Evita el envío si por alguna razón la tabla es 'pasivos'
+    if (tablaTarget === 'pasivos') {
+        alert("Acción denegada: No está permitido modificar datos de personal pasivo.");
+        return;
+    }
+
     const formData = new FormData();
     
     formData.append('cedula', document.getElementById('m_cedula').value);
@@ -1357,7 +1371,6 @@ async function actualizarUsuario(event) {
     }
 
     try {
-        // Se envía a /api/admin/modificar-usuario/nomina/:id  O  /api/admin/modificar-usuario/pasivos/:id
         const res = await fetch(`${API_URL}/admin/modificar-usuario/${tablaTarget}/${id}`, {
             method: 'PUT',
             headers: { 'Authorization': `Bearer ${token}` },
@@ -1370,7 +1383,6 @@ async function actualizarUsuario(event) {
             alert("¡Registro actualizado con éxito en la base de datos!");
             prepararModuloModificar(); // Recargar la lista actual
             
-            // Refrescar vistas generales si las funciones existen en tu panel
             if (typeof cargarEmpleados === 'function') cargarEmpleados();
             if (typeof cargarPasivos === 'function') cargarPasivos();
         } else {
