@@ -128,10 +128,7 @@
                 <button class="nav-btn role-admin" id="menu-crear" onclick="switchView('crear')">➕ Registrar Empleado</button>
                 <button class="nav-btn role-admin" id="menu-modificar" onclick="switchView('modificar'); prepararModuloModificar();">✏️ Modificar Empleado</button>
                 <button class="nav-btn role-admin" id="menu-empresa" onclick="switchView('empresa')">🏢 Docs Empresa</button>
-<button id="btn-registrar-usuarios" class="nav-btn" onclick="switchView('registrar-usuarios')" style="display: none;">
-    👤 Usuarios
-</button>
-
+                <button id="btn-registrar-usuarios" class="nav-btn" onclick="switchView('registrar-usuarios')" style="display: none;">👤 Usuarios</button>
             </div>
         </div>
         <div>
@@ -294,49 +291,42 @@
     </div>
 </div>
 
-
 <div id="view-empresa" class="view-section">
-                <div class="card">
-                    <h3>Subir Documento Institucional / Empresa</h3>
-                    <form id="form-empresa" onsubmit="subirDocEmpresa(event)">
-                        <div class="grid-form">
-                            <div>
-                                <label>Tipo de Documento:</label>
-                                <input type="text" id="emp_tipo" placeholder="Ej. Reglamento Interno, Políticas" required>
-                            </div>
-                            <div>
-                                <label>Archivo (PDF/Imagen):</label>
-                                <input type="file" id="emp_archivo" accept=".pdf" class="form-control" />
-                            </div>
-                        </div>
-                        <button type="submit" class="btn-submit">Subir Archivo General</button>
-                    </form>
+    <div class="card">
+        <h3>Subir Documento Institucional / Empresa</h3>
+        <form id="form-empresa" onsubmit="subirDocEmpresa(event)">
+            <div class="grid-form">
+                <div>
+                    <label>Tipo de Documento:</label>
+                    <input type="text" id="emp_tipo" placeholder="Ej. Reglamento Interno, Políticas" required>
                 </div>
+                <div>
+                    <label>Archivo (PDF/Imagen):</label>
+                    <input type="file" id="emp_archivo" accept=".pdf" class="form-control" />
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Subir Archivo General</button>
+        </form>
+    </div>
 
-                <div class="card">
-                    <h3>Repositorio Corporativo</h3>
-                    <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Tipo de Documento / Metadata</th>
-                                    <th>Fecha de Subida</th>
-                                    <th>Enlaces de Acceso</th>
-                                    <th>Acción</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-empresa"></tbody>
-                        </table>
-                    </div>
-                </div> 
-            </div> 
-            
-            
-            
-            
-            
-<div id="view-registrar-usuarios" class="view-section" style="padding: 25px; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 900px; width: 100%; margin: 20px auto; display: none; box-sizing: border-box;">
+    <div class="card">
+        <h3>Repositorio Corporativo</h3>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tipo de Documento / Metadata</th>
+                        <th>Fecha de Subida</th>
+                        <th>Enlaces de Acceso</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-empresa"></tbody>
+            </table>
+        </div>
+    </div> 
+</div> <div id="view-registrar-usuarios" class="view-section" style="padding: 25px; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 900px; width: 100%; margin: 20px auto; display: none; box-sizing: border-box;">
     
     <div style="margin-bottom: 1.5rem;">
         <h3 style="color: #1e293b; margin-top: 0; margin-bottom: 1rem; font-size: 1.3rem; font-weight: 700; border-bottom: 2px solid #3b82f6; padding-bottom: 0.5rem;">
@@ -436,10 +426,19 @@
 
     <div id="contenedor-formulario-edicion" style="display: none; border-top: 2px dashed #cbd5e1; padding-top: 2rem;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.75rem;">
-            <h2 style="color: #1e293b; margin: 0; font-size: 1.3rem; font-weight: 700;">✏️ Editar Colaborador Seleccionado</h2>
+            <h2 style="color: #1e293b; margin: 0; font-size: 1.3rem; font-weight: 700;">✏️ Panel de Edición de Colaboradores</h2>
         </div>
         
-        <form id="form-edicion-usuario" onsubmit="actualizarUsuario(event)" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1.25rem;">
+        <div style="background: #f1f5f9; padding: 15px; border-radius: 6px; border: 1px solid #cbd5e1; margin-bottom: 1.5rem;">
+            <label style="font-weight: 700; color: #1e293b; font-size: 0.95rem; display: block; margin-bottom: 0.5rem;">
+                🔍 Seleccione el usuario que desea modificar:
+            </label>
+            <select id="edit-selector-usuario" onchange="cargarDatosEnFormularioPorSelect(this.value)" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; height: 42px; background: white; font-weight: 500; color: #334155;">
+                <option value="">-- Elija un colaborador de la lista --</option>
+            </select>
+        </div>
+
+        <form id="form-edicion-usuario" onsubmit="actualizarUsuario(event)" enctype="multipart/form-data" style="display: none; flex-direction: column; gap: 1.25rem;">
             <input type="hidden" id="edit-id">
 
             <div style="display: flex; align-items: center; gap: 1.5rem; background: #f8fafc; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
@@ -497,134 +496,125 @@
                 💾 Actualizar Cambios del Colaborador
             </button>
         </form>
-    </div>
-</div>
+    </div> </div> <div id="modal-expediente" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="cerrarModal()">&times;</span>
+        <h2 id="modal-emp-name" style="margin-top: 0; color: #1e293b; margin-bottom: 4px;">Expediente Digital</h2>
+        <p style="font-weight: bold; color:#64748b; margin-bottom: 0.5rem;">Cédula: <span id="modal-emp-cedula"></span></p>
+        
+        <div id="section-paso1">
+            <h3 style="margin-top:0; color:#0f172a; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.75rem; font-size: 16px;">
+                📥 Selecciona el Tipo de Documento
+            </h3>
+            <div class="vector-grid" id="vector-container"></div>
+        </div>
 
-
-
-
-
-    <div id="modal-expediente" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="cerrarModal()">&times;</span>
-            <h2 id="modal-emp-name" style="margin-top: 0; color: #1e293b; margin-bottom: 4px;">Expediente Digital</h2>
-            <p style="font-weight: bold; color:#64748b; margin-bottom: 0.5rem;">Cédula: <span id="modal-emp-cedula"></span></p>
-            
-            <div id="section-paso1">
-                <h3 style="margin-top:0; color:#0f172a; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.75rem; font-size: 16px;">
-                    📥 Selecciona el Tipo de Documento
-                </h3>
-                <div class="vector-grid" id="vector-container"></div>
+        <div id="expediente-detalles" style="display: none; margin-top: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed #cbd5e1; padding-bottom: 1rem; margin-bottom: 1.5rem;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <button type="button" class="btn-action btn-clear" onclick="regresarAPaso1()" style="padding: 8px 12px; margin: 0; border-radius: 6px; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                        ⬅️ Volver
+                    </button>
+                    <h3 id="detalle-categoria-titulo" style="margin: 0; color: #1e293b; font-size: 18px;">Carpeta</h3>
+                </div>
+                <div>
+                    <button type="button" class="btn-action btn-upload" onclick="toggleUploadForm()" style="padding: 10px 20px; font-size: 14px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 0;">
+                        ➕ Subir Nuevo Documento
+                    </button>
+                </div>
             </div>
 
-            <div id="expediente-detalles" style="display: none; margin-top: 2rem;">
+            <form id="form-upload-doc" onsubmit="procesarSubidaDocumento(event)" style="display: none; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; margin-top: 0.5rem; margin-bottom: 2rem;">
+                <input type="hidden" id="upload-tipo-doc" required>
+                <h4 style="margin: 0 0 1rem 0; color: #475569; font-size: 14px;">📋 Paso 2: Completa los detalles del archivo</h4>
                 
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed #cbd5e1; padding-bottom: 1rem; margin-bottom: 1.5rem;">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <button type="button" class="btn-action btn-clear" onclick="regresarAPaso1()" style="padding: 8px 12px; margin: 0; border-radius: 6px; font-weight: 600; display: flex; align-items: center; gap: 4px;">
-                            ⬅️ Volver
-                        </button>
-                        <h3 id="detalle-categoria-titulo" style="margin: 0; color: #1e293b; font-size: 18px;">Carpeta</h3>
+                <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
+                    <div>
+                        <label>Subtipo Documento:</label>
+                        <select id="upload-subtipo-doc" required>
+                            <option value="General / Único">General / Único</option>
+                        </select>
                     </div>
                     <div>
-                        <button type="button" class="btn-action btn-upload" onclick="toggleUploadForm()" style="padding: 10px 20px; font-size: 14px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin: 0;">
-                            ➕ Subir Nuevo Documento
-                        </button>
+                        <label>Fecha Documento:</label>
+                        <input type="date" id="upload-doc-date" required>
+                    </div>
+                    <div style="grid-column: span 1;">
+                        <label>Archivo (Solo PDF):</label>
+                        <input type="file" id="upload-file" accept=".pdf" required style="padding: 7px;">
                     </div>
                 </div>
+                
+                <div style="margin-top: 1.25rem; text-align: right;">
+                    <button type="submit" class="btn-submit" style="padding:10px 24px; font-size:14px; border-radius: 8px;">🚀 Indexar y Subir Archivo</button>
+                </div>
+            </form>
 
-                <form id="form-upload-doc" onsubmit="procesarSubidaDocumento(event)" style="display: none; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; margin-top: 0.5rem; margin-bottom: 2rem;">
-                    <input type="hidden" id="upload-tipo-doc" required>
-                    <h4 style="margin: 0 0 1rem 0; color: #475569; font-size: 14px;">📋 Paso 2: Completa los detalles del archivo</h4>
-                    
-                    <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
-                        <div>
-                            <label>Subtipo Documento:</label>
-                            <select id="upload-subtipo-doc" required>
-                                <option value="General / Único">General / Único</option>
+            <div class="table-responsive" style="flex-grow: 1; overflow-y: auto; border: 1px solid #cbd5e1; border-radius: 8px; min-height: 150px;">
+                <table class="table-compacta" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>Nombre de Archivo</th>
+                            <th>Fecha Doc.</th>
+                            <th>Ver</th>
+                            <th class="role-admin">Eliminar</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-docs-empleado"></tbody>
+                </table>
+            </div>
+
+            <div class="card" style="background: #f1f5f9; padding: 1.25rem; margin-top: 1rem; margin-bottom: 0; border: 1px solid #cbd5e1;">
+                <h4 style="margin: 0 0 0.75rem 0; color: #334155; font-size: 14px;">🔍 Filtros Integrados:</h4>
+                <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.5rem; margin-bottom: 0; align-items: flex-end;">
+                    <div style="display: none;">
+                        <label style="margin-bottom:2px;">Categoría:</label>
+                        <select id="filter-doc-tipo" onchange="actualizarSubtipos('filter'); filtrarDocumentos();"></select>
+                    </div>
+                    <div>
+                        <label style="margin-bottom:2px;">Subcategoría:</label>
+                        <select id="filter-doc-subtipo" onchange="filtrarDocumentos()">
+                            <option value="TODOS">-- Todos --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="margin-bottom:2px;">Filtrar por Periodo (Mes/Año):</label>
+                        <div style="display: flex; gap: 5px;">
+                            <select id="filter-mes" onchange="filtrarDocumentos()" style="width: 100%;">
+                                <option value="">- Mes -</option>
+                                <option value="01">Enero</option>
+                                <option value="02">Febrero</option>
+                                <option value="03">Marzo</option>
+                                <option value="04">Abril</option>
+                                <option value="05">Mayo</option>
+                                <option value="06">Junio</option>
+                                <option value="07">Julio</option>
+                                <option value="08">Agosto</option>
+                                <option value="09">Septiembre</option>
+                                <option value="10">Octubre</option>
+                                <option value="11">Noviembre</option>
+                                <option value="12">Diciembre</option>
+                            </select>
+                            <select id="filter-anio" onchange="filtrarDocumentos()" style="width: 100%;">
+                                <option value="">- Año -</option>
+                                <option value="2024">2024</option>
+                                <option value="2025">2025</option>
+                                <option value="2026">2026</option>
+                                <option value="2027">2027</option>
+                                <option value="2028">2028</option>
+                                <option value="2029">2029</option>
+                                <option value="2030">2030</option>
                             </select>
                         </div>
-                        <div>
-                            <label>Fecha Documento:</label>
-                            <input type="date" id="upload-doc-date" required>
-                        </div>
-                        <div style="grid-column: span 1;">
-                            <label>Archivo (Solo PDF):</label>
-                            <input type="file" id="upload-file" accept=".pdf" required style="padding: 7px;">
-                        </div>
                     </div>
-                    
-                    <div style="margin-top: 1.25rem; text-align: right;">
-                        <button type="submit" class="btn-submit" style="padding:10px 24px; font-size:14px; border-radius: 8px;">🚀 Indexar y Subir Archivo</button>
-                    </div>
-                </form>
-
-                <div class="table-responsive" style="flex-grow: 1; overflow-y: auto; border: 1px solid #cbd5e1; border-radius: 8px; min-height: 150px;">
-                    <table class="table-compacta" style="width: 100%;">
-                        <thead>
-                            <tr>
-                                <th>Nombre de Archivo</th>
-                                <th>Fecha Doc.</th>
-                                <th>Ver</th>
-                                <th class="role-admin">Eliminar</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbody-docs-empleado"></tbody>
-                    </table>
-                </div>
-
-                <div class="card" style="background: #f1f5f9; padding: 1.25rem; margin-top: 1rem; margin-bottom: 0; border: 1px solid #cbd5e1;">
-                    <h4 style="margin: 0 0 0.75rem 0; color: #334155; font-size: 14px;">🔍 Filtros Integrados:</h4>
-                    <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.5rem; margin-bottom: 0; align-items: flex-end;">
-                        <div style="display: none;">
-                            <label style="margin-bottom:2px;">Categoría:</label>
-                            <select id="filter-doc-tipo" onchange="actualizarSubtipos('filter'); filtrarDocumentos();"></select>
-                        </div>
-                        <div>
-                            <label style="margin-bottom:2px;">Subcategoría:</label>
-                            <select id="filter-doc-subtipo" onchange="filtrarDocumentos()">
-                                <option value="TODOS">-- Todos --</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label style="margin-bottom:2px;">Filtrar por Periodo (Mes/Año):</label>
-                            <div style="display: flex; gap: 5px;">
-                                <select id="filter-mes" onchange="filtrarDocumentos()" style="width: 100%;">
-                                    <option value="">- Mes -</option>
-                                    <option value="01">Enero</option>
-                                    <option value="02">Febrero</option>
-                                    <option value="03">Marzo</option>
-                                    <option value="04">Abril</option>
-                                    <option value="05">Mayo</option>
-                                    <option value="06">Junio</option>
-                                    <option value="07">Julio</option>
-                                    <option value="08">Agosto</option>
-                                    <option value="09">Septiembre</option>
-                                    <option value="10">Octubre</option>
-                                    <option value="11">Noviembre</option>
-                                    <option value="12">Diciembre</option>
-                                </select>
-                                <select id="filter-anio" onchange="filtrarDocumentos()" style="width: 100%;">
-                                    <option value="">- Año -</option>
-                                    <option value="2024">2024</option>
-                                    <option value="2025">2025</option>
-                                    <option value="2026">2026</option>
-                                    <option value="2027">2027</option>
-                                    <option value="2028">2028</option>
-                                    <option value="2029">2029</option>
-                                    <option value="2030">2030</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div>
-                            <button type="button" class="btn-action btn-clear" style="width: 100%; padding: 10px; margin: 0; border-radius: 6px; font-weight: 600;" onclick="limpiarFiltros()">🧹 Limpiar</button>
-                        </div>
+                    <div>
+                        <button type="button" class="btn-action btn-clear" style="width: 100%; padding: 10px; margin: 0; border-radius: 6px; font-weight: 600;" onclick="limpiarFiltros()">🧹 Limpiar</button>
                     </div>
                 </div>
-
-            </div> 
-        </div>
+            </div>
+        </div> 
     </div>
+</div>
 </body>
 
 <script>
@@ -1680,8 +1670,10 @@ function toggleVisibilidadPassword(inputId) {
 }
 
 // Función para renderizar y actualizar el listado de usuarios con la columna Acciones
+// Función para renderizar y actualizar el listado de usuarios y rellenar el buscador/lista de edición
 async function cargarUsuariosSistema() {
     const tbody = document.getElementById('tbody-usuarios-sistema');
+    const selectorUsuarios = document.getElementById('edit-selector-usuario');
     if (!tbody) return;
 
     try {
@@ -1699,6 +1691,17 @@ async function cargarUsuariosSistema() {
         const usuarios = await respuesta.json();
         listaUsuariosLocal = usuarios; // Guardamos en memoria local para agilizar la edición rápida
         
+        // 🌟 NUEVO: Llenamos el selector de la lista de usuarios para modificar
+        if (selectorUsuarios) {
+            selectorUsuarios.innerHTML = '<option value="">-- Elija un colaborador de la lista --</option>';
+            usuarios.forEach(user => {
+                const opt = document.createElement('option');
+                opt.value = user.id;
+                opt.textContent = `${user.nombre_completo} (C.I: ${user.cedula} - ${user.rol})`;
+                selectorUsuarios.appendChild(opt);
+            });
+        }
+
         if (usuarios.length === 0) {
             tbody.innerHTML = `<tr><td colspan="6" style="padding: 15px; text-align: center; color: #64748b;">No hay usuarios registrados aún.</td></tr>`;
             return;
@@ -1711,7 +1714,6 @@ async function cargarUsuariosSistema() {
             
             const fotoUrl = user.foto_url ? user.foto_url : 'https://via.placeholder.com/40';
 
-            // Renderizamos 6 columnas acopladas perfectamente al HTML adaptado
             tr.innerHTML = `
                 <td style="padding: 8px;"><img src="${fotoUrl}" alt="Foto" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"></td>
                 <td style="padding: 8px; font-weight: 500; color: #1e293b;">${user.nombre_completo}</td>
@@ -1756,6 +1758,8 @@ function mostrarFormularioRegistro() {
 function mostrarFormularioEdicion() {
     const contenedorEdicion = document.getElementById('contenedor-formulario-edicion');
     const contenedorRegistro = document.getElementById('contenedor-formulario-registro');
+    const formEdicion = document.getElementById('form-edicion-usuario');
+    const selectorUsuarios = document.getElementById('edit-selector-usuario');
     const boton = document.getElementById('btn-mostrar-formulario-edicion');
     const botonRegistro = document.getElementById('btn-mostrar-formulario-registro');
     
@@ -1763,6 +1767,11 @@ function mostrarFormularioEdicion() {
         if (contenedorEdicion.style.display === 'none' || contenedorEdicion.style.display === '') {
             contenedorEdicion.style.display = 'block';
             if (contenedorRegistro) contenedorRegistro.style.display = 'none'; // Cerrar registro alternado
+            
+            // Forzar a que primero seleccione un usuario de la lista limpia antes de ver los campos
+            if (formEdicion) formEdicion.style.display = 'none';
+            if (selectorUsuarios) selectorUsuarios.value = "";
+            
             contenedorEdicion.scrollIntoView({ behavior: 'smooth' });
             if (boton) boton.innerHTML = '❌ Cerrar Panel de Edición';
             if (botonRegistro) botonRegistro.innerHTML = '👤 Registrar Nuevo Colaborador';
@@ -1773,6 +1782,16 @@ function mostrarFormularioEdicion() {
     }
 }
 
+// 🌟 NUEVA FUNCIÓN INTERMEDIA: Se ejecuta al cambiar la selección en la lista desplegable de edición
+function cargarDatosEnFormularioPorSelect(usuarioId) {
+    const formEdicion = document.getElementById('form-edicion-usuario');
+    if (!usuarioId) {
+        if (formEdicion) formEdicion.style.display = 'none'; // Esconde los campos si elige la opción vacía
+        return;
+    }
+    prepararEdicion(usuarioId);
+}
+
 // Extraer datos del usuario y prepararlos en los campos de edición
 function prepararEdicion(usuarioId) {
     const usuario = listaUsuariosLocal.find(u => String(u.id) === String(usuarioId));
@@ -1781,11 +1800,16 @@ function prepararEdicion(usuarioId) {
         return;
     }
 
-    // Forzar apertura exclusiva del panel de edición
+    // Forzar apertura exclusiva de los paneles correspondientes
     document.getElementById('contenedor-formulario-edicion').style.display = 'block';
     document.getElementById('contenedor-formulario-registro').style.display = 'none';
+    document.getElementById('form-edicion-usuario').style.display = 'flex'; // Muestra el formulario interno
     document.getElementById('btn-mostrar-formulario-edicion').innerHTML = '❌ Cerrar Panel de Edición';
     document.getElementById('btn-mostrar-formulario-registro').innerHTML = '👤 Registrar Nuevo Colaborador';
+
+    // Sincronizar el selector de la lista de usuarios por si se presionó directo el botón de la tabla
+    const selectorUsuarios = document.getElementById('edit-selector-usuario');
+    if (selectorUsuarios) selectorUsuarios.value = usuarioId;
 
     // Rellenar inputs
     document.getElementById('edit-id').value = usuario.id;
@@ -1805,7 +1829,7 @@ function prepararEdicion(usuarioId) {
         selectEdit.value = usuario.rol; 
     }
 
-    document.getElementById('contenedor-formulario-edicion').scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('form-edicion-usuario').scrollIntoView({ behavior: 'smooth' });
 }
 
 // Ejecutar el envío AJAX de la edición mediante método PUT
@@ -1863,7 +1887,7 @@ async function actualizarUsuario(event) {
         document.getElementById('contenedor-formulario-edicion').style.display = 'none';
         document.getElementById('btn-mostrar-formulario-edicion').innerHTML = '✏️ Editar Colaborador';
 
-        cargarUsuariosSistema(); // Actualiza la vista en tiempo real sin recargar la página
+        cargarUsuariosSistema(); // Actualiza la vista y la lista desplegable en tiempo real
     } catch (error) {
         console.error("Error al actualizar usuario:", error);
         alert("No se pudo completar la edición: " + error.message);
@@ -1873,7 +1897,7 @@ async function actualizarUsuario(event) {
 // Inicialización unificada de eventos al cargar el documento
 document.addEventListener('DOMContentLoaded', () => {
     cargarDepartamentos();
-    cargarUsuariosSistema(); // Opcional: Carga la nómina directo al iniciar si la sección está por defecto
+    cargarUsuariosSistema(); 
 });
 </script>
 </body>
