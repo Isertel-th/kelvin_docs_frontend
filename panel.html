@@ -1661,6 +1661,7 @@ function toggleVisibilidadPassword(inputId) {
 }
 
 // Carga usuarios y actualiza la lista local en memoria (Se eliminó la carga del select antiguo)
+// Carga usuarios y actualiza la lista local en memoria (Se eliminó la carga del select antiguo)
 async function cargarUsuariosSistema() {
     const tbody = document.getElementById('tbody-usuarios-sistema');
     if (!tbody) return;
@@ -1695,8 +1696,22 @@ async function cargarUsuariosSistema() {
                 <td style="padding: 8px; color: #475569;">${user.cedula}</td>
                 <td style="padding: 8px; color: #475569;">${user.correo}</td>
                 <td style="padding: 8px;"><span style="background: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold;">${user.rol}</span></td>
+                
+                <!-- 🌟 COLUMNA DE ACCIONES MODIFICADA CON FLEXBOX -->
                 <td style="padding: 8px; text-align: center;">
-                    <button onclick="prepararEdicion('${user.id}')" style="background: #f59e0b; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; transition: background 0.2s;">✏️ Editar</button>
+                    <div style="display: flex; gap: 6px; justify-content: center; align-items: center;">
+                        
+                        <!-- Botón Editar (Tu función existente) -->
+                        <button onclick="prepararEdicion('${user.id}')" style="background: #f59e0b; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; transition: background 0.2s;">
+                            ✏️ Editar
+                        </button>
+                        
+                        <!-- Botón Eliminar (NUEVO) -->
+                        <button onclick="eliminarUsuario('${user.id}', '${user.nombre_completo}')" style="background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; transition: background 0.2s;" onmouseover="this.style.backgroundColor='#dc2626'" onmouseout="this.style.backgroundColor='#ef4444'">
+                            🗑️ Eliminar
+                        </button>
+                        
+                    </div>
                 </td>
             `;
             tbody.appendChild(tr);
@@ -1835,6 +1850,46 @@ document.addEventListener('DOMContentLoaded', () => {
     cargarDepartamentos();
     cargarUsuariosSistema(); 
 });
+
+
+
+// 🌟 NUEVA FUNCIÓN: Envía la solicitud DELETE al Backend y refresca la tabla automáticamente
+async function eliminarUsuario(usuarioId, nombreCompleto) {
+    // Alerta de confirmación de seguridad nativa del navegador
+    const seguro = confirm(`¿Está seguro de eliminar de forma permanente al colaborador "${nombreCompleto}"?\nEsta acción no se puede deshacer.`);
+    if (!seguro) return; // Si cancela, detiene el proceso inmediatamente.
+
+    try {
+        const respuesta = await fetch(`${API_URL}/usuarios/${usuarioId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const resultado = await respuesta.json();
+
+        if (!respuesta.ok) {
+            throw new Error(resultado.error || 'No se pudo eliminar al usuario.');
+        }
+
+        alert("¡Colaborador eliminado con éxito!");
+
+        // Si el formulario de edición estaba abierto con los datos de ese usuario, lo cerramos de forma limpia
+        const idEnEdicion = document.getElementById('edit-id')?.value;
+        if (String(idEnEdicion) === String(usuarioId)) {
+            cerrarFormularioEdicion();
+        }
+
+        // Refresca la tabla llamando a tu propia función de carga
+        cargarUsuariosSistema();
+
+    } catch (error) {
+        console.error("❌ Error al eliminar usuario:", error);
+        alert("No se pudo completar la eliminación: " + error.message);
+    }
+}
 </script>
 </body>
 </html>
