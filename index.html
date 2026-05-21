@@ -43,50 +43,57 @@
         button:hover { background: #0056b3; }
         #mensaje { color: #d93025; text-align: center; margin-top: 15px; font-size: 14px; min-height: 20px; }
 
-        /* --- PANTALLA DE BIENVENIDA (SPLASH SCREEN) --- */
+        /* --- PANTALLA DE BIENVENIDA CENTRADA --- */
         .welcome-screen {
             display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
+            width: 100%;
+            max-width: 800px; /* Permite que el texto largo no se rompa en varias líneas */
+            padding: 2rem;
         }
 
         .welcome-screen.active {
             display: flex;
         }
 
-        /* Animación de la imagen */
+        /* Imagen significativamente más grande */
         .welcome-img {
-            max-width: 150px;
+            max-width: 320px; /* Aumentado de 150px a 320px */
+            width: 100%;
             height: auto;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
             animation: popIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
             opacity: 0;
         }
 
-        /* Contenedor del texto animado */
+        /* Contenedor del texto animado en el centro */
         .animated-text {
-            font-size: 28px;
+            font-size: 36px; /* Letras un poco más grandes y premium */
             font-weight: 800;
             background: linear-gradient(45deg, #007bff, #00c6ff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             display: flex;
-            gap: 4px;
+            justify-content: center; /* Centra las letras horizontalmente */
+            flex-wrap: wrap;
+            margin: 0;
+            padding: 0;
         }
 
         /* Animación de aparición letra por letra */
         .animated-text span {
             display: inline-block;
             opacity: 0;
-            transform: translateY(20px);
-            animation: floatUp 0.5s ease forwards;
+            transform: translateY(30px);
+            animation: floatUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
 
         /* Keyframes */
         @keyframes popIn {
-            0% { transform: scale(0); opacity: 0; }
+            0% { transform: scale(0.3); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
 
@@ -130,12 +137,11 @@
             const data = await response.json();
 
             if (response.ok) {
-                // Guardamos datos de sesión de forma persistente
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('rol', data.rol);
                 localStorage.setItem('nombre', data.nombre);
                 
-                // --- INICIO DE LA EXPERIENCIA VISUAL ---
+                // Ejecuta el splash screen
                 ejecutarTransicionBienvenida();
             } else {
                 mensaje.innerText = data.error || "Error en los datos";
@@ -151,34 +157,31 @@
         const welcomeScreen = document.getElementById('welcomeScreen');
         const welcomeText = document.getElementById('welcomeText');
 
-        // 1. Desvanecer la tarjeta de login
+        // 1. Desvanecer login
         loginCard.classList.add('fade-out');
 
-        // Esperar a que termine la animación de salida (500ms)
         setTimeout(() => {
             loginCard.style.display = 'none';
             
-            // 2. Mostrar la pantalla de bienvenida
+            // 2. Mostrar contenedor de bienvenida
             welcomeScreen.classList.add('active');
 
-            // 3. Generar el texto letra por letra para la animación
+            // 3. Inyectar y animar el texto "Somos Isertel, Bienvenido" de forma centrada
             const textoCompleto = "Somos Isertel, Bienvenido";
-            welcomeText.innerHTML = ''; // Limpiar
+            welcomeText.innerHTML = ''; 
 
-            // Dividimos por letras para aplicar retraso (delay) individual
             textoCompleto.split('').forEach((letra, index) => {
                 const span = document.createElement('span');
-                // Si es un espacio vacío, mantenemos su estructura
                 span.innerHTML = letra === ' ' ? '&nbsp;' : letra;
-                // Escalona el retraso de cada letra para el efecto "ola"
-                span.style.animationDelay = `${index * 0.04}s`;
+                // Aplica el retraso escalonado para el efecto máquina/ola de izquierda a centro a derecha
+                span.style.animationDelay = `${index * 0.05}s`;
                 welcomeText.appendChild(span);
             });
 
-            // 4. Redirección automática tras mostrar la animación entera (3 segundos)
+            // 4. Redirección tras finalizar por completo el efecto (3.5 segundos para disfrutar la animación)
             setTimeout(() => {
                 window.location.href = 'panel.html';
-            }, 3000);
+            }, 3500);
 
         }, 500);
     }
