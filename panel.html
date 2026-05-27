@@ -715,7 +715,7 @@ window.onload = function() {
     document.getElementById('user-display-name').innerText = nombreUsuario || "Usuario Isertel";
 
     // 2. Control de accesos por roles (Vistas de menú)
-    if (rol === 'admin') {
+    if (rol === 'Talento Humano') {
         // Mostramos el botón específico de registro de usuarios
         document.getElementById('btn-registrar-usuarios').style.display = 'block';
         
@@ -732,7 +732,7 @@ window.onload = function() {
     // 3. Cargar los datos iniciales desde el servidor
     cargarEmpleadosActivos();
     cargarEmpleadosPasivos();
-    if (rol === 'admin') cargarDocumentosEmpresa();
+    if (rol === 'Talento Humano') cargarDocumentosEmpresa();
 
     // 4. Mapeo inteligente de doble clic para abrir expedientes digitales
     const mapearDobleClic = (tbodyId) => {
@@ -837,7 +837,7 @@ if (viewId === 'registrar-usuarios') {
                             <td>${emp.correo}</td>
                             <td>${emp.celular || 'S/N'}</td>
                             <td>
-                                ${rol === 'admin' ? `<button class="btn-action btn-passive" onclick="moverAPasivo('${emp.id}')">⚠️ Liquidar / Mover Pasivo</button>` : ''}
+                                ${rol === 'Talento Humano' ? `<button class="btn-action btn-passive" onclick="moverAPasivo('${emp.id}')">⚠️ Liquidar / Mover Pasivo</button>` : ''}
                             </td>
                         </tr>`;
                 });
@@ -924,7 +924,7 @@ if (viewId === 'registrar-usuarios') {
             const selectFilter = document.getElementById('filter-doc-tipo');
             
             let opcionesArray = [];
-            if (rol === 'admin') {
+            if (rol === 'Talento Humano') {
                 opcionesArray = [
                     "Contratación", "Vacaciones", "Certificado de Competencia", 
                     "Acta de EPP's", "Certificados Médicos", "Certificados de Aptitud", 
@@ -1024,7 +1024,7 @@ async function obtenerDocumentosServidor() {
         endpoint = `${API_URL}/kelvin/documentos/${currentSelectedUserId}`;
     }
     // 3. Si no es ninguna de las anteriores, ruteamos según el rol para los documentos administrativos generales
-    else if (rol === 'admin') {
+    else if (rol === 'Talento Humano') {
         endpoint = `${API_URL}/admin/documentos/${currentSelectedUserId}?pasivo=${currentSelectedUserPasivo}`;
     } else if (rol === 'doc') {
         endpoint = `${API_URL}/doctor/aptitud/${currentSelectedUserId}`;
@@ -1085,7 +1085,7 @@ function dibujarTablaAgrupada(docsFiltrados) {
         const fechaFormateada = fechaRaw ? new Date(fechaRaw).toLocaleDateString('es-EC', {day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC'}) : 'S/F';
         
         // CORREGIDO: Ahora 'kelvin' también tiene permiso para visualizar el botón de eliminar en la tabla
-        const puedeEliminar = (rol === 'admin' || rol === 'doc' || rol === 'kelvin');
+        const puedeEliminar = (rol === 'Talento Humano' || rol === 'doc' || rol === 'kelvin');
         const nombreArchivoMostrar = doc.nombre_archivo || `${doc.tipo_documento}.pdf`;
 
         tbody.innerHTML += `
@@ -1164,7 +1164,7 @@ async function procesarSubidaDocumento(e) {
     formData.append('es_pasivo', currentSelectedUserPasivo);
 
     let uploadEndpoint = '';
-    if (rol === 'admin') uploadEndpoint = `${API_URL}/admin/subir-a-usuario`;
+    if (rol === 'Talento Humano') uploadEndpoint = `${API_URL}/admin/subir-a-usuario`;
     else if (rol === 'doc') uploadEndpoint = `${API_URL}/doctor/subir-aptitud`;
     else if (rol === 'kelvin') uploadEndpoint = `${API_URL}/kelvin/subir-certificados`;
 
@@ -1496,7 +1496,7 @@ async function cargarDocsEmpresa() {
                     <a href="${doc.url_cloudinary}" download="${doc.nombre_archivo}" target="_blank" class="btn-action btn-upload" style="background:#0284c7; text-align:center;">📥 Descargar</a>
                 </td>
                 <td>
-                    ${rol === 'admin' ? `<button class="btn-action btn-delete" onclick="eliminarDocEmpresa(${doc.id})">🗑️ Eliminar</button>` : `<span style="color:#94a3b8; font-size:12px;">Sin permisos</span>`}
+                    ${rol === 'Talento Humano' ? `<button class="btn-action btn-delete" onclick="eliminarDocEmpresa(${doc.id})">🗑️ Eliminar</button>` : `<span style="color:#94a3b8; font-size:12px;">Sin permisos</span>`}
                 </td>
             `;
             tbody.appendChild(tr);
