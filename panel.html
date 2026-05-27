@@ -1588,11 +1588,10 @@ async function registrarUsuario(event) {
         return;
     }
 
-    const dominiosPermitidos = ['gmail.com', 'hotmail.com', 'outlook.com', 'outlook.es'];
+    const dominiosPermitidos = ['gmail.com', 'hotmail.com', 'outlook.com', 'outlook.es', 'isertel.com.ec', 'isertel.net'];
     const correoDominio = correoInput.split('@')[1];
     if (!correoInput.includes('@') || !dominiosPermitidos.includes(correoDominio)) {
-        alert("Correo electrónico inválido. Dominios autorizados: gmail.com, hotmail.com, outlook.com, outlook.es");
-        return;
+    alert("Correo electrónico inválido. Dominios autorizados: gmail.com, hotmail.com, outlook.com, outlook.es, isertel.com.ec, isertel.net");        return;
     }
 
     const formData = new FormData();
