@@ -196,8 +196,8 @@
                                 <input type="text" id="c_cedula" required pattern="[0-9]{10}" maxlength="10" placeholder="Ej. 1712345678" oninput="this.value = this.value.replace(/\D/g, '')">
                             </div>
                             <div>
-                                <label>Nombre Completo:</label>
-                                <input type="text" id="c_nombre" required placeholder="Ej. Juan Pérez" oninput="this.value = formatearNombre(this.value)" onblur="this.value = limpiarEspaciosNombre(this.value)">
+                                <label>Nombre Completo (Respetando Tíldes): </label>
+                                <input type="text" id="c_nombre" required placeholder="Ej. José Leonardo Elizalde Mejía" oninput="this.value = formatearNombre(this.value)" onblur="this.value = limpiarEspaciosNombre(this.value)">
                             </div>
                             <div>
                                 <label>Fecha de Ingreso:</label>
