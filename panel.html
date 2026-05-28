@@ -1035,30 +1035,34 @@ async function obtenerDocumentosServidor() {
     let endpoint = '';
     const tipoSeleccionado = document.getElementById('filter-doc-tipo').value;
 
-    // 1. Prioridad Absoluta: Si la carpeta es médica o de aptitud, va a las tablas médicas directas
+    // 🟡 LÓGICA DE RUTAS CORREGIDA Y COMPLETA 🟡
+    // 1. Si es Médico -> Va a tablas médicas
     if (tipoSeleccionado === "Certificados Médicos" || tipoSeleccionado === "Certificados de Aptitud") {
         endpoint = `${API_URL}/doctor/aptitud/${currentSelectedUserId}`;
     } 
-    // 2. NUEVA PRIORIDAD: Si la carpeta es técnica (de Kelvin), usamos el endpoint de Kelvin
-    // Esto permite que tanto Kelvin como el Admin lean de las tablas certifi_competencia y acta_epps
+    // 2. Si es Técnico/Kelvin -> Va a tablas técnicas
     else if (tipoSeleccionado === "Certificado de Competencia" || tipoSeleccionado === "Acta de EPP's") {
         endpoint = `${API_URL}/kelvin/documentos/${currentSelectedUserId}`;
     }
-    // 3. Si no es ninguna de las anteriores, ruteamos según el rol para los documentos administrativos generales
-    else if (rol === 'Talento Humano') {
-        endpoint = `${API_URL}/admin/documentos/${currentSelectedUserId}?pasivo=${currentSelectedUserPasivo}`;
-    } else if (rol === 'doc') {
-        endpoint = `${API_URL}/doctor/aptitud/${currentSelectedUserId}`;
-    } else if (rol === 'kelvin') {
-        endpoint = `${API_URL}/kelvin/documentos/${currentSelectedUserId}`;
+    // 3. ✅ SOLUCIÓN: TODOS LOS DEMÁS CASOS (Administrativos, Logística, Gerencia, etc.)
+    // INCLUYENDO Talento Humano -> Vamos al endpoint general que lee la tabla 'documentos' y filtra por permisos
+    else {
+        endpoint = `${API_URL}/usuario/mis-documentos/${currentSelectedUserId}`;
     }
 
     try {
         const res = await fetch(endpoint, { headers: { 'Authorization': `Bearer ${token}` } });
         documentosActuales = await res.json();
-        if (!Array.isArray(documentosActuales)) documentosActuales = [];
+        
+        // Si la respuesta no es un array (por error), lo forzamos a vacío
+        if (!Array.isArray(documentosActuales)) {
+            documentosActuales = [];
+            console.warn("⚠️ No se obtuvieron datos o hubo un error en la consulta");
+        }
+        
         filtrarDocumentos();
     } catch (err) { 
+        console.error("🔴 ERROR DE CONEXIÓN:", err);
         document.getElementById('tbody-docs-empleado').innerHTML = 
             '<tr><td colspan="4" style="color:red;">Error al enlazar datos de almacenamiento remoto.</td></tr>';
     }
