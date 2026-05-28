@@ -2028,14 +2028,21 @@ function aplicarRestriccionesInterfaz() {
         }
     });
 
-    // --- 2. RESTRICCIÓN DE OPCIONES ADMINISTRATIVAS ---
-    // Como este usuario es de un departamento específico (Gerencia, Operaciones, etc.), 
-    // ocultamos las opciones de registrar o eliminar personal, ya que eso le compete solo a Talento Humano.
+// --- 2. RESTRICCIÓN DE OPCIONES ADMINISTRATIVAS ---
+    // Ocultamos SOLO el botón y el formulario de registrar personal (Exclusivo de Talento Humano)
     const opcionRegistrar = document.getElementById('btn-nav-registrar-usuario'); 
     if (opcionRegistrar) opcionRegistrar.style.display = 'none';
     
     const contenedorFormularioRegistro = document.getElementById('contenedor-formulario-registro');
     if (contenedorFormularioRegistro) contenedorFormularioRegistro.style.display = 'none';
+
+    // 🌟 ASEGURAMOS QUE LA LISTA DE EMPLEADOS SEA VISIBLE PARA TODOS:
+    // Si tenías algún contenedor general que envolvía las tablas y lo ocultabas, 
+    // asegúrate de que el contenedor de la nómina/lista permanezca en 'block' o visible.
+    const contenedorListasEmpleados = document.getElementById('contenedor-lista-usuarios'); // Ajusta al ID real de tu contenedor de tablas
+    if (contenedorListasEmpleados) {
+        contenedorListasEmpleados.style.display = 'block';
+    }
 }
 </script>
 </body>
