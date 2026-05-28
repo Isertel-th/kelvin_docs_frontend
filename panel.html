@@ -1570,8 +1570,12 @@ function mostrarSeccion(seccionId) {
 async function registrarUsuario(event) {
     event.preventDefault(); 
 
-    // Capturar permisos seleccionados
+    // 📌 PASO 1: Capturamos SOLO los permisos que MARCÓ en el formulario
+    // (Son los nombres reales que vienen de tu tabla tipos_documento)
     const permisosSeleccionados = Array.from(document.querySelectorAll('input[name="permisos"]:checked')).map(cb => cb.value);
+
+    // 📌 IMPORTANTE: Ya NO agregamos permisos falsos como 'ver_activos'
+    // Simplemente guardamos lo que eligió, porque el acceso a las tablas es GENERAL para todos
 
     const nombreInput = document.getElementById('reg-nombre').value.trim();
     const cedulaInput = document.getElementById('reg-cedula').value.trim();
@@ -1638,7 +1642,8 @@ async function registrarUsuario(event) {
             throw new Error(resultado.error || 'Error desconocido al registrar usuario');
         }
 
-        // Enviar los permisos después de crear el usuario exitosamente
+        // 📌 PASO 2: Guardar los permisos REALES en tu tabla permisos_departamento
+        // Enviamos SOLO lo que marcó, ya que el acceso a las tablas es libre para todos
         const token = localStorage.getItem('token');
         await fetch(`${API_URL}/permisos`, {
             method: 'POST',
@@ -1648,7 +1653,7 @@ async function registrarUsuario(event) {
             },
             body: JSON.stringify({ 
                 departamento: departamentoInput, 
-                permisos: permisosSeleccionados 
+                permisos: permisosSeleccionados // <-- SOLO LOS PERMISOS DE DOCUMENTOS
             })
         });
 
