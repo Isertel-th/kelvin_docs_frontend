@@ -916,72 +916,82 @@ if (viewId === 'registrar-usuarios') {
             } catch (err) { console.error(err); }
         }
 
-        async function abrirExpediente(id, nombre, cedula, esPasivo) {
-            currentSelectedUserId = id;
-            currentSelectedUserPasivo = esPasivo;
-            currentSelectedUserName = nombre;
+async function abrirExpediente(id, nombre, cedula, esPasivo) {
+    currentSelectedUserId = id;
+    currentSelectedUserPasivo = esPasivo;
+    currentSelectedUserName = nombre;
 
-            document.getElementById('modal-emp-name').innerText = `Expediente: ${nombre}`;
-            document.getElementById('modal-emp-cedula').innerText = cedula;
+    document.getElementById('modal-emp-name').innerText = `Expediente: ${nombre}`;
+    document.getElementById('modal-emp-cedula').innerText = cedula;
+    document.getElementById('form-upload-doc').reset();
+    
+    document.getElementById('section-paso1').style.display = 'block';
+    document.getElementById('expediente-detalles').style.display = 'none';
+    document.getElementById('form-upload-doc').style.display = 'none';
+    document.getElementById('upload-tipo-doc').value = '';
 
-            document.getElementById('form-upload-doc').reset();
-            
-            document.getElementById('section-paso1').style.display = 'block';
-            document.getElementById('expediente-detalles').style.display = 'none';
-            document.getElementById('form-upload-doc').style.display = 'none';
+    const selectFilter = document.getElementById('filter-doc-tipo');
+    let opcionesArray = [];
 
-            document.getElementById('upload-tipo-doc').value = '';
+    // ✅ LÓGICA CORRECTA: CONSULTA LO QUE TU ROL DE SESIÓN PUEDE VER
+    // Ya NO se consulta nada del empleado seleccionado, todo depende de TU login
+    try {
+        const res = await fetch(`${API_URL}/mis-tipos-permitidos`, { 
+            headers: { 'Authorization': `Bearer ${token}` } 
+        });
+        const permisos = await res.json();
+        
+        // Obtenemos los nombres permitidos SEGÚN TU DEPARTAMENTO/ROL
+        opcionesArray = permisos.map(p => p.nombre);
 
-            const selectFilter = document.getElementById('filter-doc-tipo');
-            
-            let opcionesArray = [];
-            if (rol === 'Talento Humano') {
-                opcionesArray = [
-                    "Contratación", "Vacaciones", "Certificado de Competencia", 
-                    "Acta de EPP's", "Certificados Médicos", "Certificados de Aptitud", 
-                    "Certificados", "Memorándum", "Certificados y Cargas Familiares"
-                ];
-                if (esPasivo) { opcionesArray.push("Desvinculación"); }
-            } else if (rol === 'doc') {
-                opcionesArray = ["Certificados Médicos", "Certificados de Aptitud"];
-            } else if (rol === 'kelvin') {
-                opcionesArray = ["Certificado de Competencia", "Acta de EPP's"];
-            }
-
-            const vectorContainer = document.getElementById('vector-container');
-            if (vectorContainer) {
-                vectorContainer.innerHTML = '';
-                opcionesArray.forEach(tipo => {
-                    const SVGString = vectoresIconos[tipo] || `<svg viewBox="0 0 24 24" fill="#94a3b8"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>`;
-                    let labelMostrar = tipo;
-                    if(tipo === "Certificados") labelMostrar = "Certificados (Lab/Hon)";
-                    
-                    vectorContainer.innerHTML += `
-                        <div class="vector-card" id="card-vector-${tipo.replace(/\s+/g, '-').replace(/'/g, '')}" onclick="seleccionarCategoriaVector('${tipo.replace(/'/g, "\\'")}')">
-                            ${SVGString}
-                            <span>${labelMostrar}</span>
-                        </div>
-                    `;
-                });
-            }
-
-            selectFilter.innerHTML = '';
-            opcionesArray.forEach(tipo => {
-                let labelMostrar = tipo;
-                if(tipo === "Certificados") labelMostrar = "Certificados (Laborales/Honorabilidad)";
-                selectFilter.innerHTML += `<option value="${tipo}">${labelMostrar}</option>`;
-            });
-            actualizarSubtipos('filter');
-
-            if (document.getElementById('filter-mes')) {
-                document.getElementById('filter-mes').value = '';
-                document.getElementById('filter-anio').value = '';
-            }
-
-            // Carga inicial basada en la primera opción
-            await obtenerDocumentosServidor();
-            document.getElementById('modal-expediente').style.display = 'flex';
+        // Si es personal pasivo, agregamos la opción especial de Desvinculación
+        if (esPasivo) {
+            opcionesArray.push("Desvinculación");
         }
+
+    } catch (err) {
+        // Si hay error, no muestra nada
+        opcionesArray = [];
+    }
+
+    // ✅ SE MANTIENE TU LÓGICA DE ÍCONOS Y VECTORES
+    const vectorContainer = document.getElementById('vector-container');
+    if (vectorContainer) {
+        vectorContainer.innerHTML = '';
+        opcionesArray.forEach(tipo => {
+            const SVGString = vectoresIconos[tipo] || `<svg viewBox="0 0 24 24" fill="#94a3b8"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>`;
+            let labelMostrar = tipo;
+            if(tipo === "Certificados") labelMostrar = "Certificados (Lab/Hon)";
+            
+            vectorContainer.innerHTML += `
+                <div class="vector-card" id="card-vector-${tipo.replace(/\s+/g, '-').replace(/'/g, '')}" onclick="seleccionarCategoriaVector('${tipo.replace(/'/g, "\\'")}')">
+                    ${SVGString}
+                    <span>${labelMostrar}</span>
+                </div>
+            `;
+        });
+    }
+
+    // ✅ SE MANTIENE TU LÓGICA DEL FILTRO DE SELECCIÓN
+    selectFilter.innerHTML = '';
+    opcionesArray.forEach(tipo => {
+        let labelMostrar = tipo;
+        if(tipo === "Certificados") labelMostrar = "Certificados (Laborales/Honorabilidad)";
+        selectFilter.innerHTML += `<option value="${tipo}">${labelMostrar}</option>`;
+    });
+    
+    // ✅ SE MANTIENE TU FUNCIÓN DE ACTUALIZAR SUBTIPOS
+    actualizarSubtipos('filter');
+
+    if (document.getElementById('filter-mes')) {
+        document.getElementById('filter-mes').value = '';
+        document.getElementById('filter-anio').value = '';
+    }
+
+    // ✅ CARGA LOS DOCUMENTOS (ahora el backend ya filtra según tu sesión)
+    await obtenerDocumentosServidor();
+    document.getElementById('modal-expediente').style.display = 'flex';
+}
 
         // CORREGIDO: Ahora hace el re-fetch automático al backend al cambiar de carpeta técnica/médica
         async function seleccionarCategoriaVector(tipoSeleccionado) {
