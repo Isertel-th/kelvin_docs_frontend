@@ -356,82 +356,75 @@
         </div>
     </div>
 
-  <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.75rem; margin-bottom: 2rem;">
-    <button type="button" id="btn-mostrar-formulario-registro" onclick="mostrarFormularioRegistro()" style="background: #3b82f6; color: white; border: none; padding: 12px 20px; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; transition: background 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-        👤 Registrar Nuevo Colaborador
-    </button>
-</div>
-
-<div id="contenedor-formulario-registro" style="display: none; border-top: 2px dashed #cbd5e1; padding-top: 2rem; margin-bottom: 2rem;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.75rem;">
-        <h2 style="color: #1e293b; margin: 0; font-size: 1.3rem; font-weight: 700;">👤 Registrar Nuevo Colaborador</h2>
-    </div>
-    
-    <form id="form-registro-usuario" onsubmit="registrarUsuario(event)" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1.25rem;">
-        <div style="display: flex; flex-direction: column; gap: 0.4rem;">
-            <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Foto de Perfil:</label>
-            <input type="file" id="reg-foto" accept="image/*" required style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; background: #f8fafc;">
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 0.4rem;">
-            <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Nombre Completo:</label>
-            <input type="text" id="reg-nombre" required placeholder="Ej. Juan Carlos Pérez" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
-        </div>
-
-        <div style="display: flex; gap: 1rem;">
-            <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
-                <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Cédula de Identidad:</label>
-                <input type="text" id="reg-cedula" required minlength="10" maxlength="10" placeholder="Ej. 172XXXXXX" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
-            </div>
-            <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
-                <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Celular:</label>
-                <input type="tel" id="reg-celular" required minlength="10" maxlength="10" placeholder="Ej. 099XXXXXXX" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
-            </div>
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 0.4rem;">
-            <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Correo Electrónico:</label>
-            <input type="email" id="reg-correo" required placeholder="usuario@gmail.com" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 0.4rem;">
-            <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Dirección de Domicilio:</label>
-            <input type="text" id="reg-direccion" required placeholder="Ej. Av. Amazonas y República" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 0.4rem;">
-            <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Contraseña de Ingreso:</label>
-            <div style="position: relative; display: flex; align-items: center;">
-                <input type="password" id="reg-contrasenia" required placeholder="Escriba la contraseña" style="width: 100%; padding: 10px; padding-right: 45px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
-                <button type="button" onclick="toggleVisibilidadPassword('reg-contrasenia')" style="position: absolute; right: 5px; background: none; border: none; cursor: pointer; padding: 8px; color: #64748b; font-size: 1.1rem; display: flex; align-items: center; justify-content: center;">
-                    👁️
-                </button>
-            </div>
-        </div>
-
-        <div style="display: flex; gap: 1rem;">
-            <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
-                <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Departamento / Rol de Acceso:</label>
-                <select id="reg-departamento" required onchange="preconfigurarPermisosPorDefecto(this.value)" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; height: 42px; background: white;">
-                    <option value="">Seleccione un departamento...</option>
-                    <option value="Talento Humano">Talento Humano</option>
-                    <option value="doc">Médico (doc)</option>
-                    <option value="kelvin">Gestor Kelvin</option>
-                </select>
-            </div>
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 0.4rem;">
-            <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Tipos de Documento Permitidos (Permisos):</label>
-            <div id="contenedor-checks-permisos" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.75rem; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; background: #f8fafc; max-height: 160px; overflow-y: auto;">
-                </div>
-        </div>
-
-        <button type="submit" style="background: #22c55e; color: white; border: none; padding: 14px; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 0.5rem; transition: background 0.2s; display: flex; justify-content: center; align-items: center; gap: 0.5rem;">
-            💾 Guardar Colaborador en Sistema
+    <!-- Contenedor de botones superiores simplificado (Se eliminó el botón de editar) -->
+    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.75rem; margin-bottom: 2rem;">
+        <button type="button" id="btn-mostrar-formulario-registro" onclick="mostrarFormularioRegistro()" style="background: #3b82f6; color: white; border: none; padding: 12px 20px; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; transition: background 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            👤 Registrar Nuevo Colaborador
         </button>
-    </form>
-</div>
+    </div>
+
+    <!-- Formulario de Registro -->
+    <div id="contenedor-formulario-registro" style="display: none; border-top: 2px dashed #cbd5e1; padding-top: 2rem; margin-bottom: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.75rem;">
+            <h2 style="color: #1e293b; margin: 0; font-size: 1.3rem; font-weight: 700;">👤 Registrar Nuevo Colaborador</h2>
+        </div>
+        
+        <form id="form-registro-usuario" onsubmit="registrarUsuario(event)" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1.25rem;">
+            <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+                <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Foto de Perfil:</label>
+                <input type="file" id="reg-foto" accept="image/*" required style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; background: #f8fafc;">
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+                <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Nombre Completo:</label>
+                <input type="text" id="reg-nombre" required placeholder="Ej. Juan Carlos Pérez" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+            </div>
+
+            <div style="display: flex; gap: 1rem;">
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
+                    <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Cédula de Identidad:</label>
+                    <input type="text" id="reg-cedula" required minlength="10" maxlength="10" placeholder="Ej. 172XXXXXX" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+                </div>
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
+                    <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Celular:</label>
+                    <input type="tel" id="reg-celular" required minlength="10" maxlength="10" placeholder="Ej. 099XXXXXXX" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+                </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+                <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Correo Electrónico:</label>
+                <input type="email" id="reg-correo" required placeholder="usuario@gmail.com" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+                <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Dirección de Domicilio:</label>
+                <input type="text" id="reg-direccion" required placeholder="Ej. Av. Amazonas y República" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+                <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Contraseña de Ingreso:</label>
+                <div style="position: relative; display: flex; align-items: center;">
+                    <input type="password" id="reg-contrasenia" required placeholder="Escriba la contraseña" style="width: 100%; padding: 10px; padding-right: 45px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+                    <button type="button" onclick="toggleVisibilidadPassword('reg-contrasenia')" style="position: absolute; right: 5px; background: none; border: none; cursor: pointer; padding: 8px; color: #64748b; font-size: 1.1rem; display: flex; align-items: center; justify-content: center;">
+                        👁️
+                    </button>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem;">
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
+                    <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Departamento:</label>
+                    <select id="reg-departamento" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; height: 42px; background: white;">
+                        <option value="">Seleccione un departamento...</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit" style="background: #22c55e; color: white; border: none; padding: 14px; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 0.5rem; transition: background 0.2s; display: flex; justify-content: center; align-items: center; gap: 0.5rem;">
+                💾 Guardar Colaborador en Sistema
+            </button>
+        </form>
+    </div>
 
     <!-- Panel de Edición Modificado (Se eliminó el buscador interno y se agregó el botón de cerrar) -->
     <div id="contenedor-formulario-edicion" style="display: none; border-top: 2px dashed #cbd5e1; padding-top: 2rem;">
@@ -1909,123 +1902,6 @@ async function eliminarUsuario(usuarioId, nombreCompleto) {
         alert("No se pudo completar la eliminación: " + error.message);
     }
 }
-
-// Catálogo maestro universal de tipos de documentos en Isertel
-const LISTA_MAESTRA_DOCUMENTOS = [
-    "Contrato", 
-    "Memorándum", 
-    "Acción de Personal", 
-    "Acta de EPP's", 
-    "Certificado de Competencia",
-    "Certificados Médicos",
-    "Certificados de Aptitud"
-];
-
-// Genera dinámicamente los checkboxes al abrir o cargar la interfaz
-function inicializarCheckboxesPermisos() {
-    const contenedor = document.getElementById('contenedor-checks-permisos');
-    if (!contenedor) return;
-    
-    contenedor.innerHTML = ''; // Limpiar registros anteriores
-    
-    LISTA_MAESTRA_DOCUMENTOS.forEach((doc, index) => {
-        contenedor.innerHTML += `
-            <label style="display: flex; align-items: center; gap: 0.5rem; color: #334155; font-size: 0.9rem; cursor: pointer; user-select: none;">
-                <input type="checkbox" value="${doc}" class="chk-permiso-usuario" style="width: 16px; height: 16px; cursor: pointer;">
-                <span>${doc}</span>
-            </label>
-        `;
-    });
-}
-
-// Ayuda automática al usuario: marca las casillas base según el departamento,
-// pero permite que Talento Humano agregue o quite más con un click.
-function preconfigurarPermisosPorDefecto(departamento) {
-    // Desmarcar absolutamente todo primero
-    const checkboxes = document.querySelectorAll('.chk-permiso-usuario');
-    checkboxes.forEach(chk => chk.checked = false);
-
-    if (departamento === 'Talento Humano') {
-        // Jefe Universal: Obtiene control y visión completa del catálogo
-        checkboxes.forEach(chk => chk.checked = true);
-    } else if (departamento === 'doc') {
-        // Rol Médico
-        marcarCheckboxEspecifico("Certificados Médicos");
-        marcarCheckboxEspecifico("Certificados de Aptitud");
-    } else if (departamento === 'kelvin') {
-        // Gestor Kelvin
-        marcarCheckboxEspecifico("Acta de EPP's");
-        marcarCheckboxEspecifico("Certificado de Competencia");
-    }
-}
-
-function marcarCheckboxEspecifico(valorDocumento) {
-    const checkboxes = document.querySelectorAll('.chk-permiso-usuario');
-    const encontrado = Array.from(checkboxes).find(chk => chk.value === valorDocumento);
-    if (encontrado) encontrado.checked = true;
-}
-
-// Reemplaza o adapta tu función registrarUsuario para empaquetar los permisos
-async function registrarUsuario(event) {
-    event.preventDefault();
-
-    // Recolectar todos los permisos que estén activos (marcados con check)
-    const permisosSeleccionados = [];
-    document.querySelectorAll('.chk-permiso-usuario:checked').forEach(chk => {
-        permisosSeleccionados.push(chk.value);
-    });
-
-    // Como usas upload.single('foto'), el envío DEBE realizarse mediante FormData
-    const formData = new FormData();
-    formData.append('foto', document.getElementById('reg-foto').files[0]);
-    formData.append('nombre_completo', document.getElementById('reg-nombre').value);
-    formData.append('cedula', document.getElementById('reg-cedula').value);
-    formData.append('celular', document.getElementById('reg-celular').value);
-    formData.append('correo', document.getElementById('reg-correo').value);
-    formData.append('direccion', document.getElementById('reg-direccion').value);
-    formData.append('contrasenia', document.getElementById('reg-contrasenia').value);
-    formData.append('departamento', document.getElementById('reg-departamento').value);
-    
-    // Enviamos el array stringificado para que Multer y Express lo procesen sin alteraciones
-    formData.append('permisos', JSON.stringify(permisosSeleccionados));
-
-    try {
-        const token = localStorage.getItem('token');
-        const respuesta = await fetch('/api/usuarios', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`
-                // NOTA: No declares 'Content-Type': 'multipart/form-data' de forma manual,
-                // el navegador lo calcula automáticamente al pasarle el objeto FormData.
-            },
-            body: formData
-        });
-
-        const resultado = await respuesta.json();
-
-        if (!respuesta.ok) {
-            throw new Error(resultado.error || 'Ocurrió un inconveniente al registrar.');
-        }
-
-        alert('¡Colaborador guardado exitosamente con sus respectivos permisos dinámicos!');
-        document.getElementById('form-registro-usuario').reset();
-        preconfigurarPermisosPorDefecto(''); // Limpia los checks
-        
-        if (typeof cargarUsuariosSistema === 'function') cargarUsuariosSistema(); // Refresca tu lista
-
-    } catch (error) {
-        console.error("Error en registro:", error);
-        alert(error.message);
-    }
-}
-
-// Ejecución al inicializar la pantalla del Panel
-document.addEventListener('DOMContentLoaded', () => {
-    inicializarCheckboxesPermisos();
-});
-
-
-
 </script>
 </body>
 </html>
