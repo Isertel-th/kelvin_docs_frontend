@@ -1184,10 +1184,18 @@ async function procesarSubidaDocumento(e) {
     formData.append('nombre_user', nombreUsuario || 'Gestor Unificado');
     formData.append('es_pasivo', currentSelectedUserPasivo);
 
-    let uploadEndpoint = '';
-    if (rol === 'Talento Humano') uploadEndpoint = `${API_URL}/admin/subir-a-usuario`;
-    else if (rol === 'doc') uploadEndpoint = `${API_URL}/doctor/subir-aptitud`;
-    else if (rol === 'kelvin') uploadEndpoint = `${API_URL}/kelvin/subir-certificados`;
+let uploadEndpoint = '';
+if (rol === 'Talento Humano') {
+    uploadEndpoint = `${API_URL}/admin/subir-a-usuario`;
+} else if (rol === 'doc') {
+    uploadEndpoint = `${API_URL}/doctor/subir-aptitud`;
+} else if (rol === 'kelvin') {
+    uploadEndpoint = `${API_URL}/kelvin/subir-certificados`;
+} else {
+    // ✅ SOLUCIÓN: TODOS LOS DEMÁS ROLES USAN ESTA RUTA
+    uploadEndpoint = `${API_URL}/usuario/subir-documento`;
+    console.log("🟡 [FRONT] Usando ruta general para:", rol);
+}
 
     try {
         const res = await fetch(uploadEndpoint, {
