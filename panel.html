@@ -1571,11 +1571,25 @@ async function registrarUsuario(event) {
     event.preventDefault(); 
 
     // 📌 PASO 1: Capturamos SOLO los permisos que MARCÓ en el formulario
-    // (Son los nombres reales que vienen de tu tabla tipos_documento)
-    const permisosSeleccionados = Array.from(document.querySelectorAll('input[name="permisos"]:checked')).map(cb => cb.value);
+    // 🛑 CORRECCIÓN: Creamos una guía para convertir NOMBRES -> IDs (coincide con tu tabla tipos_documento)
+    const mapaNombresAIDs = {
+        "Contratación": 1,
+        "Vacaciones": 2,
+        "Certificados de Competencia": 3,
+        "Actas de EPP's": 4,
+        "Certificados Médicos": 5,
+        "Certificados de Aptitud": 6,
+        "Certificados": 7,
+        "Memorándum": 8,
+        "Certificados y Cargas Familiares": 9,
+        "Desvinculación": 10
+        // ⚠️ Si en tu BD tienes nombres diferentes, ESCRÍBELOS IGUAL AQUÍ
+    };
 
-    // 📌 IMPORTANTE: Ya NO agregamos permisos falsos como 'ver_activos'
-    // Simplemente guardamos lo que eligió, porque el acceso a las tablas es GENERAL para todos
+    // 🛑 CORRECCIÓN: Ahora guardamos los IDs numéricos, NO el texto
+    const permisosSeleccionados = Array.from(document.querySelectorAll('input[name="permisos"]:checked'))
+        .map(cb => mapaNombresAIDs[cb.value]) // Convertimos el nombre al número
+        .filter(id => id !== undefined); // Eliminamos valores vacíos o erróneos
 
     const nombreInput = document.getElementById('reg-nombre').value.trim();
     const cedulaInput = document.getElementById('reg-cedula').value.trim();
@@ -1643,19 +1657,29 @@ async function registrarUsuario(event) {
         }
 
         // 📌 PASO 2: Guardar los permisos REALES en tu tabla permisos_departamento
-        // Enviamos SOLO lo que marcó, ya que el acceso a las tablas es libre para todos
+        // 🛑 MEJORA: Agregué validación y manejo de errores aquí para que te avise si falla
         const token = localStorage.getItem('token');
-        await fetch(`${API_URL}/permisos`, {
-            method: 'POST',
-            headers: { 
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ 
-                departamento: departamentoInput, 
-                permisos: permisosSeleccionados // <-- SOLO LOS PERMISOS DE DOCUMENTOS
-            })
-        });
+        
+        // 🛑 Validación: Si no marcó nada, evitamos enviar datos vacíos
+        if (permisosSeleccionados.length > 0) {
+            const respPermisos = await fetch(`${API_URL}/permisos`, {
+                method: 'POST',
+                headers: { 
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    departamento: departamentoInput, 
+                    permisos: permisosSeleccionados // <-- AHORA SÍ ENVÍA NÚMEROS, NO TEXTO ❗❗❗
+                })
+            });
+
+            if (!respPermisos.ok) {
+                console.warn("Advertencia: Usuario creado, pero permisos NO guardados", await respPermisos.text());
+            }
+        } else {
+            console.warn("Usuario creado, pero NO se seleccionó ningún permiso de documento.");
+        }
 
         alert("¡Usuario registrado con éxito!");
         document.getElementById('form-registro-usuario').reset(); 
