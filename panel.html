@@ -417,6 +417,17 @@
                     <select id="reg-departamento" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; height: 42px; background: white;">
                         <option value="">Seleccione un departamento...</option>
                     </select>
+
+
+                    <div style="display: flex; flex-direction: column; gap: 0.4rem; margin-top:1rem;">
+    <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">📋 Permisos de Visualización (Tipos de Documento):</label>
+    <div id="lista-permisos" style="border:1px solid #cbd5e1; border-radius:6px; padding:10px; max-height:200px; overflow-y:auto; background:white;">
+        <!-- Aquí se cargarán los checkboxes dinámicamente -->
+    </div>
+    <small style="color:#64748b;">* Talento Humano siempre tiene acceso completo.</small>
+</div>
+
+
                 </div>
             </div>
 
@@ -1559,6 +1570,9 @@ function mostrarSeccion(seccionId) {
 async function registrarUsuario(event) {
     event.preventDefault(); 
 
+    // Capturar permisos seleccionados
+    const permisosSeleccionados = Array.from(document.querySelectorAll('input[name="permisos"]:checked')).map(cb => cb.value);
+
     const nombreInput = document.getElementById('reg-nombre').value.trim();
     const cedulaInput = document.getElementById('reg-cedula').value.trim();
     const celularInput = document.getElementById('reg-celular').value.trim();
@@ -1591,8 +1605,8 @@ async function registrarUsuario(event) {
     const dominiosPermitidos = ['gmail.com', 'hotmail.com', 'outlook.com', 'outlook.es', 'isertel.com.ec', 'isertel.net'];
     const correoDominio = correoInput.split('@')[1];
     if (!correoInput.includes('@') || !dominiosPermitidos.includes(correoDominio)) {
-    alert("Correo electrónico inválido. Dominios autorizados: gmail.com, hotmail.com, outlook.com, outlook.es, isertel.com.ec, isertel.net");       
-     return;
+        alert("Correo electrónico inválido. Dominios autorizados: gmail.com, hotmail.com, outlook.com, outlook.es, isertel.com.ec, isertel.net");       
+        return;
     }
 
     const formData = new FormData();
@@ -1623,6 +1637,20 @@ async function registrarUsuario(event) {
         if (!respuesta.ok) {
             throw new Error(resultado.error || 'Error desconocido al registrar usuario');
         }
+
+        // Enviar los permisos después de crear el usuario exitosamente
+        const token = localStorage.getItem('token');
+        await fetch(`${API_URL}/permisos`, {
+            method: 'POST',
+            headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 
+                departamento: departamentoInput, 
+                permisos: permisosSeleccionados 
+            })
+        });
 
         alert("¡Usuario registrado con éxito!");
         document.getElementById('form-registro-usuario').reset(); 
@@ -1902,6 +1930,30 @@ async function eliminarUsuario(usuarioId, nombreCompleto) {
         alert("No se pudo completar la eliminación: " + error.message);
     }
 }
+
+
+// Cargar tipos de documento para el selector de permisos
+async function cargarTiposDocumento() {
+    try {
+        const res = await fetch(`${API_URL}/tipos-documento`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const docs = await res.json();
+        const contenedor = document.getElementById('lista-permisos');
+        
+        docs.forEach(doc => {
+            contenedor.innerHTML += `
+            <label style="display:block; margin: 4px 0;">
+                <input type="checkbox" name="permisos" value="${doc.nombre}"> ${doc.nombre}
+            </label>`;
+        });
+    } catch (err) {
+        console.error("Error cargando docs:", err);
+    }
+}
+
+// Llamarla al inicio
+document.addEventListener('DOMContentLoaded', cargarTiposDocumento);
 </script>
 </body>
 </html>
