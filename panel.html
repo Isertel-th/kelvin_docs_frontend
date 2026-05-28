@@ -1940,7 +1940,8 @@ async function eliminarUsuario(usuarioId, nombreCompleto) {
 // Cargar tipos de documento para el selector de permisos
 async function cargarTiposDocumento() {
     try {
-        const res = await fetch(`${API_URL}/tipos-documento`, {
+        // 👇 SOLO CAMBIA ESTA LÍNEA: de /tipos-documento a /mis-tipos-permitidos
+        const res = await fetch(`${API_URL}/mis-tipos-permitidos`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const docs = await res.json();
