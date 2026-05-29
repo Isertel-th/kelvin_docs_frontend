@@ -1896,13 +1896,14 @@ function prepararEdicion(usuarioId) {
 // ✅ NUEVA FUNCIÓN: Cargar todos los docs y marcar los que tiene asignados
 async function cargarPermisosEdicion(usuarioId) {
     const contenedor = document.getElementById('edit-lista-permisos');
-    contenedor.innerHTML = '';
+    contenedor.innerHTML = '<em style="color:#94a3b8;">Cargando...</em>';
 
     try {
         // 1. Obtener TODOS los tipos de documento
         const resTodos = await fetch(`${API_URL}/tipos-documento`, { 
             headers: { 'Authorization': `Bearer ${token}` } 
         });
+        if (!resTodos.ok) throw new Error("No se pudo cargar tipos");
         const todosDocs = await resTodos.json();
 
         // 2. Obtener permisos ACTUALES del usuario
@@ -1913,6 +1914,7 @@ async function cargarPermisosEdicion(usuarioId) {
         const idsPermitidos = permisosActuales.map(p => p.id);
 
         // 3. Pintar checkboxes
+        contenedor.innerHTML = '';
         todosDocs.forEach(doc => {
             const estaSeleccionado = idsPermitidos.includes(doc.id);
             const label = document.createElement('label');
@@ -1925,8 +1927,8 @@ async function cargarPermisosEdicion(usuarioId) {
         });
 
     } catch (err) {
-        contenedor.innerHTML = '<em style="color:red;">Error al cargar permisos</em>';
-        console.error(err);
+        contenedor.innerHTML = '<em style="color:#94a3b8;">Sin permisos asignados o error al cargar</em>'; // ✅ Mensaje más claro
+        console.error("❌ Error al cargar permisos:", err);
     }
 }
 
