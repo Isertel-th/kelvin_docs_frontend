@@ -196,8 +196,8 @@
                                 <input type="text" id="c_cedula" required pattern="[0-9]{10}" maxlength="10" placeholder="Ej. 1712345678" oninput="this.value = this.value.replace(/\D/g, '')">
                             </div>
                             <div>
-                                <label>Nombre Completo (Respetando Tíldes):</label>
-                                <input type="text" id="c_nombre" required placeholder="Ej. José Leonardo Elizalde Mejía" oninput="this.value = formatearNombre(this.value)" onblur="this.value = limpiarEspaciosNombre(this.value)">
+                                <label>Nombre Completo (Respetando Tíldes y Caracteres Especiales):</label>
+                                <input type="text" id="c_nombre" required placeholder="Ej. Elizalde Mejía José Leonardo" oninput="this.value = formatearNombre(this.value)" onblur="this.value = limpiarEspaciosNombre(this.value)">
                             </div>
                             <div>
                                 <label>Fecha de Ingreso:</label>
@@ -406,6 +406,17 @@
                     </button>
                 </div>
             </div>
+
+        <!-- ✅ NUEVO CAMPO AGREGADO AQUÍ -->
+        <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+            <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Confirmar Contraseña:</label>
+            <div style="position: relative; display: flex; align-items: center;">
+                <input type="password" id="reg-confirmar-contrasenia" required placeholder="Repita la contraseña" style="width: 100%; padding: 10px; padding-right: 45px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+                <button type="button" onclick="toggleVisibilidadPassword('reg-confirmar-contrasenia')" style="position: absolute; right: 5px; background: none; border: none; cursor: pointer; padding: 8px; color: #64748b; font-size: 1.1rem; display: flex; align-items: center; justify-content: center;">
+                    👁️
+                </button>
+            </div>
+        </div>
 
             <div style="display: flex; gap: 1rem;">
                 <div style="flex: 1; display: flex; flex-direction: column; gap: 0.4rem;">
@@ -1594,12 +1605,20 @@ async function registrarUsuario(event) {
     const celularInput = document.getElementById('reg-celular').value.trim();
     const correoInput = document.getElementById('reg-correo').value.trim().toLowerCase(); 
     const contraseniaInput = document.getElementById('reg-contrasenia').value; 
+    // ✅ AGREGADO: Capturamos el valor de confirmación
+    const confirmarContraseniaInput = document.getElementById('reg-confirmar-contrasenia').value; 
     const departamentoInput = document.getElementById('reg-departamento').value;
     const fotoInput = document.getElementById('reg-foto').files[0]; 
 
-if (!nombreInput || !cedulaInput || !celularInput || !correoInput || !contraseniaInput || !departamentoInput || !fotoInput) {
+if (!nombreInput || !cedulaInput || !celularInput || !correoInput || !contraseniaInput || !confirmarContraseniaInput || !departamentoInput || !fotoInput) {
         alert("Por favor, complete todos los campos obligatorios del formulario (incluyendo la foto y contraseña).");
         return; 
+    }
+
+    // ✅ VALIDACIÓN FRONTEND: También comprobamos aquí antes de enviar al servidor
+    if (contraseniaInput !== confirmarContraseniaInput) {
+        alert("Las contraseñas no coinciden.");
+        return;
     }
 
     const nombreFormateado = nombreInput
@@ -1617,10 +1636,10 @@ if (!nombreInput || !cedulaInput || !celularInput || !correoInput || !contraseni
         return;
     }
 
-    const dominiosPermitidos = ['gmail.com', 'hotmail.com', 'outlook.com', 'outlook.es', 'isertel.com.ec', 'isertel.net'];
+    const dominiosPermitidos = ['gmail.com', 'hotmail.com', 'outlook.com', 'outlook.es', 'isertel.net'];
     const correoDominio = correoInput.split('@')[1];
     if (!correoInput.includes('@') || !dominiosPermitidos.includes(correoDominio)) {
-        alert("Correo electrónico inválido. Dominios autorizados: gmail.com, hotmail.com, outlook.com, outlook.es, isertel.com.ec, isertel.net");       
+        alert("Correo electrónico inválido. Dominios autorizados: gmail.com, hotmail.com, outlook.com, outlook.es, isertel.net");       
         return;
     }
 
@@ -1630,6 +1649,8 @@ if (!nombreInput || !cedulaInput || !celularInput || !correoInput || !contraseni
     formData.append('celular', celularInput);
     formData.append('correo', correoInput);
     formData.append('contrasenia', contraseniaInput); 
+    // ✅ ENVIAMOS EL DATO AL SERVIDOR
+    formData.append('confirmar_contrasenia', confirmarContraseniaInput); 
     formData.append('departamento', departamentoInput); 
     formData.append('rol_asignado', departamentoInput); 
     
@@ -1956,29 +1977,80 @@ async function eliminarUsuario(usuarioId, nombreCompleto) {
 
 // Cargar tipos de documento para el selector de permisos
 // Modificar la función cargarTiposDocumento
+// Cargar tipos de documento para el selector de permisos
+// Modificar la función cargarTiposDocumento
 async function cargarTiposDocumento() {
     try {
-        const res = await fetch(`${API_URL}/mis-tipos-permitidos`, { headers: { 'Authorization': `Bearer ${token}` } });
+        // Verificamos que exista el token antes de continuar
+        if (!token) throw new Error("Token de autorización no disponible");
+
+        const res = await fetch(`${API_URL}/mis-tipos-permitidos`, { 
+            headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json' // Especificamos que esperamos JSON
+            } 
+        });
+
+        // Verificamos si la respuesta fue exitosa
+        if (!res.ok) throw new Error(`Error al obtener datos: ${res.status}`);
+
         const docs = await res.json();
         const contenedor = document.getElementById('lista-permisos');
         
-        // Aplicamos estilo al contenedor para alinear todo
+        // Aplicamos estilo al contenedor
         contenedor.style.display = 'flex';
         contenedor.style.flexDirection = 'column';
         contenedor.style.gap = '6px';
         contenedor.style.padding = '8px';
         
+        // Limpiamos contenido previo por si se recarga la función
+        contenedor.innerHTML = '';
+
         docs.forEach(doc => {
-            contenedor.innerHTML += `
-            <label style="display: flex; align-items: center; justify-content: flex-start; width: 100%; margin: 0; padding: 2px 0; cursor: pointer; font-size: 14px; color: #475569;">
-                <input type="checkbox" name="permisos" value="${doc.nombre}" style="margin: 0; width: auto; flex-shrink: 0;"> 
-                <span style="margin-left: 8px; line-height: 1.2;">${doc.nombre}</span>
-            </label>`;
+            // Creamos elementos de forma segura
+            const label = document.createElement('label');
+            label.style.cssText = "display: flex; align-items: center; justify-content: flex-start; width: 100%; margin: 0; padding: 2px 0; cursor: pointer; font-size: 14px; color: #475569;";
+
+            const input = document.createElement('input');
+            input.type = "checkbox";
+            input.name = "permisos";
+            input.value = doc.nombre; // Asigna valor de forma segura
+            input.style.margin = "0";
+            input.style.width = "auto";
+            input.style.flexShrink = "0";
+
+            const span = document.createElement('span');
+            span.textContent = doc.nombre; // Usamos textContent para evitar inyección
+            span.style.marginLeft = "8px";
+            span.style.lineHeight = "1.2";
+
+            // Armamos la estructura
+            label.appendChild(input);
+            label.appendChild(span);
+            contenedor.appendChild(label);
         });
+
     } catch (err) {
         console.error("Error cargando docs:", err);
+        // Opcional: Mostrar mensaje al usuario
+        // alert("No se pudieron cargar los tipos de documento");
     }
 }
+
+const esCorreoValido = (email) => {
+    // ✅ DOMINIOS PERMITIDOS ACTUALIZADOS
+    const dominiosPermitidos = ['gmail.com', 'outlook.com', 'outlook.es', 'hotmail.com', 'isertel.net']; 
+    const regexBase = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    
+    if (!regexBase.test(email)) return false;
+    
+    const dominio = email.split('@')[1].toLowerCase();
+    return dominiosPermitidos.includes(dominio);
+};
+
+// Llamarla al inicio
+document.addEventListener('DOMContentLoaded', cargarTiposDocumento);
+
 
 // Llamarla al inicio
 document.addEventListener('DOMContentLoaded', cargarTiposDocumento);
