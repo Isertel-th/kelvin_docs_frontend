@@ -505,15 +505,16 @@
         </div>
     </div>
 
-    <!-- ✅ NUEVA SECCIÓN: PERMISOS DE DOCUMENTOS -->
-    <div style="display: flex; flex-direction: column; gap: 0.4rem; margin-top:1rem;">
-        <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">📋 Permisos de Visualización:</label>
-        <div id="edit-lista-permisos" style="border:1px solid #cbd5e1; border-radius:6px; padding:10px; max-height:200px; overflow-y:auto; background:white;">
-            <!-- Aquí se cargarán los checkboxes dinámicamente -->
-            <em style="color:#94a3b8;">Cargando tipos de documento...</em>
-        </div>
-        <small style="color:#64748b;">* Marca o desmarca para otorgar o quitar acceso.</small>
+<!-- ✅ NUEVO: BLOQUE DE PERMISOS DE EDICIÓN -->
+<div style="display: flex; flex-direction: column; gap: 0.4rem; margin-top:1rem; padding: 10px; border:1px solid #e2e8f0; border-radius: 6px; background-color: #f8fafc;">
+    <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">📋 Permisos de Visualización (Tipos de Documento):</label>
+    <div id="lista-permisos-edicion" style="border:1px solid #cbd5e1; border-radius:6px; padding:10px; max-height:200px; overflow-y:auto; background:white;">
+        <!-- Aquí se cargarán los checkboxes dinámicamente -->
+        <span style="color:#64748b; font-size:13px;">Seleccione un departamento primero...</span>
     </div>
+    <small style="color:#64748b; font-size:12px;">* Marque o desmarque para cambiar el acceso. Talento Humano siempre tiene todo activo.</small>
+</div>
+
 
     <button type="submit" style="background: #f59e0b; color: white; border: none; padding: 14px; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 0.5rem; transition: background 0.2s; display: flex; justify-content: center; align-items: center; gap: 0.5rem;">
         💾 Actualizar Cambios del Colaborador
@@ -1885,56 +1886,76 @@ function prepararEdicion(usuarioId) {
     if (selectReg && selectEdit) {
         selectEdit.innerHTML = selectReg.innerHTML;
         selectEdit.value = usuario.rol; 
+        
+        // ✅ MEJORA: SI CAMBIA EL DEPARTAMENTO, RECARGAR PERMISOS AUTOMÁTICAMENTE
+        selectEdit.onchange = function() {
+            const nuevoRol = this.value;
+            cargarPermisosEnEdicion(nuevoRol);
+        };
     }
 
-    // ✅ CARGAR TIPOS DE DOCUMENTO Y MARCAR LOS QUE YA TIENE PERMITIDOS
-    cargarPermisosEdicion(usuario.id);
-
+    const rolActualUsuario = usuario.rol;
+    // Llamamos a la función que dibuja los checkboxes y marca los que ya tiene
+    cargarPermisosEnEdicion(rolActualUsuario);
+    
     document.getElementById('contenedor-formulario-edicion').scrollIntoView({ behavior: 'smooth' });
 }
 
-// ✅ NUEVA FUNCIÓN: Cargar todos los docs y marcar los que tiene asignados
-async function cargarPermisosEdicion(usuarioId) {
-    const contenedor = document.getElementById('edit-lista-permisos');
-    contenedor.innerHTML = '<em style="color:#94a3b8;">Cargando...</em>';
+
+
+
+
+// ✅ NUEVA FUNCIÓN: Carga y marca los permisos actuales en el formulario de edición
+async function cargarPermisosEnEdicion(rolNombre) {
+    const contenedor = document.getElementById('lista-permisos-edicion');
+    contenedor.innerHTML = ''; // Limpiar
 
     try {
-        // 1. Obtener TODOS los tipos de documento
-        const resTodos = await fetch(`${API_URL}/tipos-documento`, { 
+        // 1. Obtener TODOS los tipos de documentos existentes
+        const resDocs = await fetch(`${API_URL}/tipos-documento`, { 
             headers: { 'Authorization': `Bearer ${token}` } 
         });
-        if (!resTodos.ok) throw new Error("No se pudo cargar tipos");
-        const todosDocs = await resTodos.json();
+        const todosLosDocs = await resDocs.json();
 
-        // 2. Obtener permisos ACTUALES del usuario
-        const resPermisos = await fetch(`${API_URL}/usuarios/${usuarioId}/permisos`, { 
-            headers: { 'Authorization': `Bearer ${token}` } 
+        // 2. Obtener LOS PERMISOS QUE YA TIENE ASIGNADOS ESTE DEPARTAMENTO/ROL
+        const resPermisosActuales = await fetch(`${API_URL}/mis-tipos-permitidos`, { 
+            headers: { 'Authorization': `Bearer ${token}`, 'rol-usuario': rolNombre } 
         });
-        const permisosActuales = await resPermisos.json();
-        const idsPermitidos = permisosActuales.map(p => p.id);
+        const permisosActuales = await resPermisosActuales.json();
+        
+        // Extraemos solo los nombres para comparar fácil
+        const nombresPermitidos = permisosActuales.map(p => p.nombre);
 
-        // 3. Pintar checkboxes
-        contenedor.innerHTML = '';
-        todosDocs.forEach(doc => {
-            const estaSeleccionado = idsPermitidos.includes(doc.id);
+        // 3. Pintar los checkboxes
+        if(todosLosDocs.length === 0) {
+            contenedor.innerHTML = '<span style="color:#64748b; font-size:13px;">Sin tipos de documento registrados.</span>';
+            return;
+        }
+
+        todosLosDocs.forEach(doc => {
+            const estaPermitido = nombresPermitidos.includes(doc.nombre);
             const label = document.createElement('label');
-            label.style = "display:flex;align-items:center;gap:6px;padding:3px 0;cursor:pointer;font-size:14px;color:#475569;";
+            label.style.cssText = "display: flex; align-items: center; gap: 8px; padding: 4px; cursor: pointer; font-size: 14px; color: #475569;";
+
             label.innerHTML = `
-                <input type="checkbox" name="edit_permisos" value="${doc.id}" ${estaSeleccionado ? 'checked' : ''}>
+                <input type="checkbox" name="permiso_doc" value="${doc.id}" ${estaPermitido ? 'checked' : ''}>
                 <span>${doc.nombre}</span>
             `;
             contenedor.appendChild(label);
         });
 
     } catch (err) {
-        contenedor.innerHTML = '<em style="color:#94a3b8;">Sin permisos asignados o error al cargar</em>'; // ✅ Mensaje más claro
-        console.error("❌ Error al cargar permisos:", err);
+        contenedor.innerHTML = '<span style="color:red; font-size:13px;">Error al cargar permisos</span>';
+        console.error("Error cargando permisos:", err);
     }
 }
 
 
+
+
+
 // NOMBRE CORREGIDO: Evita conflictos con el módulo de modificación de nómina ('m_')
-// ✅ MODIFICADA: Al guardar, enviar también los permisos
+// NOMBRE CORREGIDO: Evita conflictos con el módulo de modificación de nómina ('m_')
 async function actualizarUsuarioSistema(event) {
     event.preventDefault();
 
@@ -1947,8 +1968,16 @@ async function actualizarUsuarioSistema(event) {
     const departamentoInput = document.getElementById('edit-departamento').value;
     const fotoInput = document.getElementById('edit-foto').files[0];
 
-if (!id || !nombreInput || !cedulaInput || !celularInput || !correoInput || !departamentoInput) {
+    // 🟡 Validación extra de correo agregada
+    const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!id || !nombreInput || !cedulaInput || !celularInput || !correoInput || !departamentoInput) {
         alert("Por favor rellene todos los campos requeridos para procesar la actualización.");
+        return;
+    }
+
+    if (!regexCorreo.test(correoInput)) {
+        alert("Por favor ingrese un correo electrónico válido.");
         return;
     }
 
@@ -1971,11 +2000,11 @@ if (!id || !nombreInput || !cedulaInput || !celularInput || !correoInput || !dep
     if (fotoInput) formData.append('foto', fotoInput);
 
     try {
-        // 1. Actualizar datos básicos
+        // PASO 1: Actualizar datos básicos del usuario
         const respuesta = await fetch(`${API_URL}/usuarios/${id}`, {
             method: 'PUT',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            headers: { 
+                'Authorization': `Bearer ${localStorage.getItem('token')}` 
             },
             body: formData
         });
@@ -1983,24 +2012,31 @@ if (!id || !nombreInput || !cedulaInput || !celularInput || !correoInput || !dep
         const resultado = await respuesta.json();
         if (!respuesta.ok) throw new Error(resultado.error || 'Error en la actualización');
 
-
-        // ✅ 2. ACTUALIZAR PERMISOS
-        const permisosSeleccionados = Array.from(document.querySelectorAll('input[name="edit_permisos"]:checked'))
+        // ✅ PASO CLAVE: GUARDAR LOS PERMISOS MODIFICADOS
+        const permisosActualizados = Array.from(document.querySelectorAll('input[name="permiso_doc"]:checked'))
             .map(cb => parseInt(cb.value));
 
-        await fetch(`${API_URL}/usuarios/${id}/permisos`, {
-            method: 'PUT',
-            headers: {
-                'Authorization': `Bearer ${token}`,
+        // PASO 2: Actualizar permisos
+        await fetch(`${API_URL}/permisos`, {
+            method: 'POST',
+            headers: { 
+                // 🔴 CORRECCIÓN AQUÍ: Usar siempre la fuente del token
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ permisos: permisosSeleccionados })
+            body: JSON.stringify({ 
+                // OPCIÓN A: Si los permisos son por DEPARTAMENTO (todos iguales)
+                departamento: departamentoInput,
+                // OPCIÓN B: Si los permisos son por USUARIO (cada uno distinto)
+                // usuario_id: id,
+                permisos: permisosActualizados  
+            })
         });
 
-
-        alert("¡Colaborador y sus permisos actualizados con éxito!");
+        alert("¡Colaborador y permisos actualizados con éxito!");
         cerrarFormularioEdicion();
-        cargarUsuariosSistema(); 
+        cargarUsuariosSistema();
+
     } catch (error) {
         console.error("Error al actualizar usuario:", error);
         alert("No se pudo completar la edición: " + error.message);
