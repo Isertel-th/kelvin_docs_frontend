@@ -1940,22 +1940,26 @@ async function prepararEdicion(usuarioId) {
     }
 
 // ✅ CARGAR PERMISOS ACTUALES Y DISPONIBLES (ESTILO MEJORADO)
+// ✅ CARGAR PERMISOS ACTUALES - CORREGIDO 100%
 try {
-    // 1. Obtener todos los tipos de documento existentes y ordenados
+    // 1. Obtener todos los tipos de documento existentes
     const resTodos = await fetch(`${API_URL}/tipos-documento`, { 
         headers: { 'Authorization': `Bearer ${token}` } 
     });
     let todosDocs = await resTodos.json();
-    todosDocs = todosDocs.sort((a, b) => a.nombre.localeCompare(b.nombre)); // ✅ Orden alfabético
+    todosDocs = todosDocs.sort((a, b) => a.nombre.localeCompare(b.nombre));
 
-    // 2. Obtener permisos que YA TIENE asignados este usuario
-    const resPermisos = await fetch(`${API_URL}/usuarios/${usuarioId}/permisos`, { 
+    // 🔑 LO CLAVE: El usuario tiene un "rol" que en realidad es el NOMBRE DEL DEPARTAMENTO
+    const nombreDepartamento = usuario.rol; 
+
+    // 2. Obtener permisos que YA TIENE ASIGNADO ESE DEPARTAMENTO
+    const resPermisos = await fetch(`${API_URL}/departamentos/${encodeURIComponent(nombreDepartamento)}/permisos`, { 
         headers: { 'Authorization': `Bearer ${token}` } 
     });
     const permisosActuales = await resPermisos.json();
     const idsPermitidos = permisosActuales.map(p => p.id);
 
-    // 3. Renderizar checkboxes con estilo uniforme
+    // 3. Renderizar checkboxes
     const contenedor = document.getElementById('edit-lista-permisos');
     contenedor.innerHTML = '';
 
@@ -1964,34 +1968,20 @@ try {
         
         const label = document.createElement('label');
         label.style.cssText = `
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 10px;
-            background: #f8fafc;
-            border-radius: 6px;
-            border: 1px solid #e2e8f0;
-            cursor: pointer;
-            font-size: 14px;
-            color: #334155;
-            transition: all 0.2s;
-            margin: 0;
+            display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+            background: #f8fafc; border-radius: 6px; border: 1px solid #e2e8f0;
+            cursor: pointer; font-size: 14px; color: #334155; margin: 0;
         `;
-        label.onmouseover = () => { label.style.borderColor = '#3b82f6'; label.style.background = '#eff6ff'; };
-        label.onmouseout = () => { label.style.borderColor = '#e2e8f0'; label.style.background = '#f8fafc'; };
 
         const input = document.createElement('input');
         input.type = "checkbox";
         input.name = "edit_permisos";
         input.value = doc.id;
-        input.checked = estaSeleccionado;
+        input.checked = estaSeleccionado; // ✅ Aquí ahora sí carga lo que existe en la tabla real
         input.style.margin = "0";
-        input.style.width = "16px";
-        input.style.height = "16px";
 
         const span = document.createElement('span');
         span.textContent = doc.nombre;
-        span.style.lineHeight = "1.3";
 
         label.appendChild(input);
         label.appendChild(span);
@@ -2000,7 +1990,7 @@ try {
 
 } catch (err) {
     console.error("Error cargando permisos:", err);
-    document.getElementById('edit-lista-permisos').innerHTML = '<p style="color:#ef4444; font-size:13px; padding:8px;">No se pudieron cargar los permisos</p>';
+    document.getElementById('edit-lista-permisos').innerHTML = '<p style="color:red;">Error al cargar</p>';
 }
 
     document.getElementById('contenedor-formulario-edicion').scrollIntoView({ behavior: 'smooth' });
@@ -2051,18 +2041,21 @@ async function actualizarUsuarioSistema(event) {
         const resultado = await respuesta.json();
         if (!respuesta.ok) throw new Error(resultado.error || 'Error en la actualización');
 
-        // ✅ NUEVO: Guardar cambios de permisos
-        const permisosSeleccionados = Array.from(document.querySelectorAll('input[name="edit_permisos"]:checked'))
-            .map(cb => parseInt(cb.value));
+// ✅ NUEVO: Guardar cambios de permisos EN LA TABLA CORRECTA (permisos_departamento)
+const permisosSeleccionados = Array.from(document.querySelectorAll('input[name="edit_permisos"]:checked'))
+    .map(cb => parseInt(cb.value));
 
-        await fetch(`${API_URL}/usuarios/${id}/permisos`, {
-            method: 'PUT',
-            headers: { 
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ permisos: permisosSeleccionados })
-        });
+// 🔑 Usamos el DEPARTAMENTO que tiene ahora el usuario
+const departamentoAsignado = departamentoInput; 
+
+await fetch(`${API_URL}/departamentos/${encodeURIComponent(departamentoAsignado)}/permisos`, {
+    method: 'PUT',
+    headers: { 
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ permisos: permisosSeleccionados }) // ✅ GUARDA AQUÍ
+});
 
         alert("¡Colaborador actualizado con éxito!");
         cerrarFormularioEdicion();
