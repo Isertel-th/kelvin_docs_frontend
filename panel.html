@@ -505,6 +505,16 @@
         </div>
     </div>
 
+    <!-- ✅ NUEVA SECCIÓN: PERMISOS DE DOCUMENTOS -->
+    <div style="display: flex; flex-direction: column; gap: 0.4rem; margin-top:1rem;">
+        <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">📋 Permisos de Visualización:</label>
+        <div id="edit-lista-permisos" style="border:1px solid #cbd5e1; border-radius:6px; padding:10px; max-height:200px; overflow-y:auto; background:white;">
+            <!-- Aquí se cargarán los checkboxes dinámicamente -->
+            <em style="color:#94a3b8;">Cargando tipos de documento...</em>
+        </div>
+        <small style="color:#64748b;">* Marca o desmarca para otorgar o quitar acceso.</small>
+    </div>
+
     <button type="submit" style="background: #f59e0b; color: white; border: none; padding: 14px; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 0.5rem; transition: background 0.2s; display: flex; justify-content: center; align-items: center; gap: 0.5rem;">
         💾 Actualizar Cambios del Colaborador
     </button>
@@ -1877,10 +1887,52 @@ function prepararEdicion(usuarioId) {
         selectEdit.value = usuario.rol; 
     }
 
+    // ✅ CARGAR TIPOS DE DOCUMENTO Y MARCAR LOS QUE YA TIENE PERMITIDOS
+    cargarPermisosEdicion(usuario.id);
+
     document.getElementById('contenedor-formulario-edicion').scrollIntoView({ behavior: 'smooth' });
 }
 
+// ✅ NUEVA FUNCIÓN: Cargar todos los docs y marcar los que tiene asignados
+async function cargarPermisosEdicion(usuarioId) {
+    const contenedor = document.getElementById('edit-lista-permisos');
+    contenedor.innerHTML = '';
+
+    try {
+        // 1. Obtener TODOS los tipos de documento
+        const resTodos = await fetch(`${API_URL}/tipos-documento`, { 
+            headers: { 'Authorization': `Bearer ${token}` } 
+        });
+        const todosDocs = await resTodos.json();
+
+        // 2. Obtener permisos ACTUALES del usuario
+        const resPermisos = await fetch(`${API_URL}/usuarios/${usuarioId}/permisos`, { 
+            headers: { 'Authorization': `Bearer ${token}` } 
+        });
+        const permisosActuales = await resPermisos.json();
+        const idsPermitidos = permisosActuales.map(p => p.id);
+
+        // 3. Pintar checkboxes
+        todosDocs.forEach(doc => {
+            const estaSeleccionado = idsPermitidos.includes(doc.id);
+            const label = document.createElement('label');
+            label.style = "display:flex;align-items:center;gap:6px;padding:3px 0;cursor:pointer;font-size:14px;color:#475569;";
+            label.innerHTML = `
+                <input type="checkbox" name="edit_permisos" value="${doc.id}" ${estaSeleccionado ? 'checked' : ''}>
+                <span>${doc.nombre}</span>
+            `;
+            contenedor.appendChild(label);
+        });
+
+    } catch (err) {
+        contenedor.innerHTML = '<em style="color:red;">Error al cargar permisos</em>';
+        console.error(err);
+    }
+}
+
+
 // NOMBRE CORREGIDO: Evita conflictos con el módulo de modificación de nómina ('m_')
+// ✅ MODIFICADA: Al guardar, enviar también los permisos
 async function actualizarUsuarioSistema(event) {
     event.preventDefault();
 
@@ -1917,6 +1969,7 @@ if (!id || !nombreInput || !cedulaInput || !celularInput || !correoInput || !dep
     if (fotoInput) formData.append('foto', fotoInput);
 
     try {
+        // 1. Actualizar datos básicos
         const respuesta = await fetch(`${API_URL}/usuarios/${id}`, {
             method: 'PUT',
             headers: {
@@ -1928,8 +1981,23 @@ if (!id || !nombreInput || !cedulaInput || !celularInput || !correoInput || !dep
         const resultado = await respuesta.json();
         if (!respuesta.ok) throw new Error(resultado.error || 'Error en la actualización');
 
-        alert("¡Colaborador actualizado con éxito!");
-        cerrarFormularioEdicion(); // Cierra el menú automáticamente tras actualizar
+
+        // ✅ 2. ACTUALIZAR PERMISOS
+        const permisosSeleccionados = Array.from(document.querySelectorAll('input[name="edit_permisos"]:checked'))
+            .map(cb => parseInt(cb.value));
+
+        await fetch(`${API_URL}/usuarios/${id}/permisos`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ permisos: permisosSeleccionados })
+        });
+
+
+        alert("¡Colaborador y sus permisos actualizados con éxito!");
+        cerrarFormularioEdicion();
         cargarUsuariosSistema(); 
     } catch (error) {
         console.error("Error al actualizar usuario:", error);
