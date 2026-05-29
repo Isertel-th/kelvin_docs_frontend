@@ -377,7 +377,7 @@
 
             <div style="display: flex; flex-direction: column; gap: 0.4rem;">
                 <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Nombre Completo:</label>
-                <input type="text" id="reg-nombre" required placeholder="Ej. Juan Carlos Pérez" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
+    <input type="text" id="reg-nombre" required placeholder="Ej. Juan Carlos Pérez" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;" oninput="this.value = formatearNombre(this.value)" onblur="this.value = limpiarEspaciosNombre(this.value)">
             </div>
 
             <div style="display: flex; gap: 1rem;">
@@ -709,7 +709,7 @@
         }
 
         function formatearNombre(texto) {
-            return texto.toLowerCase().replace(/(^|\s)\S/g, (match) => match.toUpperCase());
+    return texto.toLowerCase().replace(/(^|\s)([a-záéíóúñüÁÉÍÓÚÑÜ])/g, (match, espacio, letra) => espacio + letra.toUpperCase());
         }
 
         function limpiarEspaciosNombre(texto) {
@@ -1639,7 +1639,7 @@ async function registrarUsuario(event) {
     formData.append('cedula', cedulaInput);
     formData.append('celular', celularInput);
     formData.append('correo', correoInput);
-    formData.append('direccion', direccionInput);
+    formData.append('direccion', document.getElementById('c_direccion').value); // ✅ Agregada esta línea
     formData.append('contrasenia', contraseniaInput); 
     formData.append('departamento', departamentoInput); 
     formData.append('rol_asignado', departamentoInput); 
@@ -1896,7 +1896,7 @@ async function actualizarUsuarioSistema(event) {
     formData.append('cedula', cedulaInput);
     formData.append('celular', celularInput);
     formData.append('correo', correoInput);
-    formData.append('direccion', direccionInput);
+    formData.append('direccion', document.getElementById('c_direccion').value); // ✅ Agregada esta línea
     formData.append('rol', departamentoInput); 
     
     if (contraseniaInput) formData.append('contrasenia', contraseniaInput);
@@ -1969,19 +1969,18 @@ async function eliminarUsuario(usuarioId, nombreCompleto) {
 
 
 // Cargar tipos de documento para el selector de permisos
+// Modificar la función cargarTiposDocumento
 async function cargarTiposDocumento() {
     try {
-        // 👇 SOLO CAMBIA ESTA LÍNEA: de /tipos-documento a /mis-tipos-permitidos
-        const res = await fetch(`${API_URL}/mis-tipos-permitidos`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const res = await fetch(`${API_URL}/mis-tipos-permitidos`, { headers: { 'Authorization': `Bearer ${token}` } });
         const docs = await res.json();
         const contenedor = document.getElementById('lista-permisos');
         
         docs.forEach(doc => {
             contenedor.innerHTML += `
-            <label style="display:block; margin: 4px 0;">
-                <input type="checkbox" name="permisos" value="${doc.nombre}"> ${doc.nombre}
+            <label style="display:flex; align-items:center; gap: 8px; margin: 4px 0; cursor:pointer;">
+                <input type="checkbox" name="permisos" value="${doc.nombre}" style="margin:0;"> 
+                <span>${doc.nombre}</span>
             </label>`;
         });
     } catch (err) {
