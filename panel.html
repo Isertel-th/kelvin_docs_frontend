@@ -1972,11 +1972,17 @@ async function cargarTiposDocumento() {
         const docs = await res.json();
         const contenedor = document.getElementById('lista-permisos');
         
+        // Aplicamos estilo al contenedor para alinear todo
+        contenedor.style.display = 'flex';
+        contenedor.style.flexDirection = 'column';
+        contenedor.style.gap = '6px';
+        contenedor.style.padding = '8px';
+        
         docs.forEach(doc => {
             contenedor.innerHTML += `
-            <label style="display:flex; align-items:center; gap: 8px; margin: 4px 0; cursor:pointer;">
-                <input type="checkbox" name="permisos" value="${doc.nombre}" style="margin:0;"> 
-                <span>${doc.nombre}</span>
+            <label style="display: flex; align-items: center; justify-content: flex-start; width: 100%; margin: 0; padding: 2px 0; cursor: pointer; font-size: 14px; color: #475569;">
+                <input type="checkbox" name="permisos" value="${doc.nombre}" style="margin: 0; width: auto; flex-shrink: 0;"> 
+                <span style="margin-left: 8px; line-height: 1.2;">${doc.nombre}</span>
             </label>`;
         });
     } catch (err) {
