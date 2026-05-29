@@ -1906,6 +1906,7 @@ function prepararEdicion(usuarioId) {
 
 
 // ✅ NUEVA FUNCIÓN: Carga y marca los permisos actuales en el formulario de edición
+// ✅ FUNCIÓN CORREGIDA - AHORA SÍ FUNCIONARÁ
 async function cargarPermisosEnEdicion(rolNombre) {
     const contenedor = document.getElementById('lista-permisos-edicion');
     contenedor.innerHTML = ''; // Limpiar
@@ -1917,9 +1918,14 @@ async function cargarPermisosEnEdicion(rolNombre) {
         });
         const todosLosDocs = await resDocs.json();
 
-        // 2. Obtener LOS PERMISOS QUE YA TIENE ASIGNADOS ESTE DEPARTAMENTO/ROL
+        // 🔴 AQUÍ ESTABA EL ERROR:
+        // ANTES: llamaba a /api/usuarios/ID/permisos  ❌ NO EXISTE
+        // AHORA: llamamos a /api/mis-tipos-permitidos ✅ SÍ EXISTE
         const resPermisosActuales = await fetch(`${API_URL}/mis-tipos-permitidos`, { 
-            headers: { 'Authorization': `Bearer ${token}`, 'rol-usuario': rolNombre } 
+            headers: { 
+                'Authorization': `Bearer ${token}`,
+                'rol-usuario': rolNombre // 👈 Enviamos el rol por cabecera como lo hicimos antes
+            }
         });
         const permisosActuales = await resPermisosActuales.json();
         
@@ -1949,7 +1955,6 @@ async function cargarPermisosEnEdicion(rolNombre) {
         console.error("Error cargando permisos:", err);
     }
 }
-
 
 
 
