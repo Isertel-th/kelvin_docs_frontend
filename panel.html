@@ -115,6 +115,29 @@
     display: block !important;
 }
 
+
+/* Estilos para barra de carga */
+.upload-progress-container {
+    width: 100%;
+    height: 8px;
+    background-color: #e2e8f0;
+    border-radius: 4px;
+    margin: 10px 0;
+    overflow: hidden;
+    display: none;
+}
+.upload-progress-bar {
+    height: 100%;
+    width: 0%;
+    background-color: #10b981;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+.btn-submit:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
     </style>
 </head>
 <body>
@@ -426,12 +449,12 @@
                     </select>
 
 
-                    <div style="display: flex; flex-direction: column; gap: 0.4rem; margin-top:1rem;">
+<div style="display: flex; flex-direction: column; gap: 0.4rem; margin-top:1rem; border-top: 2px dashed #cbd5e1; padding-top:1rem;">
     <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">📋 Permisos de Visualización (Tipos de Documento):</label>
-    <div id="lista-permisos" style="border:1px solid #cbd5e1; border-radius:6px; padding:10px; max-height:200px; overflow-y:auto; background:white;">
-        <!-- Aquí se cargarán los checkboxes dinámicamente -->
+    <div id="edit-lista-permisos" style="border:1px solid #cbd5e1; border-radius:6px; padding:10px; max-height:200px; overflow-y:auto; background:white;">
+        <!-- Se cargarán dinámicamente -->
     </div>
-    <small style="color:#64748b;">* Talento Humano siempre tiene acceso completo.</small>
+    <small style="color:#64748b;">* Marca o desmarca para otorgar o quitar acceso a tipos de documento.</small>
 </div>
 
 
@@ -564,6 +587,9 @@
                     </div>
                 </div>
                 
+<div class="upload-progress-container" id="upload-progress-container">
+    <div class="upload-progress-bar" id="upload-progress-bar"></div>
+</div>
                 <div style="margin-top: 1.25rem; text-align: right;">
                     <button type="submit" class="btn-submit" style="padding:10px 24px; font-size:14px; border-radius: 8px;">🚀 Indexar y Subir Archivo</button>
                 </div>
@@ -1151,14 +1177,11 @@ async function procesarSubidaDocumento(e) {
 
     const periodoDoc = fechaDoc ? fechaDoc.substring(0, 7) : null;
 
-    // --- CORRECCIÓN AQUÍ: Evaluar si es "General / Único" ---
-    // Si el subtipo es general, usamos el tipo de documento (la carpeta) para el nombre base.
     let baseParaNombre = subtipoDoc;
     if (subtipoDoc === "General / Único") {
         baseParaNombre = tipoDoc;
     }
 
-    // Saneamos la cadena elegida (ya sea el subtipo o el tipo de documento)
     const subtipoSaneado = baseParaNombre.toLowerCase().trim()
         .normalize("NFD").replace(/[\u0300-\u036f]/g, "") 
         .replace(/\s+/g, '_')
@@ -1166,7 +1189,6 @@ async function procesarSubidaDocumento(e) {
 
     const [anio, mes, dia] = fechaDoc.split('-');
     const fechaFormateadaNombre = `${dia}_${mes}_${anio}`;
-
     const nuevoNombreArchivo = `${subtipoSaneado}_${fechaFormateadaNombre}.pdf`;
     const archivoRenombrado = new File([archivoInput], nuevoNombreArchivo, { type: archivoInput.type });
 
@@ -1181,18 +1203,35 @@ async function procesarSubidaDocumento(e) {
     formData.append('nombre_user', nombreUsuario || 'Gestor Unificado');
     formData.append('es_pasivo', currentSelectedUserPasivo);
 
-let uploadEndpoint = '';
-if (rol === 'Talento Humano') {
-    uploadEndpoint = `${API_URL}/admin/subir-a-usuario`;
-} else if (rol === 'doc') {
-    uploadEndpoint = `${API_URL}/doctor/subir-aptitud`;
-} else if (rol === 'kelvin') {
-    uploadEndpoint = `${API_URL}/kelvin/subir-certificados`;
-} else {
-    // ✅ SOLUCIÓN: TODOS LOS DEMÁS ROLES USAN ESTA RUTA
-    uploadEndpoint = `${API_URL}/usuario/subir-documento`;
-    console.log("🟡 [FRONT] Usando ruta general para:", rol);
-}
+    let uploadEndpoint = '';
+    if (rol === 'Talento Humano') {
+        uploadEndpoint = `${API_URL}/admin/subir-a-usuario`;
+    } else if (rol === 'doc') {
+        uploadEndpoint = `${API_URL}/doctor/subir-aptitud`;
+    } else if (rol === 'kelvin') {
+        uploadEndpoint = `${API_URL}/kelvin/subir-certificados`;
+    } else {
+        uploadEndpoint = `${API_URL}/usuario/subir-documento`;
+    }
+
+    // ✅ INICIO: Lógica de barra de carga y evitar doble clic
+    const btnSubmit = document.getElementById('btn-upload-submit');
+    const progressContainer = document.getElementById('upload-progress-container');
+    const progressBar = document.getElementById('upload-progress-bar');
+
+    btnSubmit.disabled = true;
+    btnSubmit.innerText = "Subiendo...";
+    progressContainer.style.display = 'block';
+    progressBar.style.width = '0%';
+
+    // Simulación de progreso (mejor experiencia visual)
+    let progress = 0;
+    const interval = setInterval(() => {
+        progress += Math.random() * 15;
+        if (progress > 90) progress = 90;
+        progressBar.style.width = `${progress}%`;
+    }, 300);
+    // ✅ FIN: Lógica de barra de carga
 
     try {
         const res = await fetch(uploadEndpoint, {
@@ -1200,21 +1239,38 @@ if (rol === 'Talento Humano') {
             headers: { 'Authorization': `Bearer ${token}` },
             body: formData
         });
+
+        // ✅ Completar barra
+        clearInterval(interval);
+        progressBar.style.width = '100%';
+
         if (res.ok) {
-            alert("Archivo PDF indexado y guardado correctamente por periodo.");
-            document.getElementById('form-upload-doc').reset();
-            document.getElementById('form-upload-doc').style.display = 'none'; 
-            
-            document.getElementById('filter-doc-tipo').value = tipoDoc;
-            actualizarSubtipos('filter');
-            
-            await obtenerDocumentosServidor();
+            setTimeout(() => {
+                alert("Archivo PDF indexado y guardado correctamente por periodo.");
+                document.getElementById('form-upload-doc').reset();
+                document.getElementById('form-upload-doc').style.display = 'none'; 
+                progressContainer.style.display = 'none';
+                progressBar.style.width = '0%';
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = "🚀 Indexar y Subir Archivo";
+                
+                document.getElementById('filter-doc-tipo').value = tipoDoc;
+                actualizarSubtipos('filter');
+                obtenerDocumentosServidor();
+            }, 500);
         } else {
             const errData = await res.json();
             alert("Error del servidor: " + errData.error);
+            progressContainer.style.display = 'none';
+            btnSubmit.disabled = false;
+            btnSubmit.innerText = "🚀 Indexar y Subir Archivo";
         }
     } catch(err) { 
+        clearInterval(interval);
         alert("Fallo de red al intentar subir.");
+        progressContainer.style.display = 'none';
+        btnSubmit.disabled = false;
+        btnSubmit.innerText = "🚀 Indexar y Subir Archivo";
     }
 }
 
@@ -1846,22 +1902,18 @@ function cerrarFormularioEdicion() {
 }
 
 // Se ejecuta directamente al presionar el botón "Editar" en la fila del usuario
-function prepararEdicion(usuarioId) {
+async function prepararEdicion(usuarioId) {
     const usuario = listaUsuariosLocal.find(u => String(u.id) === String(usuarioId));
     if (!usuario) {
         alert("No se pudieron encontrar los datos locales del colaborador.");
         return;
     }
     
-    // Ocultar registro si estuviera abierto
     document.getElementById('contenedor-formulario-registro').style.display = 'none';
     document.getElementById('btn-mostrar-formulario-registro').innerHTML = '👤 Registrar Nuevo Colaborador';
-
-    // Mostrar contenedores de edición
     document.getElementById('contenedor-formulario-edicion').style.display = 'block';
     document.getElementById('form-edicion-usuario').style.display = 'flex'; 
 
-    // Rellenar campos
     document.getElementById('edit-id').value = usuario.id;
     document.getElementById('edit-nombre').value = usuario.nombre_completo;
     document.getElementById('edit-cedula').value = usuario.cedula;
@@ -1875,6 +1927,40 @@ function prepararEdicion(usuarioId) {
     if (selectReg && selectEdit) {
         selectEdit.innerHTML = selectReg.innerHTML;
         selectEdit.value = usuario.rol; 
+    }
+
+    // ✅ NUEVO: Cargar permisos actuales y disponibles
+    try {
+        // 1. Obtener todos los tipos de documento existentes
+        const resTodos = await fetch(`${API_URL}/tipos-documento`, { 
+            headers: { 'Authorization': `Bearer ${token}` } 
+        });
+        const todosDocs = await resTodos.json();
+
+        // 2. Obtener permisos que YA TIENE asignados este usuario
+        const resPermisos = await fetch(`${API_URL}/usuarios/${usuarioId}/permisos`, { 
+            headers: { 'Authorization': `Bearer ${token}` } 
+        });
+        const permisosActuales = await resPermisos.json();
+        const idsPermitidos = permisosActuales.map(p => p.id);
+
+        // 3. Renderizar checkboxes
+        const contenedor = document.getElementById('edit-lista-permisos');
+        contenedor.innerHTML = '';
+        todosDocs.forEach(doc => {
+            const estaSeleccionado = idsPermitidos.includes(doc.id);
+            const label = document.createElement('label');
+            label.style = "display:flex; align-items:center; gap:6px; padding:2px 0; cursor:pointer; font-size:14px;";
+            label.innerHTML = `
+                <input type="checkbox" name="edit_permisos" value="${doc.id}" ${estaSeleccionado ? 'checked' : ''}>
+                <span>${doc.nombre}</span>
+            `;
+            contenedor.appendChild(label);
+        });
+
+    } catch (err) {
+        console.error("Error cargando permisos:", err);
+        document.getElementById('edit-lista-permisos').innerHTML = '<p style="color:red; font-size:12px;">Error al cargar permisos</p>';
     }
 
     document.getElementById('contenedor-formulario-edicion').scrollIntoView({ behavior: 'smooth' });
@@ -1893,13 +1979,12 @@ async function actualizarUsuarioSistema(event) {
     const departamentoInput = document.getElementById('edit-departamento').value;
     const fotoInput = document.getElementById('edit-foto').files[0];
 
-if (!id || !nombreInput || !cedulaInput || !celularInput || !correoInput || !departamentoInput) {
+    if (!id || !nombreInput || !cedulaInput || !celularInput || !correoInput || !departamentoInput) {
         alert("Por favor rellene todos los campos requeridos para procesar la actualización.");
         return;
     }
 
     const nombreFormateado = nombreInput.split(/\s+/).map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase()).join(' ');
-
     const regexSoloNumeros = /^\d{10}$/;
     if (!regexSoloNumeros.test(cedulaInput) || !regexSoloNumeros.test(celularInput)) {
         alert("La cédula y el celular deben tener exactamente 10 dígitos numéricos enteros.");
@@ -1919,17 +2004,28 @@ if (!id || !nombreInput || !cedulaInput || !celularInput || !correoInput || !dep
     try {
         const respuesta = await fetch(`${API_URL}/usuarios/${id}`, {
             method: 'PUT',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            },
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
             body: formData
         });
 
         const resultado = await respuesta.json();
         if (!respuesta.ok) throw new Error(resultado.error || 'Error en la actualización');
 
+        // ✅ NUEVO: Guardar cambios de permisos
+        const permisosSeleccionados = Array.from(document.querySelectorAll('input[name="edit_permisos"]:checked'))
+            .map(cb => parseInt(cb.value));
+
+        await fetch(`${API_URL}/usuarios/${id}/permisos`, {
+            method: 'PUT',
+            headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ permisos: permisosSeleccionados })
+        });
+
         alert("¡Colaborador actualizado con éxito!");
-        cerrarFormularioEdicion(); // Cierra el menú automáticamente tras actualizar
+        cerrarFormularioEdicion();
         cargarUsuariosSistema(); 
     } catch (error) {
         console.error("Error al actualizar usuario:", error);
@@ -2059,8 +2155,7 @@ const esCorreoValido = (email) => {
 document.addEventListener('DOMContentLoaded', cargarTiposDocumento);
 
 
-// Llamarla al inicio
-document.addEventListener('DOMContentLoaded', cargarTiposDocumento);
+
 </script>
 </body>
 </html>
