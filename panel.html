@@ -1939,30 +1939,42 @@ async function cargarPermisosEnEdicion(rolNombre) {
         }
 
 // 3. Pintar los checkboxes - AHORA ALINEADOS Y BONITOS
+// 3. Pintar los checkboxes - VERSIÓN PERFECTA Y BONITA
 todosLosDocs.forEach(doc => {
     const estaPermitido = nombresPermitidos.includes(doc.nombre);
     const label = document.createElement('label');
     
-    // ✅ ESTILOS PARA ALINEACIÓN PERFECTA
+    // ✅ ESTILOS MEJORADOS: ALINEACIÓN TOTAL Y ORDEN
     label.style.cssText = `
         display: flex;
-        align-items: center;  /* 👈 Alinea verticalmente checkbox y texto */
-        justify-content: flex-end; /* 👈 Mueve todo hacia la derecha, como en tu captura */
-        gap: 8px;             /* 👈 Espacio entre cuadro y texto */
-        padding: 3px 0;
+        align-items: center;       /* Alinea el cuadro con el centro del texto */
+        justify-content: space-between;  /* Texto a la izquierda, cuadro a la derecha */
+        gap: 12px;                 /* Espacio amplio y cómodo */
+        padding: 6px 10px;         /* Relleno interno para que no se vea pegado al borde */
+        margin: 2px 0;             /* Separación entre cada fila */
         cursor: pointer;
         font-size: 14px;
-        color: #475569;
+        color: #334155;            /* Color de texto más bonito y legible */
         width: 100%;
-        text-align: right;
+        box-sizing: border-box;
     `;
 
     label.innerHTML = `
-        <span>${doc.nombre}</span>  <!-- Texto primero -->
-        <input type="checkbox" name="permiso_doc" value="${doc.id}" ${estaPermitido ? 'checked' : ''}> <!-- Cuadro después -->
+        <span style="text-align: left; line-height: 1.4;">${doc.nombre}</span>
+        <input type="checkbox" name="permiso_doc" value="${doc.id}" ${estaPermitido ? 'checked' : ''} style="margin: 0; flex-shrink: 0;">
     `;
+
     contenedor.appendChild(label);
 });
+
+// ✅ OPCIONAL: Añade esto justo después, para que el recuadro tenga mejor diseño
+contenedor.style.cssText = `
+    padding: 8px;
+    background-color: #ffffff;
+    border-radius: 6px;
+    height: 220px; /* Altura fija como en tu captura */
+    overflow-y: auto; /* Barra de desplazamiento interna */
+`;
 
     } catch (err) {
         contenedor.innerHTML = '<span style="color:red; font-size:13px;">Error al cargar permisos</span>';
