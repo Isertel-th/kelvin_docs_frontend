@@ -1938,17 +1938,31 @@ async function cargarPermisosEnEdicion(rolNombre) {
             return;
         }
 
-        todosLosDocs.forEach(doc => {
-            const estaPermitido = nombresPermitidos.includes(doc.nombre);
-            const label = document.createElement('label');
-            label.style.cssText = "display: flex; align-items: center; gap: 8px; padding: 4px; cursor: pointer; font-size: 14px; color: #475569;";
+// 3. Pintar los checkboxes - AHORA ALINEADOS Y BONITOS
+todosLosDocs.forEach(doc => {
+    const estaPermitido = nombresPermitidos.includes(doc.nombre);
+    const label = document.createElement('label');
+    
+    // ✅ ESTILOS PARA ALINEACIÓN PERFECTA
+    label.style.cssText = `
+        display: flex;
+        align-items: center;  /* 👈 Alinea verticalmente checkbox y texto */
+        justify-content: flex-end; /* 👈 Mueve todo hacia la derecha, como en tu captura */
+        gap: 8px;             /* 👈 Espacio entre cuadro y texto */
+        padding: 3px 0;
+        cursor: pointer;
+        font-size: 14px;
+        color: #475569;
+        width: 100%;
+        text-align: right;
+    `;
 
-            label.innerHTML = `
-                <input type="checkbox" name="permiso_doc" value="${doc.id}" ${estaPermitido ? 'checked' : ''}>
-                <span>${doc.nombre}</span>
-            `;
-            contenedor.appendChild(label);
-        });
+    label.innerHTML = `
+        <span>${doc.nombre}</span>  <!-- Texto primero -->
+        <input type="checkbox" name="permiso_doc" value="${doc.id}" ${estaPermitido ? 'checked' : ''}> <!-- Cuadro después -->
+    `;
+    contenedor.appendChild(label);
+});
 
     } catch (err) {
         contenedor.innerHTML = '<span style="color:red; font-size:13px;">Error al cargar permisos</span>';
