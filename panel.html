@@ -836,47 +836,53 @@ if (viewId === 'registrar-usuarios') {
             window.location.href = 'index.html';
         }
 
-        async function cargarEmpleadosActivos() {
-            try {
-                const res = await fetch(`${API_URL}/admin/empleados`, { headers: { 'Authorization': `Bearer ${token}` } });
-                const data = await res.json();
-                const tbody = document.getElementById('tbody-activos');
-                tbody.innerHTML = '';
-                data.forEach(emp => {
-                    tbody.innerHTML += `
-                        <tr data-id="${emp.id}" data-nombre="${emp.nombre_completo}" data-cedula="${emp.cedula}" data-pasivo="false" style="cursor: pointer;" title="Doble clic para abrir expediente">
-                            <td><img src="${emp.foto_url || 'https://via.placeholder.com/150'}" class="emp-thumb"></td>
-                            <td><strong>${emp.nombre_completo}</strong></td>
-                            <td>${emp.cedula}</td>
-                            <td>${emp.correo}</td>
-                            <td>${emp.celular || 'S/N'}</td>
-                            <td>
-                                ${rol === 'Talento Humano' ? `<button class="btn-action btn-passive" onclick="moverAPasivo('${emp.id}')">⚠️ Liquidar / Mover Pasivo</button>` : ''}
-                            </td>
-                        </tr>`;
-                });
-            } catch (err) { console.error("Error cargando activos:", err); }
-        }
+async function cargarEmpleadosActivos() {
+    try {
+        const res = await fetch(`${API_URL}/admin/empleados`, { headers: { 'Authorization': `Bearer ${token}` } });
+        const data = await res.json();
+        const tbody = document.getElementById('tbody-activos');
+        tbody.innerHTML = '';
+        data.forEach(emp => {
+            // ✅ SOLUCIÓN: Usamos nuestra ruta propia + el ID guardado
+            const fotoSrc = emp.foto_url ? `${API_URL}/imagen/${emp.foto_url}` : 'https://via.placeholder.com/150';
+            
+            tbody.innerHTML += `
+                <tr data-id="${emp.id}" data-nombre="${emp.nombre_completo}" data-cedula="${emp.cedula}" data-pasivo="false" style="cursor: pointer;" title="Doble clic para abrir expediente">
+                    <td><img src="${fotoSrc}" class="emp-thumb" loading="lazy"></td>
+                    <td><strong>${emp.nombre_completo}</strong></td>
+                    <td>${emp.cedula}</td>
+                    <td>${emp.correo}</td>
+                    <td>${emp.celular || 'S/N'}</td>
+                    <td>
+                        ${rol === 'Talento Humano' ? `<button class="btn-action btn-passive" onclick="moverAPasivo('${emp.id}')">⚠️ Liquidar / Mover Pasivo</button>` : ''}
+                    </td>
+                </tr>`;
+        });
+    } catch (err) { console.error("Error cargando activos:", err); }
+}
 
-        async function cargarEmpleadosPasivos() {
-            try {
-                const res = await fetch(`${API_URL}/admin/pasivos`, { headers: { 'Authorization': `Bearer ${token}` } });
-                const data = await res.json();
-                const tbody = document.getElementById('tbody-pasivos');
-                tbody.innerHTML = '';
-                data.forEach(emp => {
-                    tbody.innerHTML += `
-                        <tr data-id="${emp.id}" data-nombre="${emp.nombre_completo}" data-cedula="${emp.cedula}" data-pasivo="true" style="cursor: pointer;" title="Doble clic para abrir expediente">
-                            <td><img src="${emp.foto_url || 'https://via.placeholder.com/150'}" class="emp-thumb"></td>
-                            <td><strong>${emp.nombre_completo}</strong></td>
-                            <td>${emp.cedula}</td>
-                            <td>${emp.correo}</td>
-                            <td>${emp.celular || 'S/N'}</td>
-                            <td></td>
-                        </tr>`;
-                });
-            } catch (err) { console.error("Error cargando pasivos:", err); }
-        }
+async function cargarEmpleadosPasivos() {
+    try {
+        const res = await fetch(`${API_URL}/admin/pasivos`, { headers: { 'Authorization': `Bearer ${token}` } });
+        const data = await res.json();
+        const tbody = document.getElementById('tbody-pasivos');
+        tbody.innerHTML = '';
+        data.forEach(emp => {
+            // ✅ SOLUCIÓN: Usamos nuestra ruta propia + el ID guardado
+            const fotoSrc = emp.foto_url ? `${API_URL}/imagen/${emp.foto_url}` : 'https://via.placeholder.com/150';
+            
+            tbody.innerHTML += `
+                <tr data-id="${emp.id}" data-nombre="${emp.nombre_completo}" data-cedula="${emp.cedula}" data-pasivo="true" style="cursor: pointer;" title="Doble clic para abrir expediente">
+                    <td><img src="${fotoSrc}" class="emp-thumb" loading="lazy"></td>
+                    <td><strong>${emp.nombre_completo}</strong></td>
+                    <td>${emp.cedula}</td>
+                    <td>${emp.correo}</td>
+                    <td>${emp.celular || 'S/N'}</td>
+                    <td></td>
+                </tr>`;
+        });
+    } catch (err) { console.error("Error cargando pasivos:", err); }
+}
 
         async function crearUsuario(e) {
             e.preventDefault();
@@ -1351,7 +1357,7 @@ function cargarDatosEmpleadoEnFormulario() {
     document.getElementById('m_correo').value = emp.correo;
     document.getElementById('m_celular').value = emp.celular;
     document.getElementById('m_direccion').value = emp.direccion;
-    document.getElementById('m_vista_foto').src = emp.foto_url || '';
+    document.getElementById('m_vista_foto').src = emp.foto_url ? `${API_URL}/imagen/${emp.foto_url}` : 'https://via.placeholder.com/60';
 
     if (emp.fecha_ingreso) {
         const fechaIso = new Date(emp.fecha_ingreso).toISOString().split('T')[0];
@@ -1774,7 +1780,8 @@ async function cargarUsuariosSistema() {
         usuarios.forEach(user => {
             const tr = document.createElement('tr');
             tr.style.borderBottom = '1px solid #e2e8f0';
-            const fotoUrl = user.foto_url ? user.foto_url : 'https://via.placeholder.com/40';
+            // ✅ SOLUCIÓN: Enlace siempre válido
+            const fotoUrl = user.foto_url ? `${API_URL}/imagen/${user.foto_url}` : 'https://via.placeholder.com/40';
 
             tr.innerHTML = `
                 <td style="padding: 8px;"><img src="${fotoUrl}" alt="Foto" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"></td>
@@ -1861,7 +1868,7 @@ function prepararEdicion(usuarioId) {
     document.getElementById('edit-celular').value = usuario.celular || '';
     document.getElementById('edit-correo').value = usuario.correo;
     document.getElementById('edit-contrasenia').value = ''; 
-    document.getElementById('edit-preview-foto').src = usuario.foto_url || 'https://via.placeholder.com/60';
+    document.getElementById('edit-preview-foto').src = usuario.foto_url ? `${API_URL}/imagen/${usuario.foto_url}` : 'https://via.placeholder.com/60';
 
     const selectReg = document.getElementById('reg-departamento');
     const selectEdit = document.getElementById('edit-departamento');
