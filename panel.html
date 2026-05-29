@@ -476,10 +476,6 @@
         <input type="email" id="edit-correo" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
     </div>
 
-    <div style="display: flex; flex-direction: column; gap: 0.4rem;">
-        <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Dirección de Domicilio:</label>
-        <input type="text" id="edit-direccion" required style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box;">
-    </div>
 
     <div style="display: flex; flex-direction: column; gap: 0.4rem;">
         <label style="font-weight: 600; color: #475569; font-size: 0.95rem;">Contraseña (Dejar en blanco para mantener la actual):</label>
@@ -879,7 +875,6 @@ if (viewId === 'registrar-usuarios') {
             formData.append('fecha_ingreso', document.getElementById('c_fecha').value);
             formData.append('correo', document.getElementById('c_correo').value);
             formData.append('celular', document.getElementById('c_celular').value);
-            formData.append('direccion', document.getElementById('c_direccion').value);
             formData.append('foto', document.getElementById('c_foto').files[0]);
             try {
                 const res = await fetch(`${API_URL}/admin/crear-usuario`, {
@@ -1598,13 +1593,12 @@ async function registrarUsuario(event) {
     const cedulaInput = document.getElementById('reg-cedula').value.trim();
     const celularInput = document.getElementById('reg-celular').value.trim();
     const correoInput = document.getElementById('reg-correo').value.trim().toLowerCase(); 
-    const direccionInput = document.getElementById('reg-direccion').value.trim();
     const contraseniaInput = document.getElementById('reg-contrasenia').value; 
     const departamentoInput = document.getElementById('reg-departamento').value;
     const fotoInput = document.getElementById('reg-foto').files[0]; 
 
-    if (!nombreInput || !cedulaInput || !celularInput || !correoInput || !direccionInput || !contraseniaInput || !departamentoInput || !fotoInput) {
-        alert("Por favor, complete todos los campos obligatorios del formulario (incluyendo la foto, dirección y contraseña).");
+if (!nombreInput || !cedulaInput || !celularInput || !correoInput || !contraseniaInput || !departamentoInput || !fotoInput) {
+        alert("Por favor, complete todos los campos obligatorios del formulario (incluyendo la foto y contraseña).");
         return; 
     }
 
@@ -1635,7 +1629,6 @@ async function registrarUsuario(event) {
     formData.append('cedula', cedulaInput);
     formData.append('celular', celularInput);
     formData.append('correo', correoInput);
-    formData.append('direccion', document.getElementById('c_direccion').value); // ✅ Agregada esta línea
     formData.append('contrasenia', contraseniaInput); 
     formData.append('departamento', departamentoInput); 
     formData.append('rol_asignado', departamentoInput); 
@@ -1846,7 +1839,6 @@ function prepararEdicion(usuarioId) {
     document.getElementById('edit-cedula').value = usuario.cedula;
     document.getElementById('edit-celular').value = usuario.celular || '';
     document.getElementById('edit-correo').value = usuario.correo;
-    document.getElementById('edit-direccion').value = usuario.direccion || '';
     document.getElementById('edit-contrasenia').value = ''; 
     document.getElementById('edit-preview-foto').src = usuario.foto_url || 'https://via.placeholder.com/60';
 
@@ -1869,12 +1861,11 @@ async function actualizarUsuarioSistema(event) {
     const cedulaInput = document.getElementById('edit-cedula').value.trim();
     const celularInput = document.getElementById('edit-celular').value.trim();
     const correoInput = document.getElementById('edit-correo').value.trim().toLowerCase();
-    const direccionInput = document.getElementById('edit-direccion').value.trim();
     const contraseniaInput = document.getElementById('edit-contrasenia').value;
     const departamentoInput = document.getElementById('edit-departamento').value;
     const fotoInput = document.getElementById('edit-foto').files[0];
 
-    if (!id || !nombreInput || !cedulaInput || !celularInput || !correoInput || !direccionInput || !departamentoInput) {
+if (!id || !nombreInput || !cedulaInput || !celularInput || !correoInput || !departamentoInput) {
         alert("Por favor rellene todos los campos requeridos para procesar la actualización.");
         return;
     }
@@ -1892,7 +1883,6 @@ async function actualizarUsuarioSistema(event) {
     formData.append('cedula', cedulaInput);
     formData.append('celular', celularInput);
     formData.append('correo', correoInput);
-    formData.append('direccion', document.getElementById('c_direccion').value); // ✅ Agregada esta línea
     formData.append('rol', departamentoInput); 
     
     if (contraseniaInput) formData.append('contrasenia', contraseniaInput);
