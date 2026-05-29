@@ -1940,40 +1940,51 @@ async function cargarPermisosEnEdicion(rolNombre) {
 
 // 3. Pintar los checkboxes - AHORA ALINEADOS Y BONITOS
 // 3. Pintar los checkboxes - VERSIÓN PERFECTA Y BONITA
+// 3. Pintar los checkboxes - ALINEACIÓN PERFECTA GARANTIZADA
 todosLosDocs.forEach(doc => {
     const estaPermitido = nombresPermitidos.includes(doc.nombre);
     const label = document.createElement('label');
     
-    // ✅ ESTILOS MEJORADOS: ALINEACIÓN TOTAL Y ORDEN
+    // ✅ ESTILOS CLAVE: Posición relativa y cuadros fijos
     label.style.cssText = `
-        display: flex;
-        align-items: center;       /* Alinea el cuadro con el centro del texto */
-        justify-content: space-between;  /* Texto a la izquierda, cuadro a la derecha */
-        gap: 12px;                 /* Espacio amplio y cómodo */
-        padding: 6px 10px;         /* Relleno interno para que no se vea pegado al borde */
-        margin: 2px 0;             /* Separación entre cada fila */
+        display: block;
+        position: relative;  /* 👈 Clave para posicionar el cuadro */
+        padding: 6px 0;
+        padding-right: 35px; /* 👈 Espacio reservado FIJO para el cuadro */
         cursor: pointer;
         font-size: 14px;
-        color: #334155;            /* Color de texto más bonito y legible */
-        width: 100%;
+        color: #334155;
+        line-height: 1.4;
         box-sizing: border-box;
     `;
 
     label.innerHTML = `
-        <span style="text-align: left; line-height: 1.4;">${doc.nombre}</span>
-        <input type="checkbox" name="permiso_doc" value="${doc.id}" ${estaPermitido ? 'checked' : ''} style="margin: 0; flex-shrink: 0;">
+        <span>${doc.nombre}</span>
+        <input 
+            type="checkbox" 
+            name="permiso_doc" 
+            value="${doc.id}" 
+            ${estaPermitido ? 'checked' : ''}
+            style="
+                position: absolute;  /* 👈 Lo sacamos del flujo normal */
+                top: 50%;           /* 👈 Centramos verticalmente */
+                right: 10px;        /* 👈 TODOS quedan a 10px del borde derecho */
+                transform: translateY(-50%); /* 👈 Ajuste perfecto al centro */
+                margin: 0;
+            "
+        >
     `;
 
     contenedor.appendChild(label);
 });
 
-// ✅ OPCIONAL: Añade esto justo después, para que el recuadro tenga mejor diseño
+// ✅ ESTILOS PARA EL CONTENEDOR (Para que no se desborde)
 contenedor.style.cssText = `
-    padding: 8px;
-    background-color: #ffffff;
-    border-radius: 6px;
-    height: 220px; /* Altura fija como en tu captura */
-    overflow-y: auto; /* Barra de desplazamiento interna */
+    position: relative;
+    padding: 5px 10px;
+    height: 220px;
+    overflow-y: auto;
+    box-sizing: border-box;
 `;
 
     } catch (err) {
