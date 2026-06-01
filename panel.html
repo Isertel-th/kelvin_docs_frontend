@@ -115,6 +115,32 @@
     display: block !important;
 }
 
+
+/* --- ESTILOS PARA EL INDICADOR DE CARGA --- */
+.cargando-contenedor {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+.circulo-carga {
+    width: 24px;
+    height: 24px;
+    border: 3px solid #e2e8f0;
+    border-top: 3px solid #007bff;
+    border-radius: 50%;
+    animation: girar 1s linear infinite;
+}
+@keyframes girar {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+.btn-desactivado {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
     </style>
 </head>
 <body>
@@ -556,7 +582,7 @@
 
             <form id="form-upload-doc" onsubmit="procesarSubidaDocumento(event)" style="display: none; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; margin-top: 0.5rem; margin-bottom: 2rem;">
                 <input type="hidden" id="upload-tipo-doc" required>
-                <h4 style="margin: 0 0 1rem 0; color: #475569; font-size: 14px;">📋 Paso 2: Completa los detalles del archivo</h4>
+                <h4 style="margin: 0 0 1rem 0; color: #475569; font-size: 14px;">📋 Completa los detalles del archivo</h4>
                 
                 <div class="grid-form" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
                     <div>
@@ -579,6 +605,18 @@
                     <button type="submit" class="btn-submit" style="padding:10px 24px; font-size:14px; border-radius: 8px;">🚀 Indexar y Subir Archivo</button>
                 </div>
             </form>
+
+
+<div style="margin-top: 1.25rem; text-align: right;">
+    <!-- CONTENEDOR DE CARGA -->
+    <div class="cargando-contenedor" id="indicadorCarga">
+        <div class="circulo-carga"></div>
+        <span style="color:#007bff; font-weight:500;">Subiendo archivo...</span>
+    </div>
+    <!-- BOTÓN ORIGINAL (LE AGREGAMOS UN ID) -->
+    <button type="submit" id="btnSubirArchivo" class="btn-submit" style="padding:10px 24px; font-size:14px; border-radius: 8px;">🚀 Indexar y Subir Archivo</button>
+</div>
+
 
             <div class="table-responsive" style="flex-grow: 1; overflow-y: auto; border: 1px solid #cbd5e1; border-radius: 8px; min-height: 150px;">
                 <table class="table-compacta" style="width: 100%;">
@@ -1142,6 +1180,11 @@ function dibujarTablaAgrupada(docsFiltrados) {
 
 async function procesarSubidaDocumento(e) {
     e.preventDefault();
+
+    // 🟡 ELEMENTOS A CONTROLAR
+    const botonSubir = document.getElementById('btnSubirArchivo');
+    const indicador = document.getElementById('indicadorCarga');
+
     const tipoDoc = document.getElementById('upload-tipo-doc').value;
     
     if (!tipoDoc) {
@@ -1192,18 +1235,29 @@ async function procesarSubidaDocumento(e) {
     formData.append('nombre_user', nombreUsuario || 'Gestor Unificado');
     formData.append('es_pasivo', currentSelectedUserPasivo);
 
-let uploadEndpoint = '';
-if (rol === 'Talento Humano') {
-    uploadEndpoint = `${API_URL}/admin/subir-a-usuario`;
-} else if (rol === 'doc') {
-    uploadEndpoint = `${API_URL}/doctor/subir-aptitud`;
-} else if (rol === 'kelvin') {
-    uploadEndpoint = `${API_URL}/kelvin/subir-certificados`;
-} else {
-    // ✅ SOLUCIÓN: TODOS LOS DEMÁS ROLES USAN ESTA RUTA
-    uploadEndpoint = `${API_URL}/usuario/subir-documento`;
-    console.log("🟡 [FRONT] Usando ruta general para:", rol);
-}
+    let uploadEndpoint = '';
+    if (rol === 'Talento Humano') {
+        uploadEndpoint = `${API_URL}/admin/subir-a-usuario`;
+    } else if (rol === 'doc') {
+        uploadEndpoint = `${API_URL}/doctor/subir-aptitud`;
+    } else if (rol === 'kelvin') {
+        uploadEndpoint = `${API_URL}/kelvin/subir-certificados`;
+    } else {
+        // ✅ SOLUCIÓN: TODOS LOS DEMÁS ROLES USAN ESTA RUTA
+        uploadEndpoint = `${API_URL}/usuario/subir-documento`;
+        console.log("🟡 [FRONT] Usando ruta general para:", rol);
+    }
+
+
+    // ==================================================
+    // ✅ INICIO: ACTIVAR ESTADO DE CARGA Y BLOQUEO
+    // ==================================================
+    botonSubir.disabled = true;
+    botonSubir.classList.add('btn-desactivado');
+    botonSubir.innerText = "📤 Subiendo..."; // Cambia el texto del botón
+    indicador.style.display = 'flex'; // Muestra el círculo girando
+    // ==================================================
+
 
     try {
         const res = await fetch(uploadEndpoint, {
@@ -1211,6 +1265,7 @@ if (rol === 'Talento Humano') {
             headers: { 'Authorization': `Bearer ${token}` },
             body: formData
         });
+        
         if (res.ok) {
             alert("Archivo PDF indexado y guardado correctamente por periodo.");
             document.getElementById('form-upload-doc').reset();
@@ -1227,6 +1282,16 @@ if (rol === 'Talento Humano') {
     } catch(err) { 
         alert("Fallo de red al intentar subir.");
     }
+
+
+    // ==================================================
+    // ✅ FIN: DESBLOQUEAR Y OCULTAR CARGA
+    // ==================================================
+    botonSubir.disabled = false;
+    botonSubir.classList.remove('btn-desactivado');
+    botonSubir.innerText = "🚀 Indexar y Subir Archivo"; // Regresa el texto original
+    indicador.style.display = 'none'; // Oculta el círculo
+    // ==================================================
 }
 
         // CORREGIDO: Redirección inteligente de eliminación según tipo de documento (Para que el admin pueda borrar registros médicos)
