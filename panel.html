@@ -1605,11 +1605,11 @@ async function cargarDocsEmpresa() {
                 <td>
                     <a href="${doc.url_cloudinary}" target="_blank" class="btn-action btn-view" style="text-align:center;">👁️ Ver</a>
                     
-<a href="https://drive.google.com/.../${doc.nombre_real}" 
+<a href="${doc.url_cloudinary.replace(doc.nombre_archivo, doc.nombre_real)}" 
    download="${doc.nombre_archivo}" 
    target="_blank" 
    class="btn-action btn-upload" 
-   style="background:#0284c7; text-align:center; color:white; padding:6px 12px; border-radius:4px; text-decoration:none;">
+   style="background:#0284c7; text-align:center; color:white; padding:6px 12px; border-radius:4px; text-decoration:none; display:inline-block;">
    📥 Descargar
 </a>
                 </td>
