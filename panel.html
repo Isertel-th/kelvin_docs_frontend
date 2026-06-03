@@ -1173,7 +1173,7 @@ function dibujarTablaAgrupada(docsFiltrados) {
                     <span style="font-size: 14px; color: #1e293b; font-weight: 500; vertical-align: middle;">${nombreArchivoMostrar}</span>
                 </td>
                 <td><strong>${fechaFormateada}</strong></td>
-                <td><a href="${doc.url_cloudinary}" target="_blank" class="btn-action btn-view">👁️ Descargar</a></td>
+                <a href="${API_URL}/descargar/${doc.url_cloudinary}" target="_blank" class="btn-action btn-view">👁️ Descargar</a>
                 ${puedeEliminar ? `<td><button class="btn-action btn-delete" onclick="eliminarDocumento('${doc.id}')">❌</button></td>` : '<td>-</td>'}
             </tr>`;
     });
