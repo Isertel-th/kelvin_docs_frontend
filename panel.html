@@ -467,6 +467,15 @@
             <button type="submit" style="background: #22c55e; color: white; border: none; padding: 14px; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 0.5rem; transition: background 0.2s; display: flex; justify-content: center; align-items: center; gap: 0.5rem;">
                 💾 Guardar Colaborador en Sistema
             </button>
+
+
+            <!-- ✅ NUEVO: Contenedor de la barra de carga circular -->
+            <div class="cargando-contenedor" id="carga-registro-usuarios">
+                <div class="circulo-carga"></div>
+                <span>Creando usuario...</span>
+            </div>
+
+
         </form>
     </div>
 
@@ -1658,6 +1667,16 @@ function mostrarSeccion(seccionId) {
 async function registrarUsuario(event) {
     event.preventDefault(); 
 
+    // 🟡 ELEMENTOS A CONTROLAR
+    const botonGuardar = event.submitter; // Capturamos el botón que disparó el evento
+    const indicadorCarga = document.getElementById('carga-registro-usuarios');
+
+    // 🟢 PASO 1: ACTIVAR CARGA Y BLOQUEAR BOTÓN
+    botonGuardar.disabled = true;
+    botonGuardar.classList.add('btn-desactivado');
+    botonGuardar.textContent = "Procesando..."; // Cambiamos texto temporalmente
+    indicadorCarga.style.display = 'flex'; // Mostramos el círculo girando
+
     // 📌 PASO 1: Capturamos SOLO los permisos que MARCÓ en el formulario
     // 🛑 CORRECCIÓN: Creamos una guía para convertir NOMBRES -> IDs (coincide con tu tabla tipos_documento)
     const mapaNombresAIDs = {
@@ -1691,12 +1710,24 @@ async function registrarUsuario(event) {
 
 if (!nombreInput || !cedulaInput || !celularInput || !correoInput || !contraseniaInput || !confirmarContraseniaInput || !departamentoInput || !fotoInput) {
         alert("Por favor, complete todos los campos obligatorios del formulario (incluyendo la foto y contraseña).");
+
+        // 🔴 PASO EXTRA: Si hay error, restauramos estado
+        botonGuardar.disabled = false;
+        botonGuardar.classList.remove('btn-desactivado');
+        botonGuardar.textContent = "💾 Guardar Colaborador en Sistema";
+        indicadorCarga.style.display = 'none';
         return; 
     }
 
     // ✅ VALIDACIÓN FRONTEND: También comprobamos aquí antes de enviar al servidor
     if (contraseniaInput !== confirmarContraseniaInput) {
         alert("Las contraseñas no coinciden.");
+
+        // 🔴 PASO EXTRA: Si hay error, restauramos estado
+        botonGuardar.disabled = false;
+        botonGuardar.classList.remove('btn-desactivado');
+        botonGuardar.textContent = "💾 Guardar Colaborador en Sistema";
+        indicadorCarga.style.display = 'none';
         return;
     }
 
@@ -1708,10 +1739,22 @@ if (!nombreInput || !cedulaInput || !celularInput || !correoInput || !contraseni
     const regexSoloNumeros = /^\d{10}$/;
     if (!regexSoloNumeros.test(cedulaInput)) {
         alert("La Cédula de Identidad no es válida. Debe contener exactamente 10 dígitos numéricos enteros.");
+
+        // 🔴 PASO EXTRA: Si hay error, restauramos estado
+        botonGuardar.disabled = false;
+        botonGuardar.classList.remove('btn-desactivado');
+        botonGuardar.textContent = "💾 Guardar Colaborador en Sistema";
+        indicadorCarga.style.display = 'none';
         return;
     }
     if (!regexSoloNumeros.test(celularInput)) {
         alert("El número de Celular no es válido. Debe contener exactamente 10 dígitos numéricos enteros.");
+
+        // 🔴 PASO EXTRA: Si hay error, restauramos estado
+        botonGuardar.disabled = false;
+        botonGuardar.classList.remove('btn-desactivado');
+        botonGuardar.textContent = "💾 Guardar Colaborador en Sistema";
+        indicadorCarga.style.display = 'none';
         return;
     }
 
@@ -1719,6 +1762,12 @@ if (!nombreInput || !cedulaInput || !celularInput || !correoInput || !contraseni
     const correoDominio = correoInput.split('@')[1];
     if (!correoInput.includes('@') || !dominiosPermitidos.includes(correoDominio)) {
         alert("Correo electrónico inválido. Dominios autorizados: gmail.com, hotmail.com, outlook.com, outlook.es, isertel.net");       
+
+        // 🔴 PASO EXTRA: Si hay error, restauramos estado
+        botonGuardar.disabled = false;
+        botonGuardar.classList.remove('btn-desactivado');
+        botonGuardar.textContent = "💾 Guardar Colaborador en Sistema";
+        indicadorCarga.style.display = 'none';
         return;
     }
 
@@ -1792,6 +1841,12 @@ if (!nombreInput || !cedulaInput || !celularInput || !correoInput || !contraseni
     } catch (error) {
         console.error("Error en registro:", error);
         alert("No se pudo completar el registro: " + error.message);
+    } finally {
+        // 🔵 PASO FINAL: SIEMPRE restauramos el estado, haya salido bien o mal
+        botonGuardar.disabled = false;
+        botonGuardar.classList.remove('btn-desactivado');
+        botonGuardar.textContent = "💾 Guardar Colaborador en Sistema";
+        indicadorCarga.style.display = 'none';
     }
 }
 
