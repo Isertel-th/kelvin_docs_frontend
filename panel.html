@@ -1162,7 +1162,6 @@ function dibujarTablaAgrupada(docsFiltrados) {
         const fechaRaw = doc.fecha_documento || doc.created_at;
         const fechaFormateada = fechaRaw ? new Date(fechaRaw).toLocaleDateString('es-EC', {day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC'}) : 'S/F';
         
-        // CORREGIDO: Ahora 'kelvin' también tiene permiso para visualizar el botón de eliminar en la tablaaa
         const puedeEliminar = (rol === 'Talento Humano' || rol === 'doc' || rol === 'kelvin');
         const nombreArchivoMostrar = doc.nombre_archivo || `${doc.tipo_documento}.pdf`;
 
@@ -1173,7 +1172,7 @@ function dibujarTablaAgrupada(docsFiltrados) {
                     <span style="font-size: 14px; color: #1e293b; font-weight: 500; vertical-align: middle;">${nombreArchivoMostrar}</span>
                 </td>
                 <td><strong>${fechaFormateada}</strong></td>
-                <td><a href="${API_URL}/descargar/${doc.url_cloudinary}" target="_blank" class="btn-action btn-view">👁️ Descargar</a></td>
+                <td><a href="${API_URL}/descargar/${doc.url_cloudinary}" download="${nombreArchivoMostrar}" target="_blank" class="btn-action btn-view">👁️ Descargar</a></td>
                 ${puedeEliminar ? `<td><button class="btn-action btn-delete" onclick="eliminarDocumento('${doc.id}')">❌</button></td>` : '<td>-</td>'}
             </tr>`;
     });
