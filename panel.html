@@ -1173,7 +1173,7 @@ function dibujarTablaAgrupada(docsFiltrados) {
                     <span style="font-size: 14px; color: #1e293b; font-weight: 500; vertical-align: middle;">${nombreArchivoMostrar}</span>
                 </td>
                 <td><strong>${fechaFormateada}</strong></td>
-<td><a href="/api/descargar-archivo/${doc.url_cloudinary}" target="_blank" class="btn-action btn-view" download="${doc.nombre_archivo}">👁️ Ver / Descargar</a></td>
+                <td><a href="${doc.url_cloudinary}" target="_blank" class="btn-action btn-view">👁️ Descargar</a></td>
                 ${puedeEliminar ? `<td><button class="btn-action btn-delete" onclick="eliminarDocumento('${doc.id}')">❌</button></td>` : '<td>-</td>'}
             </tr>`;
     });
@@ -1604,9 +1604,9 @@ async function cargarDocsEmpresa() {
                 </td>
                 <td><small style="color:#475569; font-weight:500;">📅 ${fechaFormateada}</small></td>
                 <td>
-    <a href="/api/descargar-archivo/${doc.url_cloudinary}" target="_blank" class="btn-action btn-view" style="text-align:center;">👁️ Ver</a>
+                    <a href="${doc.url_cloudinary}" target="_blank" class="btn-action btn-view" style="text-align:center;">👁️ Ver</a>
                     
-    <a href="/api/descargar-archivo/${doc.url_cloudinary}" download="${doc.nombre_archivo}" target="_blank" class="btn-action btn-upload" style="background:#0284c7; text-align:center;">📥 Descargar</a>
+                    <a href="${doc.url_cloudinary}" download="${doc.nombre_archivo}" target="_blank" class="btn-action btn-upload" style="background:#0284c7; text-align:center;">📥 Descargar</a>
                 </td>
                 <td>
                     ${rol === 'Talento Humano' ? `<button class="btn-action btn-delete" onclick="eliminarDocEmpresa(${doc.id})">🗑️ Eliminar</button>` : `<span style="color:#94a3b8; font-size:12px;">Sin permisos</span>`}
