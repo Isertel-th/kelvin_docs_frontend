@@ -153,7 +153,7 @@
                 <button class="nav-btn" onclick="switchView('pasivos')">📁 Personal Pasivo</button>
                 <button class="nav-btn role-admin" id="menu-crear" onclick="switchView('crear')">➕ Registrar Empleado</button>
                 <button class="nav-btn role-admin" id="menu-modificar" onclick="switchView('modificar'); prepararModuloModificar();">✏️ Modificar Empleado</button>
-                <button class="nav-btn role-admin" id="menu-empresa" onclick="switchView('empresa')">🏢 Docs Empresa</button>
+                <button class="nav-btn" id="menu-empresa" onclick="switchView('empresa')">🏢 Docs Empresa</button>
                 <button id="btn-registrar-usuarios" class="nav-btn" onclick="switchView('registrar-usuarios')" style="display: none;">👤 Usuarios</button>
             </div>
         </div>
@@ -316,7 +316,8 @@
 
 
 <div id="view-empresa" class="view-section">
-    <div class="card">
+    <!-- Solo visible para Talento Humano -->
+    <div id="seccion-subir-empresa" class="card">
         <h3>Subir Documento Institucional / Empresa</h3>
         <form id="form-empresa" onsubmit="subirDocEmpresa(event)">
             <div class="grid-form">
@@ -325,14 +326,17 @@
                     <input type="text" id="emp_tipo" placeholder="Ej. Reglamento Interno, Políticas" required>
                 </div>
                 <div>
-                    <label>Archivo (PDF/Imagen):</label>
-                    <input type="file" id="emp_archivo" accept=".pdf" class="form-control" />
+                    <label>Archivo (solo PDF):</label>
+                    <input type="file" id="emp_archivo" accept=".pdf" class="form-control" required />
                 </div>
             </div>
             <button type="submit" class="btn-submit">Subir Archivo General</button>
         </form>
     </div>
+</div>
 
+
+    
     <div class="card">
         <h3>Repositorio Corporativo</h3>
         <div class="table-responsive">
@@ -780,48 +784,60 @@
 
 window.onload = function() {
     // 1. Configurar la información de identidad en el header
-    document.getElementById('user-role').innerText = rol.toUpperCase();
-    document.getElementById('user-display-name').innerText = nombreUsuario || "Usuario Isertel";
+    const userRoleEl = document.getElementById('user-role');
+    const userNameEl = document.getElementById('user-display-name');
+    
+    if (userRoleEl) userRoleEl.innerText = rol.toUpperCase();
+    if (userNameEl) userNameEl.innerText = nombreUsuario || "Usuario Isertel";
 
-    // 2. Control de accesos por roles (Vistas de menú)
+    // 2. Control de accesos por roles (Vistas de menú y secciones)
+    const seccionSubirEmpresa = document.getElementById('seccion-subir-empresa');
+
     if (rol === 'Talento Humano') {
-        // Mostramos el botón específico de registro de usuarios
-        document.getElementById('btn-registrar-usuarios').style.display = 'block';
+        const btnRegistrar = document.getElementById('btn-registrar-usuarios');
+        if (btnRegistrar) btnRegistrar.style.display = 'block';
         
-        // Forzamos la aparición de todos los botones de administración ignorando el !important del CSS
         document.querySelectorAll('.role-admin').forEach(el => {
             el.style.setProperty('display', 'block', 'important');
         });
-    } else if (rol === 'doc') {
-        document.querySelectorAll('.role-doc').forEach(el => el.style.display = 'block');
-    } else if (rol === 'kelvin') {
-        document.querySelectorAll('.role-kelvin').forEach(el => el.style.display = 'block');
+
+        // Mostrar sección de documentos
+        if (seccionSubirEmpresa) seccionSubirEmpresa.style.display = 'block';
+    } else {
+        // Ocultar sección para otros roles
+        if (seccionSubirEmpresa) seccionSubirEmpresa.style.display = 'none';
+
+        if (rol === 'doc') {
+            document.querySelectorAll('.role-doc').forEach(el => el.style.display = 'block');
+        } else if (rol === 'kelvin') {
+            document.querySelectorAll('.role-kelvin').forEach(el => el.style.display = 'block');
+        }
     }
 
     // 3. Cargar los datos iniciales desde el servidor
     cargarEmpleadosActivos();
     cargarEmpleadosPasivos();
-    if (rol === 'Talento Humano') cargarDocumentosEmpresa();
+    cargarDocumentosEmpresa();
 
     // 4. Mapeo inteligente de doble clic para abrir expedientes digitales
     const mapearDobleClic = (tbodyId) => {
         const tbody = document.getElementById(tbodyId);
-        if (tbody) {
-            tbody.ondblclick = function(e) {
-                // Ignorar el doble clic si el usuario interactúa con botones o enlaces dentro de la fila
-                if (e.target.closest('button') || e.target.closest('a')) return;
+        if (!tbody) return;
 
-                const fila = e.target.closest('tr');
-                if (fila && fila.dataset.id) {
-                    const id = fila.dataset.id;
-                    const nombre = fila.dataset.nombre;
-                    const cedula = fila.dataset.cedula;
-                    const esPasivo = fila.dataset.pasivo === 'true';
-                    
-                    abrirExpediente(id, nombre, cedula, esPasivo);
-                }
-            };
-        }
+        tbody.ondblclick = function(e) {
+            // Ignorar si se hace clic en botón o enlace
+            if (e.target.closest('button') || e.target.closest('a')) return;
+
+            const fila = e.target.closest('tr');
+            if (fila?.dataset.id) {
+                const id = fila.dataset.id;
+                const nombre = fila.dataset.nombre;
+                const cedula = fila.dataset.cedula;
+                const esPasivo = fila.dataset.pasivo === 'true';
+                
+                abrirExpediente(id, nombre, cedula, esPasivo);
+            }
+        };
     };
 
     // Activar los escuchadores en ambas tablas
@@ -1332,25 +1348,6 @@ if (tipoSeleccionado === "Certificados Médicos" || tipoSeleccionado === "Certif
             document.getElementById('modal-expediente').style.display = 'none';
         }
 
-        async function subirDocEmpresa(e) {
-            e.preventDefault();
-            const formData = new FormData();
-            formData.append('tipo_documento', document.getElementById('emp_tipo').value);
-            formData.append('archivo', document.getElementById('emp_archivo').files[0]);
-
-            try {
-                const res = await fetch(`${API_URL}/subir-empresa`, {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` },
-                    body: formData
-                });
-                if(res.ok) {
-                    alert("Documentación institucional cargada.");
-                    document.getElementById('form-empresa').reset();
-                    cargarDocumentosEmpresa();
-                }
-            } catch(err) { console.error(err); }
-        }
 
         async function cargarDocumentosEmpresa() {
             try {
@@ -1510,29 +1507,46 @@ async function actualizarUsuario(event) {
 async function subirDocEmpresa(event) {
     event.preventDefault();
 
+    // Validación de configuración
+    if (!API_URL || !token) {
+        alert("Error de configuración: No se puede conectar con el servidor.");
+        return;
+    }
+
     const tipoInput = document.getElementById('emp_tipo');
     const archivoInput = document.getElementById('emp_archivo');
     const file = archivoInput.files[0];
+
+    // Validación de campos obligatorios
+    if (!tipoInput.value.trim()) {
+        alert("Por favor ingrese el tipo de documento.");
+        return;
+    }
 
     if (!file) {
         alert("Por favor seleccione un archivo.");
         return;
     }
 
-    // VALIDACIÓN: Verificar que el archivo seleccionado sea estrictamente un PDF
-    if (file.type !== "application/pdf" && !file.name.endsWith('.pdf')) {
+    // VALIDACIÓN: Verificar que sea un PDF (acepta .PDF o .pdf)
+    const esPDF = file.type === "application/pdf" || file.name.toLowerCase().endsWith('.pdf');
+    if (!esPDF) {
         alert("Error: Solo se permiten archivos en formato PDF (.pdf)");
         return;
     }
 
     const formData = new FormData();
-    formData.append('tipo_documento', tipoInput.value);
+    formData.append('tipo_documento', tipoInput.value.trim());
     formData.append('archivo', file);
 
     try {
         const res = await fetch(`${API_URL}/empresa/documentos`, {
             method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}` },
+            headers: { 
+                'Authorization': `Bearer ${token}` 
+                // ⚠️ No agregues 'Content-Type': 'multipart/form-data', 
+                // lo asigna automáticamente el navegador cuando usas FormData
+            },
             body: formData
         });
 
@@ -1542,9 +1556,9 @@ async function subirDocEmpresa(event) {
             alert("¡Documento corporativo subido e indexado con éxito!");
             tipoInput.value = "";
             archivoInput.value = "";
-            cargarDocsEmpresa();
+            cargarDocsEmpresa(); // Recarga la lista
         } else {
-            alert("Error al subir: " + data.error);
+            alert("Error al subir: " + (data.error || 'Respuesta no válida del servidor'));
         }
     } catch (err) {
         console.error("Error en submit empresa:", err);
@@ -1604,7 +1618,7 @@ async function cargarDocsEmpresa() {
                     <a href="${doc.url_cloudinary}" download="${doc.nombre_archivo}" target="_blank" class="btn-action btn-upload" style="background:#0284c7; text-align:center;">📥 Descargar</a>
                 </td>
                 <td>
-                    ${rol === 'Talento Humano' ? `<button class="btn-action btn-delete" onclick="eliminarDocEmpresa(${doc.id})">🗑️ Eliminar</button>` : `<span style="color:#94a3b8; font-size:12px;">Sin permisos</span>`}
+         ${rol === 'Talento Humano' ? `<button class="btn-action btn-delete" onclick="eliminarDocEmpresa('${doc.id}')">🗑️ Eliminar</button>` : `<span style="color:#94a3b8; font-size:12px;">Sin permisos</span>`}
                 </td>
             `;
             tbody.appendChild(tr);
@@ -2323,9 +2337,6 @@ const esCorreoValido = (email) => {
 // Llamarla al inicio
 document.addEventListener('DOMContentLoaded', cargarTiposDocumento);
 
-
-// Llamarla al inicio
-document.addEventListener('DOMContentLoaded', cargarTiposDocumento);
 </script>
 </body>
 </html>
