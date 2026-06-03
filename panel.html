@@ -316,8 +316,7 @@
 
 
 <!-- ✅ SOLO VISIBLE PARA TALENTO HUMANO -->
-    <% if (rol === 'Talento Humano') { %>
-    <div class="card">
+    <div class="card" id="seccion-empresa">  <!-- ⭐ LE AGREGAMOS UN ID -->
         <h3>Subir Documento Institucional / Empresa</h3>
         <form id="form-empresa" onsubmit="subirDocEmpresa(event)">
             <div class="grid-form">
@@ -333,7 +332,6 @@
             <button type="submit" class="btn-submit">Subir Archivo General</button>
         </form>
     </div>
-    <% } %>
 
     <div class="card">
         <h3>Repositorio Corporativo</h3>
@@ -781,55 +779,71 @@
         }
 
 window.onload = function() {
+    // 🔒 Protección: Si las variables no existen, definirlas para evitar errores
+    const rolActual = typeof rol !== 'undefined' ? rol : "";
+    const nombreUsuarioActual = typeof nombreUsuario !== 'undefined' ? nombreUsuario : "Usuario Isertel";
+
     // 1. Configurar la información de identidad en el header
-    document.getElementById('user-role').innerText = rol.toUpperCase();
-    document.getElementById('user-display-name').innerText = nombreUsuario || "Usuario Isertel";
+    const elementoRol = document.getElementById('user-role');
+    const elementoNombre = document.getElementById('user-display-name');
+    
+    if (elementoRol) elementoRol.innerText = rolActual.toUpperCase();
+    if (elementoNombre) elementoNombre.innerText = nombreUsuarioActual;
 
 
     // Mostrar u ocultar formulario de subida de Docs Empresa
-    if (rol !== 'Talento Humano') {
-        document.querySelector('#view-empresa .card:first-child').style.display = 'none';
+    const seccionEmpresa = document.getElementById('seccion-empresa');
+    if (seccionEmpresa) {
+        if (rolActual === 'Talento Humano') {
+            seccionEmpresa.style.display = 'block'; // Se ve solo si es Talento Humano
+        } else {
+            seccionEmpresa.style.display = 'none'; // Oculto para todos los demás
+        }
     }
 
     // 2. Control de accesos por roles (Vistas de menú)
-    if (rol === 'Talento Humano') {
+    if (rolActual === 'Talento Humano') {
         // Mostramos el botón específico de registro de usuarios
-        document.getElementById('btn-registrar-usuarios').style.display = 'block';
+        const botonRegistrar = document.getElementById('btn-registrar-usuarios');
+        if (botonRegistrar) botonRegistrar.style.display = 'block';
         
         // Forzamos la aparición de todos los botones de administración ignorando el !important del CSS
         document.querySelectorAll('.role-admin').forEach(el => {
             el.style.setProperty('display', 'block', 'important');
         });
-    } else if (rol === 'doc') {
+    } else if (rolActual === 'doc') {
         document.querySelectorAll('.role-doc').forEach(el => el.style.display = 'block');
-    } else if (rol === 'kelvin') {
+    } else if (rolActual === 'kelvin') {
         document.querySelectorAll('.role-kelvin').forEach(el => el.style.display = 'block');
     }
 
-    // 3. Cargar los datos iniciales desde el servidor
-    cargarEmpleadosActivos();
-    cargarEmpleadosPasivos();
-    cargarDocumentosEmpresa();
+    // 3. Cargar los datos iniciales desde el servidor (solo si las funciones existen)
+    if (typeof cargarEmpleadosActivos === 'function') cargarEmpleadosActivos();
+    if (typeof cargarEmpleadosPasivos === 'function') cargarEmpleadosPasivos();
+    if (typeof cargarDocumentosEmpresa === 'function') cargarDocumentosEmpresa();
 
     // 4. Mapeo inteligente de doble clic para abrir expedientes digitales
     const mapearDobleClic = (tbodyId) => {
         const tbody = document.getElementById(tbodyId);
-        if (tbody) {
-            tbody.ondblclick = function(e) {
-                // Ignorar el doble clic si el usuario interactúa con botones o enlaces dentro de la fila
-                if (e.target.closest('button') || e.target.closest('a')) return;
+        if (!tbody) return; // Si la tabla no existe, salimos y no hacemos nada
 
-                const fila = e.target.closest('tr');
-                if (fila && fila.dataset.id) {
-                    const id = fila.dataset.id;
-                    const nombre = fila.dataset.nombre;
-                    const cedula = fila.dataset.cedula;
-                    const esPasivo = fila.dataset.pasivo === 'true';
-                    
+        tbody.ondblclick = function(e) {
+            // Ignorar el doble clic si el usuario interactúa con botones o enlaces dentro de la fila
+            if (e.target.closest('button') || e.target.closest('a')) return;
+
+            const fila = e.target.closest('tr');
+            if (fila && fila.dataset.id) {
+                const id = fila.dataset.id;
+                const nombre = fila.dataset.nombre || ""; // Valor por si falta el dato
+                const cedula = fila.dataset.cedula || ""; // Valor por si falta el dato
+                const esPasivo = fila.dataset.pasivo === 'true';
+                
+                // Ejecutar solo si la función existe
+                if (typeof abrirExpediente === 'function') {
                     abrirExpediente(id, nombre, cedula, esPasivo);
                 }
-            };
-        }
+            }
+        };
     };
 
     // Activar los escuchadores en ambas tablas
