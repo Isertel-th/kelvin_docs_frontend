@@ -1162,7 +1162,7 @@ function dibujarTablaAgrupada(docsFiltrados) {
         const fechaRaw = doc.fecha_documento || doc.created_at;
         const fechaFormateada = fechaRaw ? new Date(fechaRaw).toLocaleDateString('es-EC', {day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC'}) : 'S/F';
         
-        // CORREGIDO: Ahora 'kelvin' también tiene permiso para visualizar el botón de eliminar en la tabla
+        // CORREGIDO: Ahora 'kelvin' también tiene permiso para visualizar el botón de eliminar en la tablaaa
         const puedeEliminar = (rol === 'Talento Humano' || rol === 'doc' || rol === 'kelvin');
         const nombreArchivoMostrar = doc.nombre_archivo || `${doc.tipo_documento}.pdf`;
 
