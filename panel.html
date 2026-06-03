@@ -153,7 +153,7 @@
                 <button class="nav-btn" onclick="switchView('pasivos')">📁 Personal Pasivo</button>
                 <button class="nav-btn role-admin" id="menu-crear" onclick="switchView('crear')">➕ Registrar Empleado</button>
                 <button class="nav-btn role-admin" id="menu-modificar" onclick="switchView('modificar'); prepararModuloModificar();">✏️ Modificar Empleado</button>
-                <button class="nav-btn role-admin" id="menu-empresa" onclick="switchView('empresa')">🏢 Docs Empresa</button>
+                <button class="nav-btn" id="menu-empresa" onclick="switchView('empresa')">🏢 Docs Empresa</button>
                 <button id="btn-registrar-usuarios" class="nav-btn" onclick="switchView('registrar-usuarios')" style="display: none;">👤 Usuarios</button>
             </div>
         </div>
@@ -316,7 +316,8 @@
 
 
 <div id="view-empresa" class="view-section">
-    <div class="card">
+    <!-- SOLO VISIBLE PARA TALENTO HUMANO -->
+    <div class="card" id="seccion-subir-empresa" style="display: none;">
         <h3>Subir Documento Institucional / Empresa</h3>
         <form id="form-empresa" onsubmit="subirDocEmpresa(event)">
             <div class="grid-form">
@@ -792,6 +793,10 @@ window.onload = function() {
         document.querySelectorAll('.role-admin').forEach(el => {
             el.style.setProperty('display', 'block', 'important');
         });
+
+        // ✅ Mostrar formulario de subida solo a Talento Humano
+        const seccionSubir = document.getElementById('seccion-subir-empresa');
+        if (seccionSubir) seccionSubir.style.display = 'block';
     } else if (rol === 'doc') {
         document.querySelectorAll('.role-doc').forEach(el => el.style.display = 'block');
     } else if (rol === 'kelvin') {
@@ -801,7 +806,7 @@ window.onload = function() {
     // 3. Cargar los datos iniciales desde el servidor
     cargarEmpleadosActivos();
     cargarEmpleadosPasivos();
-    if (rol === 'Talento Humano') cargarDocumentosEmpresa();
+    cargarDocumentosEmpresa(); // ✅ AHORA CARGA PARA TODOS
 
     // 4. Mapeo inteligente de doble clic para abrir expedientes digitales
     const mapearDobleClic = (tbodyId) => {
