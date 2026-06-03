@@ -153,7 +153,7 @@
                 <button class="nav-btn" onclick="switchView('pasivos')">📁 Personal Pasivo</button>
                 <button class="nav-btn role-admin" id="menu-crear" onclick="switchView('crear')">➕ Registrar Empleado</button>
                 <button class="nav-btn role-admin" id="menu-modificar" onclick="switchView('modificar'); prepararModuloModificar();">✏️ Modificar Empleado</button>
-                <button class="nav-btn" id="menu-empresa" onclick="switchView('empresa')">🏢 Docs Empresa</button>
+                <button class="nav-btn role-admin" id="menu-empresa" onclick="switchView('empresa')">🏢 Docs Empresa</button>
                 <button id="btn-registrar-usuarios" class="nav-btn" onclick="switchView('registrar-usuarios')" style="display: none;">👤 Usuarios</button>
             </div>
         </div>
@@ -315,8 +315,8 @@
 
 
 
-<!-- ✅ SOLO VISIBLE PARA TALENTO HUMANO -->
-    <div class="card" id="seccion-empresa">  <!-- ⭐ LE AGREGAMOS UN ID -->
+<div id="view-empresa" class="view-section">
+    <div class="card">
         <h3>Subir Documento Institucional / Empresa</h3>
         <form id="form-empresa" onsubmit="subirDocEmpresa(event)">
             <div class="grid-form">
@@ -779,71 +779,49 @@
         }
 
 window.onload = function() {
-    // 🔒 Protección: Si las variables no existen, definirlas para evitar errores
-    const rolActual = typeof rol !== 'undefined' ? rol : "";
-    const nombreUsuarioActual = typeof nombreUsuario !== 'undefined' ? nombreUsuario : "Usuario Isertel";
-
     // 1. Configurar la información de identidad en el header
-    const elementoRol = document.getElementById('user-role');
-    const elementoNombre = document.getElementById('user-display-name');
-    
-    if (elementoRol) elementoRol.innerText = rolActual.toUpperCase();
-    if (elementoNombre) elementoNombre.innerText = nombreUsuarioActual;
-
-
-    // Mostrar u ocultar formulario de subida de Docs Empresa
-    const seccionEmpresa = document.getElementById('seccion-empresa');
-    if (seccionEmpresa) {
-        if (rolActual === 'Talento Humano') {
-            seccionEmpresa.style.display = 'block'; // Se ve solo si es Talento Humano
-        } else {
-            seccionEmpresa.style.display = 'none'; // Oculto para todos los demás
-        }
-    }
+    document.getElementById('user-role').innerText = rol.toUpperCase();
+    document.getElementById('user-display-name').innerText = nombreUsuario || "Usuario Isertel";
 
     // 2. Control de accesos por roles (Vistas de menú)
-    if (rolActual === 'Talento Humano') {
+    if (rol === 'Talento Humano') {
         // Mostramos el botón específico de registro de usuarios
-        const botonRegistrar = document.getElementById('btn-registrar-usuarios');
-        if (botonRegistrar) botonRegistrar.style.display = 'block';
+        document.getElementById('btn-registrar-usuarios').style.display = 'block';
         
         // Forzamos la aparición de todos los botones de administración ignorando el !important del CSS
         document.querySelectorAll('.role-admin').forEach(el => {
             el.style.setProperty('display', 'block', 'important');
         });
-    } else if (rolActual === 'doc') {
+    } else if (rol === 'doc') {
         document.querySelectorAll('.role-doc').forEach(el => el.style.display = 'block');
-    } else if (rolActual === 'kelvin') {
+    } else if (rol === 'kelvin') {
         document.querySelectorAll('.role-kelvin').forEach(el => el.style.display = 'block');
     }
 
-    // 3. Cargar los datos iniciales desde el servidor (solo si las funciones existen)
-    if (typeof cargarEmpleadosActivos === 'function') cargarEmpleadosActivos();
-    if (typeof cargarEmpleadosPasivos === 'function') cargarEmpleadosPasivos();
-    if (typeof cargarDocumentosEmpresa === 'function') cargarDocumentosEmpresa();
+    // 3. Cargar los datos iniciales desde el servidor
+    cargarEmpleadosActivos();
+    cargarEmpleadosPasivos();
+    if (rol === 'Talento Humano') cargarDocumentosEmpresa();
 
     // 4. Mapeo inteligente de doble clic para abrir expedientes digitales
     const mapearDobleClic = (tbodyId) => {
         const tbody = document.getElementById(tbodyId);
-        if (!tbody) return; // Si la tabla no existe, salimos y no hacemos nada
+        if (tbody) {
+            tbody.ondblclick = function(e) {
+                // Ignorar el doble clic si el usuario interactúa con botones o enlaces dentro de la fila
+                if (e.target.closest('button') || e.target.closest('a')) return;
 
-        tbody.ondblclick = function(e) {
-            // Ignorar el doble clic si el usuario interactúa con botones o enlaces dentro de la fila
-            if (e.target.closest('button') || e.target.closest('a')) return;
-
-            const fila = e.target.closest('tr');
-            if (fila && fila.dataset.id) {
-                const id = fila.dataset.id;
-                const nombre = fila.dataset.nombre || ""; // Valor por si falta el dato
-                const cedula = fila.dataset.cedula || ""; // Valor por si falta el dato
-                const esPasivo = fila.dataset.pasivo === 'true';
-                
-                // Ejecutar solo si la función existe
-                if (typeof abrirExpediente === 'function') {
+                const fila = e.target.closest('tr');
+                if (fila && fila.dataset.id) {
+                    const id = fila.dataset.id;
+                    const nombre = fila.dataset.nombre;
+                    const cedula = fila.dataset.cedula;
+                    const esPasivo = fila.dataset.pasivo === 'true';
+                    
                     abrirExpediente(id, nombre, cedula, esPasivo);
                 }
-            }
-        };
+            };
+        }
     };
 
     // Activar los escuchadores en ambas tablas
