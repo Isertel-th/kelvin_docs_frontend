@@ -1603,9 +1603,8 @@ async function cargarDocsEmpresa() {
                 </td>
                 <td><small style="color:#475569; font-weight:500;">📅 ${fechaFormateada}</small></td>
                 <td>
-                    <a href="${doc.url_cloudinary}" target="_blank" class="btn-action btn-view" style="text-align:center;">👁️ Ver</a>
-                    
-                    <a href="${doc.url_cloudinary}" download="${doc.nombre_archivo}" target="_blank" class="btn-action btn-upload" style="background:#0284c7; text-align:center;">📥 Descargar</a>
+                    <a href="${API_URL}/descargar/${doc.url_cloudinary}" target="_blank" class="btn-action btn-view" style="text-align:center;">👁️ Ver</a>
+                    <a href="${API_URL}/descargar/${doc.url_cloudinary}" download="${doc.nombre_archivo}" target="_blank" class="btn-action btn-upload" style="background:#0284c7; text-align:center;">📥 Descargar</a>
                 </td>
                 <td>
                     ${rol === 'Talento Humano' ? `<button class="btn-action btn-delete" onclick="eliminarDocEmpresa(${doc.id})">🗑️ Eliminar</button>` : `<span style="color:#94a3b8; font-size:12px;">Sin permisos</span>`}
