@@ -249,6 +249,11 @@
                             <input type="file" id="c_foto" accept="image/*" required>
                         </div>
                         <button type="submit" class="btn-submit">Guardar en Base de Datos</button>
+                        <!-- ✅ AGREGAR ESTO AQUÍ -->
+<div class="cargando-contenedor" id="carga-crear">
+    <div class="circulo-carga"></div>
+    <span>Guardando colaborador...</span>
+</div>
                     </form>
                 </div>
             </div>
@@ -309,6 +314,11 @@
                 <small style="color: #64748b; display: block; margin-top: 6px;">* Dejar vacío si no se desea cambiar la imagen actual.</small>
             </div>
             <button type="submit" class="btn-submit" style="background: #e67e22;">💾 Guardar Cambios Realizados</button>
+            <!-- ✅ AGREGAR ESTO AQUÍ -->
+<div class="cargando-contenedor" id="carga-modificar">
+    <div class="circulo-carga"></div>
+    <span>Actualizando datos...</span>
+</div>
         </form>
     </div>
 </div>
@@ -331,6 +341,11 @@
                 </div>
             </div>
             <button type="submit" class="btn-submit">Subir Archivo General</button>
+            <!-- ✅ AGREGAR ESTO AQUÍ -->
+<div class="cargando-contenedor" id="carga-empresa">
+    <div class="circulo-carga"></div>
+    <span>Subiendo documento...</span>
+</div>
         </form>
     </div>
 
@@ -555,6 +570,11 @@
     <button type="submit" style="background: #f59e0b; color: white; border: none; padding: 14px; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 0.5rem; transition: background 0.2s; display: flex; justify-content: center; align-items: center; gap: 0.5rem;">
         💾 Actualizar Cambios del Usuario
     </button>
+    <!-- ✅ AGREGAR ESTO AQUÍ -->
+<div class="cargando-contenedor" id="carga-edicion-usuario">
+    <div class="circulo-carga"></div>
+    <span>Guardando cambios...</span>
+</div>
 </form>
     </div> 
 </div>
@@ -955,30 +975,56 @@ async function cargarEmpleadosPasivos() {
     } catch (err) { console.error("Error cargando pasivos:", err); }
 }
 
-        async function crearUsuario(e) {
-            e.preventDefault();
-            const formData = new FormData();
-            formData.append('cedula', document.getElementById('c_cedula').value);
-            formData.append('nombre_completo', document.getElementById('c_nombre').value);
-            formData.append('fecha_ingreso', document.getElementById('c_fecha').value);
-            formData.append('correo', document.getElementById('c_correo').value);
-            formData.append('celular', document.getElementById('c_celular').value);
-            formData.append('foto', document.getElementById('c_foto').files[0]);
-            try {
-                const res = await fetch(`${API_URL}/admin/crear-usuario`, {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` },
-                    body: formData
-                });
-                const data = await res.json();
-                if(res.ok) {
-                    alert("Empleado creado con éxito");
-                    document.getElementById('form-crear-usuario').reset();
-                    cargarEmpleadosActivos();
-                    switchView('activos');
-                } else { alert("Error: " + data.error); }
-            } catch(err) { alert("Error de comunicación backend"); }
+async function crearUsuario(e) {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append('cedula', document.getElementById('c_cedula').value);
+    formData.append('nombre_completo', document.getElementById('c_nombre').value);
+    formData.append('fecha_ingreso', document.getElementById('c_fecha').value);
+    formData.append('correo', document.getElementById('c_correo').value);
+    formData.append('celular', document.getElementById('c_celular').value);
+    
+    // Verificar si hay archivo antes de agregarlo
+    const inputFoto = document.getElementById('c_foto');
+    if (inputFoto.files.length > 0) {
+        formData.append('foto', inputFoto.files[0]);
+    }
+
+    const btnCrear = document.querySelector('#form-crear-usuario button[type="submit"]');
+    const cargaCrear = document.getElementById('carga-crear');
+    btnCrear.disabled = true;
+    btnCrear.classList.add('btn-desactivado');
+    cargaCrear.style.display = 'flex';
+
+    try {
+        const res = await fetch(`${API_URL}/admin/crear-usuario`, {
+            method: 'POST',
+            headers: { 
+                'Authorization': `Bearer ${token}`
+                // ❌ NO agregues 'Content-Type': 'multipart/form-data'
+                // El navegador lo pone automáticamente con el límite correcto
+            },
+            body: formData
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+            alert("Empleado creado con éxito");
+            document.getElementById('form-crear-usuario').reset();
+            cargarEmpleadosActivos();
+            switchView('activos');
+        } else {
+            alert("Error: " + (data.error || "Ocurrió un problema desconocido"));
         }
+    } catch (err) {
+        alert("Error de comunicación con el servidor");
+    } finally {
+        // ✅ Siempre se ejecuta, sin importar el resultado
+        btnCrear.disabled = false;
+        btnCrear.classList.remove('btn-desactivado');
+        cargaCrear.style.display = 'none';
+    }
+}
 
         async function moverAPasivo(id) {
             if(!confirm("¿Está seguro de mover este usuario a pasivos? Se transferirán todas sus carpetas e historiales médicos.")) return;
@@ -1344,25 +1390,57 @@ if (tipoSeleccionado === "Certificados Médicos" || tipoSeleccionado === "Certif
             document.getElementById('modal-expediente').style.display = 'none';
         }
 
-        async function subirDocEmpresa(e) {
-            e.preventDefault();
-            const formData = new FormData();
-            formData.append('tipo_documento', document.getElementById('emp_tipo').value);
-            formData.append('archivo', document.getElementById('emp_archivo').files[0]);
+async function subirDocEmpresa(e) {
+    e.preventDefault(); // ✅ Lo primero de todo
 
-            try {
-                const res = await fetch(`${API_URL}/subir-empresa`, {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` },
-                    body: formData
-                });
-                if(res.ok) {
-                    alert("Documentación institucional cargada.");
-                    document.getElementById('form-empresa').reset();
-                    cargarDocumentosEmpresa();
-                }
-            } catch(err) { console.error(err); }
+    // ✅ AGREGAR AL INICIO DE subirDocEmpresa()
+    const btnEmpresa = document.querySelector('#form-empresa button[type="submit"]');
+    const cargaEmpresa = document.getElementById('carga-empresa');
+    btnEmpresa.disabled = true;
+    btnEmpresa.classList.add('btn-desactivado');
+    cargaEmpresa.style.display = 'flex';
+
+    const formData = new FormData();
+    formData.append('tipo_documento', document.getElementById('emp_tipo').value);
+
+    // ✅ Validar que haya archivo seleccionado
+    const inputArchivo = document.getElementById('emp_archivo');
+    if (inputArchivo.files.length === 0) {
+        alert("Por favor selecciona un archivo para subir.");
+        // Restaurar antes de salir
+        btnEmpresa.disabled = false;
+        btnEmpresa.classList.remove('btn-desactivado');
+        cargaEmpresa.style.display = 'none';
+        return;
+    }
+    formData.append('archivo', inputArchivo.files[0]);
+
+    try {
+        const res = await fetch(`${API_URL}/subir-empresa`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` },
+            body: formData
+        });
+
+        const data = await res.json(); // Para leer mensaje del servidor si existe
+
+        if (res.ok) {
+            alert("Documentación institucional cargada.");
+            document.getElementById('form-empresa').reset();
+            cargarDocumentosEmpresa();
+        } else {
+            alert("Error al subir: " + (data.error || "Ocurrió un problema en el servidor"));
         }
+    } catch(err) {
+        console.error(err);
+        alert("Error de conexión o de red.");
+    } finally {
+        // ✅ SIEMPRE se restaura la interfaz
+        btnEmpresa.disabled = false;
+        btnEmpresa.classList.remove('btn-desactivado');
+        cargaEmpresa.style.display = 'none';
+    }
+}
 
         async function cargarDocumentosEmpresa() {
             try {
@@ -1465,14 +1543,35 @@ function cargarDatosEmpleadoEnFormulario() {
 
 // Envía la petición PUT incluyendo la tabla correspondiente como parámetro de ruta
 async function actualizarUsuario(event) {
-    event.preventDefault();
-    
+    event.preventDefault(); // ✅ Lo primero de todo
+
+    // ✅ AGREGAR AL INICIO DE actualizarUsuario()
+    const btnModificar = document.querySelector('#form-modificar-usuario button[type="submit"]');
+    const cargaModificar = document.getElementById('carga-modificar');
+    btnModificar.disabled = true;
+    btnModificar.classList.add('btn-desactivado');
+    cargaModificar.style.display = 'flex';
+
     const id = document.getElementById('m_id').value;
     const tablaTarget = document.getElementById('m_tipo_tabla').value; // 'nomina' o 'pasivos'
-    
+
+    // Validación básica
+    if (!id || !tablaTarget) {
+        alert("Faltan datos necesarios para la modificación.");
+        // Restaurar antes de salir
+        btnModificar.disabled = false;
+        btnModificar.classList.remove('btn-desactivado');
+        cargaModificar.style.display = 'none';
+        return;
+    }
+
     // SEGUNDO CANDADO DE SEGURIDAD: Evita el envío si por alguna razón la tabla es 'pasivos'
     if (tablaTarget === 'pasivos') {
         alert("Acción denegada: No está permitido modificar datos de personal pasivo.");
+        // Restaurar antes de salir
+        btnModificar.disabled = false;
+        btnModificar.classList.remove('btn-desactivado');
+        cargaModificar.style.display = 'none';
         return;
     }
 
@@ -1486,7 +1585,7 @@ async function actualizarUsuario(event) {
     formData.append('direccion', document.getElementById('m_direccion').value);
     
     const inputFoto = document.getElementById('m_foto');
-    if (inputFoto.files[0]) {
+    if (inputFoto.files.length > 0) { // ✅ Más seguro verificar longitud
         formData.append('foto', inputFoto.files[0]);
     }
 
@@ -1506,11 +1605,16 @@ async function actualizarUsuario(event) {
             if (typeof cargarEmpleados === 'function') cargarEmpleados();
             if (typeof cargarPasivos === 'function') cargarPasivos();
         } else {
-            alert("Error: " + data.error);
+            alert("Error: " + (data.error || "No se pudo actualizar el registro"));
         }
     } catch (err) {
         console.error(err);
         alert("Error de red o servidor al intentar guardar los cambios.");
+    } finally {
+        // ✅ SIEMPRE se ejecuta, pase lo que pase
+        btnModificar.disabled = false;
+        btnModificar.classList.remove('btn-desactivado');
+        cargaModificar.style.display = 'none';
     }
 }
 
@@ -2128,11 +2232,15 @@ contenedor.style.cssText = `
 
 
 
-
-// NOMBRE CORREGIDO: Evita conflictos con el módulo de modificación de nómina ('m_')
-// NOMBRE CORREGIDO: Evita conflictos con el módulo de modificación de nómina ('m_')
 async function actualizarUsuarioSistema(event) {
     event.preventDefault();
+
+    // ✅ AGREGAR AL INICIO DE actualizarUsuarioSistema()
+    const btnEditarUsuario = document.querySelector('#form-edicion-usuario button[type="submit"]');
+    const cargaEditarUsuario = document.getElementById('carga-edicion-usuario');
+    btnEditarUsuario.disabled = true;
+    btnEditarUsuario.classList.add('btn-desactivado');
+    cargaEditarUsuario.style.display = 'flex';
 
     const id = document.getElementById('edit-id').value;
     const nombreInput = document.getElementById('edit-nombre').value.trim();
@@ -2148,11 +2256,19 @@ async function actualizarUsuarioSistema(event) {
 
     if (!id || !nombreInput || !cedulaInput || !celularInput || !correoInput || !departamentoInput) {
         alert("Por favor rellene todos los campos requeridos para procesar la actualización.");
+        // Restaurar antes de salir
+        btnEditarUsuario.disabled = false;
+        btnEditarUsuario.classList.remove('btn-desactivado');
+        cargaEditarUsuario.style.display = 'none';
         return;
     }
 
     if (!regexCorreo.test(correoInput)) {
         alert("Por favor ingrese un correo electrónico válido.");
+        // Restaurar antes de salir
+        btnEditarUsuario.disabled = false;
+        btnEditarUsuario.classList.remove('btn-desactivado');
+        cargaEditarUsuario.style.display = 'none';
         return;
     }
 
@@ -2161,6 +2277,10 @@ async function actualizarUsuarioSistema(event) {
     const regexSoloNumeros = /^\d{10}$/;
     if (!regexSoloNumeros.test(cedulaInput) || !regexSoloNumeros.test(celularInput)) {
         alert("La cédula y el celular deben tener exactamente 10 dígitos numéricos enteros.");
+        // Restaurar antes de salir
+        btnEditarUsuario.disabled = false;
+        btnEditarUsuario.classList.remove('btn-desactivado');
+        cargaEditarUsuario.style.display = 'none';
         return;
     }
 
@@ -2191,11 +2311,15 @@ async function actualizarUsuarioSistema(event) {
         const permisosActualizados = Array.from(document.querySelectorAll('input[name="permiso_doc"]:checked'))
             .map(cb => parseInt(cb.value));
 
+        // ✅ OPCIONAL: Validar si hay al menos un permiso seleccionado
+        // if (permisosActualizados.length === 0) {
+        //     throw new Error("Debes seleccionar al menos un permiso.");
+        // }
+
         // PASO 2: Actualizar permisos
         await fetch(`${API_URL}/permisos`, {
             method: 'POST',
             headers: { 
-                // 🔴 CORRECCIÓN AQUÍ: Usar siempre la fuente del token
                 'Authorization': `Bearer ${localStorage.getItem('token')}`,
                 'Content-Type': 'application/json'
             },
@@ -2215,6 +2339,11 @@ async function actualizarUsuarioSistema(event) {
     } catch (error) {
         console.error("Error al actualizar usuario:", error);
         alert("No se pudo completar la edición: " + error.message);
+    } finally {
+        // ✅ SIEMPRE se ejecuta, pase lo que pase
+        btnEditarUsuario.disabled = false;
+        btnEditarUsuario.classList.remove('btn-desactivado');
+        cargaEditarUsuario.style.display = 'none';
     }
 }
 
