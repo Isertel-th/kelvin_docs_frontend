@@ -1014,10 +1014,8 @@ async function abrirExpediente(id, nombre, cedula, esPasivo) {
         // Obtenemos los nombres permitidos SEGÚN TU DEPARTAMENTO/ROL
         opcionesArray = permisos.map(p => p.nombre);
 
-        // Si es personal pasivo, agregamos la opción especial de Desvinculación
-        if (esPasivo) {
-            opcionesArray.push("Desvinculación");
-        }
+        opcionesArray.push("Desvinculación");
+
 
     } catch (err) {
         // Si hay error, no muestra nada
