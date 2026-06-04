@@ -1003,57 +1003,54 @@ async function abrirExpediente(id, nombre, cedula, esPasivo) {
     const selectFilter = document.getElementById('filter-doc-tipo');
     let opcionesArray = [];
 
+    // ✅ LÓGICA CORRECTA: CONSULTA LO QUE TU ROL DE SESIÓN PUEDE VER
+    // Ya NO se consulta nada del empleado seleccionado, todo depende de TU login
     try {
-        // ✅ MISMA RUTA SIEMPRE, sin importar activo/pasivo
         const res = await fetch(`${API_URL}/mis-tipos-permitidos`, { 
             headers: { 'Authorization': `Bearer ${token}` } 
         });
-
-        if (!res.ok) throw new Error('Error en la respuesta');
         const permisos = await res.json();
+        
+        // Obtenemos los nombres permitidos SEGÚN TU DEPARTAMENTO/ROL
         opcionesArray = permisos.map(p => p.nombre);
 
-        // ✅ DESVINCULACIÓN: GLOBAL, PARA TODOS
-        opcionesArray.unshift("Desvinculación");
+        // Si es personal pasivo, agregamos la opción especial de Desvinculación
+        if (esPasivo) {
+            opcionesArray.push("Desvinculación");
+        }
 
     } catch (err) {
-        console.error('Error al obtener permisos:', err);
+        // Si hay error, no muestra nada
         opcionesArray = [];
     }
 
+    // ✅ SE MANTIENE TU LÓGICA DE ÍCONOS Y VECTORES
     const vectorContainer = document.getElementById('vector-container');
     if (vectorContainer) {
         vectorContainer.innerHTML = '';
-
-        if (opcionesArray.length === 0) {
-            vectorContainer.innerHTML = '<p style="color:#94a3b8; padding:1rem;">No tienes permisos para ver o gestionar documentos</p>';
-        } else {
-            opcionesArray.forEach(tipo => {
-                const SVGString = vectoresIconos[tipo] || `<svg viewBox="0 0 24 24" fill="#94a3b8"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>`;
-                
-                // ✅ ETIQUETA ÚNICA, SIN DUPLICADOS
-                let labelMostrar = tipo;
-                if(tipo === "Certificados") labelMostrar = "Certificados (Lab/Hon/Capaci)";
-                
-                const idTarjeta = tipo.replace(/\s+/g, '-').replace(/['"]/g, '');
-                vectorContainer.innerHTML += `
-                    <div class="vector-card" id="card-vector-${idTarjeta}" data-tipo="${tipo.replace(/"/g, '&quot;')}" onclick="seleccionarCategoriaVector(this.dataset.tipo)">
-                        ${SVGString}
-                        <span>${labelMostrar}</span>
-                    </div>
-                `;
-            });
-        }
+        opcionesArray.forEach(tipo => {
+            const SVGString = vectoresIconos[tipo] || `<svg viewBox="0 0 24 24" fill="#94a3b8"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>`;
+            let labelMostrar = tipo;
+            if(tipo === "Certificados") labelMostrar = "Certificados (Lab/Hon/Capaci)";
+            
+            vectorContainer.innerHTML += `
+                <div class="vector-card" id="card-vector-${tipo.replace(/\s+/g, '-').replace(/'/g, '')}" onclick="seleccionarCategoriaVector('${tipo.replace(/'/g, "\\'")}')">
+                    ${SVGString}
+                    <span>${labelMostrar}</span>
+                </div>
+            `;
+        });
     }
 
+    // ✅ SE MANTIENE TU LÓGICA DEL FILTRO DE SELECCIÓN
     selectFilter.innerHTML = '';
     opcionesArray.forEach(tipo => {
-        // ✅ MISMA ETIQUETA EN FILTRO Y TARJETAS
         let labelMostrar = tipo;
-        if(tipo === "Certificados") labelMostrar = "Certificados (Lab/Hon/Capaci)";
+        if(tipo === "Certificados") labelMostrar = "Certificados (Laborales/Honorabilidad)";
         selectFilter.innerHTML += `<option value="${tipo}">${labelMostrar}</option>`;
     });
     
+    // ✅ SE MANTIENE TU FUNCIÓN DE ACTUALIZAR SUBTIPOS
     actualizarSubtipos('filter');
 
     if (document.getElementById('filter-mes')) {
@@ -1061,6 +1058,7 @@ async function abrirExpediente(id, nombre, cedula, esPasivo) {
         document.getElementById('filter-anio').value = '';
     }
 
+    // ✅ CARGA LOS DOCUMENTOS (ahora el backend ya filtra según tu sesión)
     await obtenerDocumentosServidor();
     document.getElementById('modal-expediente').style.display = 'flex';
 }
