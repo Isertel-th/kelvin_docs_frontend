@@ -719,7 +719,8 @@
             "Acta de Entrega EPP": ["General / Único"],
             "Certificado de Competencia": ["General / Único"],
             "Actas de EPP's": ["General / Único"],
-            "Memorándum": ["General / Único"]
+            "Memorándum": ["General / Único"],
+            "Escolaridad": ["Título de Bachiller" , "Título Tecnológico" , "Título de Tercer Nivel" , "Título de Cuarto Nivel"]
         };
 
         // Diccionario de Vectores Ilustrativos
@@ -738,8 +739,9 @@
             "Aptitud Médica": `<svg viewBox="0 0 24 24" fill="#06b6d4"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 12 10 10-4.48 10-12S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>`,
             "Certificado de Competencia Laboral": `<svg viewBox="0 0 24 24" fill="#10b981"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>`,
             "Certificado Técnico Operaciones": `<svg viewBox="0 0 24 24" fill="#eab308"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>`,
-            "Acta de Entrega EPP": `<svg viewBox="0 0 24 24" fill="#8b5cf6"><path d="M12 22c5.52 0 10-4.48 10-10S17.52 2 12 2 2 6.48 2 12s4.48 10 12 10zm1-15h2v6h-2V7zm0 8h2v2h-2v-2z"/></svg>`
-        };
+            "Acta de Entrega EPP": `<svg viewBox="0 0 24 24" fill="#8b5cf6"><path d="M12 22c5.52 0 10-4.48 10-10S17.52 2 12 2 2 6.48 2 12s4.48 10 12 10zm1-15h2v6h-2V7zm0 8h2v2h-2v-2z"/></svg>`,
+            "Escolaridad": `<svg viewBox="0 0 24 24" fill="#8b5cf6"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm0 2.67l7.07 3.86L12 13.41 4.93 9.53 12 5.67zM12 18.17L7 15.44v-3.79l5 2.73 5-2.73v3.79l-5 2.73z"/></svg>`
+         };
 
         function toggleUploadForm() {
             const form = document.getElementById('form-upload-doc');
@@ -1692,7 +1694,8 @@ async function registrarUsuario(event) {
         "Certificados": 7,
         "Memorándum": 8,
         "Certificados y Cargas Familiares": 9,
-        "Desvinculación": 10
+        "Desvinculación": 10,
+        "Escolaridad": 11
         // ⚠️ Si en tu BD tienes nombres diferentes, ESCRÍBELOS IGUAL AQUÍ
     };
 
