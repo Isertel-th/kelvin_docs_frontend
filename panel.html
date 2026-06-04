@@ -214,7 +214,7 @@
 
             <div id="view-crear" class="view-section">
                 <div class="card">
-                    <h3>Registrar Nuevo Colaborador en Nómina</h3>
+                    <h3>Registrar Nuevo Empleado en Nómina</h3>
                     <form id="form-crear-usuario" onsubmit="crearUsuario(event)">
                         <div class="grid-form">
                             <div>
@@ -255,7 +255,7 @@
 
 <div id="view-modificar" class="view-section">
     <div class="card">
-        <h3>Modificar Colaborador Activo</h3>
+        <h3>Modificar Empleado Activo</h3>
         <p style="color: #64748b; font-size: 14px; margin-bottom: 1rem;">Corrige de forma directa los detalles o errores de registro de cualquier colaborador en nómina activa.</p>
         
         <div class="grid-form" style="margin-bottom: 1.5rem; background: #f1f5f9; padding: 1rem; border-radius: 8px;">
@@ -263,7 +263,7 @@
             <input type="hidden" id="m_tipo_tabla" value="nomina">
             
             <div style="grid-column: span 2;">
-                <label style="font-weight: bold;">Seleccionar Colaborador Activo:</label>
+                <label style="font-weight: bold;">Seleccionar Empleado Activo:</label>
                 <select id="m_select_empleado" onchange="cargarDatosEmpleadoEnFormulario()" style="border: 2px solid var(--primary-color);">
                     <option value="">-- Seleccione un empleado --</option>
                 </select>
@@ -386,14 +386,14 @@
     <!-- Contenedor de botones superiores simplificado (Se eliminó el botón de editar) -->
     <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.75rem; margin-bottom: 2rem;">
         <button type="button" id="btn-mostrar-formulario-registro" onclick="mostrarFormularioRegistro()" style="background: #3b82f6; color: white; border: none; padding: 12px 20px; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; transition: background 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-            👤 Registrar Nuevo Colaborador
+            👤 Registrar Nuevo Usuario
         </button>
     </div>
 
     <!-- Formulario de Registro -->
     <div id="contenedor-formulario-registro" style="display: none; border-top: 2px dashed #cbd5e1; padding-top: 2rem; margin-bottom: 2rem;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.75rem;">
-            <h2 style="color: #1e293b; margin: 0; font-size: 1.3rem; font-weight: 700;">👤 Registrar Nuevo Colaborador</h2>
+            <h2 style="color: #1e293b; margin: 0; font-size: 1.3rem; font-weight: 700;">👤 Registrar Nuevo Usuario</h2>
         </div>
         
         <form id="form-registro-usuario" onsubmit="registrarUsuario(event)" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1.25rem;">
@@ -466,7 +466,7 @@
             </div>
 
             <button type="submit" style="background: #22c55e; color: white; border: none; padding: 14px; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 0.5rem; transition: background 0.2s; display: flex; justify-content: center; align-items: center; gap: 0.5rem;">
-                💾 Guardar Colaborador en Sistema
+                💾 Guardar Usuario en Sistema
             </button>
 
 
@@ -1717,7 +1717,7 @@ if (!nombreInput || !cedulaInput || !celularInput || !correoInput || !contraseni
         // 🔴 PASO EXTRA: Si hay error, restauramos estado
         botonGuardar.disabled = false;
         botonGuardar.classList.remove('btn-desactivado');
-        botonGuardar.textContent = "💾 Guardar Colaborador en Sistema";
+        botonGuardar.textContent = "💾 Guardar Usuario en Sistema";
         indicadorCarga.style.display = 'none';
         return; 
     }
@@ -1729,7 +1729,7 @@ if (!nombreInput || !cedulaInput || !celularInput || !correoInput || !contraseni
         // 🔴 PASO EXTRA: Si hay error, restauramos estado
         botonGuardar.disabled = false;
         botonGuardar.classList.remove('btn-desactivado');
-        botonGuardar.textContent = "💾 Guardar Colaborador en Sistema";
+        botonGuardar.textContent = "💾 Guardar Usuario en Sistema";
         indicadorCarga.style.display = 'none';
         return;
     }
@@ -1746,7 +1746,7 @@ if (!nombreInput || !cedulaInput || !celularInput || !correoInput || !contraseni
         // 🔴 PASO EXTRA: Si hay error, restauramos estado
         botonGuardar.disabled = false;
         botonGuardar.classList.remove('btn-desactivado');
-        botonGuardar.textContent = "💾 Guardar Colaborador en Sistema";
+        botonGuardar.textContent = "💾 Guardar Usuario en Sistema";
         indicadorCarga.style.display = 'none';
         return;
     }
@@ -1756,7 +1756,7 @@ if (!nombreInput || !cedulaInput || !celularInput || !correoInput || !contraseni
         // 🔴 PASO EXTRA: Si hay error, restauramos estado
         botonGuardar.disabled = false;
         botonGuardar.classList.remove('btn-desactivado');
-        botonGuardar.textContent = "💾 Guardar Colaborador en Sistema";
+        botonGuardar.textContent = "💾 Guardar Usuario en Sistema";
         indicadorCarga.style.display = 'none';
         return;
     }
@@ -1769,7 +1769,7 @@ if (!nombreInput || !cedulaInput || !celularInput || !correoInput || !contraseni
         // 🔴 PASO EXTRA: Si hay error, restauramos estado
         botonGuardar.disabled = false;
         botonGuardar.classList.remove('btn-desactivado');
-        botonGuardar.textContent = "💾 Guardar Colaborador en Sistema";
+        botonGuardar.textContent = "💾 Guardar Usuario en Sistema";
         indicadorCarga.style.display = 'none';
         return;
     }
@@ -1835,7 +1835,7 @@ if (!nombreInput || !cedulaInput || !celularInput || !correoInput || !contraseni
         const contenedorForm = document.getElementById('contenedor-formulario-registro');
         if (contenedorForm) contenedorForm.style.display = 'none';
         const boton = document.getElementById('btn-mostrar-formulario-registro');
-        if (boton) boton.innerHTML = '👤 Registrar Nuevo Colaborador';
+        if (boton) boton.innerHTML = '👤 Registrar Nuevo Usuario';
 
         if (typeof cargarUsuariosSistema === 'function') {
             cargarUsuariosSistema();
@@ -1848,7 +1848,7 @@ if (!nombreInput || !cedulaInput || !celularInput || !correoInput || !contraseni
         // 🔵 PASO FINAL: SIEMPRE restauramos el estado, haya salido bien o mal
         botonGuardar.disabled = false;
         botonGuardar.classList.remove('btn-desactivado');
-        botonGuardar.textContent = "💾 Guardar Colaborador en Sistema";
+        botonGuardar.textContent = "💾 Guardar Usuario en Sistema";
         indicadorCarga.style.display = 'none';
     }
 }
@@ -1959,7 +1959,7 @@ function mostrarFormularioRegistro() {
             if (boton) boton.innerHTML = '❌ Cerrar Formulario de Registro';
         } else {
             contenedorForm.style.display = 'none';
-            if (boton) boton.innerHTML = '👤 Registrar Nuevo Colaborador';
+            if (boton) boton.innerHTML = '👤 Registrar Nuevo Usuario';
         }
     }
 }
@@ -1986,7 +1986,7 @@ function prepararEdicion(usuarioId) {
     
     // Ocultar registro si estuviera abierto
     document.getElementById('contenedor-formulario-registro').style.display = 'none';
-    document.getElementById('btn-mostrar-formulario-registro').innerHTML = '👤 Registrar Nuevo Colaborador';
+    document.getElementById('btn-mostrar-formulario-registro').innerHTML = '👤 Registrar Nuevo Usuario';
 
     // Mostrar contenedores de edición
     document.getElementById('contenedor-formulario-edicion').style.display = 'block';
