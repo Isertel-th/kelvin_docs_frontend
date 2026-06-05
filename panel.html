@@ -1393,9 +1393,11 @@ if (tipoSeleccionado === "Certificados Médicos" || tipoSeleccionado === "Certif
 async function subirDocEmpresa(e) {
     e.preventDefault(); // ✅ Lo primero de todo
 
-    // ✅ AGREGAR AL INICIO DE subirDocEmpresa()
+    // ✅ AGREGADO: Elementos a controlar
     const btnEmpresa = document.querySelector('#form-empresa button[type="submit"]');
     const cargaEmpresa = document.getElementById('carga-empresa');
+    
+    // ✅ AGREGADO: Activar estado de carga y bloquear botón
     btnEmpresa.disabled = true;
     btnEmpresa.classList.add('btn-desactivado');
     cargaEmpresa.style.display = 'flex';
@@ -1407,7 +1409,7 @@ async function subirDocEmpresa(e) {
     const inputArchivo = document.getElementById('emp_archivo');
     if (inputArchivo.files.length === 0) {
         alert("Por favor selecciona un archivo para subir.");
-        // Restaurar antes de salir
+        // ✅ Restaurar antes de salir
         btnEmpresa.disabled = false;
         btnEmpresa.classList.remove('btn-desactivado');
         cargaEmpresa.style.display = 'none';
@@ -1435,7 +1437,7 @@ async function subirDocEmpresa(e) {
         console.error(err);
         alert("Error de conexión o de red.");
     } finally {
-        // ✅ SIEMPRE se restaura la interfaz
+        // ✅ AGREGADO: SIEMPRE se restaura la interfaz, haya éxito o error
         btnEmpresa.disabled = false;
         btnEmpresa.classList.remove('btn-desactivado');
         cargaEmpresa.style.display = 'none';
