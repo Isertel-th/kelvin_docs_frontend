@@ -1634,6 +1634,9 @@ async function actualizarUsuario(event) {
 async function subirDocEmpresa(event) {
     event.preventDefault();
 
+    // 🟡 ELEMENTOS A CONTROLAR (YA EXISTEN EN TU HTML)
+    const botonSubir = document.querySelector('#form-empresa button[type="submit"]');
+    const contenedorCarga = document.getElementById('carga-empresa'); // ✅ YA LO TIENES PUESTO
     const tipoInput = document.getElementById('emp_tipo');
     const archivoInput = document.getElementById('emp_archivo');
     const file = archivoInput.files[0];
@@ -1649,6 +1652,12 @@ async function subirDocEmpresa(event) {
         return;
     }
 
+    // ✅ PASO CLAVE: MOSTRAR CARGA Y BLOQUEAR BOTÓN
+    botonSubir.disabled = true;
+    botonSubir.classList.add('btn-desactivado');
+    botonSubir.innerText = "Procesando...";
+    contenedorCarga.style.display = 'flex'; // ✅ APARECE LA BARRA
+
     const formData = new FormData();
     formData.append('tipo_documento', tipoInput.value);
     formData.append('archivo', file);
@@ -1659,6 +1668,10 @@ async function subirDocEmpresa(event) {
             headers: { 'Authorization': `Bearer ${token}` },
             body: formData
         });
+
+        // ✅ TRUCO PARA QUE SE VEA: ESPERAR 1 SEGUNDO MÍNIMO
+        // Si es muy rápido, esto fuerza a que se vea la barra
+        await new Promise(resolve => setTimeout(resolve, 1000));
 
         const data = await res.json();
 
@@ -1673,6 +1686,12 @@ async function subirDocEmpresa(event) {
     } catch (err) {
         console.error("Error en submit empresa:", err);
         alert("Ocurrió un fallo en la conexión con el servidor.");
+    } finally {
+        // ✅ SIEMPRE OCULTAR AL FINAL
+        botonSubir.disabled = false;
+        botonSubir.classList.remove('btn-desactivado');
+        botonSubir.innerText = "Subir Archivo General";
+        contenedorCarga.style.display = 'none'; // ✅ DESAPARECE
     }
 }
 
