@@ -983,6 +983,8 @@ async function crearUsuario(e) {
     formData.append('fecha_ingreso', document.getElementById('c_fecha').value);
     formData.append('correo', document.getElementById('c_correo').value);
     formData.append('celular', document.getElementById('c_celular').value);
+    formData.append('direccion', document.getElementById('c_direccion').value);
+
     
     // Verificar si hay archivo antes de agregarlo
     const inputFoto = document.getElementById('c_foto');
@@ -1536,7 +1538,7 @@ function cargarDatosEmpleadoEnFormulario() {
     document.getElementById('m_nombre').value = emp.nombre_completo;
     document.getElementById('m_correo').value = emp.correo;
     document.getElementById('m_celular').value = emp.celular;
-    document.getElementById('m_direccion').value = emp.direccion_domiciliaria;
+    document.getElementById('m_direccion').value = emp.direccion;
     document.getElementById('m_vista_foto').src = emp.foto_url ? `${API_URL}/imagen/${emp.foto_url}` : 'https://via.placeholder.com/60';
 
     if (emp.fecha_ingreso) {
