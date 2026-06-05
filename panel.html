@@ -1391,56 +1391,62 @@ if (tipoSeleccionado === "Certificados Médicos" || tipoSeleccionado === "Certif
         }
 
 async function subirDocEmpresa(e) {
-    e.preventDefault(); // ✅ Lo primero de todo
+    e.preventDefault(); // Detenemos recarga de página
 
-    // ✅ AGREGADO: Elementos a controlar
-    const btnEmpresa = document.querySelector('#form-empresa button[type="submit"]');
-    const cargaEmpresa = document.getElementById('carga-empresa');
-    
-    // ✅ AGREGADO: Activar estado de carga y bloquear botón
-    btnEmpresa.disabled = true;
-    btnEmpresa.classList.add('btn-desactivado');
-    cargaEmpresa.style.display = 'flex';
-
-    const formData = new FormData();
-    formData.append('tipo_documento', document.getElementById('emp_tipo').value);
-
-    // ✅ Validar que haya archivo seleccionado
+    // 🟡 SELECCIONAMOS LOS ELEMENTOS A CONTROLAR
+    const botonSubir = document.querySelector('#form-empresa button[type="submit"]');
+    const contenedorCarga = document.getElementById('carga-empresa');
     const inputArchivo = document.getElementById('emp_archivo');
+
+    // 🛑 VALIDACIÓN: Verificar que haya un archivo seleccionado
     if (inputArchivo.files.length === 0) {
-        alert("Por favor selecciona un archivo para subir.");
-        // ✅ Restaurar antes de salir
-        btnEmpresa.disabled = false;
-        btnEmpresa.classList.remove('btn-desactivado');
-        cargaEmpresa.style.display = 'none';
+        alert("Por favor, selecciona un archivo PDF antes de continuar.");
         return;
     }
+
+    // ✅ ACTIVAMOS EL ESTADO DE CARGA
+    // Bloqueamos el botón, cambiamos su aspecto y mostramos el círculo
+    botonSubir.disabled = true;
+    botonSubir.classList.add('btn-desactivado'); // Opacidad baja y cursor prohibido
+    botonSubir.innerText = "Procesando..."; // Cambiamos el texto del botón
+    contenedorCarga.style.display = 'flex'; // Mostramos la animación circular
+
+    // Preparamos los datos para enviar
+    const formData = new FormData();
+    formData.append('tipo_documento', document.getElementById('emp_tipo').value);
     formData.append('archivo', inputArchivo.files[0]);
 
     try {
+        // Hacemos la petición al servidor
         const res = await fetch(`${API_URL}/subir-empresa`, {
             method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}` },
+            headers: { 
+                'Authorization': `Bearer ${token}` 
+            },
             body: formData
         });
 
-        const data = await res.json(); // Para leer mensaje del servidor si existe
+        const data = await res.json();
 
         if (res.ok) {
-            alert("Documentación institucional cargada.");
-            document.getElementById('form-empresa').reset();
-            cargarDocumentosEmpresa();
+            alert("✅ Documento institucional subido correctamente.");
+            document.getElementById('form-empresa').reset(); // Limpiamos el formulario
+            cargarDocumentosEmpresa(); // Refrescamos la lista de abajo
         } else {
-            alert("Error al subir: " + (data.error || "Ocurrió un problema en el servidor"));
+            alert("❌ Error: " + (data.error || "No se pudo guardar el archivo"));
         }
-    } catch(err) {
+
+    } catch (err) {
         console.error(err);
-        alert("Error de conexión o de red.");
-    } finally {
-        // ✅ AGREGADO: SIEMPRE se restaura la interfaz, haya éxito o error
-        btnEmpresa.disabled = false;
-        btnEmpresa.classList.remove('btn-desactivado');
-        cargaEmpresa.style.display = 'none';
+        alert("❌ Error de conexión con el servidor.");
+    } 
+    finally {
+        // ✅ SIEMPRE EJECUTAMOS ESTO: Se haya subido bien o mal
+        // Restauramos el botón y ocultamos el indicador de carga
+        botonSubir.disabled = false;
+        botonSubir.classList.remove('btn-desactivado');
+        botonSubir.innerText = "Subir Archivo General"; // Texto original
+        contenedorCarga.style.display = 'none'; // Ocultamos la animación
     }
 }
 
