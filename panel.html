@@ -1536,7 +1536,7 @@ function cargarDatosEmpleadoEnFormulario() {
     document.getElementById('m_nombre').value = emp.nombre_completo;
     document.getElementById('m_correo').value = emp.correo;
     document.getElementById('m_celular').value = emp.celular;
-    document.getElementById('m_direccion').value = emp.direccion;
+    document.getElementById('m_direccion').value = emp.direccion || '';
     document.getElementById('m_vista_foto').src = emp.foto_url ? `${API_URL}/imagen/${emp.foto_url}` : 'https://via.placeholder.com/60';
 
     if (emp.fecha_ingreso) {
@@ -1590,7 +1590,8 @@ async function actualizarUsuario(event) {
     formData.append('fecha_ingreso', document.getElementById('m_fecha').value);
     formData.append('correo', document.getElementById('m_correo').value);
     formData.append('celular', document.getElementById('m_celular').value);
-    formData.append('direccion', document.getElementById('m_direccion').value);
+    const direccionActual = document.getElementById('m_direccion').value.trim();
+    formData.append('direccion', direccionActual);
     
     const inputFoto = document.getElementById('m_foto');
     if (inputFoto.files.length > 0) { // ✅ Más seguro verificar longitud
