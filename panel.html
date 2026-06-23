@@ -223,8 +223,7 @@
                             </div>
                             <div>
                                 <label>Nombre Completo (Respetando Tíldes y Caracteres Especiales):</label>
-                                <input type="text" id="c_nombre" required placeholder="Ej. Elizalde Mejía José Leonardo" oninput="this.value = formatearNombre(this.value)" onblur="this.value = limpiarEspaciosNombre(this.value)">
-                            </div>
+<input type="text" id="c_nombre" required placeholder="Ej. ELIZALDE MEJÍA JOSÉ LEONARDO" oninput="this.value = formatearNombre(this.value)" onblur="this.value = limpiarEspaciosNombre(this.value)">                            </div>
                             <div>
                                 <label>Fecha de Ingreso:</label>
                                 <input type="date" id="c_fecha" required>
@@ -241,8 +240,7 @@
                             </div>
                             <div>
                                 <label>Dirección domiciliaria:</label>
-                                <input type="text" id="c_direccion" required placeholder="Ej. Av. Amazonas y Shyris">
-                            </div>
+<input type="text" id="c_direccion" required placeholder="Ej. AV. AMAZONAS #123 - SECTOR NORTE" oninput="this.value = formatearDireccion(this.value)">                            </div>
                         </div>
                         <div style="margin-bottom: 1.5rem;">
                             <label>Foto de Perfil del Empleado:</label>
@@ -284,8 +282,7 @@
                 </div>
                 <div>
                     <label>Nombre Completo:</label>
-                    <input type="text" id="m_nombre" required oninput="this.value = formatearNombre(this.value)" onblur="this.value = limpiarEspaciosNombre(this.value)">
-                </div>
+<input type="text" id="m_nombre" required oninput="this.value = formatearNombre(this.value)" onblur="this.value = limpiarEspaciosNombre(this.value)">                </div>
                 <div>
                     <label>Fecha de Ingreso:</label>
                     <input type="date" id="m_fecha" required>
@@ -302,7 +299,7 @@
                 </div>
                 <div>
                     <label>Dirección domiciliaria:</label>
-                    <input type="text" id="m_direccion" required>
+<input type="text" id="m_direccion" required oninput="this.value = formatearDireccion(this.value)">
                 </div>
             </div>
             <div style="margin-bottom: 1.5rem; background: #f8fafc; padding: 1rem; border-radius: 6px; border: 1px dashed #cbd5e1;">
@@ -798,13 +795,23 @@
             });
         }
 
-        function formatearNombre(texto) {
-    return texto.toLowerCase().replace(/(^|\s)([a-záéíóúñüÁÉÍÓÚÑÜ])/g, (match, espacio, letra) => espacio + letra.toUpperCase());
-        }
+function formatearNombre(texto) {
+    // Todo en mayúsculas, solo letras, espacios y ñ
+    return texto
+      .toUpperCase()
+      .replace(/[^A-ZÑ\s]/g, '');
+}
 
         function limpiarEspaciosNombre(texto) {
             return texto.trim().replace(/\s+/g, ' ');
         }
+
+        function formatearDireccion(texto) {
+    // Todo en mayúsculas, admite ñ, números, espacios, #, -, /, ., ,
+    return texto
+      .toUpperCase()
+      .replace(/[^A-ZÑ0-9\s#\-\/.,]/g, '');
+}
 
         if (!token || !rol) {
             cerrarSesion();
