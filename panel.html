@@ -1376,15 +1376,28 @@ async function eliminarDocumento(id, origen) {
         return;
     }
 
-    if (!id || !origen) {
-        console.error("❌ Falta ID u origen:", { id, origen });
+if (
+    !id ||
+    !origen ||
+    origen === 'undefined' ||
+    origen === 'null'
+) {
 
-        alert(
-            "No se pudo identificar correctamente el documento."
-        );
+    console.error(
+        "❌ Falta ID u origen válido:",
+        {
+            id,
+            origen
+        }
+    );
 
-        return;
-    }
+    alert(
+        "No se pudo identificar correctamente " +
+        "la tabla de origen del documento."
+    );
+
+    return;
+}
 
     const deleteEndpoint =
         `${API_URL}/documentos/${encodeURIComponent(origen)}/${encodeURIComponent(id)}`;
