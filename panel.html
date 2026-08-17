@@ -1236,7 +1236,7 @@ function dibujarTablaAgrupada(docsFiltrados) {
                 </td>
                 <td><strong>${fechaFormateada}</strong></td>
                 <td><a href="${API_URL}/descargar/${doc.url_cloudinary}" download="${nombreArchivoMostrar}" target="_blank" class="btn-action btn-view">👁️ Descargar</a></td>
-                ${puedeEliminar ? `<td><button class="btn-action btn-delete" onclick="eliminarDocumento('${doc.id}')">❌</button></td>` : '<td>-</td>'}
+                ${puedeEliminar ? `<td><button class="btn-action btn-delete" onclick="eliminarDocumento('${doc.id}', '${doc.origen}')">❌</button></td>` : '<td>-</td>'}
             </tr>`;
     });
 }
@@ -1368,32 +1368,78 @@ async function procesarSubidaDocumento(e) {
 }
 
         // CORREGIDO: Redirección inteligente de eliminación según tipo de documento (Para que el admin pueda borrar registros médicos)
-        async function eliminarDocumento(id) {
-            if(!confirm("¿Desea suprimir permanentemente este registro documental?")) return;
-            
-            const tipoSeleccionado = document.getElementById('filter-doc-tipo').value;
-            let deleteEndpoint = '';
-            
-// Si es una carpeta técnica, ambos (Admin y Kelvin) deberían apuntar al endpoint de Kelvin que limpia esas tablas específicas
-if (tipoSeleccionado === "Certificados Médicos" || tipoSeleccionado === "Certificados de Aptitud") {
-    deleteEndpoint = `${API_URL}/doctor/aptitud/${id}`;
-} else if (tipoSeleccionado === "Certificado de Competencia" || tipoSeleccionado === "Acta de EPP's") {
-    deleteEndpoint = `${API_URL}/kelvin/documentos/${id}`;
-} else {
-    deleteEndpoint = `${API_URL}/admin/documentos/${id}`;
-}
+async function eliminarDocumento(id, origen) {
 
-            try {
-                const res = await fetch(deleteEndpoint, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if(res.ok) {
-                    alert("Registro eliminado.");
-                    await obtenerDocumentosServidor(); 
-                } else { alert("Denegado o error de procesamiento."); }
-            } catch (err) { console.error(err); }
+    if (!confirm(
+        "¿Desea suprimir permanentemente este registro documental?"
+    )) {
+        return;
+    }
+
+    if (!id || !origen) {
+        console.error("❌ Falta ID u origen:", { id, origen });
+
+        alert(
+            "No se pudo identificar correctamente el documento."
+        );
+
+        return;
+    }
+
+    const deleteEndpoint =
+        `${API_URL}/documentos/${encodeURIComponent(origen)}/${encodeURIComponent(id)}`;
+
+    console.log("🗑️ Solicitud de eliminación:", {
+        id,
+        origen,
+        endpoint: deleteEndpoint
+    });
+
+    try {
+
+        const res = await fetch(deleteEndpoint, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        let data = {};
+
+        try {
+            data = await res.json();
+        } catch (e) {
+            console.warn("La respuesta no contenía JSON.");
         }
+
+        if (!res.ok) {
+
+            console.error("❌ ERROR DELETE:", {
+                status: res.status,
+                respuesta: data
+            });
+
+            alert(
+                data.error ||
+                `No se pudo eliminar el documento. Error ${res.status}.`
+            );
+
+            return;
+        }
+
+        alert("✅ Registro eliminado correctamente.");
+
+        await obtenerDocumentosServidor();
+
+    } catch (err) {
+
+        console.error("❌ Error de conexión DELETE:", err);
+
+        alert(
+            "No se pudo establecer comunicación con el servidor."
+        );
+    }
+}
 
         function cerrarModal() {
             document.getElementById('modal-expediente').style.display = 'none';
