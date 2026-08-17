@@ -1368,32 +1368,49 @@ async function procesarSubidaDocumento(e) {
 }
 
         // CORREGIDO: Redirección inteligente de eliminación según tipo de documento (Para que el admin pueda borrar registros médicos)
-        async function eliminarDocumento(id) {
-            if(!confirm("¿Desea suprimir permanentemente este registro documental?")) return;
-            
-            const tipoSeleccionado = document.getElementById('filter-doc-tipo').value;
-            let deleteEndpoint = '';
-            
-// Si es una carpeta técnica, ambos (Admin y Kelvin) deberían apuntar al endpoint de Kelvin que limpia esas tablas específicas
-if (tipoSeleccionado === "Certificados Médicos" || tipoSeleccionado === "Certificados de Aptitud") {
-    deleteEndpoint = `${API_URL}/doctor/aptitud/${id}`;
-} else if (tipoSeleccionado === "Certificado de Competencia" || tipoSeleccionado === "Acta de EPP's") {
-    deleteEndpoint = `${API_URL}/kelvin/documentos/${id}`;
-} else {
-    deleteEndpoint = `${API_URL}/admin/documentos/${id}`;
-}
+async function eliminarDocumento(id) {
+    if(!confirm("¿Desea suprimir permanentemente este registro documental?")) return;
 
-            try {
-                const res = await fetch(deleteEndpoint, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if(res.ok) {
-                    alert("Registro eliminado.");
-                    await obtenerDocumentosServidor(); 
-                } else { alert("Denegado o error de procesamiento."); }
-            } catch (err) { console.error(err); }
+    if (!token) {
+        alert("Sesión no válida. Recarga la página e inicia sesión nuevamente.");
+        return;
+    }
+    
+    const tipoSeleccionado = document.getElementById('filter-doc-tipo').value;
+    let deleteEndpoint = '';
+    
+    // ✅ Comparación EXACTA con los nombres que devuelve el backend
+    if (tipoSeleccionado === "Certificados Médicos" || tipoSeleccionado === "Certificados de Aptitud") {
+        deleteEndpoint = `${API_URL}/doctor/aptitud/${id}`;
+    } 
+    else if (tipoSeleccionado === "Certificado de Competencia" || tipoSeleccionado === "Acta de EPP's") {
+        deleteEndpoint = `${API_URL}/kelvin/documentos/${id}`;
+    } 
+    else {
+        // Para todos los demás tipos: documentos, pasivos, contratación, vacaciones, etc.
+        deleteEndpoint = `${API_URL}/admin/documentos/${id}`;
+    }
+
+    console.log("🗑️ Eliminando ID:", id, "Tipo:", tipoSeleccionado, "→ Endpoint:", deleteEndpoint);
+
+    try {
+        const res = await fetch(deleteEndpoint, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if(res.ok) {
+            alert("Registro eliminado correctamente.");
+            await obtenerDocumentosServidor(); 
+        } else {
+            const err = await res.json();
+            alert(`Error: ${err.error || 'No se encontró el registro'}`);
         }
+    } catch (err) { 
+        console.error("🔴 Error eliminando:", err); 
+        alert("Error de conexión o del servidor. Revisa la consola para detalles.");
+    }
+}
 
         function cerrarModal() {
             document.getElementById('modal-expediente').style.display = 'none';
