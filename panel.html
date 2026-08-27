@@ -1164,7 +1164,7 @@ async function abrirExpediente(id, nombre, cedula, esPasivo) {
 
 async function obtenerDocumentosServidor() {
     // ✅ AUTOMATIZACIÓN TOTAL: TODOS van a la misma ruta
-    const endpoint = `${API_URL}/usuario/mis-documentos/${currentSelectedUserId}`;
+    const endpoint = `${API_URL}/usuario/mis-documentos/${currentSelectedUserId}?pasivo=${currentSelectedUserPasivo}`;
 
     try {
         const res = await fetch(endpoint, { 
