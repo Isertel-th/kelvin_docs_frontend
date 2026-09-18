@@ -256,8 +256,8 @@
             <!-- Nuevos campos de activos -->
             <div class="grid-form">
                 <div>
-                    <label>Contacto de Emergencia:</label>
-                    <input type="text" id="c_contacto_emergencia" placeholder="Ej. MARÍA PÉREZ" oninput="this.value = formatearNombre(this.value)">
+                    <label>Contacto de Emergencia (10 dígitos):</label>
+                    <input type="text" id="c_contacto_emergencia" required pattern="[0-9]{10}" maxlength="10" placeholder="Ej. 0991234567" oninput="this.value = this.value.replace(/\D/g, '')">
                 </div>
                 <div>
                     <label>Parentesco de Emergencia:</label>
@@ -373,8 +373,8 @@
             <!-- Nuevos campos en modificar -->
             <div class="grid-form">
                 <div>
-                    <label>Contacto Emergencia:</label>
-                    <input type="text" id="m_contacto_emergencia" oninput="this.value = formatearNombre(this.value)">
+                    <label>Contacto Emergencia (10 dígitos):</label>
+                    <input type="text" id="m_contacto_emergencia" required pattern="[0-9]{10}" maxlength="10" placeholder="Ej. 0991234567" oninput="this.value = this.value.replace(/\D/g, '')">
                 </div>
                 <div>
                     <label>Parentesco:</label>
