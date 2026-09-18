@@ -212,57 +212,112 @@
                 </div>
             </div>
 
-            <div id="view-crear" class="view-section">
-                <div class="card">
-                    <h3>Registrar Nuevo Colaborador en Nómina</h3>
-                    <form id="form-crear-usuario" onsubmit="crearUsuario(event)">
-                        <div class="grid-form">
-                            <div>
-                                <label>Cédula (10 dígitos enteros):</label>
-                                <input type="text" id="c_cedula" required pattern="[0-9]{10}" maxlength="10" placeholder="Ej. 1712345678" oninput="this.value = this.value.replace(/\D/g, '')">
-                            </div>
-                            <div>
-                                <label>Nombre Completo (Respetando Tíldes y Caracteres Especiales):</label>
-<input type="text" id="c_nombre" required placeholder="Ej. ELIZALDE MEJÍA JOSÉ LEONARDO" oninput="this.value = formatearNombre(this.value)" onblur="this.value = limpiarEspaciosNombre(this.value)">                            </div>
-                            <div>
-                                <label>Fecha de Ingreso:</label>
-                                <input type="date" id="c_fecha" required>
-                            </div>
-                        </div>
-                        <div class="grid-form">
-                            <div>
-                                <label>Correo Electrónico (Personal o Empresarial):</label>
-                                <input type="email" id="c_correo" required placeholder="raulperez@gmail.com">
-                            </div>
-                            <div>
-                                <label>Celular (10 dígitos enteros):</label>
-                                <input type="text" id="c_celular" required pattern="[0-9]{10}" maxlength="10" placeholder="Ej. 0998765432" oninput="this.value = this.value.replace(/\D/g, '')">
-                            </div>
-                            <div>
-                                <label>Dirección domiciliaria:</label>
-<input type="text" id="c_direccion" required placeholder="Ej. AV. AMAZONAS #123 - SECTOR NORTE" oninput="this.value = formatearDireccion(this.value)">                            </div>
-                        </div>
-                        <div style="margin-bottom: 1.5rem;">
-                            <label>Foto de Perfil del Empleado:</label>
-                            <input type="file" id="c_foto" accept="image/*" required>
-                        </div>
-                        <button type="submit" class="btn-submit">Guardar en Base de Datos</button>
-                        <!-- ✅ AGREGAR ESTO AQUÍ -->
-<div class="cargando-contenedor" id="carga-crear">
-    <div class="circulo-carga"></div>
-    <span>Guardando colaborador...</span>
-</div>
-                    </form>
+<!-- VISTA: CREAR COLABORADOR -->
+<div id="view-crear" class="view-section">
+    <div class="card">
+        <h3>Registrar Nuevo Colaborador en Nómina</h3>
+        <form id="form-crear-usuario" onsubmit="crearUsuario(event)">
+            
+            <div class="grid-form">
+                <div>
+                    <label>Cédula (10 dígitos enteros):</label>
+                    <input type="text" id="c_cedula" required pattern="[0-9]{10}" maxlength="10" placeholder="Ej. 1712345678" oninput="this.value = this.value.replace(/\D/g, '')">
+                </div>
+                <div>
+                    <label>Nombre Completo (Respetando Tíldes y Caracteres Especiales):</label>
+                    <input type="text" id="c_nombre" required placeholder="Ej. ELIZALDE MEJÍA JOSÉ LEONARDO" oninput="this.value = formatearNombre(this.value)" onblur="this.value = limpiarEspaciosNombre(this.value)">
+                </div>
+                <div>
+                    <label>Fecha de Ingreso:</label>
+                    <input type="date" id="c_fecha" required>
                 </div>
             </div>
 
+            <div class="grid-form">
+                <div>
+                    <label>Correo Electrónico (Personal o Empresarial):</label>
+                    <input type="email" id="c_correo" required placeholder="raulperez@gmail.com">
+                </div>
+                <div>
+                    <label>Celular (10 dígitos enteros):</label>
+                    <input type="text" id="c_celular" required pattern="[0-9]{10}" maxlength="10" placeholder="Ej. 0998765432" oninput="this.value = this.value.replace(/\D/g, '')">
+                </div>
+                <div>
+                    <label>Dirección domiciliaria:</label>
+                    <input type="text" id="c_direccion" required placeholder="Ej. AV. AMAZONAS #123 - SECTOR NORTE" oninput="this.value = formatearDireccion(this.value)">
+                </div>
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <label>Foto de Perfil del Empleado:</label>
+                <input type="file" id="c_foto" accept="image/*" required>
+            </div>
+
+            <!-- Nuevos campos de activos -->
+            <div class="grid-form">
+                <div>
+                    <label>Contacto de Emergencia:</label>
+                    <input type="text" id="c_contacto_emergencia" placeholder="Ej. MARÍA PÉREZ" oninput="this.value = formatearNombre(this.value)">
+                </div>
+                <div>
+                    <label>Parentesco de Emergencia:</label>
+                    <input type="text" id="c_parentesco_emergencia" placeholder="Ej. ESPOSA / MADRE" oninput="this.value = formatearNombre(this.value)">
+                </div>
+                <div>
+                    <label>Cargas Familiares (número):</label>
+                    <input type="number" id="c_cargas_familiares" min="0" value="0">
+                </div>
+            </div>
+
+            <div class="grid-form">
+                <div>
+                    <label>Vacaciones (Días positivos o negativos):</label>
+                    <input type="number" step="0.5" id="c_vacaciones" value="0">
+                </div>
+                <div>
+                    <label>Número de Cuenta Bancaria:</label>
+                    <input type="text" id="c_numero_cuenta" placeholder="Ej. 2200123456" oninput="this.value = this.value.replace(/\D/g, '')">
+                </div>
+                <div>
+                    <label>Nombre del Banco:</label>
+                    <input type="text" id="c_nombre_banco" placeholder="Ej. BANCO PICHINCHA" oninput="this.value = formatearNombre(this.value)">
+                </div>
+            </div>
+
+            <div class="grid-form">
+                <div>
+                    <label>Tipo de Cuenta:</label>
+                    <select id="c_tipo_cuenta">
+                        <option value="">Seleccione...</option>
+                        <option value="Ahorros">Ahorros</option>
+                        <option value="Corriente">Corriente</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Tipo de Contrato:</label>
+                    <select id="c_tipo_contrato_id" required>
+                        <!-- Se llena dinámicamente desde /api/tipos-contrato -->
+                    </select>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn-submit" style="margin-top: 1rem;">Guardar en Base de Datos</button>
+            
+            <div class="cargando-contenedor" id="carga-crear">
+                <div class="circulo-carga"></div>
+                <span>Guardando colaborador...</span>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- VISTA: MODIFICAR COLABORADOR -->
 <div id="view-modificar" class="view-section">
     <div class="card">
         <h3>Modificar Colaborador Activo</h3>
         <p style="color: #64748b; font-size: 14px; margin-bottom: 1rem;">Corrige de forma directa los detalles o errores de registro de cualquier colaborador en nómina activa.</p>
         
         <div class="grid-form" style="margin-bottom: 1.5rem; background: #f1f5f9; padding: 1rem; border-radius: 8px;">
-            <!-- Forzamos de forma oculta el valor 'nomina' para que tus funciones JS sigan operando correctamente sin romperse -->
             <input type="hidden" id="m_tipo_tabla" value="nomina">
             
             <div style="grid-column: span 2;">
@@ -275,6 +330,7 @@
 
         <form id="form-modificar-usuario" onsubmit="actualizarUsuario(event)" style="display: none; border-top: 1px solid #e2e8f0; padding-top: 1.5rem;">
             <input type="hidden" id="m_id">
+            
             <div class="grid-form">
                 <div>
                     <label>Cédula (10 dígitos enteros):</label>
@@ -282,12 +338,14 @@
                 </div>
                 <div>
                     <label>Nombre Completo:</label>
-<input type="text" id="m_nombre" required oninput="this.value = formatearNombre(this.value)" onblur="this.value = limpiarEspaciosNombre(this.value)">                </div>
+                    <input type="text" id="m_nombre" required oninput="this.value = formatearNombre(this.value)" onblur="this.value = limpiarEspaciosNombre(this.value)">
+                </div>
                 <div>
                     <label>Fecha de Ingreso:</label>
                     <input type="date" id="m_fecha" required>
                 </div>
             </div>
+
             <div class="grid-form">
                 <div>
                     <label>Correo Electrónico:</label>
@@ -299,9 +357,10 @@
                 </div>
                 <div>
                     <label>Dirección domiciliaria:</label>
-<input type="text" id="m_direccion" required oninput="this.value = formatearDireccion(this.value)">
+                    <input type="text" id="m_direccion" required oninput="this.value = formatearDireccion(this.value)">
                 </div>
             </div>
+
             <div style="margin-bottom: 1.5rem; background: #f8fafc; padding: 1rem; border-radius: 6px; border: 1px dashed #cbd5e1;">
                 <label style="margin-bottom: 8px;">Foto de Perfil actual / Cambiar Foto:</label>
                 <div style="display: flex; align-items: center; gap: 15px;">
@@ -310,12 +369,61 @@
                 </div>
                 <small style="color: #64748b; display: block; margin-top: 6px;">* Dejar vacío si no se desea cambiar la imagen actual.</small>
             </div>
-            <button type="submit" class="btn-submit" style="background: #e67e22;">💾 Guardar Cambios Realizados</button>
-            <!-- ✅ AGREGAR ESTO AQUÍ -->
-<div class="cargando-contenedor" id="carga-modificar">
-    <div class="circulo-carga"></div>
-    <span>Actualizando datos...</span>
-</div>
+
+            <!-- Nuevos campos en modificar -->
+            <div class="grid-form">
+                <div>
+                    <label>Contacto Emergencia:</label>
+                    <input type="text" id="m_contacto_emergencia" oninput="this.value = formatearNombre(this.value)">
+                </div>
+                <div>
+                    <label>Parentesco:</label>
+                    <input type="text" id="m_parentesco_emergencia" oninput="this.value = formatearNombre(this.value)">
+                </div>
+                <div>
+                    <label>Cargas Familiares:</label>
+                    <input type="number" id="m_cargas_familiares" min="0">
+                </div>
+            </div>
+
+            <div class="grid-form">
+                <div>
+                    <label>Vacaciones:</label>
+                    <input type="number" step="0.5" id="m_vacaciones">
+                </div>
+                <div>
+                    <label>Cuenta Bancaria:</label>
+                    <input type="text" id="m_numero_cuenta" oninput="this.value = this.value.replace(/\D/g, '')">
+                </div>
+                <div>
+                    <label>Banco:</label>
+                    <input type="text" id="m_nombre_banco" oninput="this.value = formatearNombre(this.value)">
+                </div>
+            </div>
+
+            <div class="grid-form">
+                <div>
+                    <label>Tipo de Cuenta:</label>
+                    <select id="m_tipo_cuenta">
+                        <option value="">Seleccione...</option>
+                        <option value="Ahorros">Ahorros</option>
+                        <option value="Corriente">Corriente</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Tipo de Contrato:</label>
+                    <select id="m_tipo_contrato_id">
+                        <!-- Se llena dinámicamente -->
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit" style="background: #e67e22; margin-top: 1rem;">💾 Guardar Cambios Realizados</button>
+            
+            <div class="cargando-contenedor" id="carga-modificar">
+                <div class="circulo-carga"></div>
+                <span>Actualizando datos...</span>
+            </div>
         </form>
     </div>
 </div>
@@ -2493,50 +2601,48 @@ async function eliminarUsuario(usuarioId, nombreCompleto) {
 // Modificar la función cargarTiposDocumento
 async function cargarTiposDocumento() {
     try {
-        // Verificamos que exista el token antes de continuar
+        // Obtenemos el token directamente del storage
+        const token = localStorage.getItem('token');
         if (!token) throw new Error("Token de autorización no disponible");
 
         const res = await fetch(`${API_URL}/mis-tipos-permitidos`, { 
             headers: { 
                 'Authorization': `Bearer ${token}`,
-                'Accept': 'application/json' // Especificamos que esperamos JSON
+                'Accept': 'application/json'
             } 
         });
 
-        // Verificamos si la respuesta fue exitosa
         if (!res.ok) throw new Error(`Error al obtener datos: ${res.status}`);
 
         const docs = await res.json();
         const contenedor = document.getElementById('lista-permisos');
         
-        // Aplicamos estilo al contenedor
+        // Verificamos si el elemento existe en el DOM
+        if (!contenedor) return;
+
         contenedor.style.display = 'flex';
         contenedor.style.flexDirection = 'column';
         contenedor.style.gap = '6px';
         contenedor.style.padding = '8px';
-        
-        // Limpiamos contenido previo por si se recarga la función
         contenedor.innerHTML = '';
 
         docs.forEach(doc => {
-            // Creamos elementos de forma segura
             const label = document.createElement('label');
             label.style.cssText = "display: flex; align-items: center; justify-content: flex-start; width: 100%; margin: 0; padding: 2px 0; cursor: pointer; font-size: 14px; color: #475569;";
 
             const input = document.createElement('input');
             input.type = "checkbox";
             input.name = "permisos";
-            input.value = doc.nombre; // Asigna valor de forma segura
+            input.value = doc.nombre;
             input.style.margin = "0";
             input.style.width = "auto";
             input.style.flexShrink = "0";
 
             const span = document.createElement('span');
-            span.textContent = doc.nombre; // Usamos textContent para evitar inyección
+            span.textContent = doc.nombre;
             span.style.marginLeft = "8px";
             span.style.lineHeight = "1.2";
 
-            // Armamos la estructura
             label.appendChild(input);
             label.appendChild(span);
             contenedor.appendChild(label);
@@ -2544,13 +2650,10 @@ async function cargarTiposDocumento() {
 
     } catch (err) {
         console.error("Error cargando docs:", err);
-        // Opcional: Mostrar mensaje al usuario
-        // alert("No se pudieron cargar los tipos de documento");
     }
 }
 
 const esCorreoValido = (email) => {
-    // ✅ DOMINIOS PERMITIDOS ACTUALIZADOS
     const dominiosPermitidos = ['gmail.com', 'outlook.com', 'outlook.es', 'hotmail.com', 'isertel.net']; 
     const regexBase = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     
@@ -2560,8 +2663,37 @@ const esCorreoValido = (email) => {
     return dominiosPermitidos.includes(dominio);
 };
 
-// Llamarla al inicio
-document.addEventListener('DOMContentLoaded', cargarTiposDocumento);
+async function cargarTiposContrato() {
+    try {
+        const token = localStorage.getItem('token');
+        const res = await fetch('/api/tipos-contrato', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        
+        if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
+
+        const contratos = await res.json();
+        
+        const selectCrear = document.getElementById('c_tipo_contrato_id');
+        const selectMod = document.getElementById('m_tipo_contrato_id');
+        
+        let html = '<option value="">Seleccione contrato...</option>';
+        contratos.forEach(c => {
+            html += `<option value="${c.id}">${c.nombre}</option>`;
+        });
+        
+        if (selectCrear) selectCrear.innerHTML = html;
+        if (selectMod) selectMod.innerHTML = html;
+    } catch (err) {
+        console.error("Error al obtener tipos de contrato:", err);
+    }
+}
+
+// Inicialización cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', () => {
+    cargarTiposDocumento();
+    cargarTiposContrato();
+});
 </script>
 </body>
 </html>
