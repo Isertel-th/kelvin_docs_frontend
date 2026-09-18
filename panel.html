@@ -688,11 +688,24 @@
     
     
     <div id="modal-expediente" class="modal">
-    <div class="modal-content">
+<div class="modal-content">
         <span class="close-modal" onclick="cerrarModal()">&times;</span>
         <h2 id="modal-emp-name" style="margin-top: 0; color: #1e293b; margin-bottom: 4px;">Expediente Digital</h2>
         <p style="font-weight: bold; color:#64748b; margin-bottom: 0.5rem;">Cédula: <span id="modal-emp-cedula"></span></p>
         
+        <!-- INICIO: NUEVO CONTENEDOR DE DATOS DEL EMPLEADO -->
+        <div id="modal-emp-datos-extra" style="background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e2e8f0; font-size: 14px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; color: #334155;">
+            <div style="margin:0;"><strong>Contacto Emergencia:</strong> <span id="v_contacto_emergencia">-</span></div>
+            <div style="margin:0;"><strong>Parentesco:</strong> <span id="v_parentesco_emergencia">-</span></div>
+            <div style="margin:0;"><strong>Cargas Familiares:</strong> <span id="v_cargas_familiares">-</span></div>
+            <div style="margin:0;"><strong>Vacaciones Disp.:</strong> <span id="v_vacaciones">-</span></div>
+            <div style="margin:0;"><strong>Banco:</strong> <span id="v_nombre_banco">-</span></div>
+            <div style="margin:0;"><strong>Tipo Cuenta:</strong> <span id="v_tipo_cuenta">-</span></div>
+            <div style="margin:0;"><strong>N° Cuenta:</strong> <span id="v_numero_cuenta">-</span></div>
+            <div style="margin:0;"><strong>Tipo Contrato:</strong> <span id="v_tipo_contrato_id">-</span></div>
+        </div>
+        <!-- FIN: NUEVO CONTENEDOR -->
+
         <div id="section-paso1">
             <h3 style="margin-top:0; color:#0f172a; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.75rem; font-size: 16px;">
                 📥 Selecciona el Tipo de Documento
@@ -1103,14 +1116,14 @@ async function crearUsuario(e) {
     formData.append('direccion', document.getElementById('c_direccion').value);
 
     // 📍 NUEVOS CAMPOS AGREGADOS:
-    formData.append('contacto_emergencia', document.getElementById('c_contacto_emergencia')?.value || '');
-    formData.append('parentesco_emergencia', document.getElementById('c_parentesco_emergencia')?.value || '');
-    formData.append('cargas_familiares', document.getElementById('c_cargas_familiares')?.value || '0');
-    formData.append('vacaciones', document.getElementById('c_vacaciones')?.value || '0');
-    formData.append('numero_cuenta_bancaria', document.getElementById('c_numero_cuenta')?.value || '');
-    formData.append('nombre_banco', document.getElementById('c_nombre_banco')?.value || '');
-    formData.append('tipo_cuenta', document.getElementById('c_tipo_cuenta')?.value || '');
-    formData.append('tipo_contrato_id', document.getElementById('c_tipo_contrato_id')?.value || '');
+    formData.append('contacto_emergencia', document.getElementById('c_contacto_emergencia').value);
+    formData.append('parentesco_emergencia', document.getElementById('c_parentesco_emergencia').value);
+    formData.append('cargas_familiares', document.getElementById('c_cargas_familiares').value);
+    formData.append('vacaciones', document.getElementById('c_vacaciones').value);
+    formData.append('numero_cuenta_bancaria', document.getElementById('c_numero_cuenta').value);
+    formData.append('nombre_banco', document.getElementById('c_nombre_banco').value);
+    formData.append('tipo_cuenta', document.getElementById('c_tipo_cuenta').value);
+    formData.append('tipo_contrato_id', document.getElementById('c_tipo_contrato_id').value);
 
     const inputFoto = document.getElementById('c_foto');
     if (inputFoto && inputFoto.files.length > 0) {
@@ -1171,6 +1184,32 @@ async function abrirExpediente(id, nombre, cedula, esPasivo) {
 
     document.getElementById('modal-emp-name').innerText = `Expediente: ${nombre}`;
     document.getElementById('modal-emp-cedula').innerText = cedula;
+    
+    // --- LÓGICA DE VISIBILIDAD: ACTIVOS VS PASIVOS ---
+    const contenedorDatosExtra = document.getElementById('modal-emp-datos-extra');
+    
+    if (esPasivo) {
+        // Si el empleado es pasivo, ocultamos el bloque de información extra
+        contenedorDatosExtra.style.display = 'none';
+    } else {
+        // Si es activo, lo mostramos como cuadrícula (grid) y llenamos los datos
+        contenedorDatosExtra.style.display = 'grid';
+        
+        // Busca al empleado en tu arreglo global de datos de activos 
+        // (Ajusta 'empleados' al nombre real de tu array global si es diferente)
+        const empleado = empleados.find(emp => emp.id === id) || {};
+
+        document.getElementById('v_contacto_emergencia').innerText = empleado.contacto_emergencia || 'No registrado';
+        document.getElementById('v_parentesco_emergencia').innerText = empleado.parentesco_emergencia || 'N/A';
+        document.getElementById('v_cargas_familiares').innerText = empleado.cargas_familiares || '0';
+        document.getElementById('v_vacaciones').innerText = empleado.vacaciones || '0 días';
+        document.getElementById('v_nombre_banco').innerText = empleado.nombre_banco || 'No registrado';
+        document.getElementById('v_tipo_cuenta').innerText = empleado.tipo_cuenta || 'No registrado';
+        document.getElementById('v_numero_cuenta').innerText = empleado.numero_cuenta_bancaria || 'No registrado';
+        document.getElementById('v_tipo_contrato_id').innerText = empleado.tipo_contrato_id || 'No registrado';
+    }
+    // -------------------------------------------------
+
     document.getElementById('form-upload-doc').reset();
     
     document.getElementById('section-paso1').style.display = 'block';
@@ -1181,25 +1220,17 @@ async function abrirExpediente(id, nombre, cedula, esPasivo) {
     const selectFilter = document.getElementById('filter-doc-tipo');
     let opcionesArray = [];
 
-    // ✅ LÓGICA CORRECTA: CONSULTA LO QUE TU ROL DE SESIÓN PUEDE VER
-    // Ya NO se consulta nada del empleado seleccionado, todo depende de TU login
     try {
         const res = await fetch(`${API_URL}/mis-tipos-permitidos`, { 
             headers: { 'Authorization': `Bearer ${token}` } 
         });
         const permisos = await res.json();
-        
-        // Obtenemos los nombres permitidos SEGÚN TU DEPARTAMENTO/ROL
         opcionesArray = permisos.map(p => p.nombre);
-
-
-
     } catch (err) {
-        // Si hay error, no muestra nada
         opcionesArray = [];
     }
 
-    // ✅ SE MANTIENE TU LÓGICA DE ÍCONOS Y VECTORES
+    // (El resto de tu función original sigue exactamente igual)
     const vectorContainer = document.getElementById('vector-container');
     if (vectorContainer) {
         vectorContainer.innerHTML = '';
@@ -1217,7 +1248,6 @@ async function abrirExpediente(id, nombre, cedula, esPasivo) {
         });
     }
 
-    // ✅ SE MANTIENE TU LÓGICA DEL FILTRO DE SELECCIÓN
     selectFilter.innerHTML = '';
     opcionesArray.forEach(tipo => {
         let labelMostrar = tipo;
@@ -1225,7 +1255,6 @@ async function abrirExpediente(id, nombre, cedula, esPasivo) {
         selectFilter.innerHTML += `<option value="${tipo}">${labelMostrar}</option>`;
     });
     
-    // ✅ SE MANTIENE TU FUNCIÓN DE ACTUALIZAR SUBTIPOS
     actualizarSubtipos('filter');
 
     if (document.getElementById('filter-mes')) {
@@ -1233,7 +1262,6 @@ async function abrirExpediente(id, nombre, cedula, esPasivo) {
         document.getElementById('filter-anio').value = '';
     }
 
-    // ✅ CARGA LOS DOCUMENTOS (ahora el backend ya filtra según tu sesión)
     await obtenerDocumentosServidor();
     document.getElementById('modal-expediente').style.display = 'flex';
 }
@@ -1721,6 +1749,16 @@ function cargarDatosEmpleadoEnFormulario() {
     document.getElementById('m_direccion').value = emp.direccion;
     document.getElementById('m_vista_foto').src = emp.foto_url ? `${API_URL}/imagen/${emp.foto_url}` : 'https://via.placeholder.com/60';
 
+
+    document.getElementById('m_contacto_emergencia').value = empleado.contacto_emergencia || '';
+    document.getElementById('m_parentesco_emergencia').value = empleado.parentesco_emergencia || '';
+    document.getElementById('m_cargas_familiares').value = empleado.cargas_familiares || '0';
+    document.getElementById('m_vacaciones').value = empleado.vacaciones || '0';
+    document.getElementById('m_numero_cuenta').value = empleado.numero_cuenta_bancaria || '';
+    document.getElementById('m_nombre_banco').value = empleado.nombre_banco || '';
+    document.getElementById('m_tipo_cuenta').value = empleado.tipo_cuenta || '';
+    document.getElementById('m_tipo_contrato_id').value = empleado.tipo_contrato_id || '';
+
     if (emp.fecha_ingreso) {
         const fechaIso = new Date(emp.fecha_ingreso).toISOString().split('T')[0];
         document.getElementById('m_fecha').value = fechaIso;
@@ -1769,14 +1807,14 @@ async function actualizarUsuario(event) {
     formData.append('direccion', document.getElementById('m_direccion').value);
 
     // 📍 NUEVOS CAMPOS AGREGADOS:
-    formData.append('contacto_emergencia', document.getElementById('m_contacto_emergencia')?.value || '');
-    formData.append('parentesco_emergencia', document.getElementById('m_parentesco_emergencia')?.value || '');
-    formData.append('cargas_familiares', document.getElementById('m_cargas_familiares')?.value || '0');
-    formData.append('vacaciones', document.getElementById('m_vacaciones')?.value || '0');
-    formData.append('numero_cuenta_bancaria', document.getElementById('m_numero_cuenta')?.value || '');
-    formData.append('nombre_banco', document.getElementById('m_nombre_banco')?.value || '');
-    formData.append('tipo_cuenta', document.getElementById('m_tipo_cuenta')?.value || '');
-    formData.append('tipo_contrato_id', document.getElementById('m_tipo_contrato_id')?.value || '');
+formData.append('contacto_emergencia', document.getElementById('m_contacto_emergencia').value);
+formData.append('parentesco_emergencia', document.getElementById('m_parentesco_emergencia').value);
+formData.append('cargas_familiares', document.getElementById('m_cargas_familiares').value);
+formData.append('vacaciones', document.getElementById('m_vacaciones').value);
+formData.append('numero_cuenta_bancaria', document.getElementById('m_numero_cuenta').value);
+formData.append('nombre_banco', document.getElementById('m_nombre_banco').value);
+formData.append('tipo_cuenta', document.getElementById('m_tipo_cuenta').value);
+formData.append('tipo_contrato_id', document.getElementById('m_tipo_contrato_id').value);
 
     const inputFoto = document.getElementById('m_foto');
     if (inputFoto && inputFoto.files.length > 0) {
