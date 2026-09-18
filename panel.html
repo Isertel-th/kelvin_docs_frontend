@@ -1093,6 +1093,8 @@ async function cargarEmpleadosPasivos() {
 async function crearUsuario(e) {
     e.preventDefault();
     const formData = new FormData();
+    
+    // Campos principales
     formData.append('cedula', document.getElementById('c_cedula').value);
     formData.append('nombre_completo', document.getElementById('c_nombre').value);
     formData.append('fecha_ingreso', document.getElementById('c_fecha').value);
@@ -1100,10 +1102,18 @@ async function crearUsuario(e) {
     formData.append('celular', document.getElementById('c_celular').value);
     formData.append('direccion', document.getElementById('c_direccion').value);
 
-    
-    // Verificar si hay archivo antes de agregarlo
+    // 📍 NUEVOS CAMPOS AGREGADOS:
+    formData.append('contacto_emergencia', document.getElementById('c_contacto_emergencia')?.value || '');
+    formData.append('parentesco_emergencia', document.getElementById('c_parentesco_emergencia')?.value || '');
+    formData.append('cargas_familiares', document.getElementById('c_cargas_familiares')?.value || '0');
+    formData.append('vacaciones', document.getElementById('c_vacaciones')?.value || '0');
+    formData.append('numero_cuenta_bancaria', document.getElementById('c_numero_cuenta')?.value || '');
+    formData.append('nombre_banco', document.getElementById('c_nombre_banco')?.value || '');
+    formData.append('tipo_cuenta', document.getElementById('c_tipo_cuenta')?.value || '');
+    formData.append('tipo_contrato_id', document.getElementById('c_tipo_contrato_id')?.value || '');
+
     const inputFoto = document.getElementById('c_foto');
-    if (inputFoto.files.length > 0) {
+    if (inputFoto && inputFoto.files.length > 0) {
         formData.append('foto', inputFoto.files[0]);
     }
 
@@ -1111,16 +1121,13 @@ async function crearUsuario(e) {
     const cargaCrear = document.getElementById('carga-crear');
     btnCrear.disabled = true;
     btnCrear.classList.add('btn-desactivado');
-    cargaCrear.style.display = 'flex';
+    if (cargaCrear) cargaCrear.style.display = 'flex';
 
     try {
+        const token = localStorage.getItem('token');
         const res = await fetch(`${API_URL}/admin/crear-usuario`, {
             method: 'POST',
-            headers: { 
-                'Authorization': `Bearer ${token}`
-                // ❌ NO agregues 'Content-Type': 'multipart/form-data'
-                // El navegador lo pone automáticamente con el límite correcto
-            },
+            headers: { 'Authorization': `Bearer ${token}` },
             body: formData
         });
 
@@ -1128,18 +1135,17 @@ async function crearUsuario(e) {
         if (res.ok) {
             alert("Empleado creado con éxito");
             document.getElementById('form-crear-usuario').reset();
-            cargarEmpleadosActivos();
-            switchView('activos');
+            if (typeof cargarEmpleadosActivos === 'function') cargarEmpleadosActivos();
+            if (typeof switchView === 'function') switchView('activos');
         } else {
             alert("Error: " + (data.error || "Ocurrió un problema desconocido"));
         }
     } catch (err) {
         alert("Error de comunicación con el servidor");
     } finally {
-        // ✅ Siempre se ejecuta, sin importar el resultado
         btnCrear.disabled = false;
         btnCrear.classList.remove('btn-desactivado');
-        cargaCrear.style.display = 'none';
+        if (cargaCrear) cargaCrear.style.display = 'none';
     }
 }
 
@@ -1727,53 +1733,58 @@ function cargarDatosEmpleadoEnFormulario() {
 
 // Envía la petición PUT incluyendo la tabla correspondiente como parámetro de ruta
 async function actualizarUsuario(event) {
-    event.preventDefault(); // ✅ Lo primero de todo
+    event.preventDefault();
 
-    // ✅ AGREGAR AL INICIO DE actualizarUsuario()
     const btnModificar = document.querySelector('#form-modificar-usuario button[type="submit"]');
     const cargaModificar = document.getElementById('carga-modificar');
     btnModificar.disabled = true;
     btnModificar.classList.add('btn-desactivado');
-    cargaModificar.style.display = 'flex';
+    if (cargaModificar) cargaModificar.style.display = 'flex';
 
     const id = document.getElementById('m_id').value;
-    const tablaTarget = document.getElementById('m_tipo_tabla').value; // 'nomina' o 'pasivos'
+    const tablaTarget = document.getElementById('m_tipo_tabla').value;
 
-    // Validación básica
     if (!id || !tablaTarget) {
         alert("Faltan datos necesarios para la modificación.");
-        // Restaurar antes de salir
         btnModificar.disabled = false;
         btnModificar.classList.remove('btn-desactivado');
-        cargaModificar.style.display = 'none';
+        if (cargaModificar) cargaModificar.style.display = 'none';
         return;
     }
 
-    // SEGUNDO CANDADO DE SEGURIDAD: Evita el envío si por alguna razón la tabla es 'pasivos'
     if (tablaTarget === 'pasivos') {
         alert("Acción denegada: No está permitido modificar datos de personal pasivo.");
-        // Restaurar antes de salir
         btnModificar.disabled = false;
         btnModificar.classList.remove('btn-desactivado');
-        cargaModificar.style.display = 'none';
+        if (cargaModificar) cargaModificar.style.display = 'none';
         return;
     }
 
     const formData = new FormData();
-    
     formData.append('cedula', document.getElementById('m_cedula').value);
     formData.append('nombre_completo', document.getElementById('m_nombre').value);
     formData.append('fecha_ingreso', document.getElementById('m_fecha').value);
     formData.append('correo', document.getElementById('m_correo').value);
     formData.append('celular', document.getElementById('m_celular').value);
     formData.append('direccion', document.getElementById('m_direccion').value);
-    
+
+    // 📍 NUEVOS CAMPOS AGREGADOS:
+    formData.append('contacto_emergencia', document.getElementById('m_contacto_emergencia')?.value || '');
+    formData.append('parentesco_emergencia', document.getElementById('m_parentesco_emergencia')?.value || '');
+    formData.append('cargas_familiares', document.getElementById('m_cargas_familiares')?.value || '0');
+    formData.append('vacaciones', document.getElementById('m_vacaciones')?.value || '0');
+    formData.append('numero_cuenta_bancaria', document.getElementById('m_numero_cuenta')?.value || '');
+    formData.append('nombre_banco', document.getElementById('m_nombre_banco')?.value || '');
+    formData.append('tipo_cuenta', document.getElementById('m_tipo_cuenta')?.value || '');
+    formData.append('tipo_contrato_id', document.getElementById('m_tipo_contrato_id')?.value || '');
+
     const inputFoto = document.getElementById('m_foto');
-    if (inputFoto.files.length > 0) { // ✅ Más seguro verificar longitud
+    if (inputFoto && inputFoto.files.length > 0) {
         formData.append('foto', inputFoto.files[0]);
     }
 
     try {
+        const token = localStorage.getItem('token');
         const res = await fetch(`${API_URL}/admin/modificar-usuario/${tablaTarget}/${id}`, {
             method: 'PUT',
             headers: { 'Authorization': `Bearer ${token}` },
@@ -1784,8 +1795,7 @@ async function actualizarUsuario(event) {
 
         if (res.ok) {
             alert("¡Registro actualizado con éxito en la base de datos!");
-            prepararModuloModificar(); // Recargar la lista actual
-            
+            if (typeof prepararModuloModificar === 'function') prepararModuloModificar();
             if (typeof cargarEmpleados === 'function') cargarEmpleados();
             if (typeof cargarPasivos === 'function') cargarPasivos();
         } else {
@@ -1795,10 +1805,9 @@ async function actualizarUsuario(event) {
         console.error(err);
         alert("Error de red o servidor al intentar guardar los cambios.");
     } finally {
-        // ✅ SIEMPRE se ejecuta, pase lo que pase
         btnModificar.disabled = false;
         btnModificar.classList.remove('btn-desactivado');
-        cargaModificar.style.display = 'none';
+        if (cargaModificar) cargaModificar.style.display = 'none';
     }
 }
 
