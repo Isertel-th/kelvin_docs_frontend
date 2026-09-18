@@ -2666,7 +2666,9 @@ const esCorreoValido = (email) => {
 async function cargarTiposContrato() {
     try {
         const token = localStorage.getItem('token');
-        const res = await fetch('/api/tipos-contrato', {
+        
+        // 📍 CORRECCIÓN: Se usa API_URL para conectar con Render
+        const res = await fetch(`${API_URL}/tipos-contrato`, {
             headers: { 'Authorization': 'Bearer ' + token }
         });
         
