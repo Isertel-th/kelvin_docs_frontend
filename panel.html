@@ -242,6 +242,62 @@
                                 <label>Dirección domiciliaria:</label>
 <input type="text" id="c_direccion" required placeholder="Ej. AV. AMAZONAS #123 - SECTOR NORTE" oninput="this.value = formatearDireccion(this.value)">                            </div>
                         </div>
+
+                        <!-- NUEVOS CAMPOS: Contacto Emergencia, Cargas, Vacaciones, Banco, Contrato -->
+                        <div class="grid-form">
+                            <div>
+                                <label>Nombre Contacto de Emergencia:</label>
+                                <input type="text" id="c_emergencia_nombre" required placeholder="Nombre completo" oninput="this.value = formatearNombre(this.value)">
+                            </div>
+                            <div>
+                                <label>Teléfono Contacto (10 dígitos):</label>
+                                <input type="text" id="c_emergencia_telefono" required pattern="[0-9]{10}" maxlength="10" placeholder="099XXXXXXX" oninput="this.value = this.value.replace(/\D/g, '')">
+                            </div>
+                            <div>
+                                <label>Parentesco:</label>
+                                <input type="text" id="c_emergencia_parentesco" required placeholder="Ej. Cónyuge, Padre, Hermano">
+                            </div>
+                        </div>
+                        <div class="grid-form">
+                            <div>
+                                <label>Cargas Familiares (número):</label>
+                                <input type="number" id="c_cargas_familiares" min="0" value="0">
+                            </div>
+                            <div>
+                                <label>Días de Vacaciones:</label>
+                                <input type="number" id="c_vacaciones" step="0.5" value="0">
+                            </div>
+                        </div>
+                        <div class="grid-form">
+                            <div>
+                                <label>Nombre del Banco:</label>
+                                <input type="text" id="c_banco_nombre" placeholder="Ej. Banco Pichincha">
+                            </div>
+                            <div>
+                                <label>Tipo de Cuenta:</label>
+                                <select id="c_banco_tipo">
+                                    <option value="">Seleccione...</option>
+                                    <option value="ahorros">Ahorros</option>
+                                    <option value="corriente">Corriente</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Número de Cuenta:</label>
+                                <input type="text" id="c_banco_cuenta" placeholder="Número de cuenta">
+                            </div>
+                        </div>
+                        <div class="grid-form">
+                            <div>
+                                <label>Tipo de Contrato:</label>
+                                <select id="c_tipo_contrato" required>
+                                    <option value="">Cargando...</option>
+                                    <!-- Se llena dinámicamente desde tipo_contratos -->
+                                </select>
+                            </div>
+                        </div>
+                        <!-- FIN NUEVOS CAMPOS -->
+                         
+                        
                         <div style="margin-bottom: 1.5rem;">
                             <label>Foto de Perfil del Empleado:</label>
                             <input type="file" id="c_foto" accept="image/*" required>
@@ -290,6 +346,9 @@
             </div>
             <div class="grid-form">
                 <div>
+                <!-- ✅ Correcto -->
+                <div class="grid-form">
+                <div>
                     <label>Correo Electrónico:</label>
                     <input type="email" id="m_correo" required>
                 </div>
@@ -299,8 +358,62 @@
                 </div>
                 <div>
                     <label>Dirección domiciliaria:</label>
-<input type="text" id="m_direccion" required oninput="this.value = formatearDireccion(this.value)">
+                    <input type="text" id="m_direccion" required oninput="this.value = formatearDireccion(this.value)">
                 </div>
+                </div>
+
+                <div class="grid-form">
+                <div>
+                    <label>Nombre Contacto de Emergencia:</label>
+                    <input type="text" id="m_emergencia_nombre" oninput="this.value = formatearNombre(this.value)">
+                </div>
+                <div>
+                    <label>Teléfono Contacto (10 dígitos):</label>
+                    <input type="text" id="m_emergencia_telefono" pattern="[0-9]{10}" maxlength="10" oninput="this.value = this.value.replace(/\D/g, '')">
+                </div>
+                <div>
+                    <label>Parentesco:</label>
+                    <input type="text" id="m_emergencia_parentesco">
+                </div>
+                </div>
+            <div class="grid-form">
+                <div>
+                    <label>Cargas Familiares:</label>
+                    <input type="number" id="m_cargas_familiares" min="0">
+                </div>
+                <div>
+                    <label>Días de Vacaciones:</label>
+                    <input type="number" id="m_vacaciones" step="0.5">
+                </div>
+            </div>
+            <div class="grid-form">
+                <div>
+                    <label>Nombre del Banco:</label>
+                    <input type="text" id="m_banco_nombre">
+                </div>
+                <div>
+                    <label>Tipo de Cuenta:</label>
+                    <select id="m_banco_tipo">
+                        <option value="">Seleccione...</option>
+                        <option value="ahorros">Ahorros</option>
+                        <option value="corriente">Corriente</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Número de Cuenta:</label>
+                    <input type="text" id="m_banco_cuenta">
+                </div>
+            </div>
+            <div class="grid-form">
+                <div>
+                    <label>Tipo de Contrato:</label>
+                    <select id="m_tipo_contrato">
+                        <option value="">Cargando...</option>
+                    </select>
+                </div>
+            </div>
+            <!-- FIN NUEVOS CAMPOS -->
+
             </div>
             <div style="margin-bottom: 1.5rem; background: #f8fafc; padding: 1rem; border-radius: 6px; border: 1px dashed #cbd5e1;">
                 <label style="margin-bottom: 8px;">Foto de Perfil actual / Cambiar Foto:</label>
@@ -584,6 +697,21 @@
         <span class="close-modal" onclick="cerrarModal()">&times;</span>
         <h2 id="modal-emp-name" style="margin-top: 0; color: #1e293b; margin-bottom: 4px;">Expediente Digital</h2>
         <p style="font-weight: bold; color:#64748b; margin-bottom: 0.5rem;">Cédula: <span id="modal-emp-cedula"></span></p>
+                <!-- ✅ DATOS COMPLETOS DEL COLABORADOR -->
+        <div id="modal-datos-completos" style="background: #f8fafc; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; border: 1px solid #e2e8f0; font-size: 14px; line-height: 1.6;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.5rem;">
+                <div><strong>📅 Fecha de Ingreso:</strong> <span id="modal-fechai"></span></div>
+                <div><strong>📧 Correo:</strong> <span id="modal-correo"></span></div>
+                <div><strong>📱 Celular:</strong> <span id="modal-celular"></span></div>
+                <div><strong>🏠 Dirección:</strong> <span id="modal-direccion"></span></div>
+                <div><strong>📝 Tipo de Contrato:</strong> <span id="modal-tipo-contrato"></span></div>
+                <div><strong>👨‍👩‍👧‍👦 Cargas Familiares:</strong> <span id="modal-cargas"></span></div>
+                <div><strong>🏖️ Vacaciones:</strong> <span id="modal-vacaciones"></span></div>
+                <div><strong>🏦 Banco:</strong> <span id="modal-banco"></span></div>
+                <div><strong>📞 Contacto Emergencia:</strong> <span id="modal-emergencia"></span></div>
+            </div>
+        </div>
+        <!-- ✅ FIN DATOS COMPLETOS -->
         
         <div id="section-paso1">
             <h3 style="margin-top:0; color:#0f172a; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.75rem; font-size: 16px;">
@@ -845,6 +973,8 @@ window.onload = function() {
     cargarEmpleadosActivos();
     cargarEmpleadosPasivos();
     cargarDocumentosEmpresa(); // ✅ AHORA CARGA PARA TODOS
+    cargarTiposContrato(); // ✅ Agrega esta línea
+
 
     // 4. Mapeo inteligente de doble clic para abrir expedientes digitales
     const mapearDobleClic = (tbodyId) => {
@@ -985,19 +1115,29 @@ async function cargarEmpleadosPasivos() {
 async function crearUsuario(e) {
     e.preventDefault();
     const formData = new FormData();
+    // Campos originales
     formData.append('cedula', document.getElementById('c_cedula').value);
     formData.append('nombre_completo', document.getElementById('c_nombre').value);
     formData.append('fecha_ingreso', document.getElementById('c_fecha').value);
     formData.append('correo', document.getElementById('c_correo').value);
     formData.append('celular', document.getElementById('c_celular').value);
     formData.append('direccion', document.getElementById('c_direccion').value);
-
     
-    // Verificar si hay archivo antes de agregarlo
+    // ✅ NUEVOS CAMPOS
+    formData.append('contacto_emergencia_nombre', document.getElementById('c_emergencia_nombre').value);
+    formData.append('contacto_emergencia_telefono', document.getElementById('c_emergencia_telefono').value);
+    formData.append('contacto_emergencia_parentesco', document.getElementById('c_emergencia_parentesco').value);
+    formData.append('cargas_familiares', document.getElementById('c_cargas_familiares').value || 0);
+    formData.append('vacaciones', document.getElementById('c_vacaciones').value || 0);
+    formData.append('banco_nombre', document.getElementById('c_banco_nombre').value);
+    formData.append('banco_tipo_cuenta', document.getElementById('c_banco_tipo').value);
+    formData.append('banco_cuenta', document.getElementById('c_banco_cuenta').value);
+    formData.append('tipo_contrato_id', document.getElementById('c_tipo_contrato').value);
+    
+    // Foto igual que antes
     const inputFoto = document.getElementById('c_foto');
-    if (inputFoto.files.length > 0) {
-        formData.append('foto', inputFoto.files[0]);
-    }
+    if (inputFoto.files.length > 0) formData.append('foto', inputFoto.files[0]);
+    
 
     const btnCrear = document.querySelector('#form-crear-usuario button[type="submit"]');
     const cargaCrear = document.getElementById('carga-crear');
@@ -1051,14 +1191,17 @@ async function crearUsuario(e) {
         }
 
 async function abrirExpediente(id, nombre, cedula, esPasivo) {
+    // Asignación de variables de estado
     currentSelectedUserId = id;
     currentSelectedUserPasivo = esPasivo;
     currentSelectedUserName = nombre;
 
+    // Actualización de datos en interfaz
     document.getElementById('modal-emp-name').innerText = `Expediente: ${nombre}`;
     document.getElementById('modal-emp-cedula').innerText = cedula;
     document.getElementById('form-upload-doc').reset();
-    
+
+    // Control de visibilidad de secciones
     document.getElementById('section-paso1').style.display = 'block';
     document.getElementById('expediente-detalles').style.display = 'none';
     document.getElementById('form-upload-doc').style.display = 'none';
@@ -1067,35 +1210,48 @@ async function abrirExpediente(id, nombre, cedula, esPasivo) {
     const selectFilter = document.getElementById('filter-doc-tipo');
     let opcionesArray = [];
 
-    // ✅ LÓGICA CORRECTA: CONSULTA LO QUE TU ROL DE SESIÓN PUEDE VER
-    // Ya NO se consulta nada del empleado seleccionado, todo depende de TU login
+    // ✅ LÓGICA DE PERMISOS SEGÚN SESIÓN ACTIVA
     try {
-        const res = await fetch(`${API_URL}/mis-tipos-permitidos`, { 
-            headers: { 'Authorization': `Bearer ${token}` } 
+        const res = await fetch(`${API_URL}/mis-tipos-permitidos`, {
+            headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json'
+            }
         });
+
+        if (!res.ok) {
+            throw new Error(`Error en respuesta: ${res.status} ${res.statusText}`);
+        }
+
         const permisos = await res.json();
         
-        // Obtenemos los nombres permitidos SEGÚN TU DEPARTAMENTO/ROL
-        opcionesArray = permisos.map(p => p.nombre);
-
-
-
+        // Validación de estructura de respuesta
+        if (Array.isArray(permisos)) {
+            opcionesArray = permisos.map(p => p.nombre).filter(nombre => nombre);
+        }
     } catch (err) {
-        // Si hay error, no muestra nada
+        console.warn('No se pudieron cargar los tipos de documento permitidos:', err);
         opcionesArray = [];
     }
 
-    // ✅ SE MANTIENE TU LÓGICA DE ÍCONOS Y VECTORES
+    // ✅ RENDERIZADO DE ÍCONOS / TARJETAS VISUALES
     const vectorContainer = document.getElementById('vector-container');
     if (vectorContainer) {
         vectorContainer.innerHTML = '';
+        
         opcionesArray.forEach(tipo => {
             const SVGString = vectoresIconos[tipo] || `<svg viewBox="0 0 24 24" fill="#94a3b8"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>`;
-            let labelMostrar = tipo;
-            if(tipo === "Certificados") labelMostrar = "Certificados (Lab/Hon/Capaci)";
             
+            let labelMostrar = tipo;
+            if (tipo === "Certificados") {
+                labelMostrar = "Certificados (Lab/Hon/Capaci)";
+            }
+
+            const idCardo = `card-vector-${tipo.replace(/\s+/g, '-').replace(/'/g, '')}`;
+            const tipoEscapado = tipo.replace(/'/g, "\\'");
+
             vectorContainer.innerHTML += `
-                <div class="vector-card" id="card-vector-${tipo.replace(/\s+/g, '-').replace(/'/g, '')}" onclick="seleccionarCategoriaVector('${tipo.replace(/'/g, "\\'")}')">
+                <div class="vector-card" id="${idCardo}" onclick="seleccionarCategoriaVector('${tipoEscapado}')">
                     ${SVGString}
                     <span>${labelMostrar}</span>
                 </div>
@@ -1103,24 +1259,37 @@ async function abrirExpediente(id, nombre, cedula, esPasivo) {
         });
     }
 
-    // ✅ SE MANTIENE TU LÓGICA DEL FILTRO DE SELECCIÓN
-    selectFilter.innerHTML = '';
-    opcionesArray.forEach(tipo => {
-        let labelMostrar = tipo;
-        if(tipo === "Certificados") labelMostrar = "Certificados (Laborales/Honorabilidad)";
-        selectFilter.innerHTML += `<option value="${tipo}">${labelMostrar}</option>`;
-    });
-    
-    // ✅ SE MANTIENE TU FUNCIÓN DE ACTUALIZAR SUBTIPOS
-    actualizarSubtipos('filter');
-
-    if (document.getElementById('filter-mes')) {
-        document.getElementById('filter-mes').value = '';
-        document.getElementById('filter-anio').value = '';
+    // ✅ LLENADO DEL FILTRO DE TIPOS DE DOCUMENTO
+    if (selectFilter) {
+        selectFilter.innerHTML = '';
+        
+        opcionesArray.forEach(tipo => {
+            let labelMostrar = tipo;
+            if (tipo === "Certificados") {
+                labelMostrar = "Certificados (Laborales/Honorabilidad)";
+            }
+            selectFilter.innerHTML += `<option value="${tipo}">${labelMostrar}</option>`;
+        });
     }
 
-    // ✅ CARGA LOS DOCUMENTOS (ahora el backend ya filtra según tu sesión)
-    await obtenerDocumentosServidor();
+    // ✅ ACTUALIZACIÓN DE SUBTIPOS Y FILTROS
+    actualizarSubtipos('filter');
+    
+    const filtroMes = document.getElementById('filter-mes');
+    const filtroAnio = document.getElementById('filter-anio');
+    if (filtroMes) filtroMes.value = '';
+    if (filtroAnio) filtroAnio.value = '';
+
+await obtenerDocumentosServidor();
+// ✅ Agrega ESTO:
+// Cargar datos completos del colaborador
+const resEmp = await fetch(`${API_URL}/admin/empleados`, {
+  headers: { 'Authorization': `Bearer ${token}` }
+});
+const todos = await resEmp.json();
+const emp = todos.find(e => String(e.id) === String(currentSelectedUserId));
+if (emp) llenarDatosExpediente(emp);
+    // ✅ MOSTRAR EL MODAL
     document.getElementById('modal-expediente').style.display = 'flex';
 }
 
@@ -1590,15 +1759,11 @@ async function prepararModuloModificar() {
 function cargarDatosEmpleadoEnFormulario() {
     const idSeleccionado = document.getElementById('m_select_empleado').value;
     const form = document.getElementById('form-modificar-usuario');
-
-    if (!idSeleccionado) {
-        form.style.display = 'none';
-        return;
-    }
-
+    if (!idSeleccionado) { form.style.display = 'none'; return; }
     const emp = empleadosModificarList.find(e => e.id == idSeleccionado);
     if (!emp) return;
-
+    
+    // Campos originales
     document.getElementById('m_id').value = emp.id;
     document.getElementById('m_cedula').value = emp.cedula;
     document.getElementById('m_nombre').value = emp.nombre_completo;
@@ -1606,14 +1771,22 @@ function cargarDatosEmpleadoEnFormulario() {
     document.getElementById('m_celular').value = emp.celular;
     document.getElementById('m_direccion').value = emp.direccion;
     document.getElementById('m_vista_foto').src = emp.foto_url ? `${API_URL}/imagen/${emp.foto_url}` : 'https://via.placeholder.com/60';
-
     if (emp.fecha_ingreso) {
         const fechaIso = new Date(emp.fecha_ingreso).toISOString().split('T')[0];
         document.getElementById('m_fecha').value = fechaIso;
-    } else {
-        document.getElementById('m_fecha').value = '';
     }
-
+    
+    // ✅ NUEVOS CAMPOS — rellenar
+    document.getElementById('m_emergencia_nombre').value = emp.contacto_emergencia_nombre || '';
+    document.getElementById('m_emergencia_telefono').value = emp.contacto_emergencia_telefono || '';
+    document.getElementById('m_emergencia_parentesco').value = emp.contacto_emergencia_parentesco || '';
+    document.getElementById('m_cargas_familiares').value = emp.cargas_familiares ?? '';
+    document.getElementById('m_vacaciones').value = emp.vacaciones ?? '';
+    document.getElementById('m_banco_nombre').value = emp.banco_nombre || '';
+    document.getElementById('m_banco_tipo').value = emp.banco_tipo_cuenta || '';
+    document.getElementById('m_banco_cuenta').value = emp.banco_cuenta || '';
+    document.getElementById('m_tipo_contrato').value = emp.tipo_contrato_id || '';
+    
     form.style.display = 'block';
 }
 
@@ -1652,7 +1825,7 @@ async function actualizarUsuario(event) {
     }
 
     const formData = new FormData();
-    
+    // Campos originales
     formData.append('cedula', document.getElementById('m_cedula').value);
     formData.append('nombre_completo', document.getElementById('m_nombre').value);
     formData.append('fecha_ingreso', document.getElementById('m_fecha').value);
@@ -1660,10 +1833,21 @@ async function actualizarUsuario(event) {
     formData.append('celular', document.getElementById('m_celular').value);
     formData.append('direccion', document.getElementById('m_direccion').value);
     
+    // ✅ NUEVOS CAMPOS
+    formData.append('contacto_emergencia_nombre', document.getElementById('m_emergencia_nombre').value);
+    formData.append('contacto_emergencia_telefono', document.getElementById('m_emergencia_telefono').value);
+    formData.append('contacto_emergencia_parentesco', document.getElementById('m_emergencia_parentesco').value);
+    formData.append('cargas_familiares', document.getElementById('m_cargas_familiares').value || 0);
+    formData.append('vacaciones', document.getElementById('m_vacaciones').value || 0);
+    formData.append('banco_nombre', document.getElementById('m_banco_nombre').value);
+    formData.append('banco_tipo_cuenta', document.getElementById('m_banco_tipo').value);
+    formData.append('banco_cuenta', document.getElementById('m_banco_cuenta').value);
+    formData.append('tipo_contrato_id', document.getElementById('m_tipo_contrato').value);
+    
+    // Foto igual que antes
     const inputFoto = document.getElementById('m_foto');
-    if (inputFoto.files.length > 0) { // ✅ Más seguro verificar longitud
-        formData.append('foto', inputFoto.files[0]);
-    }
+    if (inputFoto.files.length > 0) formData.append('foto', inputFoto.files[0]);
+    
 
     try {
         const res = await fetch(`${API_URL}/admin/modificar-usuario/${tablaTarget}/${id}`, {
@@ -1694,74 +1878,7 @@ async function actualizarUsuario(event) {
     }
 }
 
-// ==========================================
-//       LÓGICA: REPOSITORIO EMPRESA
-// ==========================================
 
-// Función para subir el documento mediante AJAX/Fetch
-async function subirDocEmpresa(event) {
-    event.preventDefault();
-
-    // 🟡 ELEMENTOS A CONTROLAR (YA EXISTEN EN TU HTML)
-    const botonSubir = document.querySelector('#form-empresa button[type="submit"]');
-    const contenedorCarga = document.getElementById('carga-empresa'); // ✅ YA LO TIENES PUESTO
-    const tipoInput = document.getElementById('emp_tipo');
-    const archivoInput = document.getElementById('emp_archivo');
-    const file = archivoInput.files[0];
-
-    if (!file) {
-        alert("Por favor seleccione un archivo.");
-        return;
-    }
-
-    // VALIDACIÓN: Verificar que el archivo seleccionado sea estrictamente un PDF
-    if (file.type !== "application/pdf" && !file.name.endsWith('.pdf')) {
-        alert("Error: Solo se permiten archivos en formato PDF (.pdf)");
-        return;
-    }
-
-    // ✅ PASO CLAVE: MOSTRAR CARGA Y BLOQUEAR BOTÓN
-    botonSubir.disabled = true;
-    botonSubir.classList.add('btn-desactivado');
-    botonSubir.innerText = "Procesando...";
-    contenedorCarga.style.display = 'flex'; // ✅ APARECE LA BARRA
-
-    const formData = new FormData();
-    formData.append('tipo_documento', tipoInput.value);
-    formData.append('archivo', file);
-
-    try {
-        const res = await fetch(`${API_URL}/empresa/documentos`, {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}` },
-            body: formData
-        });
-
-        // ✅ TRUCO PARA QUE SE VEA: ESPERAR 1 SEGUNDO MÍNIMO
-        // Si es muy rápido, esto fuerza a que se vea la barra
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        const data = await res.json();
-
-        if (res.ok) {
-            alert("¡Documento corporativo subido e indexado con éxito!");
-            tipoInput.value = "";
-            archivoInput.value = "";
-            cargarDocsEmpresa();
-        } else {
-            alert("Error al subir: " + data.error);
-        }
-    } catch (err) {
-        console.error("Error en submit empresa:", err);
-        alert("Ocurrió un fallo en la conexión con el servidor.");
-    } finally {
-        // ✅ SIEMPRE OCULTAR AL FINAL
-        botonSubir.disabled = false;
-        botonSubir.classList.remove('btn-desactivado');
-        botonSubir.innerText = "Subir Archivo General";
-        contenedorCarga.style.display = 'none'; // ✅ DESAPARECE
-    }
-}
 
 // Función para listar todos los documentos guardados
 async function cargarDocsEmpresa() {
@@ -2559,6 +2676,43 @@ const esCorreoValido = (email) => {
     const dominio = email.split('@')[1].toLowerCase();
     return dominiosPermitidos.includes(dominio);
 };
+
+
+// Cargar lista de tipos de contrato desde la BD
+async function cargarTiposContrato() {
+    try {
+        const res = await fetch(`${API_URL}/tipos-contrato`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const lista = await res.json();
+        const cre = document.getElementById('c_tipo_contrato');
+        const mod = document.getElementById('m_tipo_contrato');
+        const opts = lista.map(t => `<option value="${t.id}">${t.nombre}</option>`).join('');
+        if (cre) cre.innerHTML = `<option value="">Seleccione...</option>${opts}`;
+        if (mod) mod.innerHTML = `<option value="">Seleccione...</option>${opts}`;
+    } catch (err) {
+        console.error("Error cargando tipos de contrato:", err);
+    }
+}
+
+// Llenar TODOS los datos en el expediente
+function llenarDatosExpediente(emp) {
+    const formatearFecha = (f) => f ? new Date(f).toLocaleDateString('es-EC') : 'S/F';
+    document.getElementById('modal-fechai').innerText = formatearFecha(emp.fecha_ingreso);
+    document.getElementById('modal-correo').innerText = emp.correo || '—';
+    document.getElementById('modal-celular').innerText = emp.celular || '—';
+    document.getElementById('modal-direccion').innerText = emp.direccion || '—';
+    document.getElementById('modal-tipo-contrato').innerText = emp.tipo_contrato_nombre || '—';
+    document.getElementById('modal-cargas').innerText = emp.cargas_familiares ?? 0;
+    document.getElementById('modal-vacaciones').innerText = emp.vacaciones ?? 0;
+    document.getElementById('modal-banco').innerText = emp.banco_nombre 
+        ? `${emp.banco_nombre} — ${emp.banco_tipo_cuenta || ''} — ${emp.banco_cuenta || ''}` 
+        : '—';
+    const tel = emp.contacto_emergencia_telefono || '—';
+    document.getElementById('modal-emergencia').innerText = emp.contacto_emergencia_nombre 
+        ? `${emp.contacto_emergencia_nombre} (${tel}) — ${emp.contacto_emergencia_parentesco || ''}`
+        : '—';
+}
 
 // Llamarla al inicio
 document.addEventListener('DOMContentLoaded', cargarTiposDocumento);
