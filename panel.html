@@ -155,6 +155,7 @@
                 <button class="nav-btn role-admin" id="menu-modificar" onclick="switchView('modificar'); prepararModuloModificar();">✏️ Modificar Colaborador</button>
                 <button class="nav-btn" id="menu-empresa" onclick="switchView('empresa')">🏢 Docs Empresa</button>
                 <button id="btn-registrar-usuarios" class="nav-btn" onclick="switchView('registrar-usuarios')" style="display: none;">👤 Usuarios</button>
+                <button id="btn-reporte-cargas" class="nav-btn" onclick="descargarReporteCargasFamiliares()" style="display: none;">👨‍👩‍👧‍👦 Reporte de cargas familiares</button>
             </div>
         </div>
         <div>
@@ -938,6 +939,11 @@ window.onload = function() {
         // Mostramos el botón específico de registro de usuarios
         document.getElementById('btn-registrar-usuarios').style.display = 'block';
         
+// 🟢 MOSTRAR EL BOTÓN DE REPORTE DE CARGAS FAMILIARES SOLO A TALENTO HUMANO
+        const btnCargas = document.getElementById('btn-reporte-cargas');
+        if (btnCargas) btnCargas.style.display = 'block';
+
+
         // Forzamos la aparición de todos los botones de administración ignorando el !important del CSS
         document.querySelectorAll('.role-admin').forEach(el => {
             el.style.setProperty('display', 'block', 'important');
@@ -2811,6 +2817,61 @@ async function cargarTiposContrato() {
         if (selectMod) selectMod.innerHTML = '<option value="">-- Seleccione Contrato --</option>' + opcionesHtml;
     } catch (e) {
         console.error("Error al cargar contratos:", e);
+    }
+}
+
+async function descargarReporteCargasFamiliares() {
+    try {
+        // Consultar los colaboradores activos de la tabla nómina
+        const res = await fetch(`${API_URL}/admin/empleados`, { 
+            headers: { 'Authorization': `Bearer ${token}` } 
+        });
+
+        if (!res.ok) {
+            alert("Error al obtener los datos del personal activo.");
+            return;
+        }
+
+        const colaboradores = await res.json();
+
+        if (!colaboradores || colaboradores.length === 0) {
+            alert("No hay datos disponibles en la nómina activa.");
+            return;
+        }
+
+        // Encabezado CSV compatible con Excel con BOM UTF-8 (mantiene tildes y eñes)
+        let csvContent = "\uFEFF"; 
+        csvContent += "Cédula;Nombre Completo;Número de Cargas Familiares\n";
+
+        colaboradores.forEach(emp => {
+            const cedula = emp.cedula ? `"${emp.cedula}"` : '""';
+            const nombre = emp.nombre_completo ? `"${emp.nombre_completo.replace(/"/g, '""')}"` : '""';
+            
+            // Obtener cargas familiares (incluyendo 0 si aplica)
+            const cargas = (emp.cargas_familiares !== undefined && emp.cargas_familiares !== null) 
+                            ? emp.cargas_familiares 
+                            : ((emp.cargas !== undefined && emp.cargas !== null) ? emp.cargas : 0);
+
+            csvContent += `${cedula};${nombre};${cargas}\n`;
+        });
+
+        // Crear archivo Blob y desencadenar la descarga en Excel
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        
+        const fechaActual = new Date().toISOString().slice(0, 10);
+        link.setAttribute("href", url);
+        link.setAttribute("download", `Reporte_Cargas_Familiares_${fechaActual}.csv`);
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+    } catch (err) {
+        console.error("Error al generar el reporte de cargas familiares:", err);
+        alert("Ocurrió un error al intentar descargar el reporte.");
     }
 }
 
