@@ -212,59 +212,114 @@
                 </div>
             </div>
 
-            <div id="view-crear" class="view-section">
-                <div class="card">
-                    <h3>Registrar Nuevo Colaborador en Nómina</h3>
-                    <form id="form-crear-usuario" onsubmit="crearUsuario(event)">
-                        <div class="grid-form">
-                            <div>
-                                <label>Cédula (10 dígitos enteros):</label>
-                                <input type="text" id="c_cedula" required pattern="[0-9]{10}" maxlength="10" placeholder="Ej. 1712345678" oninput="this.value = this.value.replace(/\D/g, '')">
-                            </div>
-                            <div>
-                                <label>Nombre Completo (Respetando Tíldes y Caracteres Especiales):</label>
-<input type="text" id="c_nombre" required placeholder="Ej. ELIZALDE MEJÍA JOSÉ LEONARDO" oninput="this.value = formatearNombre(this.value)" onblur="this.value = limpiarEspaciosNombre(this.value)">                            </div>
-                            <div>
-                                <label>Fecha de Ingreso:</label>
-                                <input type="date" id="c_fecha" required>
-                            </div>
-                        </div>
-                        <div class="grid-form">
-                            <div>
-                                <label>Correo Electrónico (Personal o Empresarial):</label>
-                                <input type="email" id="c_correo" required placeholder="raulperez@gmail.com">
-                            </div>
-                            <div>
-                                <label>Celular (10 dígitos enteros):</label>
-                                <input type="text" id="c_celular" required pattern="[0-9]{10}" maxlength="10" placeholder="Ej. 0998765432" oninput="this.value = this.value.replace(/\D/g, '')">
-                            </div>
-                            <div>
-                                <label>Dirección domiciliaria:</label>
-<input type="text" id="c_direccion" required placeholder="Ej. AV. AMAZONAS #123 - SECTOR NORTE" oninput="this.value = formatearDireccion(this.value)">                            </div>
-                        </div>
-                        <div style="margin-bottom: 1.5rem;">
-                            <label>Foto de Perfil del Empleado:</label>
-                            <input type="file" id="c_foto" accept="image/*" required>
-                        </div>
-                        <button type="submit" class="btn-submit">Guardar en Base de Datos</button>
-                        <!-- ✅ AGREGAR ESTO AQUÍ -->
-<div class="cargando-contenedor" id="carga-crear">
-    <div class="circulo-carga"></div>
-    <span>Guardando colaborador...</span>
-</div>
-                    </form>
+<div id="view-crear" class="view-section">
+    <div class="card">
+        <h3>Registrar Nuevo Colaborador en Nómina</h3>
+        <form id="form-crear-usuario" onsubmit="crearUsuario(event)">
+            <!-- Datos Básicos -->
+            <div class="grid-form">
+                <div>
+                    <label>Cédula (10 dígitos):</label>
+                    <input type="text" id="c_cedula" required pattern="[0-9]{10}" maxlength="10" placeholder="1712345678" oninput="this.value = this.value.replace(/\D/g, '')">
+                </div>
+                <div>
+                    <label>Nombre Completo:</label>
+                    <input type="text" id="c_nombre" required placeholder="ELIZALDE MEJÍA JOSÉ LEONARDO" oninput="this.value = formatearNombre(this.value)" onblur="this.value = limpiarEspaciosNombre(this.value)">
+                </div>
+                <div>
+                    <label>Fecha de Ingreso:</label>
+                    <input type="date" id="c_fecha" required>
                 </div>
             </div>
+            <div class="grid-form">
+                <div>
+                    <label>Correo Electrónico:</label>
+                    <input type="email" id="c_correo" required placeholder="ejemplo@isertel.net">
+                </div>
+                <div>
+                    <label>Celular (10 dígitos):</label>
+                    <input type="text" id="c_celular" required pattern="[0-9]{10}" maxlength="10" placeholder="0998765432" oninput="this.value = this.value.replace(/\D/g, '')">
+                </div>
+                <div>
+                    <label>Dirección domiciliaria:</label>
+                    <input type="text" id="c_direccion" required placeholder="AV. AMAZONAS #123" oninput="this.value = formatearDireccion(this.value)">
+                </div>
+            </div>
+
+            <!-- Contacto de Emergencia -->
+            <h4 style="margin-top: 15px; color: #334155;">🚨 Contacto de Emergencia</h4>
+            <div class="grid-form">
+                <div>
+                    <label>Teléfono Emergencia (10 dígitos):</label>
+                    <input type="text" id="c_emergencia_tel" pattern="[0-9]{10}" maxlength="10" placeholder="0987654321" oninput="this.value = this.value.replace(/\D/g, '')">
+                </div>
+                <div>
+                    <label>Nombre del Contacto:</label>
+                    <input type="text" id="c_emergencia_nom" placeholder="MARÍA PÉREZ">
+                </div>
+                <div>
+                    <label>Parentesco:</label>
+                    <input type="text" id="c_emergencia_par" placeholder="MADRE / ESPOSA">
+                </div>
+            </div>
+
+            <!-- Datos Laborales y Financieros -->
+            <h4 style="margin-top: 15px; color: #334155;">💼 Datos Financieros y Laborales</h4>
+            <div class="grid-form">
+                <div>
+                    <label>Cargas Familiares:</label>
+                    <input type="number" id="c_cargas" min="0" value="0">
+                </div>
+                <div>
+                    <label>Días Vacaciones (+ / -):</label>
+                    <input type="number" step="0.5" id="c_vacaciones" value="0">
+                </div>
+                <div>
+                    <label>Tipo de Contrato:</label>
+                    <select id="c_tipo_contrato" required>
+                        <option value="">-- Seleccione Contrato --</option>
+                    </select>
+                </div>
+            </div>
+            <div class="grid-form">
+                <div>
+                    <label>Cuenta Bancaria:</label>
+                    <input type="text" id="c_cuenta_bancaria" placeholder="1234567890">
+                </div>
+                <div>
+                    <label>Nombre del Banco:</label>
+                    <input type="text" id="c_banco" placeholder="BANCO PICHINCHA">
+                </div>
+                <div>
+                    <label>Tipo de Cuenta:</label>
+                    <select id="c_tipo_cuenta">
+                        <option value="Ahorros">Ahorros</option>
+                        <option value="Corriente">Corriente</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 1.5rem; margin-top: 15px;">
+                <label>Foto de Perfil del Empleado:</label>
+                <input type="file" id="c_foto" accept="image/*" required>
+            </div>
+            <button type="submit" class="btn-submit">Guardar en Base de Datos</button>
+            <div class="cargando-contenedor" id="carga-crear">
+                <div class="circulo-carga"></div>
+                <span>Guardando colaborador...</span>
+            </div>
+        </form>
+    </div>
+</div>
+
+
 
 <div id="view-modificar" class="view-section">
     <div class="card">
         <h3>Modificar Colaborador Activo</h3>
-        <p style="color: #64748b; font-size: 14px; margin-bottom: 1rem;">Corrige de forma directa los detalles o errores de registro de cualquier colaborador en nómina activa.</p>
         
         <div class="grid-form" style="margin-bottom: 1.5rem; background: #f1f5f9; padding: 1rem; border-radius: 8px;">
-            <!-- Forzamos de forma oculta el valor 'nomina' para que tus funciones JS sigan operando correctamente sin romperse -->
             <input type="hidden" id="m_tipo_tabla" value="nomina">
-            
             <div style="grid-column: span 2;">
                 <label style="font-weight: bold;">Seleccionar Colaborador Activo:</label>
                 <select id="m_select_empleado" onchange="cargarDatosEmpleadoEnFormulario()" style="border: 2px solid var(--primary-color);">
@@ -275,14 +330,16 @@
 
         <form id="form-modificar-usuario" onsubmit="actualizarUsuario(event)" style="display: none; border-top: 1px solid #e2e8f0; padding-top: 1.5rem;">
             <input type="hidden" id="m_id">
+            
             <div class="grid-form">
                 <div>
-                    <label>Cédula (10 dígitos enteros):</label>
+                    <label>Cédula (10 dígitos):</label>
                     <input type="text" id="m_cedula" required pattern="[0-9]{10}" maxlength="10" oninput="this.value = this.value.replace(/\D/g, '')">
                 </div>
                 <div>
                     <label>Nombre Completo:</label>
-<input type="text" id="m_nombre" required oninput="this.value = formatearNombre(this.value)" onblur="this.value = limpiarEspaciosNombre(this.value)">                </div>
+                    <input type="text" id="m_nombre" required oninput="this.value = formatearNombre(this.value)" onblur="this.value = limpiarEspaciosNombre(this.value)">
+                </div>
                 <div>
                     <label>Fecha de Ingreso:</label>
                     <input type="date" id="m_fecha" required>
@@ -294,28 +351,78 @@
                     <input type="email" id="m_correo" required>
                 </div>
                 <div>
-                    <label>Celular (10 dígitos enteros):</label>
+                    <label>Celular (10 dígitos):</label>
                     <input type="text" id="m_celular" required pattern="[0-9]{10}" maxlength="10" oninput="this.value = this.value.replace(/\D/g, '')">
                 </div>
                 <div>
                     <label>Dirección domiciliaria:</label>
-<input type="text" id="m_direccion" required oninput="this.value = formatearDireccion(this.value)">
+                    <input type="text" id="m_direccion" required oninput="this.value = formatearDireccion(this.value)">
                 </div>
             </div>
-            <div style="margin-bottom: 1.5rem; background: #f8fafc; padding: 1rem; border-radius: 6px; border: 1px dashed #cbd5e1;">
+
+            <h4 style="margin-top: 15px; color: #334155;">🚨 Contacto de Emergencia</h4>
+            <div class="grid-form">
+                <div>
+                    <label>Teléfono Emergencia (10 dígitos):</label>
+                    <input type="text" id="m_emergencia_tel" pattern="[0-9]{10}" maxlength="10" oninput="this.value = this.value.replace(/\D/g, '')">
+                </div>
+                <div>
+                    <label>Nombre del Contacto:</label>
+                    <input type="text" id="m_emergencia_nom">
+                </div>
+                <div>
+                    <label>Parentesco:</label>
+                    <input type="text" id="m_emergencia_par">
+                </div>
+            </div>
+
+            <h4 style="margin-top: 15px; color: #334155;">💼 Datos Financieros y Laborales</h4>
+            <div class="grid-form">
+                <div>
+                    <label>Cargas Familiares:</label>
+                    <input type="number" id="m_cargas" min="0">
+                </div>
+                <div>
+                    <label>Días Vacaciones (+ / -):</label>
+                    <input type="number" step="0.5" id="m_vacaciones">
+                </div>
+                <div>
+                    <label>Tipo de Contrato:</label>
+                    <select id="m_tipo_contrato" required>
+                        <option value="">-- Seleccione Contrato --</option>
+                    </select>
+                </div>
+            </div>
+            <div class="grid-form">
+                <div>
+                    <label>Cuenta Bancaria:</label>
+                    <input type="text" id="m_cuenta_bancaria">
+                </div>
+                <div>
+                    <label>Nombre del Banco:</label>
+                    <input type="text" id="m_banco">
+                </div>
+                <div>
+                    <label>Tipo de Cuenta:</label>
+                    <select id="m_tipo_cuenta">
+                        <option value="Ahorros">Ahorros</option>
+                        <option value="Corriente">Corriente</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 1.5rem; background: #f8fafc; padding: 1rem; border-radius: 6px; border: 1px dashed #cbd5e1; margin-top: 15px;">
                 <label style="margin-bottom: 8px;">Foto de Perfil actual / Cambiar Foto:</label>
                 <div style="display: flex; align-items: center; gap: 15px;">
                     <img id="m_vista_foto" src="" alt="Perfil" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 1px solid #cbd5e1;">
                     <input type="file" id="m_foto" accept="image/*">
                 </div>
-                <small style="color: #64748b; display: block; margin-top: 6px;">* Dejar vacío si no se desea cambiar la imagen actual.</small>
             </div>
             <button type="submit" class="btn-submit" style="background: #e67e22;">💾 Guardar Cambios Realizados</button>
-            <!-- ✅ AGREGAR ESTO AQUÍ -->
-<div class="cargando-contenedor" id="carga-modificar">
-    <div class="circulo-carga"></div>
-    <span>Actualizando datos...</span>
-</div>
+            <div class="cargando-contenedor" id="carga-modificar">
+                <div class="circulo-carga"></div>
+                <span>Actualizando datos...</span>
+            </div>
         </form>
     </div>
 </div>
@@ -985,6 +1092,8 @@ async function cargarEmpleadosPasivos() {
 async function crearUsuario(e) {
     e.preventDefault();
     const formData = new FormData();
+
+    // Datos básicos
     formData.append('cedula', document.getElementById('c_cedula').value);
     formData.append('nombre_completo', document.getElementById('c_nombre').value);
     formData.append('fecha_ingreso', document.getElementById('c_fecha').value);
@@ -992,8 +1101,20 @@ async function crearUsuario(e) {
     formData.append('celular', document.getElementById('c_celular').value);
     formData.append('direccion', document.getElementById('c_direccion').value);
 
-    
-    // Verificar si hay archivo antes de agregarlo
+    // Contacto de emergencia
+    formData.append('contacto_emergencia_telefono', document.getElementById('c_emergencia_tel').value);
+    formData.append('contacto_emergencia_nombre', document.getElementById('c_emergencia_nom').value);
+    formData.append('contacto_emergencia_parentesco', document.getElementById('c_emergencia_par').value);
+
+    // Datos laborales y financieros
+    formData.append('cargas_familiares', document.getElementById('c_cargas').value);
+    formData.append('vacaciones', document.getElementById('c_vacaciones').value);
+    formData.append('tipo_contrato_id', document.getElementById('c_tipo_contrato').value);
+    formData.append('cuenta_bancaria', document.getElementById('c_cuenta_bancaria').value);
+    formData.append('nombre_banco', document.getElementById('c_banco').value);
+    formData.append('tipo_cuenta', document.getElementById('c_tipo_cuenta').value);
+
+    // Adjuntar foto si existe
     const inputFoto = document.getElementById('c_foto');
     if (inputFoto.files.length > 0) {
         formData.append('foto', inputFoto.files[0]);
@@ -1010,8 +1131,6 @@ async function crearUsuario(e) {
             method: 'POST',
             headers: { 
                 'Authorization': `Bearer ${token}`
-                // ❌ NO agregues 'Content-Type': 'multipart/form-data'
-                // El navegador lo pone automáticamente con el límite correcto
             },
             body: formData
         });
@@ -1020,15 +1139,14 @@ async function crearUsuario(e) {
         if (res.ok) {
             alert("Empleado creado con éxito");
             document.getElementById('form-crear-usuario').reset();
-            cargarEmpleadosActivos();
-            switchView('activos');
+            if (typeof cargarEmpleadosActivos === 'function') cargarEmpleadosActivos();
+            if (typeof switchView === 'function') switchView('activos');
         } else {
             alert("Error: " + (data.error || "Ocurrió un problema desconocido"));
         }
     } catch (err) {
         alert("Error de comunicación con el servidor");
     } finally {
-        // ✅ Siempre se ejecuta, sin importar el resultado
         btnCrear.disabled = false;
         btnCrear.classList.remove('btn-desactivado');
         cargaCrear.style.display = 'none';
@@ -1586,7 +1704,7 @@ async function prepararModuloModificar() {
     }
 }
 
-// Rellena los inputs cuando seleccionas un empleado del dropdown
+// 1. Cargar datos del empleado seleccionado en el formulario de modificación
 function cargarDatosEmpleadoEnFormulario() {
     const idSeleccionado = document.getElementById('m_select_empleado').value;
     const form = document.getElementById('form-modificar-usuario');
@@ -1599,14 +1717,31 @@ function cargarDatosEmpleadoEnFormulario() {
     const emp = empleadosModificarList.find(e => e.id == idSeleccionado);
     if (!emp) return;
 
-    document.getElementById('m_id').value = emp.id;
-    document.getElementById('m_cedula').value = emp.cedula;
-    document.getElementById('m_nombre').value = emp.nombre_completo;
-    document.getElementById('m_correo').value = emp.correo;
-    document.getElementById('m_celular').value = emp.celular;
-    document.getElementById('m_direccion').value = emp.direccion;
+    // Datos básicos
+    document.getElementById('m_id').value = emp.id || '';
+    document.getElementById('m_cedula').value = emp.cedula || '';
+    document.getElementById('m_nombre').value = emp.nombre_completo || '';
+    document.getElementById('m_correo').value = emp.correo || '';
+    document.getElementById('m_celular').value = emp.celular || '';
+    document.getElementById('m_direccion').value = emp.direccion || '';
+
+    // Contacto de emergencia
+    document.getElementById('m_emergencia_tel').value = emp.contacto_emergencia_telefono || '';
+    document.getElementById('m_emergencia_nom').value = emp.contacto_emergencia_nombre || '';
+    document.getElementById('m_emergencia_par').value = emp.contacto_emergencia_parentesco || '';
+
+    // Datos laborales y financieros
+    document.getElementById('m_cargas').value = emp.cargas_familiares ?? 0;
+    document.getElementById('m_vacaciones').value = emp.vacaciones ?? 0;
+    document.getElementById('m_tipo_contrato').value = emp.tipo_contrato_id || '';
+    document.getElementById('m_cuenta_bancaria').value = emp.cuenta_bancaria || '';
+    document.getElementById('m_banco').value = emp.nombre_banco || '';
+    document.getElementById('m_tipo_cuenta').value = emp.tipo_cuenta || 'Ahorros';
+
+    // Foto de perfil
     document.getElementById('m_vista_foto').src = emp.foto_url ? `${API_URL}/imagen/${emp.foto_url}` : 'https://via.placeholder.com/60';
 
+    // Fecha de ingreso
     if (emp.fecha_ingreso) {
         const fechaIso = new Date(emp.fecha_ingreso).toISOString().split('T')[0];
         document.getElementById('m_fecha').value = fechaIso;
@@ -1619,9 +1754,8 @@ function cargarDatosEmpleadoEnFormulario() {
 
 // Envía la petición PUT incluyendo la tabla correspondiente como parámetro de ruta
 async function actualizarUsuario(event) {
-    event.preventDefault(); // ✅ Lo primero de todo
+    event.preventDefault();
 
-    // ✅ AGREGAR AL INICIO DE actualizarUsuario()
     const btnModificar = document.querySelector('#form-modificar-usuario button[type="submit"]');
     const cargaModificar = document.getElementById('carga-modificar');
     btnModificar.disabled = true;
@@ -1629,22 +1763,18 @@ async function actualizarUsuario(event) {
     cargaModificar.style.display = 'flex';
 
     const id = document.getElementById('m_id').value;
-    const tablaTarget = document.getElementById('m_tipo_tabla').value; // 'nomina' o 'pasivos'
+    const tablaTarget = document.getElementById('m_tipo_tabla').value;
 
-    // Validación básica
     if (!id || !tablaTarget) {
         alert("Faltan datos necesarios para la modificación.");
-        // Restaurar antes de salir
         btnModificar.disabled = false;
         btnModificar.classList.remove('btn-desactivado');
         cargaModificar.style.display = 'none';
         return;
     }
 
-    // SEGUNDO CANDADO DE SEGURIDAD: Evita el envío si por alguna razón la tabla es 'pasivos'
     if (tablaTarget === 'pasivos') {
         alert("Acción denegada: No está permitido modificar datos de personal pasivo.");
-        // Restaurar antes de salir
         btnModificar.disabled = false;
         btnModificar.classList.remove('btn-desactivado');
         cargaModificar.style.display = 'none';
@@ -1653,15 +1783,30 @@ async function actualizarUsuario(event) {
 
     const formData = new FormData();
     
+    // Datos básicos
     formData.append('cedula', document.getElementById('m_cedula').value);
     formData.append('nombre_completo', document.getElementById('m_nombre').value);
     formData.append('fecha_ingreso', document.getElementById('m_fecha').value);
     formData.append('correo', document.getElementById('m_correo').value);
     formData.append('celular', document.getElementById('m_celular').value);
     formData.append('direccion', document.getElementById('m_direccion').value);
+
+    // Contacto de emergencia
+    formData.append('contacto_emergencia_telefono', document.getElementById('m_emergencia_tel').value);
+    formData.append('contacto_emergencia_nombre', document.getElementById('m_emergencia_nom').value);
+    formData.append('contacto_emergencia_parentesco', document.getElementById('m_emergencia_par').value);
+
+    // Datos laborales y financieros
+    formData.append('cargas_familiares', document.getElementById('m_cargas').value);
+    formData.append('vacaciones', document.getElementById('m_vacaciones').value);
+    formData.append('tipo_contrato_id', document.getElementById('m_tipo_contrato').value);
+    formData.append('cuenta_bancaria', document.getElementById('m_cuenta_bancaria').value);
+    formData.append('nombre_banco', document.getElementById('m_banco').value);
+    formData.append('tipo_cuenta', document.getElementById('m_tipo_cuenta').value);
     
+    // Adjuntar foto solo si se subió una nueva
     const inputFoto = document.getElementById('m_foto');
-    if (inputFoto.files.length > 0) { // ✅ Más seguro verificar longitud
+    if (inputFoto.files.length > 0) {
         formData.append('foto', inputFoto.files[0]);
     }
 
@@ -1676,8 +1821,7 @@ async function actualizarUsuario(event) {
 
         if (res.ok) {
             alert("¡Registro actualizado con éxito en la base de datos!");
-            prepararModuloModificar(); // Recargar la lista actual
-            
+            if (typeof prepararModuloModificar === 'function') prepararModuloModificar();
             if (typeof cargarEmpleados === 'function') cargarEmpleados();
             if (typeof cargarPasivos === 'function') cargarPasivos();
         } else {
@@ -1687,7 +1831,6 @@ async function actualizarUsuario(event) {
         console.error(err);
         alert("Error de red o servidor al intentar guardar los cambios.");
     } finally {
-        // ✅ SIEMPRE se ejecuta, pase lo que pase
         btnModificar.disabled = false;
         btnModificar.classList.remove('btn-desactivado');
         cargaModificar.style.display = 'none';
@@ -2442,9 +2585,46 @@ async function actualizarUsuarioSistema(event) {
     }
 }
 
+
+// 5. Renderizado en la Cabecera del Expediente
+function renderizarEncabezadoExpediente(emp) {
+    const contenedor = document.getElementById('encabezado-expediente-info');
+    if (!contenedor) return;
+
+    const fechaIngresoFormateada = emp.fecha_ingreso ? new Date(emp.fecha_ingreso).toLocaleDateString('es-EC') : 'N/A';
+    const tipoContrato = emp.tipo_contrato_nombre || 'No asignado';
+
+    contenedor.innerHTML = `
+        <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+            <div style="display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 10px;">
+                <img src="${emp.foto_url ? `/api/imagen/${emp.foto_url}` : 'https://via.placeholder.com/60'}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;">
+                <div>
+                    <h3 style="margin: 0; color: #1e293b;">Expediente: ${emp.nombre_completo}</h3>
+                    <p style="margin: 2px 0 0 0; color: #64748b; font-size: 14px;"><strong>Cédula:</strong> ${emp.cedula} | <strong>Fecha Ingreso:</strong> ${fechaIngresoFormateada}</p>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; font-size: 13px; color: #334155;">
+                <div><strong>📧 Correo:</strong> ${emp.correo || 'N/A'}</div>
+                <div><strong>📱 Celular:</strong> ${emp.celular || 'N/A'}</div>
+                <div><strong>🏠 Dirección:</strong> ${emp.direccion || 'N/A'}</div>
+                <div><strong>📄 Contrato:</strong> ${tipoContrato}</div>
+                <div><strong>👨‍👩‍👧 Cargas Familiares:</strong> ${emp.cargas_familiares ?? 0}</div>
+                <div><strong>🏖️ Días Vacaciones:</strong> ${emp.vacaciones ?? 0}</div>
+                <div><strong>🏦 Banco:</strong> ${emp.nombre_banco || 'N/A'} (${emp.tipo_cuenta || 'N/A'})</div>
+                <div><strong>💳 Cuenta Bancaria:</strong> ${emp.cuenta_bancaria || 'N/A'}</div>
+                <div style="grid-column: span 2;"><strong>🚨 Emergencia:</strong> ${emp.contacto_emergencia_nombre || 'N/A'} (${emp.contacto_emergencia_parentesco || 'N/A'}) - 📞 ${emp.contacto_emergencia_telefono || 'N/A'}</div>
+            </div>
+        </div>
+        <h4 style="margin-bottom: 10px; color: #1e293b;">📥 Selecciona el Tipo de Documento</h4>
+    `;
+}
+
+
 document.addEventListener('DOMContentLoaded', () => {
     cargarDepartamentos();
     cargarUsuariosSistema(); 
+    cargarTiposContrato();
 });
 
 
@@ -2559,6 +2739,29 @@ const esCorreoValido = (email) => {
     const dominio = email.split('@')[1].toLowerCase();
     return dominiosPermitidos.includes(dominio);
 };
+
+let listaContratos = [];
+let listaEmpleadosGlobal = [];
+
+// 1. Cargar tipos de contrato al iniciar el panel
+async function cargarTiposContrato() {
+    try {
+        const res = await fetch('/api/tipos-contrato', {
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        });
+        listaContratos = await res.json();
+
+        const selectCrear = document.getElementById('c_tipo_contrato');
+        const selectMod = document.getElementById('m_tipo_contrato');
+
+        const opcionesHtml = listaContratos.map(c => `<option value="${c.id}">${c.nombre || c.descripcion}</option>`).join('');
+        
+        if (selectCrear) selectCrear.innerHTML = '<option value="">-- Seleccione Contrato --</option>' + opcionesHtml;
+        if (selectMod) selectMod.innerHTML = '<option value="">-- Seleccione Contrato --</option>' + opcionesHtml;
+    } catch (e) {
+        console.error("Error al cargar contratos:", e);
+    }
+}
 
 // Llamarla al inicio
 document.addEventListener('DOMContentLoaded', cargarTiposDocumento);
