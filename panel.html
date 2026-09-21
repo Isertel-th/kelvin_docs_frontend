@@ -686,11 +686,15 @@
     
     
     
-    <div id="modal-expediente" class="modal">
+<div id="modal-expediente" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="cerrarModal()">&times;</span>
-        <h2 id="modal-emp-name" style="margin-top: 0; color: #1e293b; margin-bottom: 4px;">Expediente Digital</h2>
-        <p style="font-weight: bold; color:#64748b; margin-bottom: 0.5rem;">Cédula: <span id="modal-emp-cedula"></span></p>
+        <!-- ✅ REEMPLAZA ESTA SECCIÓN COMPLETA -->
+        <div id="encabezado-expediente-info">
+            <h2 id="modal-emp-name" style="margin-top: 0; color: #1e293b; margin-bottom: 4px;">Expediente Digital</h2>
+            <p style="font-weight: bold; color:#64748b; margin-bottom: 0.5rem;">Cédula: <span id="modal-emp-cedula"></span></p>
+        </div>
+        <!-- ✅ FIN DE LA SECCIÓN A REEMPLAZAR -->
         
         <div id="section-paso1">
             <h3 style="margin-top:0; color:#0f172a; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.75rem; font-size: 16px;">
@@ -1173,10 +1177,42 @@ async function abrirExpediente(id, nombre, cedula, esPasivo) {
     currentSelectedUserPasivo = esPasivo;
     currentSelectedUserName = nombre;
 
-    document.getElementById('modal-emp-name').innerText = `Expediente: ${nombre}`;
-    document.getElementById('modal-emp-cedula').innerText = cedula;
+    // ✅ SOLO PARA COLABORADORES ACTIVOS: Cargar datos completos
+    if (!esPasivo) {
+        try {
+            const res = await fetch(`${API_URL}/admin/empleados`, { 
+                headers: { 'Authorization': `Bearer ${token}` } 
+            });
+            const listaEmpleados = await res.json();
+            const emp = listaEmpleados.find(e => String(e.id) === String(id));
+            
+            if (emp) {
+                // Renderizar encabezado completo con todos los datos
+                renderizarEncabezadoExpediente(emp);
+            } else {
+                // Fallback si no se encuentra
+                document.getElementById('encabezado-expediente-info').innerHTML = `
+                    <h2 id="modal-emp-name" style="margin-top: 0; color: #1e293b; margin-bottom: 4px;">Expediente: ${nombre}</h2>
+                    <p style="font-weight: bold; color:#64748b; margin-bottom: 0.5rem;">Cédula: ${cedula}</p>
+                `;
+            }
+        } catch (err) {
+            console.error("Error cargando datos del colaborador:", err);
+            // Fallback en caso de error
+            document.getElementById('encabezado-expediente-info').innerHTML = `
+                <h2 id="modal-emp-name" style="margin-top: 0; color: #1e293b; margin-bottom: 4px;">Expediente: ${nombre}</h2>
+                <p style="font-weight: bold; color:#64748b; margin-bottom: 0.5rem;">Cédula: ${cedula}</p>
+            `;
+        }
+    } else {
+        // Para pasivos: mostrar solo nombre y cédula
+        document.getElementById('encabezado-expediente-info').innerHTML = `
+            <h2 id="modal-emp-name" style="margin-top: 0; color: #1e293b; margin-bottom: 4px;">Expediente: ${nombre}</h2>
+            <p style="font-weight: bold; color:#64748b; margin-bottom: 0.5rem;">Cédula: ${cedula}</p>
+        `;
+    }
+
     document.getElementById('form-upload-doc').reset();
-    
     document.getElementById('section-paso1').style.display = 'block';
     document.getElementById('expediente-detalles').style.display = 'none';
     document.getElementById('form-upload-doc').style.display = 'none';
@@ -2590,20 +2626,25 @@ async function actualizarUsuarioSistema(event) {
 function renderizarEncabezadoExpediente(emp) {
     const contenedor = document.getElementById('encabezado-expediente-info');
     if (!contenedor) return;
-
-    const fechaIngresoFormateada = emp.fecha_ingreso ? new Date(emp.fecha_ingreso).toLocaleDateString('es-EC') : 'N/A';
+    
+    const fechaIngresoFormateada = emp.fecha_ingreso 
+        ? new Date(emp.fecha_ingreso).toLocaleDateString('es-EC') 
+        : 'N/A';
     const tipoContrato = emp.tipo_contrato_nombre || 'No asignado';
-
+    
     contenedor.innerHTML = `
         <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
             <div style="display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 10px;">
-                <img src="${emp.foto_url ? `/api/imagen/${emp.foto_url}` : 'https://via.placeholder.com/60'}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;">
+                <img src="${emp.foto_url ? `${API_URL}/imagen/${emp.foto_url}` : 'https://via.placeholder.com/60'}" 
+                     style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;">
                 <div>
                     <h3 style="margin: 0; color: #1e293b;">Expediente: ${emp.nombre_completo}</h3>
-                    <p style="margin: 2px 0 0 0; color: #64748b; font-size: 14px;"><strong>Cédula:</strong> ${emp.cedula} | <strong>Fecha Ingreso:</strong> ${fechaIngresoFormateada}</p>
+                    <p style="margin: 2px 0 0 0; color: #64748b; font-size: 14px;">
+                        <strong>Cédula:</strong> ${emp.cedula} | 
+                        <strong>Fecha Ingreso:</strong> ${fechaIngresoFormateada}
+                    </p>
                 </div>
             </div>
-
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; font-size: 13px; color: #334155;">
                 <div><strong>📧 Correo:</strong> ${emp.correo || 'N/A'}</div>
                 <div><strong>📱 Celular:</strong> ${emp.celular || 'N/A'}</div>
@@ -2613,7 +2654,11 @@ function renderizarEncabezadoExpediente(emp) {
                 <div><strong>🏖️ Días Vacaciones:</strong> ${emp.vacaciones ?? 0}</div>
                 <div><strong>🏦 Banco:</strong> ${emp.nombre_banco || 'N/A'} (${emp.tipo_cuenta || 'N/A'})</div>
                 <div><strong>💳 Cuenta Bancaria:</strong> ${emp.cuenta_bancaria || 'N/A'}</div>
-                <div style="grid-column: span 2;"><strong>🚨 Emergencia:</strong> ${emp.contacto_emergencia_nombre || 'N/A'} (${emp.contacto_emergencia_parentesco || 'N/A'}) - 📞 ${emp.contacto_emergencia_telefono || 'N/A'}</div>
+                <div style="grid-column: span 2;">
+                    <strong>🚨 Emergencia:</strong> ${emp.contacto_emergencia_nombre || 'N/A'} 
+                    (${emp.contacto_emergencia_parentesco || 'N/A'}) - 
+                    📞 ${emp.contacto_emergencia_telefono || 'N/A'}
+                </div>
             </div>
         </div>
         <h4 style="margin-bottom: 10px; color: #1e293b;">📥 Selecciona el Tipo de Documento</h4>
