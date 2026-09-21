@@ -2746,9 +2746,16 @@ let listaEmpleadosGlobal = [];
 // 1. Cargar tipos de contrato al iniciar el panel
 async function cargarTiposContrato() {
     try {
-        const res = await fetch('/api/tipos-contrato', {
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        const res = await fetch(`${API_URL}/tipos-contrato`, {
+            headers: { 
+                'Authorization': `Bearer ${typeof token !== 'undefined' ? token : localStorage.getItem('token')}` 
+            }
         });
+
+        if (!res.ok) {
+            throw new Error(`El servidor devolvió estado ${res.status}`);
+        }
+
         listaContratos = await res.json();
 
         const selectCrear = document.getElementById('c_tipo_contrato');
