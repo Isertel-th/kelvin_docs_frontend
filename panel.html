@@ -141,6 +141,27 @@
     cursor: not-allowed;
 }
 
+/* Agrega o corrige en tus estilos CSS / panel.html */
+.modal-editar-colaborador, 
+.form-modificacion {
+    max-width: 650px;
+    width: 90%;
+    margin: 20px auto;
+    padding: 25px;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    box-sizing: border-box;
+}
+
+.form-modificacion input, 
+.form-modificacion select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 12px;
+    box-sizing: border-box;
+}
+
     </style>
 </head>
 <body>
@@ -1070,21 +1091,36 @@ async function cargarEmpleadosActivos() {
         const data = await res.json();
         const tbody = document.getElementById('tbody-activos');
         tbody.innerHTML = '';
+        
         data.forEach(emp => {
-            // ✅ SOLUCIÓN: Usamos nuestra ruta propia + el ID guardado
             const fotoSrc = emp.foto_url ? `${API_URL}/imagen/${emp.foto_url}` : 'https://via.placeholder.com/150';
             
-            tbody.innerHTML += `
-                <tr data-id="${emp.id}" data-nombre="${emp.nombre_completo}" data-cedula="${emp.cedula}" data-pasivo="false" style="cursor: pointer;" title="Doble clic para abrir expediente">
-                    <td><img src="${fotoSrc}" class="emp-thumb" loading="lazy"></td>
-                    <td><strong>${emp.nombre_completo}</strong></td>
-                    <td>${emp.cedula}</td>
-                    <td>${emp.correo}</td>
-                    <td>${emp.celular || 'S/N'}</td>
-                    <td>
-                        ${rol === 'Talento Humano' ? `<button class="btn-action btn-passive" onclick="moverAPasivo('${emp.id}')">⚠️ Liquidar / Mover Pasivo</button>` : ''}
-                    </td>
-                </tr>`;
+            // Creamos el elemento <tr>
+            const tr = document.createElement('tr');
+            tr.dataset.id = emp.id;
+            tr.dataset.nombre = emp.nombre_completo;
+            tr.dataset.cedula = emp.cedula;
+            tr.dataset.pasivo = "false";
+            tr.style.cursor = "pointer";
+            tr.title = "Doble clic para abrir expediente";
+
+            // EVENTO DE DOBLE CLIC
+            tr.ondblclick = function() {
+                abrirExpediente(emp.id, emp.nombre_completo, emp.cedula, false);
+            };
+
+            tr.innerHTML = `
+                <td><img src="${fotoSrc}" class="emp-thumb" loading="lazy"></td>
+                <td><strong>${emp.nombre_completo}</strong></td>
+                <td>${emp.cedula}</td>
+                <td>${emp.correo}</td>
+                <td>${emp.celular || 'S/N'}</td>
+                <td>
+                    ${rol === 'Talento Humano' ? `<button class="btn-action btn-passive" onclick="event.stopPropagation(); moverAPasivo('${emp.id}')">⚠️ Liquidar / Mover Pasivo</button>` : ''}
+                </td>
+            `;
+
+            tbody.appendChild(tr);
         });
     } catch (err) { console.error("Error cargando activos:", err); }
 }
@@ -1095,23 +1131,37 @@ async function cargarEmpleadosPasivos() {
         const data = await res.json();
         const tbody = document.getElementById('tbody-pasivos');
         tbody.innerHTML = '';
+
         data.forEach(emp => {
-            // ✅ SOLUCIÓN: Usamos nuestra ruta propia + el ID guardado
             const fotoSrc = emp.foto_url ? `${API_URL}/imagen/${emp.foto_url}` : 'https://via.placeholder.com/150';
             
-            tbody.innerHTML += `
-                <tr data-id="${emp.id}" data-nombre="${emp.nombre_completo}" data-cedula="${emp.cedula}" data-pasivo="true" style="cursor: pointer;" title="Doble clic para abrir expediente">
-                    <td><img src="${fotoSrc}" class="emp-thumb" loading="lazy"></td>
-                    <td><strong>${emp.nombre_completo}</strong></td>
-                    <td>${emp.cedula}</td>
-                    <td>${emp.correo}</td>
-                    <td>${emp.celular || 'S/N'}</td>
-                    <td></td>
-                </tr>`;
+            // Creamos el elemento <tr>
+            const tr = document.createElement('tr');
+            tr.dataset.id = emp.id;
+            tr.dataset.nombre = emp.nombre_completo;
+            tr.dataset.cedula = emp.cedula;
+            tr.dataset.pasivo = "true";
+            tr.style.cursor = "pointer";
+            tr.title = "Doble clic para abrir expediente";
+
+            // EVENTO DE DOBLE CLIC
+            tr.ondblclick = function() {
+                abrirExpediente(emp.id, emp.nombre_completo, emp.cedula, true);
+            };
+
+            tr.innerHTML = `
+                <td><img src="${fotoSrc}" class="emp-thumb" loading="lazy"></td>
+                <td><strong>${emp.nombre_completo}</strong></td>
+                <td>${emp.cedula}</td>
+                <td>${emp.correo}</td>
+                <td>${emp.celular || 'S/N'}</td>
+                <td></td>
+            `;
+
+            tbody.appendChild(tr);
         });
     } catch (err) { console.error("Error cargando pasivos:", err); }
 }
-
 async function crearUsuario(e) {
     e.preventDefault();
     const formData = new FormData();
