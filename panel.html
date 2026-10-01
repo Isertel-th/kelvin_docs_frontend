@@ -1454,7 +1454,11 @@ async function procesarSubidaDocumento(e) {
     const [anio, mes, dia] = fechaDoc.split('-');
     const fechaFormateadaNombre = `${dia}_${mes}_${anio}`;
 
-    const nuevoNombreArchivo = `${subtipoSaneado}_${fechaFormateadaNombre}.pdf`;
+    
+const cedulaColaborador = document.getElementById('modal-emp-cedula')?.innerText.trim();
+const nuevoNombreArchivo = `${cedulaColaborador}_${subtipoSaneado}_${fechaFormateadaNombre}.pdf`;
+
+
     const archivoRenombrado = new File([archivoInput], nuevoNombreArchivo, { type: archivoInput.type });
 
     const formData = new FormData();
