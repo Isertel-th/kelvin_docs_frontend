@@ -1455,7 +1455,25 @@ async function procesarSubidaDocumento(e) {
     const fechaFormateadaNombre = `${dia}_${mes}_${anio}`;
 
     
-const cedulaColaborador = document.getElementById('modal-emp-cedula')?.innerText.trim();
+// 1. Capturar la cédula limpia del span del modal
+let cedulaColaborador = document.getElementById('modal-emp-cedula')?.innerText.trim();
+
+// 2. Si viene vacía o con texto, extraer únicamente los 10 dígitos numéricos
+if (cedulaColaborador) {
+    const match = cedulaColaborador.match(/\d{10}/);
+    if (match) cedulaColaborador = match[0];
+}
+
+// 3. Si por alguna razón no la encuentra en ese campo, buscarla en la variable global o en la cabecera
+if (!cedulaColaborador || cedulaColaborador.length !== 10) {
+    const cabeceraTexto = document.getElementById('encabezado-expediente-info')?.innerText || '';
+    const matchCabecera = cabeceraTexto.match(/\d{10}/);
+    if (matchCabecera) {
+        cedulaColaborador = matchCabecera[0];
+    }
+}
+
+// 4. Armar el nombre final en el formato exacto: cedula_tipodedocumento_fecha.pdf
 const nuevoNombreArchivo = `${cedulaColaborador}_${subtipoSaneado}_${fechaFormateadaNombre}.pdf`;
 
 
