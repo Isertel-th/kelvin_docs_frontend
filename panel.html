@@ -77,7 +77,13 @@
         }
 
         #section-paso1 { overflow-y: auto; flex-grow: 1; }
-        #expediente-detalles { flex-grow: 1; overflow: hidden; flex-direction: column; }
+        #expediente-detalles { 
+    flex-grow: 1; 
+    overflow-y: auto; /* 👈 Permite el scroll vertical en todo el contenedor de detalles */
+    display: flex; 
+    flex-direction: column; 
+    padding-right: 5px; /* Un pequeño margen para que la barra de scroll no toque el contenido */
+}
         .close-modal { position: absolute; top: 20px; right: 25px; font-size: 28px; cursor: pointer; color: #94a3b8; transition: color 0.2s; }
         .close-modal:hover { color: #475569; }
 
@@ -754,19 +760,19 @@
     </div>
 
 
-            <div class="table-responsive" style="flex-grow: 1; overflow-y: auto; border: 1px solid #cbd5e1; border-radius: 8px; min-height: 150px;">
-                <table class="table-compacta" style="width: 100%;">
-                    <thead>
-                        <tr>
-                            <th>Nombre de Archivo</th>
-                            <th>Fecha Doc.</th>
-                            <th>Ver</th>
-                            <th class="role-admin">Eliminar</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbody-docs-empleado"></tbody>
-                </table>
-            </div>
+<div class="table-responsive" style="border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 1rem;">
+    <table class="table-compacta" style="width: 100%;">
+        <thead style="position: sticky; top: 0; background: #f1f5f9; z-index: 10;">
+            <tr>
+                <th>Nombre de Archivo</th>
+                <th>Fecha Doc.</th>
+                <th>Ver</th>
+                <th class="role-admin">Eliminar</th>
+            </tr>
+        </thead>
+        <tbody id="tbody-docs-empleado"></tbody>
+    </table>
+</div>
 
             <div class="card" style="background: #f1f5f9; padding: 1.25rem; margin-top: 1rem; margin-bottom: 0; border: 1px solid #cbd5e1;">
                 <h4 style="margin: 0 0 0.75rem 0; color: #334155; font-size: 14px;">🔍 Filtros Integrados:</h4>
