@@ -306,6 +306,27 @@
                 </div>
             </div>
 
+            <div class="grid-form">
+    <div>
+        <label>Tipo de Licencia (Opcional):</label>
+        <select id="c_tipo_licencia">
+            <option value="">-- Ninguna / No aplica --</option>
+            <option value="A">Tipo A - Motocicletas y similares</option>
+            <option value="A1">Tipo A1 - Vehículos de dos o tres ruedas de uso comercial/servicio</option>
+            <option value="B">Tipo B - Vehículos livianos particulares</option>
+            <option value="C">Tipo C - Vehículos de servicio comercial</option>
+            <option value="D">Tipo D - Transporte de pasajeros</option>
+            <option value="E">Tipo E - Vehículos pesados y transporte de carga</option>
+            <option value="F">Tipo F - Vehículos adaptados para personas con discapacidad</option>
+            <option value="G">Tipo G - Maquinaria agrícola y maquinaria especial</option>
+        </select>
+    </div>
+    <div>
+        <label>Fecha Caducidad Licencia (Opcional):</label>
+        <input type="date" id="c_fecha_caducidad_licencia">
+    </div>
+</div>
+
             <div style="margin-bottom: 1.5rem; margin-top: 15px;">
                 <label>Foto de Perfil del Empleado:</label>
                 <input type="file" id="c_foto" accept="image/*" required>
@@ -417,6 +438,27 @@
                     </select>
                 </div>
             </div>
+
+            <div class="grid-form">
+    <div>
+        <label>Tipo de Licencia (Opcional):</label>
+        <select id="m_tipo_licencia">
+            <option value="">-- Ninguna / No aplica --</option>
+            <option value="A">Tipo A - Motocicletas y similares</option>
+            <option value="A1">Tipo A1 - Vehículos de dos o tres ruedas de uso comercial/servicio</option>
+            <option value="B">Tipo B - Vehículos livianos particulares</option>
+            <option value="C">Tipo C - Vehículos de servicio comercial</option>
+            <option value="D">Tipo D - Transporte de pasajeros</option>
+            <option value="E">Tipo E - Vehículos pesados y transporte de carga</option>
+            <option value="F">Tipo F - Vehículos adaptados para personas con discapacidad</option>
+            <option value="G">Tipo G - Maquinaria agrícola y maquinaria especial</option>
+        </select>
+    </div>
+    <div>
+        <label>Fecha Caducidad Licencia (Opcional):</label>
+        <input type="date" id="m_fecha_caducidad_licencia">
+    </div>
+</div>
 
             <div style="margin-bottom: 1.5rem; background: #f8fafc; padding: 1rem; border-radius: 6px; border: 1px dashed #cbd5e1; margin-top: 15px;">
                 <label style="margin-bottom: 8px;">Foto de Perfil actual / Cambiar Foto:</label>
@@ -1130,6 +1172,9 @@ async function crearUsuario(e) {
     formData.append('nombre_banco', document.getElementById('c_banco').value);
     formData.append('tipo_cuenta', document.getElementById('c_tipo_cuenta').value);
 
+    formData.append('tipo_licencia', document.getElementById('c_tipo_licencia').value);
+formData.append('fecha_caducidad_licencia', document.getElementById('c_fecha_caducidad_licencia').value);
+
     // Adjuntar foto si existe
     const inputFoto = document.getElementById('c_foto');
     if (inputFoto.files.length > 0) {
@@ -1808,6 +1853,11 @@ function cargarDatosEmpleadoEnFormulario() {
     document.getElementById('m_banco').value = emp.nombre_banco || '';
     document.getElementById('m_tipo_cuenta').value = emp.tipo_cuenta || 'Ahorros';
 
+    document.getElementById('m_tipo_licencia').value = emp.tipo_licencia || '';
+document.getElementById('m_fecha_caducidad_licencia').value = emp.fecha_caducidad_licencia 
+    ? emp.fecha_caducidad_licencia.toString().split('T')[0] 
+    : '';
+
     // Foto de perfil
     document.getElementById('m_vista_foto').src = emp.foto_url ? `${API_URL}/imagen/${emp.foto_url}` : 'https://via.placeholder.com/60';
 
@@ -1873,6 +1923,9 @@ async function actualizarUsuario(event) {
     formData.append('cuenta_bancaria', document.getElementById('m_cuenta_bancaria').value);
     formData.append('nombre_banco', document.getElementById('m_banco').value);
     formData.append('tipo_cuenta', document.getElementById('m_tipo_cuenta').value);
+
+    formData.append('tipo_licencia', document.getElementById('m_tipo_licencia').value);
+formData.append('fecha_caducidad_licencia', document.getElementById('m_fecha_caducidad_licencia').value);
     
     // Adjuntar foto solo si se subió una nueva
     const inputFoto = document.getElementById('m_foto');
@@ -2664,6 +2717,11 @@ function renderizarEncabezadoExpediente(emp) {
     const fechaIngresoFormateada = emp.fecha_ingreso 
         ? new Date(emp.fecha_ingreso).toLocaleDateString('es-EC') 
         : 'N/A';
+
+    const fechaCaducidadLicenciaFormateada = emp.fecha_caducidad_licencia 
+        ? new Date(emp.fecha_caducidad_licencia).toLocaleDateString('es-EC') 
+        : 'N/A';
+
     const tipoContrato = emp.tipo_contrato_nombre || 'No asignado';
     
     contenedor.innerHTML = `
@@ -2684,6 +2742,8 @@ function renderizarEncabezadoExpediente(emp) {
                 <div><strong>📱 Celular:</strong> ${emp.celular || 'N/A'}</div>
                 <div><strong>🏠 Dirección:</strong> ${emp.direccion || 'N/A'}</div>
                 <div><strong>📄 Contrato:</strong> ${tipoContrato}</div>
+                <div><strong>🪪 Tipo Licencia:</strong> ${emp.tipo_licencia || 'N/A'}</div>
+                <div><strong>📅 Caducidad Licencia:</strong> ${fechaCaducidadLicenciaFormateada}</div>
                 <div><strong>👨‍👩‍👧 Cargas Familiares:</strong> ${emp.cargas_familiares ?? 0}</div>
                 <div><strong>🏖️ Días Vacaciones:</strong> ${emp.vacaciones ?? 0}</div>
                 <div><strong>🏦 Banco:</strong> ${emp.nombre_banco || 'N/A'} (${emp.tipo_cuenta || 'N/A'})</div>
